@@ -1,4 +1,4 @@
-/**
+/*
  * wxSRparlab.h 
  * Top level header file for wxSRparlab
  *

@@ -1,4 +1,4 @@
-/**
+/*
  * CamFrame.h
  * Header of the camera frame for wxSRparlab
  *
@@ -18,10 +18,20 @@
 #include "wx/image.h" //!< for wxImages
 
 
-class CamFrame: public wxFrame
+/**
+ * Camera frame class \n
+ * This class: \n
+ * - displays the camera image (s) \n
+ * - displays GUI elements allowing to modify the display \n
+ * - displays GUI elements allowing to modify camera settings \n
+ */
+class CamFrame: public wxFrame //!< Camera frame class
 {
 public:
+	//! constructor
     CamFrame( wxFrame* parentFrm, const wxString& title, const wxPoint& pos, const wxSize& size);
+	
+	//! Close() method
     void OnClose(wxCommandEvent& event);
 
 public:
@@ -29,6 +39,7 @@ public:
     DECLARE_EVENT_TABLE()
 };
 
+//! enum used by the CamFrame class
 enum CamFrameEnum
 {
     ID_Close = 1

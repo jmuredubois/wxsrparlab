@@ -1,4 +1,4 @@
-/**
+/*
  * CMainWnd.h
  * Header of the main window for wxSRparlab
  *
@@ -7,10 +7,13 @@
  */
 
 #pragma once
-#include "wxSRparlab.h" // top-level header file
+#include "wxSRparlab.h" //!< top-level header file
 
-
-class wxSrApp: public wxApp
+/**
+ * Main application class
+ */
+class wxSrApp: public wxApp	//! Main application class
 {
+	//! method called on initialization
     virtual bool OnInit();
 };
