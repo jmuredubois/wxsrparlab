@@ -1,4 +1,4 @@
-/**
+/*
  * CMainWnd.cpp
  * Implementation of the main window for wxSRparlab
  *
@@ -20,7 +20,12 @@ END_EVENT_TABLE()
 IMPLEMENT_APP(wxSrApp)
 
 
-
+/**
+ * Main window construction \n
+ * - the main window is derived from wxFrame \n
+ * - it has no parent \n
+ *
+ */
 MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
 : wxFrame((wxFrame *)NULL, -1, title, pos, size)
 {
@@ -37,17 +42,26 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
     SetMenuBar( menuBar );
 
     CreateStatusBar();
-    SetStatusText( _T("Welcome to wxWindows!") );
+    SetStatusText( _T("Welcome to wxSRparlab!") );
 }
 
+/**
+ * Main window close \n
+ * The method: \n
+ * - calls the wxWindowBase Close() method \n
+ */
 void MainWnd::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
-	
     Close(TRUE);
 }
 
+/**
+ * About Box \n
+ * The method: \n
+ * - displays an info msg using wxMessageBox \n
+ */
 void MainWnd::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
-    wxMessageBox(_T("This is a wxWindows Hello world sample"),
-        _T("About Hello World"), wxOK | wxICON_INFORMATION, this);
+    wxMessageBox(_T("This is a wxWindows SR application sample"),
+        _T("About wxSRparlab"), wxOK | wxICON_INFORMATION, this);
 }
