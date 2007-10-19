@@ -36,3 +36,4 @@
  *  (accessed on 2007.10.19)
  */
 
+#define NUMCAMS 4	//!< number of SR cams
