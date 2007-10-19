@@ -17,7 +17,7 @@ BEGIN_EVENT_TABLE(MainWnd, wxFrame)
     EVT_MENU(ID_About, MainWnd::OnAbout)
 END_EVENT_TABLE()
 
-IMPLEMENT_APP(wxSrApp)
+IMPLEMENT_APP(SrApp)
 
 
 /**
