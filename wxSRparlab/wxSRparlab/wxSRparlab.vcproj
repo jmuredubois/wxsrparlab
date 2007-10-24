@@ -175,6 +175,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CamPanelSettinsgs.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CMainWnd.cpp"
 				>
 			</File>
@@ -190,6 +194,10 @@
 			>
 			<File
 				RelativePath=".\CamFrame.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CamPanelSettings.h"
 				>
 			</File>
 			<File

@@ -17,7 +17,10 @@
  *  - config specific: "$(WXWIN)/include/vc_lib/msvc/" should 
  *    be added to the include path for "setup.h"
  */
-#include "wx/wx.h"    //!< base for wxWindows
+#include "wx/wx.h"			//!< base for wxWindows
+#include "wx/mdi.h"			//!< used for MDI interface
+#include "wx/panel.h"		//!< for panels (used in tabbed interface)
+#include "wx/notebook.h"	//!< for notebook (tabbed interface)
 
 
 /** on win32 machine, wxWidgets needs those 5 libs, \n
