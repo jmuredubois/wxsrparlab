@@ -24,4 +24,6 @@ class CamPanelSettings: public wxPanel //!< Camera frame class
 public:
 	//! constructor
     CamPanelSettings( wxWindow* parent, const wxString& title, const wxPoint& pos, const wxSize& size);
+	//! init settings
+	int InitSettings();
 };

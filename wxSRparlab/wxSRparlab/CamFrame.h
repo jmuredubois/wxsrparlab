@@ -46,5 +46,6 @@ public:
 //! enum used by the CamFrame class
 enum CamFrameEnum
 {
-    ID_Close = 1
+    ID_Close = 1 ,
+	IDB_CLOSE  =2 
 };
