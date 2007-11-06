@@ -60,10 +60,8 @@ bool SrApp::OnInit()
 
 	// temp variables to avoid creating new camFrames on top of each other
 	wxPoint pos = wxPoint(100,100);	// initial position
-	wxPoint pos0 = wxPoint(10,10);	// initial position
 	wxPoint incr = wxPoint(50,50);	// increment in position
-	wxSize	sz = wxSize(176,144);	// size for camFrame
-	wxSize	sz0 = wxSize(10,10);	// size for camFrame
+	wxSize	sz = wxSize(400,300);	// size for camFrame
 	wxString lab;					// title string for camFrame
 	wxString labT;					// title string for camFrame
 	

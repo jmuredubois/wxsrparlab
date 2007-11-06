@@ -42,7 +42,16 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
     SetMenuBar( menuBar );
 
     CreateStatusBar();
-    SetStatusText( _T("Welcome to wxSRparlab!") );
+	wxString strU = wxGetUserName();
+	wxString strM = wxT(" - Welcome ");
+	wxString strP = wxT(" !");
+
+	wxDateTime now = wxDateTime::Now();
+
+	wxString date1 = now.Format();
+    //SetStatusText( _T("Welcome to wxSRparlab!") );
+	wxString strW = date1 + strM + strU + strP;
+	SetStatusText(strW);
 }
 
 /**

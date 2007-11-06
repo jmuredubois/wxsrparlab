@@ -28,7 +28,8 @@ CamFrame::CamFrame(wxFrame* parentFrm, const wxString& title, const wxPoint& pos
 }
 
 BEGIN_EVENT_TABLE(CamFrame, wxFrame)
-    EVT_MENU(ID_Close, CamFrame::OnClose)
+    EVT_MENU(IDM_Close, CamFrame::OnClose)
+	EVT_BUTTON(IDB_CLOSE,  CamFrame::OnClose)
 END_EVENT_TABLE()
 
 /**
@@ -55,6 +56,12 @@ int CamFrame::CreateAndSetNotebook(const wxString& title)
 	_camNB = new wxNotebook(this, -1, wxPoint(-1,-1), wxSize(-1,-1), wxNB_TOP, title);
 
 	_camNB->AddPage(new wxPanel(_camNB), wxString("toto"), FALSE, -1);
-	_camNB->AddPage(new CamPanelSettings(_camNB,wxString("Settings"), wxPoint(-1,-1), wxSize(-1,-1)), wxString("Settings"), FALSE, -1);
+	CamPanelSettings* settingsPane = new CamPanelSettings(_camNB,wxString("Settings"), wxPoint(-1,-1), wxSize(-1,-1));
+	settingsPane->InitSettings();
+	_camNB->AddPage(settingsPane, wxString("Settings"), FALSE, -1);
+	
+	Connect(IDB_CLOSE, wxEVT_COMMAND_BUTTON_CLICKED, 
+		wxCommandEventHandler(CamFrame::OnClose));
+
 	return res;
 }

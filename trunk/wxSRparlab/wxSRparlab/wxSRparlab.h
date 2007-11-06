@@ -21,6 +21,7 @@
 #include "wx/mdi.h"			//!< used for MDI interface
 #include "wx/panel.h"		//!< for panels (used in tabbed interface)
 #include "wx/notebook.h"	//!< for notebook (tabbed interface)
+#include "wx/datetime.h"	//!< for date/time
 
 
 /** on win32 machine, wxWidgets needs those 5 libs, \n
