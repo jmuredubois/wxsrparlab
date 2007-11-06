@@ -22,6 +22,7 @@
 #include "wx/panel.h"		//!< for panels (used in tabbed interface)
 #include "wx/notebook.h"	//!< for notebook (tabbed interface)
 #include "wx/datetime.h"	//!< for date/time
+#include "wx/stattext.h"	//!< for static text
 
 
 /** on win32 machine, wxWidgets needs those 5 libs, \n

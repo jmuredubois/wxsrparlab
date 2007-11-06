@@ -26,4 +26,31 @@ public:
     CamPanelSettings( wxWindow* parent, const wxString& title, const wxPoint& pos, const wxSize& size);
 	//! init settings
 	int InitSettings();
+	void SetText(wxString text); //!< Sets the text in SR setting panel
+
+	/* Opening and closing */
+	void DisableOpenSR(); //!< Disables the "OpenSR" button
+	void EnableOpenSR();  //!< Enables the "OpenSR" button
+	void DisableCloseSR(); //!< Disables the "CloseSR" button
+	void EnableCloseSR();  //!< Enables the "CloseSR" button
+
+	/* Disabling and enabling other controls */
+	void CamPanelSettings::DisableRadioFrq(); //!< Disables the frequency radio panel
+	void CamPanelSettings::EnableRadioFrq();  //!< Enables the frequency radio panel
+	void CamPanelSettings::DisableRadioFilt(); //!< Disables the filter radio panel
+	void CamPanelSettings::EnableRadioFilt();  //!< Enables the fliter radio panel
+
+
+private:
+
+	/* Buttons */
+	wxButton* m_buttonOpenDev; //!< Open camera
+	wxButton* m_buttonCloseDev; //!< Close camera
+
+	/* Buttons */
+	wxRadioBox* m_radioboxFrq;	//!< camera frq
+	wxRadioBox* m_radioboxSrFilt;	//!< libusbSR filtering
+
+	/* Text zones */
+	wxStaticText* m_statText;
 };
