@@ -35,9 +35,12 @@ public:
 	//! Close() method
     void OnClose(wxCommandEvent& event);
 	int CreateAndSetNotebook(const wxString& title); //!< creates a new Notebook
+	void OnOpenDev(wxCommandEvent& WXUNUSED(event));
+	void OnCloseDev(wxCommandEvent& WXUNUSED(event));
 
 private:
-	wxNotebook* _camNB; //!< a notebook interface
+	wxNotebook* m_camNB; //!< a notebook interface
+	CamPanelSettings* m_settingsPane;
 
 public:
     DECLARE_EVENT_TABLE()
@@ -46,6 +49,10 @@ public:
 //! enum used by the CamFrame class
 enum CamFrameEnum
 {
-    ID_Close = 1 ,
-	IDB_CLOSE  =2 
+    IDM_Close = 1 ,
+	IDB_CLOSE = 2 ,
+	IDS_TEXT  = 3 ,
+	IDB_OpenDev = 4,
+	IDB_CloseDev = 5,
+	ID_ThisIsAStop = 255
 };
