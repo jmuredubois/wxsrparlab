@@ -25,6 +25,7 @@ CamFrame::CamFrame(wxFrame* parentFrm, const wxString& title, const wxPoint& pos
     SetStatusText( _T("cam") );
 
 	m_camNB = NULL;
+	m_sr = NULL;
 }
 
 BEGIN_EVENT_TABLE(CamFrame, wxFrame)
@@ -39,6 +40,11 @@ END_EVENT_TABLE()
  */
 void CamFrame::OnClose(wxCommandEvent& WXUNUSED(event))
 {
+	int res;
+	if(m_sr != NULL)
+	{
+		res = SR_Close(m_sr);
+	}
 	// - calls the wxWindowBase Close() method \n
     Close(TRUE);
 }
@@ -59,7 +65,7 @@ int CamFrame::CreateAndSetNotebook(const wxString& title)
 	m_camNB->AddPage(new wxPanel(m_camNB), wxString("toto"), FALSE, -1);
 	m_settingsPane = new CamPanelSettings(m_camNB,wxString("Settings"), wxPoint(-1,-1), wxSize(-1,-1));
 	m_settingsPane->InitSettings();
-	m_camNB->AddPage(m_settingsPane, wxString("Settings"), FALSE, -1);
+	m_camNB->AddPage(m_settingsPane, wxString("Settings"), TRUE, -1);
 	
 	Connect(IDB_CLOSE, wxEVT_COMMAND_BUTTON_CLICKED, 
 		wxCommandEventHandler(CamFrame::OnClose));
@@ -88,7 +94,21 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   m_settingsPane->EnableRadioFilt();	// ensable filter selection
   m_settingsPane->EnableRadioFrq();		// enable frequency selection
   m_settingsPane->EnableCloseSR();	// enable "Close" button
-  m_settingsPane->SetText(wxT("Open successfull"));
+  wxString strR;
+  if(m_sr == NULL)
+  {
+	  res = -1;
+		res = SR_OpenUSB(& m_sr);
+		//Returns the serial number (if existing) of the camera
+  }
+  strR.sprintf(wxT("cam open %i"), res); // ... change title text ...
+  if(m_sr != NULL)
+  {
+	  res =  SR_ReadSerial(m_sr); 
+	  strR.sprintf(wxT("cam serial %i"), res); // ... change title text ...
+  }
+  m_settingsPane->SetText(strR);
+  //m_settingsPane->SetText(wxT("Open successfull"));
 }
 
 //---------------------------------------------------
@@ -108,6 +128,11 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   m_settingsPane->DisableCloseSR();		// disable "Close" button
   m_settingsPane->DisableRadioFilt();	// disable filter selection
   m_settingsPane->DisableRadioFrq();	// disable frequency selection
+  if(m_sr != NULL)
+  {
+		res = SR_Close(m_sr);
+		m_sr = NULL;
+  }
   m_settingsPane->EnableOpenSR();	// enable "Open" button
   m_settingsPane->SetText(wxT("Close successfull"));
 }

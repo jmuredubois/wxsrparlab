@@ -8,6 +8,15 @@
 
 #pragma once
 
+//#define DUMMYSR //!< use this flag to disable SR fcts
+
+#ifndef DUMMYSR
+	#include "libusbSR.h"
+	#pragma comment( lib, "libusbSR" )
+#else
+    #include "srDummy.h"
+#endif
+
 #define wxUSE_GUI 1		//!< using wxWidgets GUI components
 #define __WXDEBUG__		//!< using debug version of wxWidgets
 
