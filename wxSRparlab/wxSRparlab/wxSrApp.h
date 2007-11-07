@@ -3,7 +3,7 @@
  * Header of the main window for wxSRparlab
  *
  * @author: James Mure-Dubois
- * @version: 2007.10.24
+ * @version: 2007.11.06
  */
 
 #pragma once

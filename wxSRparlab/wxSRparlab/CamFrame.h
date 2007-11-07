@@ -13,6 +13,7 @@
 #include "CamPanelSettings.h" //!< camera settings panel header file
 
 
+
 /** the environment variable WXWIN should point to a valid wxWidget 
  *  installation /n
  * "$(WXWIN)/include"    should be added to the include path
@@ -39,6 +40,7 @@ public:
 	void OnCloseDev(wxCommandEvent& WXUNUSED(event));
 
 private:
+	SRCAM	m_sr;	// pointer for SR camera
 	wxNotebook* m_camNB; //!< a notebook interface
 	CamPanelSettings* m_settingsPane;
 
