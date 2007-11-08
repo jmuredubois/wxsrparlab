@@ -3,7 +3,7 @@
  * Implementation of the camera frame for wxSRparlab
  *
  * @author: James Mure-Dubois
- * @version: 2007.11.07
+ * @version: 2007.11.08
  */
 
 #include "wxSRparlab.h" //!< top-level header file
@@ -65,17 +65,16 @@ int CamFrame::CreateAndSetNotebook(const wxString& title)
 	//m_camNB->AddPage(new wxPanel(m_camNB), wxString("toto"), FALSE, -1);
 
 	// %%%%%%%
-	m_settingsPane = new CamPanelSettings(m_camNB,wxString("Settings"), wxPoint(-1,-1), wxSize(-1,-1));
+	m_settingsPane = new CamPanelSettings(m_camNB,wxT("Settings"), wxPoint(-1,-1), wxSize(-1,-1));
 	m_settingsPane->InitSettings();
-	m_camNB->AddPage(m_settingsPane, wxString("Settings"), TRUE, -1);
+	m_camNB->AddPage(m_settingsPane, wxT("Settings"), TRUE, -1);
 
 	// %%%%%%
-	m_viewRangePane = new CamViewRange(m_camNB,wxString("Range"), wxPoint(-1,-1), wxSize(100,100));
+	m_viewRangePane = new CamViewData(m_camNB,wxT("Range"), wxPoint(-1,-1), wxSize(100,100));
 	m_viewRangePane->InitViewRange();
-	m_camNB->AddPage(m_viewRangePane, wxString("Range"), TRUE, -1);
+	m_camNB->AddPage(m_viewRangePane, wxT("Range"), TRUE, -1);
 	
-	Connect(IDB_CLOSE, wxEVT_COMMAND_BUTTON_CLICKED, 
-		wxCommandEventHandler(CamFrame::OnClose));
+	//Connect(IDB_CLOSE, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CamFrame::OnClose));
 
 	return res;
 }

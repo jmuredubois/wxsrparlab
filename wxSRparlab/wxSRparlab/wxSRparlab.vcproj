@@ -182,7 +182,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CamViewRange.cpp"
+				RelativePath=".\CamViewData.cpp"
 				>
 			</File>
 			<File
@@ -208,7 +208,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CamViewRange.h"
+				RelativePath=".\CamViewData.h"
 				>
 			</File>
 			<File

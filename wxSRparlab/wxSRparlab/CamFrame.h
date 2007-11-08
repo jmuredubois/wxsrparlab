@@ -3,7 +3,7 @@
  * Header of the camera frame for wxSRparlab
  *
  * @author: James Mure-Dubois
- * @version: 2007.11.07
+ * @version: 2007.11.08
  */
 
 #pragma once
@@ -11,7 +11,7 @@
 #include "wxSrApp.h"	//!< application header file
 #include "CMainWnd.h"	//!< main window header file
 #include "CamPanelSettings.h" //!< camera settings panel header file
-#include "CamViewRange.h" //!< camera view panel header file
+#include "CamViewData.h" //!< camera view panel header file
 
 
 
@@ -44,7 +44,7 @@ private:
 	SRCAM	m_sr;	// pointer for SR camera
 	wxNotebook* m_camNB; //!< a notebook interface
 	CamPanelSettings* m_settingsPane;
-	CamViewRange* m_viewRangePane;
+	CamViewData* m_viewRangePane;
 
 public:
     DECLARE_EVENT_TABLE()
