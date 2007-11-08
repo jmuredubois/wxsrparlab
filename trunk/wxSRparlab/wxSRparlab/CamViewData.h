@@ -37,9 +37,11 @@ public:
 	/* Drawing bitmap */
 	void Draw( wxDC& dc );
 
-	/* */
+	/* Mapping ushort data*/
 	int MapUshort2rgb();
 	
+	/* Copying data to display */
+	int SetUshortData( unsigned short * buf, int numPix);
 
 private:
 

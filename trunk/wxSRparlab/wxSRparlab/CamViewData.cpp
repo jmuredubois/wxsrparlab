@@ -118,15 +118,14 @@ CamViewData::CamViewData(wxWindow* parent, const wxString& title, const wxPoint&
 	/* Endof: Gray ramps */
 
 
-	// convert data from raw image to wxImg 
-	m_pWxImg = wxImage( m_nDataWidth, m_nDataHeight, m_pRGB, TRUE );
-	m_pWxImg.SetAlpha( m_pAlpha, TRUE);
-	// convert to bitmap to be used by the window to draw
-	m_pBitmap = wxBitmap( m_pWxImg.Scale(m_nDataWidth, m_nDataHeight) );
+	//// convert data from raw image to wxImg 
+	//m_pWxImg = wxImage( m_nDataWidth, m_nDataHeight, m_pRGB, TRUE );
+	//m_pWxImg.SetAlpha( m_pAlpha, TRUE);
+	//// convert to bitmap to be used by the window to draw
+	//m_pBitmap = wxBitmap( m_pWxImg.Scale(m_nDataWidth, m_nDataHeight) );
 }
 /**
- * Camera settings panel class constructor \n
- * Each instance must have a parent wnd (usually a notebook) \n
+ * Camera view panel class destructor \n
  */
 CamViewData::~CamViewData()
 {
@@ -280,5 +279,26 @@ int CamViewData::MapUshort2rgb()
 		memcpy( (void*) curPix, (const void*) curCol, m_nComp);
 	}
 
+	// convert data from raw image to wxImg 
+	m_pWxImg = wxImage( m_nDataWidth, m_nDataHeight, m_pRGB, TRUE );
+	m_pWxImg.SetAlpha( m_pAlpha, TRUE);
+	// convert to bitmap to be used by the window to draw
+	m_pBitmap = wxBitmap( m_pWxImg.Scale(m_nDataWidth, m_nDataHeight) );
+
 	return res;
 };
+
+
+/* Copying data to display */
+int CamViewData::SetUshortData( unsigned short * buf, int numPix)
+{
+	int res= 0;
+	if(buf == NULL){return -1;};
+	if(numPix*sizeof(unsigned short) > m_nDataWidth * m_nDataHeight *sizeof(unsigned short)){return -2;};
+	if(m_pDataArray == NULL){return -3;};
+
+	memcpy( (void*) m_pDataArray, (const void*) buf, numPix*sizeof(unsigned short));
+	MapUshort2rgb();
+
+	return res;
+}

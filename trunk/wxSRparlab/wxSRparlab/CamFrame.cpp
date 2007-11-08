@@ -26,6 +26,17 @@ CamFrame::CamFrame(wxFrame* parentFrm, const wxString& title, const wxPoint& pos
 
 	m_camNB = NULL;
 	m_sr = NULL;
+	m_pSrBuf = NULL; m_nRows = 0; m_nCols = 0; m_nSrBufSz = 0;
+}
+
+/**
+ * Camera frame class destructor \n
+ */
+CamFrame::~CamFrame()
+{
+	int res = -1;
+	if(m_sr		  != NULL) { res = SR_Close(m_sr);	m_sr = NULL; };
+	if(m_pSrBuf   != NULL) { free((void*) m_pSrBuf  ); m_pSrBuf   = NULL; };
 }
 
 BEGIN_EVENT_TABLE(CamFrame, wxFrame)
@@ -101,6 +112,7 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   m_settingsPane->EnableRadioFrq();		// enable frequency selection
   m_settingsPane->EnableCloseSR();	// enable "Close" button
   wxString strR;
+  int serial = 0;
   if(m_sr == NULL)
   {
 	  res = -1;
@@ -110,8 +122,20 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   strR.sprintf(wxT("cam open %i"), res); // ... change title text ...
   if(m_sr != NULL)
   {
-	  res =  SR_ReadSerial(m_sr); 
-	  strR.sprintf(wxT("cam serial %i"), res); // ... change title text ...
+	  serial =  SR_ReadSerial(m_sr); 
+	  strR.sprintf(wxT("cam serial %i"), serial); // ... change title text ...
+  }
+  if(m_sr != NULL)
+  {
+	  m_nSrBufSz = (int) SR_GetBufferSize(m_sr); 
+	  m_nCols = (int) SR_GetCols(m_sr); 
+	  m_nRows = (int) SR_GetRows(m_sr); 
+	  strR.sprintf(wxT("cam serial %i - %ix%i  - %i"), serial, m_nRows, m_nCols, m_nSrBufSz); // ... change text ...
+	  m_pSrBuf = (unsigned char*) malloc(m_nSrBufSz);
+	  memset(m_pSrBuf, 0x77, m_nSrBufSz);
+	  res = SR_SetBuffer(m_sr, (void*) m_pSrBuf , m_nSrBufSz);
+	  res = SR_Acquire(m_sr, AM_COR_FIX_PTRN || AM_COR_LED_NON_LIN );
+	  res = m_viewRangePane->SetUshortData((unsigned short*) m_pSrBuf, m_nRows*m_nCols);
   }
   m_settingsPane->SetText(strR);
   //m_settingsPane->SetText(wxT("Open successfull"));
@@ -138,6 +162,9 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   {
 		res = SR_Close(m_sr);
 		m_sr = NULL;
+		m_nSrBufSz = 0; 
+		m_nCols = 0; 
+		m_nRows = 0; 
   }
   m_settingsPane->EnableOpenSR();	// enable "Open" button
   m_settingsPane->SetText(wxT("Close successfull"));

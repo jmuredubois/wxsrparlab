@@ -34,6 +34,8 @@ class CamFrame: public wxFrame //!< Camera frame class
 public:
 	//! constructor
     CamFrame( wxFrame* parentFrm, const wxString& title, const wxPoint& pos, const wxSize& size);
+	//! destructor
+	~CamFrame();
 	//! Close() method
     void OnClose(wxCommandEvent& event);
 	int CreateAndSetNotebook(const wxString& title); //!< creates a new Notebook
@@ -42,6 +44,11 @@ public:
 
 private:
 	SRCAM	m_sr;	// pointer for SR camera
+	//! buffer where the SR camera will return the data
+	unsigned char       *m_pSrBuf;
+	int m_nSrBufSz ;
+	int m_nRows;
+	int m_nCols;
 	wxNotebook* m_camNB; //!< a notebook interface
 	CamPanelSettings* m_settingsPane;
 	CamViewData* m_viewRangePane;
