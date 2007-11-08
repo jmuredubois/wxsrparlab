@@ -41,6 +41,7 @@ public:
 	int CreateAndSetNotebook(const wxString& title); //!< creates a new Notebook
 	void OnOpenDev(wxCommandEvent& WXUNUSED(event));
 	void OnCloseDev(wxCommandEvent& WXUNUSED(event));
+	void Acquire(wxCommandEvent& WXUNUSED(event));
 
 private:
 	SRCAM	m_sr;	// pointer for SR camera
@@ -65,5 +66,6 @@ enum CamFrameEnum
 	IDS_TEXT  = 3 ,
 	IDB_OpenDev = 4,
 	IDB_CloseDev = 5,
+	IDB_Acquire = 6, 
 	ID_ThisIsAStop = 255
 };
