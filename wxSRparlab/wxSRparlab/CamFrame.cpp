@@ -71,7 +71,7 @@ int CamFrame::CreateAndSetNotebook(const wxString& title)
 
 	// %%%%%%
 	m_viewRangePane = new CamViewData(m_camNB,wxT("Range"), wxPoint(-1,-1), wxSize(100,100));
-	m_viewRangePane->InitViewRange();
+	m_viewRangePane->InitViewData();
 	m_camNB->AddPage(m_viewRangePane, wxT("Range"), TRUE, -1);
 	
 	//Connect(IDB_CLOSE, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CamFrame::OnClose));

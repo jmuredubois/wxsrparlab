@@ -15,7 +15,7 @@
 
 // implement message map
 BEGIN_EVENT_TABLE(CamViewData, wxPanel)
-	EVT_BUTTON(IDB_CloseViewRange,  CamViewData::CloseView)
+	EVT_BUTTON(IDB_CloseViewData,  CamViewData::CloseView)
 	EVT_SIZE( CamViewData::OnSize ) 
 	EVT_PAINT( CamViewData::OnPaint)
 END_EVENT_TABLE()
@@ -29,26 +29,54 @@ CamViewData::CamViewData(wxWindow* parent, const wxString& title, const wxPoint&
 : wxPanel(parent, wxID_ANY, pos, size, wxBORDER_NONE, title)
 {
 	// set my canvas width/height
-	m_nWidth = size.GetWidth( );
-	m_nHeight = size.GetHeight( );
+	/*m_nWidth = size.GetWidth( );
+	m_nHeight = size.GetHeight( );*/
 	m_bDrawing = false;
 	m_bNewImage = true;
 
+	m_nComp = NCOMP;
+	m_nLUTlen = LUTLEN;
+
+	m_pLUT = (unsigned char*) malloc(m_nComp* m_nLUTlen *sizeof(unsigned char));
+	memset((void*) m_pLUT, 0x77, m_nComp* m_nLUTlen *sizeof(unsigned char));
+
+	int i, c; // variables used in loops
+
+	/* Debug: gray ramp */
+	c = 0; unsigned char R, G, B;
+	R = 0; G = 0; B = 0;
+	for(i = 0 ; i <(m_nLUTlen); i++)
+	{
+		m_pLUT[m_nComp*i+0] = R;
+		m_pLUT[m_nComp*i+1] = G;
+		m_pLUT[m_nComp*i+2] = B;
+		c +=1;
+		if (c >= m_nLUTlen)
+		{
+			c = 0;
+		}
+		R=c;G=c;B=c;
+	}
+	/* ENDOF Debug: gray ramp */
+	
 	m_nDataWidth = 176;
 	m_nDataHeight = 144;
-	int nComp = 3;
-	m_pRGB = (unsigned char*) malloc(nComp* m_nDataWidth * m_nDataHeight *sizeof(unsigned char));
-	memset((void*) m_pRGB, 0x77, nComp* m_nDataWidth * m_nDataHeight *sizeof(unsigned char));
+	
+	m_pRGB = (unsigned char*) malloc(m_nComp* m_nDataWidth * m_nDataHeight *sizeof(unsigned char));
+	memset((void*) m_pRGB, 0x77, m_nComp* m_nDataWidth * m_nDataHeight *sizeof(unsigned char));
 	m_pAlpha = (unsigned char*) malloc( m_nDataWidth * m_nDataHeight *sizeof(unsigned char));
 	memset((void*) m_pAlpha, 0x77, m_nDataWidth * m_nDataHeight *sizeof(unsigned char));
 
+	/* Debug: 3ramps /
 	int c = 0; int r = 0; unsigned char R, G, B;
 	R = 0; G = 0; B = 0;
-	for(int i = 0 ; i <(m_nDataWidth * m_nDataHeight); i++)
+	/* ENDOF Debug: 3ramps */
+	for(i = 0 ; i <(m_nDataWidth * m_nDataHeight); i++)
 	{
-		m_pRGB[3*i+0] = R;
-		m_pRGB[3*i+1] = G;
-		m_pRGB[3*i+2] = B;
+		/* Debug: 3ramps /
+		m_pRGB[m_nComp*i+0] = R;
+		m_pRGB[m_nComp*i+1] = G;
+		m_pRGB[m_nComp*i+2] = B;
 		c +=1;
 		if (c >= m_nDataWidth)
 		{
@@ -58,14 +86,38 @@ CamViewData::CamViewData(wxWindow* parent, const wxString& title, const wxPoint&
 		if(r < (m_nDataHeight /3)) {R=c;G=0;B=0;}
 		else{if(r < (m_nDataHeight *2/3)) {R=0;G=c;B=0;}
 		else{R=0;G=0;B=c;} } ;
-		/*m_pRGB[3*i+0] = (unsigned char) 0x00; 
+		/* ENDOF Debug: 3ramps */
+		/* Debug: blueScreen /
+		m_pRGB[3*i+0] = (unsigned char) 0x00; 
 		m_pRGB[3*i+1] = (unsigned char) 0x00;
-		m_pRGB[3*i+2] = (unsigned char) 0xFF; */ /* Debug: blueScreen */ 
+		m_pRGB[3*i+2] = (unsigned char) 0xFF;  
+		/* ENDOF Debug: blueScreen */ 
+
 		m_pAlpha[i] = (unsigned char) 0xFF; // alpha to 1.0
 	}
 
+	m_pDataArray = (void*) malloc( m_nDataWidth * m_nDataHeight *sizeof(unsigned short));
+	memset((void*) m_pDataArray, 0x77, m_nDataWidth * m_nDataHeight *sizeof(unsigned short));
 
-	bool toto; // DEBUG variable
+	unsigned short *data = (unsigned short*) m_pDataArray;
+
+	/* Debug: Gray ramps */
+	c = 0;
+	for(i = 0 ; i <(m_nDataWidth * m_nDataHeight); i++)
+	{
+		data[i] = c;
+		c +=1;
+		if (c >= 25344)
+		{
+			c = 0;
+		}
+	}
+	m_dValMin = 0.0;
+	m_dValMax = 25344.0;
+	int toto = MapUshort2rgb();
+	/* Endof: Gray ramps */
+
+
 	// convert data from raw image to wxImg 
 	m_pWxImg = wxImage( m_nDataWidth, m_nDataHeight, m_pRGB, TRUE );
 	m_pWxImg.SetAlpha( m_pAlpha, TRUE);
@@ -80,23 +132,25 @@ CamViewData::~CamViewData()
 {
 	if(m_pRGB   != NULL) { free((void*) m_pRGB  ); m_pRGB   = NULL; };
 	if(m_pAlpha != NULL) { free((void*) m_pAlpha); m_pAlpha = NULL; };
+	if(m_pLUT   != NULL) { free((void*) m_pLUT  ); m_pLUT   = NULL; };
+	if(m_pDataArray != NULL) { free((void*) m_pDataArray ); m_pDataArray = NULL; };
 }
 
 /**
  * 
  */
-int CamViewData::InitViewRange()
+int CamViewData::InitViewData()
 {
 	int res = 0;
 
-	m_buttonCloseView = new wxButton(this, IDB_CloseViewRange, wxT("Close"));
-	m_buttonStopView = new wxButton(this, IDB_FreezeViewRange, wxT("Freeze"));
+	m_buttonCloseView = new wxButton(this, IDB_CloseViewData, wxT("Close"));
+	m_buttonStopView = new wxButton(this, IDB_FreezeViewData, wxT("Freeze"));
 	m_buttonStopView->SetFocus();
 	  wxBoxSizer *sizerButtons = new wxBoxSizer(wxHORIZONTAL);
 	    sizerButtons->Add(m_buttonCloseView, 1, wxEXPAND);
 	    sizerButtons->Add(m_buttonStopView, 1, wxEXPAND);
 
-	//Connect(IDB_CloseViewRange, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CamViewData::CloseView));
+	//Connect(IDB_CloseViewData, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CamViewData::CloseView));
 
 
 	wxString types[] = { wxT("Range"), wxT("Amp"), wxT("z"),
@@ -110,7 +164,7 @@ int CamViewData::InitViewRange()
 	m_DrawPanel = new wxPanel(this, IDP_DrawPanel, wxPoint(-1, -1), wxSize(176, 144));
 	  wxBoxSizer *sizerText = new wxBoxSizer(wxHORIZONTAL);
 	    sizerText->Add(m_textMin, 1, wxEXPAND);
-		sizerText->Add(m_DrawPanel);
+		sizerText->Add(m_DrawPanel, 1, wxEXPAND);
 	    sizerText->Add(m_textMax, 1, wxEXPAND);
 
 	/* sizer stuff  ...*/
@@ -151,8 +205,8 @@ void CamViewData::OnSize( wxSizeEvent& even )
 	int nWidth = even.GetSize().GetWidth();
 	int nHeight = even.GetSize().GetHeight();
 
-	m_nWidth = nWidth;
-	m_nHeight = nHeight;
+	/*m_nWidth = nWidth;
+	m_nHeight = nHeight;*/
 	even.Skip();		// allow automatic handling of event
 
 }
@@ -200,3 +254,31 @@ void CamViewData::Draw( wxDC& dc )
 
 	return;
 }
+
+//! maps to RGB
+int CamViewData::MapUshort2rgb()
+{
+	int res = 0;
+	if(m_pLUT       == NULL){return -1;};
+	if(m_pRGB       == NULL){return -2;};
+	if(m_pDataArray == NULL){return -3;};
+
+	unsigned short* data = (unsigned short*) m_pDataArray;
+	double invDyn = 1.0/ (m_dValMax - m_dValMin) * ( (double) m_nLUTlen);
+
+	int val = 0;
+	unsigned char *curPix, *curCol;
+	for(int i = 0 ; i <(m_nDataWidth * m_nDataHeight); i++)
+	{
+		val = (int)floor(( ((double)data[i]) - m_dValMin ) * invDyn );
+		if(val <0){ val = 0;}
+		if(val > (m_nLUTlen-1) ) {val = (m_nLUTlen-1) ;}
+
+
+		curPix = &m_pRGB[m_nComp*i+0];
+		curCol = &m_pLUT[m_nComp*val];
+		memcpy( (void*) curPix, (const void*) curCol, m_nComp);
+	}
+
+	return res;
+};
