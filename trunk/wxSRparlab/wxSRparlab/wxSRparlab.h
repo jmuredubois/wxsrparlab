@@ -54,4 +54,6 @@
  *  (accessed on 2007.10.19)
  */
 
+#include <math.h>
+
 #define NUMCAMS 4	//!< number of SR cams

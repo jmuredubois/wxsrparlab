@@ -12,7 +12,8 @@
 #include "CMainWnd.h"	//!< main window header file
 #include "CamFrame.h"	//!< cam  window header file
 
-
+#define LUTLEN 256	// color LUT length
+#define NCOMP 3		// number of components (RGB)
 
 /**
  * Camera settings panel class \n
@@ -27,12 +28,17 @@ public:
 	//! destructor
 	~CamViewData();
 	//! init settings
-	int InitViewRange();
+	int InitViewData();
 
 	/* Opening and closing */
 	void CloseView(wxCommandEvent& WXUNUSED(event)); //!< Closes the display
 	void StopView(wxCommandEvent& WXUNUSED(event));  //!< Disables the display
+
+	/* Drawing bitmap */
 	void Draw( wxDC& dc );
+
+	/* */
+	int MapUshort2rgb();
 	
 
 private:
@@ -64,10 +70,19 @@ private:
 	void	OnSize( wxSizeEvent& even );
 
 	//
-	unsigned char *m_pRGB;	// RGB buffer
+	unsigned char *m_pRGB;		// RGB buffer
 	unsigned char *m_pAlpha;	// alpha buffer
-	int m_nDataWidth;
-	int m_nDataHeight;
+	unsigned char *m_pLUT;		// color LUT
+	int m_nLUTlen;				// color LUT length
+	int m_nComp;				// number of components (RGB)
+	int m_nDataWidth;	// data width
+	int m_nDataHeight;	// data type
+	int m_nDataBytes;	// data bytes per sample
+	void *m_pDataArray;			// data array
+	
+	double m_dValMin;	// min value
+	double m_dValMax;	// max value
+	
 
 // protected data
 protected:
@@ -78,8 +93,8 @@ protected:
 //! enum used by the CamFrame class
 enum CamViewDataEnum
 {
-	IDB_CloseViewRange   = 256 ,
-	IDB_FreezeViewRange  = 257 ,
+	IDB_CloseViewData   = 256 ,
+	IDB_FreezeViewData  = 257 ,
 	IDS_TextMinDisp = 258,
 	IDS_TextMaxDisp = 259,
 	IDP_DrawPanel = 260,

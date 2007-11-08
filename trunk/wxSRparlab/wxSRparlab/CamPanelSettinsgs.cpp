@@ -3,7 +3,7 @@
  * Implementation of the camera settings panel for wxSRparlab
  *
  * @author: James Mure-Dubois
- * @version: 2007.11.06
+ * @version: 2007.11.08
  */
 
 #include "wxSRparlab.h" //!< top-level header file
@@ -42,7 +42,7 @@ int CamPanelSettings::InitSettings()
         wxT("30 MHz") };
 
     m_radioboxFrq = new wxRadioBox(this, wxID_ANY, wxT("Choose Frq"),
-        wxDefaultPosition, wxDefaultSize, 4, freqs, 2, wxRA_SPECIFY_ROWS);
+        wxDefaultPosition, wxDefaultSize, 4, freqs, 0, wxRA_SPECIFY_COLS);
 
     wxString srFilter[] = { wxT("None"), wxT("Median") };
 
@@ -56,7 +56,7 @@ int CamPanelSettings::InitSettings()
     wxBoxSizer *sizerPanel = new wxBoxSizer(wxVERTICAL);
 
 	sizerPanel->Add(sizerButtons, 1, wxEXPAND);
-    sizerPanel->Add(m_radioboxFrq, 2, wxEXPAND);
+    sizerPanel->Add(m_radioboxFrq, 1, wxEXPAND);
     sizerPanel->Add(m_radioboxSrFilt, 1, wxEXPAND);
 
 	sizerPanel->Add(m_statText, 1, wxEXPAND);
