@@ -182,6 +182,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CamViewRange.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CMainWnd.cpp"
 				>
 			</File>
@@ -201,6 +205,10 @@
 			</File>
 			<File
 				RelativePath=".\CamPanelSettings.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CamViewRange.h"
 				>
 			</File>
 			<File

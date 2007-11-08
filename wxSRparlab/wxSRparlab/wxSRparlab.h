@@ -3,7 +3,7 @@
  * Top level header file for wxSRparlab
  *
  * @author: James Mure-Dubois
- * @version: 2007.10.19
+ * @version: 2007.11.07
  */
 
 #pragma once
@@ -26,7 +26,11 @@
  *  - config specific: "$(WXWIN)/include/vc_lib/msvc/" should 
  *    be added to the include path for "setup.h"
  */
-#include "wx/wx.h"			//!< base for wxWindows
+#include "wx/wxprec.h"
+#ifndef  WX_PRECOMP
+  #include "wx/wx.h"
+#endif //precompiled headers
+//#include "wx/wx.h"			//!< base for wxWindows
 #include "wx/mdi.h"			//!< used for MDI interface
 #include "wx/panel.h"		//!< for panels (used in tabbed interface)
 #include "wx/notebook.h"	//!< for notebook (tabbed interface)
