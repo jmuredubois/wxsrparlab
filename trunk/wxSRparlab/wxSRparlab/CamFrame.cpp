@@ -43,6 +43,7 @@ BEGIN_EVENT_TABLE(CamFrame, wxFrame)
     EVT_MENU(IDM_Close, CamFrame::OnClose)
 	EVT_BUTTON(IDB_OpenDev,  CamFrame::OnOpenDev)
 	EVT_BUTTON(IDB_CloseDev,  CamFrame::OnCloseDev)
+	EVT_BUTTON(IDB_Acquire,  CamFrame::Acquire)
 END_EVENT_TABLE()
 
 /**
@@ -138,6 +139,23 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	  res = m_viewRangePane->SetUshortData((unsigned short*) m_pSrBuf, m_nRows*m_nCols);
   }
   m_settingsPane->SetText(strR);
+  //m_settingsPane->SetText(wxT("Open successfull"));
+}
+
+
+//! Acquire 1 Frame
+void CamFrame::Acquire(wxCommandEvent& WXUNUSED(event))
+{
+  int res = 0;
+  wxString strR;
+  if((m_sr != NULL) && (m_pSrBuf != NULL) )
+  {
+	  // ... change text ...
+	  res = SR_Acquire(m_sr, AM_COR_FIX_PTRN || AM_COR_LED_NON_LIN );
+	  /*res = */ m_viewRangePane->SetUshortData((unsigned short*) m_pSrBuf, m_nRows*m_nCols);
+	  strR.sprintf(wxT("cam serial %i - %ix%i  - %i"), res, m_nRows, m_nCols, m_nSrBufSz);
+	  m_settingsPane->SetText(strR);
+  }
   //m_settingsPane->SetText(wxT("Open successfull"));
 }
 

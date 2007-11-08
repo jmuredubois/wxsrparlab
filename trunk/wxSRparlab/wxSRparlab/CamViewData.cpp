@@ -143,9 +143,11 @@ int CamViewData::InitViewData()
 	int res = 0;
 
 	m_buttonCloseView = new wxButton(this, IDB_CloseViewData, wxT("Close"));
+	m_buttonAcquire = new wxButton(this, IDB_Acquire, wxT("Acquire"));
 	m_buttonStopView = new wxButton(this, IDB_FreezeViewData, wxT("Freeze"));
 	m_buttonStopView->SetFocus();
 	  wxBoxSizer *sizerButtons = new wxBoxSizer(wxHORIZONTAL);
+		sizerButtons->Add(m_buttonAcquire, 1, wxEXPAND);
 	    sizerButtons->Add(m_buttonCloseView, 1, wxEXPAND);
 	    sizerButtons->Add(m_buttonStopView, 1, wxEXPAND);
 
@@ -299,6 +301,9 @@ int CamViewData::SetUshortData( unsigned short * buf, int numPix)
 
 	memcpy( (void*) m_pDataArray, (const void*) buf, numPix*sizeof(unsigned short));
 	MapUshort2rgb();
+	m_DrawPanel->Refresh();
+	m_DrawPanel->Update();
+	Refresh();
 
 	return res;
 }

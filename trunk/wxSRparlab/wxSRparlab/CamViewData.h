@@ -46,7 +46,8 @@ public:
 private:
 
 	/* Buttons */
-	wxButton* m_buttonCloseView; //!< Close camera
+	wxButton* m_buttonCloseView; //!< Close view
+	wxButton* m_buttonAcquire; //!< Acquire image camera
 	wxButton* m_buttonStopView;  //!< Freeze display
 
 	/* Buttons */
