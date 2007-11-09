@@ -85,6 +85,8 @@ int CamFrame::CreateAndSetNotebook(const wxString& title)
 	// %%%%%% Camview window
 	m_viewAmpPane = new CamViewData(m_camNB,wxT("Amplitude"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
 	m_viewAmpPane->InitViewData();
+	m_viewAmpPane->SetDispMin(0.0);
+	m_viewAmpPane->SetDispMax(4000.0);
 
 	/* NBparadigm */
 	m_camNB->AddPage(m_settingsPane, wxT("Settings"), TRUE, -1);
