@@ -74,19 +74,18 @@ int CamFrame::CreateAndSetNotebook(const wxString& title)
 	}
 	m_camNB = new wxNotebook(this, -1, wxPoint(-1,-1), wxSize(-1,-1), wxNB_TOP, title);
 
-	//m_camNB->AddPage(new wxPanel(m_camNB), wxString("toto"), FALSE, -1);
-
-	// %%%%%%%
-	m_settingsPane = new CamPanelSettings(m_camNB,wxT("Settings"), wxPoint(-1,-1), wxSize(-1,-1));
+	// %%%%%%% Settings window
+	m_settingsPane = new CamPanelSettings(m_camNB,wxT("Settings"), wxPoint(-1,-1), wxSize(-1,-1)); /* NBparadigm */
 	m_settingsPane->InitSettings();
-	m_camNB->AddPage(m_settingsPane, wxT("Settings"), TRUE, -1);
 
-	// %%%%%%
-	m_viewRangePane = new CamViewData(m_camNB,wxT("Range"), wxPoint(-1,-1), wxSize(100,100));
+	// %%%%%% Camview window
+	m_viewRangePane = new CamViewData(m_camNB,wxT("Range"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
 	m_viewRangePane->InitViewData();
-	m_camNB->AddPage(m_viewRangePane, wxT("Range"), TRUE, -1);
-	
-	//Connect(IDB_CLOSE, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CamFrame::OnClose));
+
+	/* NBparadigm */
+	m_camNB->AddPage(m_settingsPane, wxT("Settings"), TRUE, -1);
+	m_camNB->AddPage(m_viewRangePane, wxT("Range"), FALSE, -1);
+	/* EO NBparadigm */
 
 	return res;
 }
@@ -136,7 +135,7 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	  memset(m_pSrBuf, 0x77, m_nSrBufSz);
 	  res = SR_SetBuffer(m_sr, (void*) m_pSrBuf , m_nSrBufSz);
 	  res = SR_Acquire(m_sr, AM_COR_FIX_PTRN || AM_COR_LED_NON_LIN );
-	  res = m_viewRangePane->SetUshortData((unsigned short*) m_pSrBuf, m_nRows*m_nCols);
+	  res = m_viewRangePane->SetUshortData((unsigned short*) SR_GetImage(m_sr, 0), m_nRows*m_nCols);
   }
   m_settingsPane->SetText(strR);
   //m_settingsPane->SetText(wxT("Open successfull"));
@@ -152,8 +151,8 @@ void CamFrame::Acquire(wxCommandEvent& WXUNUSED(event))
   {
 	  // ... change text ...
 	  res = SR_Acquire(m_sr, AM_COR_FIX_PTRN || AM_COR_LED_NON_LIN );
-	  /*res = */ m_viewRangePane->SetUshortData((unsigned short*) m_pSrBuf, m_nRows*m_nCols);
-	  strR.sprintf(wxT("cam serial %i - %ix%i  - %i"), res, m_nRows, m_nCols, m_nSrBufSz);
+	  strR.sprintf(wxT("pixRead %i - %ix%i  - %i"), res, m_nRows, m_nCols, m_nSrBufSz);
+	  /*res = */ m_viewRangePane->SetUshortData((unsigned short*) SR_GetImage(m_sr, 0), m_nRows*m_nCols);
 	  m_settingsPane->SetText(strR);
   }
   //m_settingsPane->SetText(wxT("Open successfull"));
