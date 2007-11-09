@@ -27,9 +27,16 @@ public:
     CamViewData( wxWindow* parent, const wxString& title, const wxPoint& pos, const wxSize& size);
 	//! destructor
 	~CamViewData();
+
 	//! init settings
 	int InitViewData();
 
+private:
+	int AllocLUT(); /* initialize LUT */
+	int AllocRGBA(); /* initialize RGB and Alpha buffer */
+	int AllocDataArray(); /* initialize data buffer */
+
+public:
 	/* Opening and closing */
 	void CloseView(wxCommandEvent& WXUNUSED(event)); //!< Closes the display
 	void StopView(wxCommandEvent& WXUNUSED(event));  //!< Disables the display
@@ -74,8 +81,6 @@ protected:
 	wxBitmap	m_pBitmap;	// wxBitmap to paint (Dev. Dep.)
   	bool	m_bDrawing;
 	bool	m_bNewImage;
-	int m_nWidth;			// window width
-	int m_nHeight;			// window height
 
 // private methods
 private:
