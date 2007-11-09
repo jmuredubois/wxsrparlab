@@ -31,6 +31,5 @@ public:
 private:
 	MainWnd		*_mainWnd;		//!< pointer to main window
 	int			_numCams;		//!< count of cameras
-	//CamFrame	**_camFrm;		//!< pointer to array of camFrames
-	std::list<CamFrame*> m_camFrm;		//!< pointer to array of camFrames
+	std::list<CamFrame*> m_camFrm;		//!< list of camFrames
 };
