@@ -18,6 +18,8 @@ BEGIN_EVENT_TABLE(CamViewData, wxPanel)
 	EVT_BUTTON(IDB_CloseViewData,  CamViewData::CloseView)
 	EVT_SIZE( CamViewData::OnSize ) 
 	EVT_PAINT( CamViewData::OnPaint)
+	EVT_TEXT( IDT_DispMin , CamViewData::TextChangedDispMin)
+	EVT_TEXT( IDT_DispMax , CamViewData::TextChangedDispMax)
 END_EVENT_TABLE()
 
 
@@ -33,6 +35,7 @@ CamViewData::CamViewData(wxWindow* parent, const wxString& title, const wxPoint&
 	m_nHeight = size.GetHeight( );*/
 	m_bDrawing = false;
 	m_bNewImage = true;
+	m_bTextInit = false;
 
 	m_nComp = NCOMP;
 	m_nLUTlen = LUTLEN;
@@ -112,8 +115,8 @@ CamViewData::CamViewData(wxWindow* parent, const wxString& title, const wxPoint&
 			c = 0;
 		}
 	}
-	m_dValMin = 0.0;
-	m_dValMax = 25344.0;
+	m_dDispMin = 0.0;
+	m_dDispMax = 25344.0;
 	int toto = MapUshort2rgb();
 	/* Endof: Gray ramps */
 
@@ -160,8 +163,9 @@ int CamViewData::InitViewData()
     m_radioboxDtype = new wxRadioBox(this, wxID_ANY, wxT("DataType"),
         wxDefaultPosition, wxDefaultSize, 4, types, 4, wxRA_SPECIFY_COLS);
 
-	m_textMin = new wxTextCtrl( this, IDT_MinDisp, wxT("0") );
-	m_textMax = new wxTextCtrl( this, IDT_MaxDisp, wxT("7500"));
+	m_textMin = new wxTextCtrl( this, IDT_DispMin, wxT("0") );
+	m_textMax = new wxTextCtrl( this, IDT_DispMax, wxT("7500"));
+	m_bTextInit = true;
 	m_DrawPanel = new wxPanel(this, IDP_DrawPanel, wxPoint(-1, -1), wxSize(176, 144));
 	  wxBoxSizer *sizerText = new wxBoxSizer(wxHORIZONTAL);
 	    sizerText->Add(m_textMin, 1, wxEXPAND);
@@ -265,13 +269,13 @@ int CamViewData::MapUshort2rgb()
 	if(m_pDataArray == NULL){return -3;};
 
 	unsigned short* data = (unsigned short*) m_pDataArray;
-	double invDyn = 1.0/ (m_dValMax - m_dValMin) * ( (double) m_nLUTlen);
+	double invDyn = 1.0/ (m_dDispMax - m_dDispMin) * ( (double) m_nLUTlen);
 
 	int val = 0;
 	unsigned char *curPix, *curCol;
 	for(int i = 0 ; i <(m_nDataWidth * m_nDataHeight); i++)
 	{
-		val = (int)floor(( ((double)data[i]) - m_dValMin ) * invDyn );
+		val = (int)floor(( ((double)data[i]) - m_dDispMin ) * invDyn );
 		if(val <0){ val = 0;}
 		if(val > (m_nLUTlen-1) ) {val = (m_nLUTlen-1) ;}
 
@@ -306,4 +310,49 @@ int CamViewData::SetUshortData( unsigned short * buf, int numPix)
 	Refresh();
 
 	return res;
+}
+
+/* Setting display min value*/
+void CamViewData::SetDispMin(double val)
+{
+	m_dDispMin = val;
+}
+/* Setting display min value*/
+void CamViewData::SetDispMax(double val)
+{
+	m_dDispMax = val;
+}
+
+/* acting on chaged text value */
+void CamViewData::TextChangedDispMin(wxCommandEvent &)
+{
+	double val = 0;
+	if( !m_bTextInit){return ;};
+	wxString strVal = m_textMin->GetValue();
+	if( strVal.ToDouble(& val) ) /* read value as double*/
+	{
+		m_dDispMin = val;
+	}
+	else
+	{
+		strVal.Printf(wxT("%d"),m_dDispMin);
+		m_textMin->ChangeValue(strVal); 
+	}
+}
+
+/* acting on chaged text value */
+void CamViewData::TextChangedDispMax(wxCommandEvent &)
+{
+	double val = 0;
+	if( !m_bTextInit){return ;};
+	wxString strVal = m_textMax->GetValue();
+	if( strVal.ToDouble(& val) ) /* read value as double*/
+	{
+		m_dDispMax = val;
+	}
+	else
+	{
+		strVal.Printf(wxT("%d"),m_dDispMax);
+		m_textMax->ChangeValue(strVal); 
+	}
 }

@@ -39,6 +39,15 @@ public:
 
 	/* Mapping ushort data*/
 	int MapUshort2rgb();
+
+	/* Mapping data limits*/
+	void SetDispMin(double val);
+	void SetDispMax(double val);
+	double GetDispMin(){return m_dDispMin;};
+	double GetDispMax(){return m_dDispMax;};
+	/* */
+	void TextChangedDispMin(wxCommandEvent& WXUNUSED(event));/* */
+	void TextChangedDispMax(wxCommandEvent& WXUNUSED(event));/* */
 	
 	/* Copying data to display */
 	int SetUshortData( unsigned short * buf, int numPix);
@@ -56,6 +65,7 @@ private:
 	/* Text zones */
 	wxTextCtrl* m_textMin;
 	wxTextCtrl* m_textMax;
+	bool m_bTextInit;
 	wxPanel* m_DrawPanel;
 
 	// Protected data
@@ -83,8 +93,8 @@ private:
 	int m_nDataBytes;	// data bytes per sample
 	void *m_pDataArray;			// data array
 	
-	double m_dValMin;	// min value
-	double m_dValMax;	// max value
+	double m_dDispMin;	// min value
+	double m_dDispMax;	// max value
 	
 
 // protected data
@@ -98,8 +108,8 @@ enum CamViewDataEnum
 {
 	IDB_CloseViewData   = 256 ,
 	IDB_FreezeViewData  = 257 ,
-	IDT_MinDisp = 258,
-	IDT_MaxDisp = 259,
+	IDT_DispMin = 258,
+	IDT_DispMax = 259,
 	IDP_DrawPanel = 260,
 	ID_ThisIsAStop2 = 512
 };
