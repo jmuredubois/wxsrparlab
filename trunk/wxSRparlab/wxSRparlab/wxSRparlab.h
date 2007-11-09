@@ -36,6 +36,8 @@
 #include "wx/notebook.h"	//!< for notebook (tabbed interface)
 #include "wx/datetime.h"	//!< for date/time
 #include "wx/stattext.h"	//!< for static text
+#include "wx/textctrl.h"	//!< for text control
+#include "wx/image.h"		//!< for images
 
 
 /** on win32 machine, wxWidgets needs those 5 libs, \n

@@ -19,7 +19,7 @@
  * This class: \n
  * - displays GUI elements allowing to modify camera settings \n
  */
-class CamPanelSettings: public wxPanel //!< Camera frame class
+class CamPanelSettings: public wxPanel //!< Camera settings panel
 {
 public:
 	//! constructor

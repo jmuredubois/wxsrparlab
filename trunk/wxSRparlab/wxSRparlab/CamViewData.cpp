@@ -3,7 +3,7 @@
  * Implementation of the camera settings panel for wxSRparlab
  *
  * @author: James Mure-Dubois
- * @version: 2007.11.08
+ * @version: 2007.11.09
  */
 
 #include "wxSRparlab.h" //!< top-level header file
@@ -160,8 +160,8 @@ int CamViewData::InitViewData()
     m_radioboxDtype = new wxRadioBox(this, wxID_ANY, wxT("DataType"),
         wxDefaultPosition, wxDefaultSize, 4, types, 4, wxRA_SPECIFY_COLS);
 
-	m_textMin = new wxStaticText( this, IDS_TextMinDisp, wxT("0"));
-	m_textMax = new wxStaticText( this, IDS_TextMaxDisp, wxT("7500"));
+	m_textMin = new wxTextCtrl( this, IDT_MinDisp, wxT("0") );
+	m_textMax = new wxTextCtrl( this, IDT_MaxDisp, wxT("7500"));
 	m_DrawPanel = new wxPanel(this, IDP_DrawPanel, wxPoint(-1, -1), wxSize(176, 144));
 	  wxBoxSizer *sizerText = new wxBoxSizer(wxHORIZONTAL);
 	    sizerText->Add(m_textMin, 1, wxEXPAND);

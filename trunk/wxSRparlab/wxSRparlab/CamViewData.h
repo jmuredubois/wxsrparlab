@@ -1,9 +1,9 @@
 /*
  * CamViewData.h
- * Header of the camera settings panel for wxSRparlab
+ * Header of the camera view panel for wxSRparlab
  *
  * @author: James Mure-Dubois
- * @version: 2007.11.08
+ * @version: 2007.11.09
  */
 
 #pragma once
@@ -20,7 +20,7 @@
  * This class: \n
  * - displays GUI elements allowing to modify camera settings \n
  */
-class CamViewData: public wxPanel //!< Camera frame class
+class CamViewData: public wxPanel //!< Camera view panel
 {
 public:
 	//! constructor
@@ -54,8 +54,8 @@ private:
 	wxRadioBox* m_radioboxDtype;	//!< SR data type
 
 	/* Text zones */
-	wxStaticText* m_textMin;
-	wxStaticText* m_textMax;
+	wxTextCtrl* m_textMin;
+	wxTextCtrl* m_textMax;
 	wxPanel* m_DrawPanel;
 
 	// Protected data
@@ -98,8 +98,8 @@ enum CamViewDataEnum
 {
 	IDB_CloseViewData   = 256 ,
 	IDB_FreezeViewData  = 257 ,
-	IDS_TextMinDisp = 258,
-	IDS_TextMaxDisp = 259,
+	IDT_MinDisp = 258,
+	IDT_MaxDisp = 259,
 	IDP_DrawPanel = 260,
 	ID_ThisIsAStop2 = 512
 };
