@@ -55,9 +55,9 @@ int CamPanelSettings::InitSettings()
 	/* sizer stuff  ...*/
     wxBoxSizer *sizerPanel = new wxBoxSizer(wxVERTICAL);
 
-	sizerPanel->Add(sizerButtons, 1, wxEXPAND);
-    sizerPanel->Add(m_radioboxFrq, 1, wxEXPAND);
-    sizerPanel->Add(m_radioboxSrFilt, 1, wxEXPAND);
+	sizerPanel->Add(sizerButtons, 0, wxEXPAND);
+    sizerPanel->Add(m_radioboxFrq, 0, wxEXPAND);
+    sizerPanel->Add(m_radioboxSrFilt, 0, wxEXPAND);
 
 	sizerPanel->Add(m_statText, 1, wxEXPAND);
 
