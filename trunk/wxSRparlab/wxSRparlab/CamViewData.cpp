@@ -294,67 +294,19 @@ void CamViewData::Draw( wxDC& dc )
 	return;
 }
 
-//! maps to RGB
-int CamViewData::MapUshort2rgb()
-{
-	int res = 0;
-	if(m_pLUT       == NULL){return -1;};
-	if(m_pRGB       == NULL){return -2;};
-	if(m_pDataArray == NULL){return -3;};
-
-	unsigned short* data = (unsigned short*) m_pDataArray;
-	double invDyn = 1.0/ (m_dDispMax - m_dDispMin) * ( (double) m_nLUTlen);
-
-	int val = 0;
-	unsigned char *curPix, *curCol;
-	for(int i = 0 ; i <(m_nDataWidth * m_nDataHeight); i++)
-	{
-		val = (int)floor(( ((double)data[i]) - m_dDispMin ) * invDyn );
-		if(val <0){ val = 0;}
-		if(val > (m_nLUTlen-1) ) {val = (m_nLUTlen-1) ;}
-
-
-		curPix = &m_pRGB[m_nComp*i+0];
-		curCol = &m_pLUT[m_nComp*val];
-		memcpy( (void*) curPix, (const void*) curCol, m_nComp);
-	}
-
-	// convert data from raw image to wxImg 
-	m_pWxImg = wxImage( m_nDataWidth, m_nDataHeight, m_pRGB, TRUE );
-	m_pWxImg.SetAlpha( m_pAlpha, TRUE);
-	// convert to bitmap to be used by the window to draw
-	m_pBitmap = wxBitmap( m_pWxImg.Scale(m_nDataWidth, m_nDataHeight) );
-
-	return res;
-};
-
-
-/* Copying data to display */
-int CamViewData::SetUshortData( unsigned short * buf, int numPix)
-{
-	int res= 0;
-	if(buf == NULL){return -1;};
-	if(numPix*sizeof(unsigned short) > m_nDataWidth * m_nDataHeight *sizeof(unsigned short)){return -2;};
-	if(m_pDataArray == NULL){return -3;};
-
-	memcpy( (void*) m_pDataArray, (const void*) buf, numPix*sizeof(unsigned short));
-	MapUshort2rgb();
-	m_DrawPanel->Refresh();
-	m_DrawPanel->Update();
-	Refresh();
-
-	return res;
-}
-
 /* Setting display min value*/
 void CamViewData::SetDispMin(double val)
 {
 	m_dDispMin = val;
+	m_textMin->GetValue().Printf(wxT("%d"), val);
+	m_textMin->SetModified(true);
 }
 /* Setting display min value*/
 void CamViewData::SetDispMax(double val)
 {
 	m_dDispMax = val;
+	m_textMax->GetValue().Printf(wxT("%d"), val);
+	m_textMax->SetModified(true);
 }
 
 /* acting on chaged text value */
@@ -365,11 +317,12 @@ void CamViewData::TextChangedDispMin(wxCommandEvent &)
 	wxString strVal = m_textMin->GetValue();
 	if( strVal.ToDouble(& val) ) /* read value as double*/
 	{
-		m_dDispMin = val;
+		SetDispMin(val);
 	}
 	else
 	{
 		m_textMin->DiscardEdits();
+		m_textMax->GetValue().Printf(wxT("%d"), m_dDispMin);
 	}
 }
 
@@ -381,64 +334,12 @@ void CamViewData::TextChangedDispMax(wxCommandEvent &)
 	wxString strVal = m_textMax->GetValue();
 	if( strVal.ToDouble(& val) ) /* read value as double*/
 	{
-		m_dDispMax = val;
+		SetDispMax(val);
 	}
 	else
 	{
 		m_textMax->DiscardEdits();
+		m_textMax->GetValue().Printf(wxT("%d"), m_dDispMax);
 	}
 }
-
-
-//template <typename T> int CamViewData::SetDataArray( T* buf, int numPix)
-//{
-//	int res= 0;
-//	if(buf == NULL){return -1;};
-//	if(numPix*sizeof(T) > m_nDataWidth * m_nDataHeight *sizeof(T)){return -2;};
-//	if(m_pDataArray == NULL){return -3;};
-//
-//	memcpy( (void*) m_pDataArray, (const void*) buf, numPix*sizeof(T));
-//	T first = buf[0]
-//	//Map2rgb<T>(first);
-//	m_DrawPanel->Refresh();
-//	m_DrawPanel->Update();
-//	Refresh();
-//
-//	return res;
-//}
-////template int CamViewData::SetDataArray<unsigned short>( unsigned short* buf, int numPix);
-
-//! maps to RGB
-//template<typename T> int CamViewData::Map2rgb(T firstVal)
-//{
-//	int res = 0;
-//	if(m_pLUT       == NULL){return -1;};
-//	if(m_pRGB       == NULL){return -2;};
-//	if(m_pDataArray == NULL){return -3;};
-//
-//	T* data = (T*) m_pDataArray;
-//	double invDyn = 1.0/ (m_dDispMax - m_dDispMin) * ( (double) m_nLUTlen);
-//
-//	int val = 0;
-//	unsigned char *curPix, *curCol;
-//	for(int i = 0 ; i <(m_nDataWidth * m_nDataHeight); i++)
-//	{
-//		val = (int)floor(( ((double)data[i]) - m_dDispMin ) * invDyn );
-//		if(val <0){ val = 0;}
-//		if(val > (m_nLUTlen-1) ) {val = (m_nLUTlen-1) ;}
-//
-//
-//		curPix = &m_pRGB[m_nComp*i+0];
-//		curCol = &m_pLUT[m_nComp*val];
-//		memcpy( (void*) curPix, (const void*) curCol, m_nComp);
-//	}
-//
-//	// convert data from raw image to wxImg 
-//	m_pWxImg = wxImage( m_nDataWidth, m_nDataHeight, m_pRGB, TRUE );
-//	m_pWxImg.SetAlpha( m_pAlpha, TRUE);
-//	// convert to bitmap to be used by the window to draw
-//	m_pBitmap = wxBitmap( m_pWxImg.Scale(m_nDataWidth, m_nDataHeight) );
-//
-//	return res;
-//};
 

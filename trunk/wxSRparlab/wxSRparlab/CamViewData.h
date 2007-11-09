@@ -44,9 +44,6 @@ public:
 	/* Drawing bitmap */
 	void Draw( wxDC& dc );
 
-	/* Mapping ushort data*/
-	int MapUshort2rgb();
-
 	/* Mapping data limits*/
 	void SetDispMin(double val);
 	void SetDispMax(double val);
@@ -74,9 +71,9 @@ public:
 		return res;
 	};
 //template int CamViewData::SetDataArray<unsigned short>( unsigned short* buf, int numPix);
-	int SetUshortData( unsigned short * buf, int numPix); 
 
 
+	/* Mapping data to RGB buffer*/
 	template<typename T> int Map2rgb(T firstVal)
 {
 	int res = 0;
