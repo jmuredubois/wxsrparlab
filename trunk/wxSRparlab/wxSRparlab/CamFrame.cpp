@@ -82,9 +82,14 @@ int CamFrame::CreateAndSetNotebook(const wxString& title)
 	m_viewRangePane = new CamViewData(m_camNB,wxT("Range"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
 	m_viewRangePane->InitViewData();
 
+	// %%%%%% Camview window
+	m_viewAmpPane = new CamViewData(m_camNB,wxT("Amplitude"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
+	m_viewAmpPane->InitViewData();
+
 	/* NBparadigm */
 	m_camNB->AddPage(m_settingsPane, wxT("Settings"), TRUE, -1);
 	m_camNB->AddPage(m_viewRangePane, wxT("Range"), FALSE, -1);
+	m_camNB->AddPage(m_viewAmpPane, wxT("Amplitude"), FALSE, -1);
 	/* EO NBparadigm */
 
 	return res;
@@ -135,10 +140,11 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	  memset(m_pSrBuf, 0x77, m_nSrBufSz);
 	  res = SR_SetBuffer(m_sr, (void*) m_pSrBuf , m_nSrBufSz);
 	  res = SR_Acquire(m_sr, AM_COR_FIX_PTRN || AM_COR_LED_NON_LIN );
-	  res = m_viewRangePane->SetUshortData((unsigned short*) SR_GetImage(m_sr, 0), m_nRows*m_nCols);
+	  //
+	  res = m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 0), m_nRows*m_nCols);
+	  res = m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 1), m_nRows*m_nCols);
   }
   m_settingsPane->SetText(strR);
-  //m_settingsPane->SetText(wxT("Open successfull"));
 }
 
 
@@ -152,10 +158,10 @@ void CamFrame::Acquire(wxCommandEvent& WXUNUSED(event))
 	  // ... change text ...
 	  res = SR_Acquire(m_sr, AM_COR_FIX_PTRN || AM_COR_LED_NON_LIN );
 	  strR.sprintf(wxT("pixRead %i - %ix%i  - %i"), res, m_nRows, m_nCols, m_nSrBufSz);
-	  /*res = */ m_viewRangePane->SetUshortData((unsigned short*) SR_GetImage(m_sr, 0), m_nRows*m_nCols);
+	  m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 0), m_nRows*m_nCols);
+	  m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 1), m_nRows*m_nCols);
 	  m_settingsPane->SetText(strR);
   }
-  //m_settingsPane->SetText(wxT("Open successfull"));
 }
 
 //---------------------------------------------------

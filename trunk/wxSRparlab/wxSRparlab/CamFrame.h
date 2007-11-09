@@ -53,6 +53,7 @@ private:
 	wxNotebook* m_camNB; //!< a notebook interface
 	CamPanelSettings* m_settingsPane;
 	CamViewData* m_viewRangePane;
+	CamViewData* m_viewAmpPane;
 
 public:
     DECLARE_EVENT_TABLE()
