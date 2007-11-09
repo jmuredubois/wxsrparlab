@@ -45,19 +45,12 @@ CamViewData::CamViewData(wxWindow* parent, const wxString& title, const wxPoint&
 	
 	res += AllocRGBA();
 	res += AllocDataArray();
+	unsigned short val = 0;
 
 	m_dDispMin = 25344.0;
 	m_dDispMax = 0.0;
 
-	int toto = MapUshort2rgb();
-	/* Endof: Gray ramps */
-
-
-	//// convert data from raw image to wxImg 
-	//m_pWxImg = wxImage( m_nDataWidth, m_nDataHeight, m_pRGB, TRUE );
-	//m_pWxImg.SetAlpha( m_pAlpha, TRUE);
-	//// convert to bitmap to be used by the window to draw
-	//m_pBitmap = wxBitmap( m_pWxImg.Scale(m_nDataWidth, m_nDataHeight) );
+	res += Map2rgb<unsigned short>(val);
 }
 /**
  * Camera view panel class destructor \n
@@ -153,11 +146,12 @@ int CamViewData::AllocRGBA() //! Allocate RGB and alpha buffer
 int CamViewData::AllocDataArray() //! Allocate dataArray buffer
 {
 	if( (m_nDataWidth < 0) || (m_nDataHeight <0 ) ){return -2;} ; // fail if size not assigned
-	m_pDataArray = (void*) malloc( m_nDataWidth * m_nDataHeight *sizeof(unsigned short));
+	m_pDataArray = (void*) malloc( m_nDataWidth * m_nDataHeight *sizeof(double));
 	if(m_pDataArray == NULL) { return -1; }; // return if malloc fails
-	memset((void*) m_pDataArray, 0x77, m_nDataWidth * m_nDataHeight *sizeof(unsigned short));
+	memset((void*) m_pDataArray, 0x77, m_nDataWidth * m_nDataHeight *sizeof(double));
 
 	int i, c; // used in loops
+	/* double *data = (double*) m_pDataArray; */
 	unsigned short *data = (unsigned short*) m_pDataArray;
 
 	/* Debug: Gray ramps */
@@ -394,3 +388,57 @@ void CamViewData::TextChangedDispMax(wxCommandEvent &)
 		m_textMax->DiscardEdits();
 	}
 }
+
+
+//template <typename T> int CamViewData::SetDataArray( T* buf, int numPix)
+//{
+//	int res= 0;
+//	if(buf == NULL){return -1;};
+//	if(numPix*sizeof(T) > m_nDataWidth * m_nDataHeight *sizeof(T)){return -2;};
+//	if(m_pDataArray == NULL){return -3;};
+//
+//	memcpy( (void*) m_pDataArray, (const void*) buf, numPix*sizeof(T));
+//	T first = buf[0]
+//	//Map2rgb<T>(first);
+//	m_DrawPanel->Refresh();
+//	m_DrawPanel->Update();
+//	Refresh();
+//
+//	return res;
+//}
+////template int CamViewData::SetDataArray<unsigned short>( unsigned short* buf, int numPix);
+
+//! maps to RGB
+//template<typename T> int CamViewData::Map2rgb(T firstVal)
+//{
+//	int res = 0;
+//	if(m_pLUT       == NULL){return -1;};
+//	if(m_pRGB       == NULL){return -2;};
+//	if(m_pDataArray == NULL){return -3;};
+//
+//	T* data = (T*) m_pDataArray;
+//	double invDyn = 1.0/ (m_dDispMax - m_dDispMin) * ( (double) m_nLUTlen);
+//
+//	int val = 0;
+//	unsigned char *curPix, *curCol;
+//	for(int i = 0 ; i <(m_nDataWidth * m_nDataHeight); i++)
+//	{
+//		val = (int)floor(( ((double)data[i]) - m_dDispMin ) * invDyn );
+//		if(val <0){ val = 0;}
+//		if(val > (m_nLUTlen-1) ) {val = (m_nLUTlen-1) ;}
+//
+//
+//		curPix = &m_pRGB[m_nComp*i+0];
+//		curCol = &m_pLUT[m_nComp*val];
+//		memcpy( (void*) curPix, (const void*) curCol, m_nComp);
+//	}
+//
+//	// convert data from raw image to wxImg 
+//	m_pWxImg = wxImage( m_nDataWidth, m_nDataHeight, m_pRGB, TRUE );
+//	m_pWxImg.SetAlpha( m_pAlpha, TRUE);
+//	// convert to bitmap to be used by the window to draw
+//	m_pBitmap = wxBitmap( m_pWxImg.Scale(m_nDataWidth, m_nDataHeight) );
+//
+//	return res;
+//};
+
