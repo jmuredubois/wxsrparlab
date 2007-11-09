@@ -40,7 +40,7 @@ bool SrApp::OnInit()
 	_camFrm = NULL;
 
 	//! - creates a new main window \n
-    _mainWnd = new MainWnd( _T("wxSRparlab"), wxPoint(100,100), wxSize(800,600) );
+    _mainWnd = new MainWnd( _T("wxSRparlab"), wxPoint(050,050), wxSize(250,100) );
 	if(_mainWnd != NULL){
 		_mainWnd->Show(TRUE); // show the main window
 	}
@@ -59,9 +59,9 @@ bool SrApp::OnInit()
 
 
 	// temp variables to avoid creating new camFrames on top of each other
-	wxPoint pos = wxPoint(100,100);	// initial position
-	wxPoint incr = wxPoint(50,50);	// increment in position
-	wxSize	sz = wxSize(400,300);	// size for camFrame
+	wxPoint pos = wxPoint(50,150);	// initial position
+	wxPoint incr = wxPoint(220,00);	// increment in position
+	wxSize	sz = wxSize(220,400);	// size for camFrame
 	wxString lab;					// title string for camFrame
 	wxString labT;					// title string for camFrame
 	

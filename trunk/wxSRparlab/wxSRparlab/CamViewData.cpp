@@ -202,21 +202,27 @@ int CamViewData::InitViewData()
 	m_textMin = new wxTextCtrl( this, IDT_DispMin, wxT("25344.0"));
 	m_textMax = new wxTextCtrl( this, IDT_DispMax, wxT("0.0"));
 	m_bTextInit = true; m_textMin->SetModified(true); m_textMax->SetModified(true);
-	m_DrawPanel = new wxPanel(this, IDP_DrawPanel, wxPoint(-1, -1), wxSize(176, 144));
+	m_DrawPanel = new wxPanel(this, IDP_DrawPanel);//, wxPoint(-1, -1), wxSize(176, 144));
+	m_DrawPanel->SetMinSize(wxSize(176, 144));
+	    wxBoxSizer *sizerDraw = new wxBoxSizer(wxHORIZONTAL);
+		sizerDraw->Add(m_DrawPanel, 1, wxEXPAND);
 	  wxBoxSizer *sizerText = new wxBoxSizer(wxHORIZONTAL);
-	    sizerText->Add(m_textMin, 1, wxEXPAND);
-		sizerText->Add(m_DrawPanel, 1, wxEXPAND);
-	    sizerText->Add(m_textMax, 1, wxEXPAND);
+	    sizerText->Add(m_textMin, 0, wxEXPAND);
+		sizerText->AddStretchSpacer();
+	    sizerText->Add(m_textMax, 0, wxEXPAND);
+	  wxBoxSizer *sizerDrawText = new wxBoxSizer(wxVERTICAL);
+		sizerDrawText->Add(sizerText, 0, wxEXPAND);
+		sizerDrawText->Add(sizerDraw, 4, wxEXPAND);
 
 	/* sizer stuff  ...*/
     wxBoxSizer *sizerPanel = new wxBoxSizer(wxVERTICAL);
 
-	sizerPanel->Add(sizerButtons, 1, wxEXPAND);
-    sizerPanel->Add(m_radioboxDtype, 1, wxEXPAND);
-	sizerPanel->Add(sizerText, 1, wxEXPAND);
+	sizerPanel->Add(sizerButtons, 0, wxEXPAND);
+    sizerPanel->Add(m_radioboxDtype, 0, wxEXPAND);
+	sizerPanel->Add(sizerDrawText, 4, wxEXPAND);
 
 
-    this->SetSizer(sizerPanel);
+    this->SetSizerAndFit(sizerPanel);
 
 	return res;
 }
