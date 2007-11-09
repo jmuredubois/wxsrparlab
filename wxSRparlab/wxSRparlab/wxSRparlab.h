@@ -39,6 +39,7 @@
 #include "wx/textctrl.h"	//!< for text control
 #include "wx/image.h"		//!< for images
 
+#include <list>		//STL list
 
 /** on win32 machine, wxWidgets needs those 5 libs, \n
  *  comctl32.lib rpcrt4.lib winmm.lib advapi32.lib wsock32.lib 

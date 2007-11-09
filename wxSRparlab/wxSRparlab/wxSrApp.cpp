@@ -37,7 +37,7 @@ bool SrApp::OnInit()
 	//! - inits private vars to safe defaults \n
 	_mainWnd = NULL;
 	_numCams = NUMCAMS;
-	_camFrm = NULL;
+	//_camFrm = NULL;
 
 	//! - creates a new main window \n
     _mainWnd = new MainWnd( _T("wxSRparlab"), wxPoint(050,050), wxSize(250,100) );
@@ -49,13 +49,13 @@ bool SrApp::OnInit()
 	} // ENDOF if(_mainWnd != NULL)
 
 
-	//! - allocates a 1D table of camFrames \n
-	_camFrm = (CamFrame**) malloc(_numCams*sizeof(CamFrame*));
-	if(_camFrm == NULL){ // crude allocation error checkc
-		wxMessageBox(_T("Allocation error"), _T("Malloc error"));
-		return FALSE;
-	} // ENDOF if(_camFrm == NULL)
-	memset( (void*) _camFrm, 0x0, _numCams*sizeof(CamFrame*) );
+	////! - allocates a 1D table of camFrames \n
+	//_camFrm = (CamFrame**) malloc(_numCams*sizeof(CamFrame*));
+	//if(_camFrm == NULL){ // crude allocation error checkc
+	//	wxMessageBox(_T("Allocation error"), _T("Malloc error"));
+	//	return FALSE;
+	//} // ENDOF if(_camFrm == NULL)
+	//memset( (void*) _camFrm, 0x0, _numCams*sizeof(CamFrame*) );
 
 
 	// temp variables to avoid creating new camFrames on top of each other
@@ -65,14 +65,26 @@ bool SrApp::OnInit()
 	wxString lab;					// title string for camFrame
 	wxString labT;					// title string for camFrame
 	
+	////! - for the max number of cameras ...
+	//for(int i = 0; i<_numCams; i++){
+	//	lab.sprintf(wxT("Caméra %i"), i); // ... change title text ...
+	//	labT.sprintf(wxT("Cam %i"), i); // ... change title text ...
+	//	//! ... create and show new camFrame ... \n
+	//	_camFrm[i] = new CamFrame( _mainWnd, lab, pos, sz );
+	//	_camFrm[i]->Show(TRUE);
+	//	_camFrm[i]->CreateAndSetNotebook(labT);
+	//	pos += incr; //... increment position.
+	//} // ENDOF for loop on _numCams
+
 	//! - for the max number of cameras ...
 	for(int i = 0; i<_numCams; i++){
 		lab.sprintf(wxT("Caméra %i"), i); // ... change title text ...
 		labT.sprintf(wxT("Cam %i"), i); // ... change title text ...
 		//! ... create and show new camFrame ... \n
-		_camFrm[i] = new CamFrame( _mainWnd, lab, pos, sz );
-		_camFrm[i]->Show(TRUE);
-		_camFrm[i]->CreateAndSetNotebook(labT);
+		CamFrame *camFrm = new CamFrame( _mainWnd, lab, pos, sz );
+		camFrm->Show(TRUE);
+		camFrm->CreateAndSetNotebook(labT);
+		m_camFrm.push_back(camFrm);
 		pos += incr; //... increment position.
 	} // ENDOF for loop on _numCams
 
@@ -94,10 +106,10 @@ bool SrApp::OnInit()
 int SrApp::OnExit()
 {
 	int res = 0;
-	//! - table _camFrm is deallocated here \n
-	if(_camFrm != NULL){
-		delete(_camFrm);
-		_camFrm = NULL;
-	}
+	////! - table _camFrm is deallocated here \n
+	//if(_camFrm != NULL){
+	//	delete(_camFrm);
+	//	_camFrm = NULL;
+	//}
 	return res;
 }
