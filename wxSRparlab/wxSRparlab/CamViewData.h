@@ -35,6 +35,8 @@ private:
 	int AllocLUT(); /* initialize LUT */
 	int AllocRGBA(); /* initialize RGB and Alpha buffer */
 	int AllocDataArray(); /* initialize data buffer */
+	int AllocWxImg(); /* initialize WxImage buffer */
+	int AllocWxBitmap(); /* initialize WxBitmap buffer */
 	
 public:
 	/* Opening and closing */
@@ -43,6 +45,7 @@ public:
 
 	/* Drawing bitmap */
 	void Draw( wxDC& dc );
+	void SetNewImage();
 
 	/* Mapping data limits*/
 	void SetDispMin(double val);
@@ -98,16 +101,17 @@ public:
 		memcpy( (void*) curPix, (const void*) curCol, m_nComp);
 	}
 
-	// convert data from raw image to wxImg 
-	m_pWxImg = wxImage( m_nDataWidth, m_nDataHeight, m_pRGB, TRUE );
-	m_pWxImg.SetAlpha( m_pAlpha, TRUE);
+	//// convert data from raw image to wxImg 
+	//m_pWxImg = wxImage( m_nDataWidth, m_nDataHeight, m_pRGB, TRUE );
+	//m_pWxImg.SetAlpha( m_pAlpha, TRUE);
 	// convert to bitmap to be used by the window to draw
-	m_pBitmap = wxBitmap( m_pWxImg.Scale(m_nDataWidth, m_nDataHeight) );
-
+	SetBitmap();
 	return res;
 };
 
 
+
+	int SetBitmap();
 private:
 
 	/* Buttons */
@@ -124,10 +128,10 @@ private:
 	bool m_bTextInit;
 	wxPanel* m_DrawPanel;
 
-	// Protected data
-protected:
-	wxImage		m_pWxImg;	// pointer to image  (Dev. Indep.)
-	wxBitmap	m_pBitmap;	// wxBitmap to paint (Dev. Dep.)
+	// Private data
+private:
+	wxImage*	m_pWxImg;	// pointer to image  (Dev. Indep.)
+	wxBitmap*	m_pBitmap;	// wxBitmap to paint (Dev. Dep.)
   	bool	m_bDrawing;
 	bool	m_bNewImage;
 
@@ -144,6 +148,8 @@ private:
 	int m_nComp;				// number of components (RGB)
 	int m_nDataWidth;	// data width
 	int m_nDataHeight;	// data type
+	int m_nDispWidth;	// data width
+	int m_nDispHeight;	// data type
 	int m_nDataBytes;	// data bytes per sample
 	void *m_pDataArray;			// data array
 	

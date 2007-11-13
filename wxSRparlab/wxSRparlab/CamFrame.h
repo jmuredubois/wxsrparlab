@@ -42,7 +42,7 @@ public:
 	void OnOpenDev(wxCommandEvent& WXUNUSED(event));
 	void OnCloseDev(wxCommandEvent& WXUNUSED(event));
 	void Acquire(wxCommandEvent& WXUNUSED(event));
-	void SetFreq(wxCommandEvent& (event));
+	void SetFreq(wxCommandEvent& event);
 
 private:
 	SRCAM	m_sr;	// pointer for SR camera
