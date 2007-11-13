@@ -54,7 +54,7 @@ int SR_GetDeviceString(SRCAM srCam, char* buf, int buflen);
 void SR_SetTimeout(SRCAM srCam, int ms);
 
 //!returns the required buffersize for a SR_Acquire() call.
-size_t SR_GetBufferSize(SRCAM srCam);
+int SR_GetBufferSize(SRCAM srCam);
 
 //!returns the number of rows the camera will deliver
 unsigned int SR_GetRows(SRCAM srCam);
@@ -72,7 +72,7 @@ unsigned int  SR_GetBytePerPix(SRCAM srCam);
 //!SR_Acquire(), SR_CoordTrfFlt(), SR_GetImage() etc.
 //!The buffer is allocated and freed by the user.
 //!Use SR_GetBufferSize() to query and allocate the required buffer size.
-int SR_SetBuffer(SRCAM srCam, void *buffer,size_t size);
+int SR_SetBuffer(SRCAM srCam, void *buffer,int size);
 
 //! \deprecated Use SR_OpenUSB() instead
 int SR_Open(SRCAM* srCam, unsigned int serialNumber=0);//depreciated: Use SR_OpenUSB, SR_OpenETH instead!

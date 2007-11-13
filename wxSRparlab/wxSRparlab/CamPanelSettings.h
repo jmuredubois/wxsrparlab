@@ -47,10 +47,41 @@ private:
 	wxButton* m_buttonOpenDev; //!< Open camera
 	wxButton* m_buttonCloseDev; //!< Close camera
 
-	/* Buttons */
+	/* Radio boxes */
 	wxRadioBox* m_radioboxFrq;	//!< camera frq
 	wxRadioBox* m_radioboxSrFilt;	//!< libusbSR filtering
+	
+	/* Check boxes */
+	wxCheckBox* m_ckBoxFixPtrn;
+	wxCheckBox* m_ckBoxLedNonLin;
+	
+	/* TextControls */
+	wxTextCtrl* m_TxtDelayStat;
+	wxTextCtrl* m_TxtDelayDin;
+	wxTextCtrl* m_TxtScatSzX;
+	wxTextCtrl* m_TxtScatSzy;
+	wxTextCtrl* m_TxtRegAddr;
+	wxTextCtrl* m_TxtRegValue;
+	wxTextCtrl* m_TxtAmpThr;
+	wxTextCtrl* m_TxtSatThr;
+	wxTextCtrl* m_TxtIntegrTime;
 
 	/* Text zones */
 	wxStaticText* m_statText;
+	wxStaticText* m_stTxtVersion;
+	wxStaticText* m_stTxtbufSize;
+	wxStaticText* m_stTxtRows;
+	wxStaticText* m_stTxtCols;
+	wxStaticText* m_stTxtNumImg;
+	wxStaticText* m_stTxtBytePerPix;
+	wxStaticText* m_stTxtDevId;
+	wxStaticText* m_stTxtSerial;
+	
+	/*Auto illumination*/
+	wxCheckBox* m_ckBoxAutoIllum;
+	wxTextCtrl* m_TxtIntTimeMin;
+	wxTextCtrl* m_TxtIntTimeMax;
+	wxTextCtrl* m_TxtPercentOver;
+	wxTextCtrl* m_TxtDesiredPos;
+	
 };
