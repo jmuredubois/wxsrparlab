@@ -38,6 +38,7 @@
 #include "wx/stattext.h"	//!< for static text
 #include "wx/textctrl.h"	//!< for text control
 #include "wx/image.h"		//!< for images
+#include "wx/checkbox.h"	//!< for checkboxes
 
 #include <list>		//STL list
 
