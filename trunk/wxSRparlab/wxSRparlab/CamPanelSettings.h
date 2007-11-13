@@ -3,7 +3,7 @@
  * Header of the camera settings panel for wxSRparlab
  *
  * @author: James Mure-Dubois
- * @version: 2007.11.06
+ * @version: 2007.11.13
  */
 
 #pragma once
