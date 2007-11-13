@@ -41,7 +41,7 @@ int CamPanelSettings::InitSettings()
 	wxString freqs[] = { wxT("19 MHz"), wxT("20 MHz"), wxT("21 MHz"),
         wxT("30 MHz") };
 
-    m_radioboxFrq = new wxRadioBox(this, wxID_ANY, wxT("Choose Frq"),
+    m_radioboxFrq = new wxRadioBox(this, IDR_Freq, wxT("Choose Frq"),
         wxDefaultPosition, wxDefaultSize, 4, freqs, 0, wxRA_SPECIFY_COLS);
 
     wxString srFilter[] = { wxT("None"), wxT("Median") };

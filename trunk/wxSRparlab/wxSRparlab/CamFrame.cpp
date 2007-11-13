@@ -44,6 +44,7 @@ BEGIN_EVENT_TABLE(CamFrame, wxFrame)
 	EVT_BUTTON(IDB_OpenDev,  CamFrame::OnOpenDev)
 	EVT_BUTTON(IDB_CloseDev,  CamFrame::OnCloseDev)
 	EVT_BUTTON(IDB_Acquire,  CamFrame::Acquire)
+	EVT_RADIOBOX(IDR_Freq, CamFrame::SetFreq)
 END_EVENT_TABLE()
 
 /**
@@ -149,23 +150,6 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   m_settingsPane->SetText(strR);
 }
 
-
-//! Acquire 1 Frame
-void CamFrame::Acquire(wxCommandEvent& WXUNUSED(event))
-{
-  int res = 0;
-  wxString strR;
-  if((m_sr != NULL) && (m_pSrBuf != NULL) )
-  {
-	  // ... change text ...
-	  res = SR_Acquire(m_sr, AM_COR_FIX_PTRN || AM_COR_LED_NON_LIN );
-	  strR.sprintf(wxT("pixRead %i - %ix%i  - %i"), res, m_nRows, m_nCols, m_nSrBufSz);
-	  m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 0), m_nRows*m_nCols);
-	  m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 1), m_nRows*m_nCols);
-	  m_settingsPane->SetText(strR);
-  }
-}
-
 //---------------------------------------------------
 /*!
 	- Clears IPL buffers. \n
@@ -193,4 +177,55 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   }
   m_settingsPane->EnableOpenSR();	// enable "Open" button
   m_settingsPane->SetText(wxT("Close successfull"));
+}
+
+//! Acquire 1 Frame
+void CamFrame::Acquire(wxCommandEvent& WXUNUSED(event))
+{
+  int res = 0;
+  wxString strR;
+  if((m_sr != NULL) && (m_pSrBuf != NULL) )
+  {
+	  // ... change text ...
+	  res = SR_Acquire(m_sr, AM_COR_FIX_PTRN || AM_COR_LED_NON_LIN );
+	  strR.sprintf(wxT("pixRead %i - %ix%i  - %i"), res, m_nRows, m_nCols, m_nSrBufSz);
+	  m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 0), m_nRows*m_nCols);
+	  m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 1), m_nRows*m_nCols);
+	  m_settingsPane->SetText(strR);
+  }
+}
+
+//! Acquire 1 Frame
+void CamFrame::SetFreq(wxCommandEvent&(event))
+{
+  int res = 0;
+  wxString strR;
+  if((m_sr != NULL) )
+  {
+	  wxString strF = event.GetString();
+	  ModulationFrq srFrq = MF_20MHz ;
+	  if( ( strF.Find(wxT("MHz")) != wxNOT_FOUND) )
+	  {
+		  if( ( strF.Find(wxT("19")) != wxNOT_FOUND) )
+		  {
+			  srFrq = MF_19MHz;
+		  }
+		  if( ( strF.Find(wxT("20")) != wxNOT_FOUND) )
+		  {
+			  srFrq = MF_20MHz;
+		  }
+		  if( ( strF.Find(wxT("21")) != wxNOT_FOUND) )
+		  {
+			  srFrq = MF_21MHz;
+		  }
+		  if( ( strF.Find(wxT("30")) != wxNOT_FOUND) )
+		  {
+			  srFrq = MF_30MHz;
+		  }
+		  res = SR_SetModulationFrequency(m_sr, srFrq);
+	  }
+	  srFrq = SR_GetModulationFrequency(m_sr);
+	  strR.sprintf(wxT("Mod Frq = %i "), srFrq);
+	  m_settingsPane->SetText(strR);
+  }
 }

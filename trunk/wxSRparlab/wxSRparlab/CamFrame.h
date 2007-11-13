@@ -42,6 +42,7 @@ public:
 	void OnOpenDev(wxCommandEvent& WXUNUSED(event));
 	void OnCloseDev(wxCommandEvent& WXUNUSED(event));
 	void Acquire(wxCommandEvent& WXUNUSED(event));
+	void SetFreq(wxCommandEvent& (event));
 
 private:
 	SRCAM	m_sr;	// pointer for SR camera
@@ -68,5 +69,6 @@ enum CamFrameEnum
 	IDB_OpenDev = 4,
 	IDB_CloseDev = 5,
 	IDB_Acquire = 6, 
+	IDR_Freq = 7,
 	ID_ThisIsAStop = 255
 };
