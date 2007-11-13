@@ -195,7 +195,7 @@ void CamFrame::Acquire(wxCommandEvent& WXUNUSED(event))
   }
   m_viewRangePane->SetNewImage();
   m_viewAmpPane->SetNewImage();
-}
+};
 
 //! Interface fct to set the modulation frequency
 void CamFrame::SetFreq(wxCommandEvent&(event))
@@ -230,4 +230,5 @@ void CamFrame::SetFreq(wxCommandEvent&(event))
 	  strR.sprintf(wxT("Mod Frq = %i "), srFrq);
 	  m_settingsPane->SetText(strR);
   }
-}
+};
+

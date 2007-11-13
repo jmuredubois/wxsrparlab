@@ -72,3 +72,4 @@ enum CamFrameEnum
 	IDR_Freq = 7,
 	ID_ThisIsAStop = 255
 };
+
