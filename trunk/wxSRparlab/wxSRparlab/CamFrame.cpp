@@ -193,17 +193,19 @@ void CamFrame::Acquire(wxCommandEvent& WXUNUSED(event))
 	  m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 1), m_nRows*m_nCols);
 	  m_settingsPane->SetText(strR);
   }
+  m_viewRangePane->SetNewImage();
+  m_viewAmpPane->SetNewImage();
 }
 
-//! Acquire 1 Frame
+//! Interface fct to set the modulation frequency
 void CamFrame::SetFreq(wxCommandEvent&(event))
 {
   int res = 0;
   wxString strR;
+  ModulationFrq srFrq = MF_20MHz ;
   if((m_sr != NULL) )
   {
 	  wxString strF = event.GetString();
-	  ModulationFrq srFrq = MF_20MHz ;
 	  if( ( strF.Find(wxT("MHz")) != wxNOT_FOUND) )
 	  {
 		  if( ( strF.Find(wxT("19")) != wxNOT_FOUND) )

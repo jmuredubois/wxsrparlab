@@ -32,11 +32,15 @@ CamViewData::CamViewData(wxWindow* parent, const wxString& title, const wxPoint&
 {
 	int res = 0;
 	m_bDrawing = false;
-	m_bNewImage = true;
+	m_bNewImage = false;
 	m_bTextInit = false;
 
 	m_nComp = NCOMP;
 	m_nLUTlen = LUTLEN;
+
+	m_pWxImg = NULL;
+	m_pBitmap = NULL;
+	m_DrawPanel = NULL;
 
 	res += AllocLUT(); //Allocs the LUT
 	
@@ -45,6 +49,10 @@ CamViewData::CamViewData(wxWindow* parent, const wxString& title, const wxPoint&
 	
 	res += AllocRGBA();
 	res += AllocDataArray();
+
+	res += AllocWxImg();
+	res += AllocWxBitmap();
+
 	unsigned short val = 0;
 
 	m_dDispMin = 25344.0;
@@ -61,6 +69,8 @@ CamViewData::~CamViewData()
 	if(m_pAlpha != NULL) { free((void*) m_pAlpha); m_pAlpha = NULL; };
 	if(m_pLUT   != NULL) { free((void*) m_pLUT  ); m_pLUT   = NULL; };
 	if(m_pDataArray != NULL) { free((void*) m_pDataArray ); m_pDataArray = NULL; };
+	if(m_pWxImg != NULL) { delete( m_pWxImg ); m_pWxImg = NULL; };
+	if(m_pBitmap != NULL) { delete( m_pBitmap ); m_pBitmap = NULL; };
 }
 /**
  * Allocates the LUT onto which data is mapped
@@ -168,6 +178,34 @@ int CamViewData::AllocDataArray() //! Allocate dataArray buffer
 	return 0;
 }
 /**
+ * Allocates the wxImg
+ */
+int CamViewData::AllocWxImg() //! Allocate wxImg buffer
+{
+	int res = 0;
+	if( (m_nDataWidth < 0) || (m_nDataHeight <0 ) ){return -2;} ; // fail if size not assigned
+	if(m_pRGB == NULL) { return -1; }; // return the RGB buffer is null
+	// convert data from raw image to wxImg 
+	m_pWxImg = new wxImage( m_nDataWidth, m_nDataHeight, m_pRGB, TRUE );
+
+	if(m_pAlpha == NULL) { return -3; }; // return the RGB buffer is null
+	// convert data from raw image to wxImg 
+	m_pWxImg->SetAlpha( m_pAlpha, TRUE);
+
+	return res;
+}
+/**
+ * Allocates the wxBitmap
+ */
+int CamViewData::AllocWxBitmap() //! Allocate wxBitmap buffer
+{
+	int res = 0;
+	if( (m_nDataWidth < 0) || (m_nDataHeight <0 ) ){return -2;} ; // fail if size not assigned
+	if(m_pWxImg == NULL) { return -1; }; // return the RGB buffer is null
+	m_pBitmap = new wxBitmap( m_pWxImg->Scale(m_nDataWidth , m_nDataHeight) );
+	return res;
+}
+/**
  * 
  */
 int CamViewData::InitViewData()
@@ -265,7 +303,7 @@ void CamViewData::OnPaint( wxPaintEvent& event )
 
 ////////////////////////////////////////////////////////////////////
 // Method:	Draw
-// Class:	CCamView
+// Class:	CamViewData
 // Purose:	camera drawing
 // Input:	reference to dc
 // Output:	nothing
@@ -273,17 +311,17 @@ void CamViewData::OnPaint( wxPaintEvent& event )
 void CamViewData::Draw( wxDC& dc )
 {
 	// check if dc available
-	if( !dc.Ok( ) || m_bDrawing == true ){ return; }
+	if( !dc.Ok() || m_bDrawing == true ){ return; }
 
 		m_bDrawing = true;
 
 		int x,y,w,h;
 		dc.GetClippingBox( &x, &y, &w, &h );
 		// if there is a new image to draw
-		if( m_bNewImage )
+		if( (m_bNewImage) && (m_pBitmap!=NULL) )
 		{
-			dc.DrawBitmap( m_pBitmap, x, y );
-			//m_bNewImage = false;
+			dc.DrawBitmap( m_pBitmap[0] , x, y );
+			m_bNewImage = false;
 		} else
 		{
 			// draw inter frame ?
@@ -292,6 +330,12 @@ void CamViewData::Draw( wxDC& dc )
 		m_bDrawing = false;
 
 	return;
+}
+
+/* Setting display min value*/
+void CamViewData::SetNewImage()
+{
+	m_bNewImage = true;
 }
 
 /* Setting display min value*/
@@ -343,3 +387,24 @@ void CamViewData::TextChangedDispMax(wxCommandEvent &)
 	}
 }
 
+/* sets the bitmap */
+int CamViewData::SetBitmap()
+{
+	int res = 0;
+	if(m_DrawPanel == NULL) { return -1;};
+	if( (m_nDataWidth < 1) || (m_nDataWidth < 1)) { return -2;};
+	if(m_pWxImg == NULL) { return -3;};
+	int wP= 0; int hP = 0;
+	m_DrawPanel->GetSize(&wP, &hP);
+	if( (wP<1) || (hP<1)) { return res;};
+	double scFact = ((double) wP / (double) m_nDataWidth);
+	if (((double) hP / (double) m_nDataHeight) < scFact) {
+				scFact = ((double) hP / (double) m_nDataHeight);};
+	int wD = (int) floor(m_nDataWidth * scFact);
+	int hD = (int) floor(m_nDataHeight * scFact);
+	delete(m_pBitmap);
+	m_pBitmap = new wxBitmap( m_pWxImg->Scale(wD, hD) );
+
+	SetNewImage();
+	return res;
+};
