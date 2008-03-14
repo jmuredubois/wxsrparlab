@@ -27,6 +27,8 @@ CamFrame::CamFrame(wxFrame* parentFrm, const wxString& title, const wxPoint& pos
 	m_camNB = NULL;
 	m_sr = NULL;
 	m_pSrBuf = NULL; m_nRows = 0; m_nCols = 0; m_nSrBufSz = 0;
+
+	m_pFile4Read = new wxFFile();
 }
 
 /**
@@ -37,6 +39,7 @@ CamFrame::~CamFrame()
 	int res = -1;
 	if(m_sr		  != NULL) { res = SR_Close(m_sr);	m_sr = NULL; };
 	if(m_pSrBuf   != NULL) { free((void*) m_pSrBuf  ); m_pSrBuf   = NULL; };
+	if(m_pFile4Read != NULL) { delete(m_pFile4Read); m_pFile4Read = NULL; };
 }
 
 BEGIN_EVENT_TABLE(CamFrame, wxFrame)
@@ -133,6 +136,30 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	  serial =  SR_ReadSerial(m_sr); 
 	  strR.sprintf(wxT("cam serial %i"), serial); // ... change title text ...
   }
+
+  wxFileDialog* OpenDialog = new wxFileDialog(this, 
+	  wxT("Choose a SR file to open"),	// msg
+	  wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
+	  wxEmptyString,	// default file
+	  wxT("SR files (*.16b)|*.16b|All files (*.*)|*.*"),	// file ext
+	  wxOPEN|wxCHANGE_DIR,
+	  wxDefaultPosition);
+  if(OpenDialog->ShowModal()==wxID_OK)
+  {
+	  wxString strPath = OpenDialog->GetPath();
+		// Sets our current document to the file the user selected
+	  wxFFile* wxFp = new wxFFile(strPath, "rb");
+	  if(wxFp->IsOpened())
+	  {
+		m_pFile4Read->Attach(wxFp->fp());
+		wxFp->Detach();
+	  }
+
+	  delete(wxFp);
+  }
+  delete(OpenDialog);
+
+
   if(m_sr != NULL)
   {
 	  m_nSrBufSz = (int) SR_GetBufferSize(m_sr); 
@@ -142,7 +169,7 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	  m_pSrBuf = (unsigned char*) malloc(m_nSrBufSz);
 	  memset(m_pSrBuf, 0x77, m_nSrBufSz);
 	  res = SR_SetBuffer(m_sr, (void*) m_pSrBuf , m_nSrBufSz);
-	  res = SR_Acquire(m_sr, AM_COR_FIX_PTRN || AM_COR_LED_NON_LIN );
+	  res = SR_Acquire(m_sr, AM_COR_FIX_PTRN );//|| AM_COR_LED_NON_LIN );
 	  //
 	  res = m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 0), m_nRows*m_nCols);
 	  res = m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 1), m_nRows*m_nCols);
@@ -175,6 +202,10 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
 		m_nCols = 0; 
 		m_nRows = 0; 
   }
+  if(m_pFile4Read->IsOpened())
+  {
+	  m_pFile4Read->Close();
+  }
   m_settingsPane->EnableOpenSR();	// enable "Open" button
   m_settingsPane->SetText(wxT("Close successfull"));
 }
@@ -186,6 +217,11 @@ void CamFrame::Acquire(wxCommandEvent& WXUNUSED(event))
   wxString strR;
   if((m_sr != NULL) && (m_pSrBuf != NULL) )
   {
+	  if(m_pFile4Read->IsOpened())
+	  {
+		  //size_t resT = m_pFile4Read->Read(...)
+
+	  }
 	  // ... change text ...
 	  res = SR_Acquire(m_sr, AM_COR_FIX_PTRN || AM_COR_LED_NON_LIN );
 	  strR.sprintf(wxT("pixRead %i - %ix%i  - %i"), res, m_nRows, m_nCols, m_nSrBufSz);

@@ -58,7 +58,7 @@ void SR_SetTimeout(SRCAM srCam, int ms)
 };
 
 //!returns the required buffersize for a SR_Acquire() call.
-size_t SR_GetBufferSize(SRCAM srCam)
+int SR_GetBufferSize(SRCAM srCam)
 {
 	return ((size_t)(176*144));
 };
@@ -91,7 +91,7 @@ unsigned int  SR_GetBytePerPix(SRCAM srCam)
 //!SR_Acquire(), SR_CoordTrfFlt(), SR_GetImage() etc.
 //!The buffer is allocated and freed by the user.
 //!Use SR_GetBufferSize() to query and allocate the required buffer size.
-int SR_SetBuffer(SRCAM srCam, void *buffer,size_t size)
+int SR_SetBuffer(SRCAM srCam, void *buffer,int size)
 {
 	return -7;
 };
