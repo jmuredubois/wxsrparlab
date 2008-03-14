@@ -8,7 +8,7 @@
 
 #pragma once
 
-//#define DUMMYSR //!< use this flag to disable SR fcts
+#define DUMMYSR //!< use this flag to disable SR fcts
 
 #ifndef DUMMYSR
 	#include "libusbSR.h"
@@ -39,6 +39,7 @@
 #include "wx/textctrl.h"	//!< for text control
 #include "wx/image.h"		//!< for images
 #include "wx/checkbox.h"	//!< for checkboxes
+#include "wx/ffile.h"		//!< for files
 
 #include <list>		//STL list
 
