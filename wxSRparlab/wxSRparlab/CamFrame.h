@@ -52,7 +52,8 @@ private:
 	int m_nRows;
 	int m_nCols;
 	wxNotebook* m_camNB; //!< a notebook interface
-	wxFFile*		m_pFile4Read; // File for read operation
+	wxFFile*		m_pFile4ReadPha; // PHASE file for read operation
+	wxFFile*		m_pFile4ReadAmp; // AMPLITUDE file for read operation
 	CamPanelSettings* m_settingsPane;
 	CamViewData* m_viewRangePane;
 	CamViewData* m_viewAmpPane;
