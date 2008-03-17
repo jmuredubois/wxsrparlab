@@ -30,6 +30,7 @@ CamFrame::CamFrame(wxFrame* parentFrm, const wxString& title, const wxPoint& pos
 
 	m_pFile4ReadPha = NULL;//new wxFFile();
 	m_pFile4ReadAmp = NULL;//new wxFFile();
+	m_nFrmRead = 0; // 0 frames read when creating
 }
 
 /**
@@ -139,6 +140,13 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	  strR.sprintf(wxT("cam serial %i"), serial); // ... change title text ...
   }
 
+  wxFileDialog* OpenDialogPar = new wxFileDialog(this, 
+	  wxT("Choose a SR parameters file to open"),	// msg
+	  wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
+	  wxEmptyString,	// default file
+	  wxT("SR parameters files (*.sr2)|*.sr2|All files (*.*)|*.*"),	// file ext
+	  wxOPEN|wxCHANGE_DIR,
+	  wxDefaultPosition);
   wxFileDialog* OpenDialogPha = new wxFileDialog(this, 
 	  wxT("Choose a SR PHASE file to open"),	// msg
 	  wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
@@ -153,30 +161,55 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	  wxT("SR amplitude files (*.16b)|*.16b|All files (*.*)|*.*"),	// file ext
 	  wxOPEN|wxCHANGE_DIR,
 	  wxDefaultPosition);
-  if((OpenDialogPha->ShowModal()==wxID_OK) && (OpenDialogAmp->ShowModal()==wxID_OK))
+  if((OpenDialogPar->ShowModal()==wxID_OK) && (OpenDialogPha->ShowModal()==wxID_OK) && (OpenDialogAmp->ShowModal()==wxID_OK))
   {
+	  wxString strPathPar = OpenDialogPar->GetPath();
 	  wxString strPathPha = OpenDialogPha->GetPath();
 	  wxString strPathAmp = OpenDialogAmp->GetPath();
 		// Sets our current document to the file the user selected
-	  m_pFile4ReadPha = new wxFFile(strPathPha, "rb");
-	  m_pFile4ReadAmp = new wxFFile(strPathAmp, "rb");
-	  if ( (!(m_pFile4ReadAmp->IsOpened())) || (!(m_pFile4ReadAmp->IsOpened())))
+	  wxFFile* wxFparams = new wxFFile(strPathPar, "rb");
+	  if ( (wxFparams->IsOpened()) )
 	  {
-		res -=4;
-	  }
+	    int tmp = 0; // DANGER = 1 int must be 4 bytes
+		if(sizeof(int)!=4)
+		{
+			res-=64; 
+			m_nCols = (int) 176; 
+			m_nRows = (int) 144; 
+			m_nSrBufSz = (int) (m_nCols*m_nRows*2*2); // *2 amp,pha *2:short
+		}
+		else // (sizeof(int)!=4)
+		{
+	      size_t readBytes= wxFparams->Read(&tmp, sizeof(int));
+		  m_nRows = tmp;
+		  readBytes= wxFparams->Read(&tmp, sizeof(int));
+		  m_nCols = tmp;
+		  readBytes= wxFparams->Read(&tmp, sizeof(int));
+		  int numImg = tmp;
+		  readBytes = wxFparams->Read(&tmp, sizeof(int));
+		  int bytesPerSample = tmp;
+		  readBytes= wxFparams->Read(&tmp, sizeof(int));
+		  m_nSrBufSz = tmp;
+		} // (sizeof(int)!=4)
+		delete(wxFparams);
+	    m_pFile4ReadPha = new wxFFile(strPathPha, "rb");
+	    m_pFile4ReadAmp = new wxFFile(strPathAmp, "rb");
+	    if ( (!(m_pFile4ReadAmp->IsOpened())) || (!(m_pFile4ReadAmp->IsOpened())))
+	    {
+		  res -=4;
+	    }
  
-	  m_nCols = (int) 176; 
-	  m_nRows = (int) 144; 
-	  m_nSrBufSz = (int) (m_nCols*m_nRows*2*2); // *2 amp,pha *2:short
-	  strR.sprintf(wxT("cam serial %i - %ix%i  - %i"), serial, m_nRows, m_nCols, m_nSrBufSz); // ... change text ...
-	  m_pSrBuf = (unsigned char*) malloc(m_nSrBufSz);
-	  memset(m_pSrBuf, 0x77, m_nSrBufSz);
+	    strR.sprintf(wxT("cam serial %i - %ix%i  - %i"), serial, m_nRows, m_nCols, m_nSrBufSz); // ... change text ...
+	    m_pSrBuf = (unsigned char*) malloc(m_nSrBufSz);
+	    memset(m_pSrBuf, 0x77, m_nSrBufSz);
 	  //
-	  res = m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[0], m_nRows*m_nCols);
-	  res = m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2], m_nRows*m_nCols);
+	    res = m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[0], m_nRows*m_nCols);
+	    res = m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2], m_nRows*m_nCols);
  
-	  m_settingsPane->SetText(strR);
-  }
+	    m_settingsPane->SetText(strR);
+	  } // (wxFparams->IsOpened())
+  } // (OpenDialogPar->ShowModal()==wxID_OK) && (OpenDialogPha->ShowModal()==wxID_OK) && (OpenDialogAmp->ShowModal()==wxID_OK)
+  delete(OpenDialogPar);
   delete(OpenDialogPha);
   delete(OpenDialogAmp);
   if((m_pFile4ReadPha->IsOpened()) && (m_pFile4ReadAmp->IsOpened()))
@@ -222,19 +255,15 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   if(m_sr != NULL)
   {
 		res = SR_Close(m_sr);
-		m_sr = NULL;
-		m_nSrBufSz = 0; 
-		m_nCols = 0; 
-		m_nRows = 0; 
+		m_sr = NULL; 
   }
-  if(m_pFile4ReadPha->IsOpened())
-  {
-	  m_pFile4ReadPha->Close();
-  }
-  if(m_pFile4ReadAmp->IsOpened())
-  {
-	  m_pFile4ReadAmp->Close();
-  }
+  if(m_pFile4ReadPha != NULL) { delete(m_pFile4ReadPha); m_pFile4ReadPha = NULL; };
+  if(m_pFile4ReadAmp != NULL) { delete(m_pFile4ReadAmp); m_pFile4ReadAmp = NULL; };
+  if(m_pSrBuf   != NULL) { free((void*) m_pSrBuf  ); m_pSrBuf   = NULL; };
+  m_nSrBufSz = 0; 
+  m_nCols = 0; 
+  m_nRows = 0;
+  m_nFrmRead = 0;
   m_settingsPane->EnableOpenSR();	// enable "Open" button
   m_settingsPane->SetText(wxT("Close successfull"));
 }
@@ -246,22 +275,31 @@ void CamFrame::Acquire(wxCommandEvent& WXUNUSED(event))
   wxString strR;
   if((m_sr == NULL) && (m_pSrBuf != NULL) && (m_pFile4ReadPha->IsOpened()) && (m_pFile4ReadAmp->IsOpened()))
   {
-	  size_t resP = m_pFile4ReadPha->Read(m_pSrBuf, m_nCols*m_nRows*2);
-	  size_t resA = m_pFile4ReadAmp->Read(&m_pSrBuf[m_nCols*m_nRows*2], m_nCols*m_nRows*2);
+	  res = m_pFile4ReadPha->Read(m_pSrBuf, m_nCols*m_nRows*2);
+	  res = m_pFile4ReadAmp->Read(&m_pSrBuf[m_nCols*m_nRows*2], m_nCols*m_nRows*2);
+	  m_nFrmRead +=1;
 	  // ... change text ...
-	  strR.sprintf(wxT("pixFileRead %i - %ix%i  - %i"), res, m_nRows, m_nCols, m_nSrBufSz);
+	  strR.sprintf(wxT("frm:%05u - pixFileRead %i - %ix%i  - %i"), m_nFrmRead, res, m_nRows, m_nCols, m_nSrBufSz);
 	  m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[0], m_nRows*m_nCols);
 	  m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2], m_nRows*m_nCols);
 	  m_settingsPane->SetText(strR);
+
+	  if( (m_pFile4ReadPha->Eof()) || (m_pFile4ReadAmp->Eof()) )
+	  {
+		  m_pFile4ReadPha->Seek(0); // rewind phase
+		  m_pFile4ReadAmp->Seek(0); // rewind phase
+		  m_nFrmRead = 0;	// reset frame count
+	  }
   }
   if((m_sr != NULL) && (m_pSrBuf != NULL) )
   {
 	  // ... change text ...
 	  res = SR_Acquire(m_sr, AM_COR_FIX_PTRN || AM_COR_LED_NON_LIN );
-	  strR.sprintf(wxT("pixRead %i - %ix%i  - %i"), res, m_nRows, m_nCols, m_nSrBufSz);
+	  strR.sprintf(wxT("frm:%05u - pixRead %i - %ix%i  - %i"), m_nFrmRead, res, m_nRows, m_nCols, m_nSrBufSz);
 	  m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 0), m_nRows*m_nCols);
 	  m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 1), m_nRows*m_nCols);
 	  m_settingsPane->SetText(strR);
+	  m_nFrmRead +=1;
   }
   m_viewRangePane->SetNewImage();
   m_viewAmpPane->SetNewImage();
