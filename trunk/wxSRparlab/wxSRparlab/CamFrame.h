@@ -57,6 +57,7 @@ private:
 	CamPanelSettings* m_settingsPane;
 	CamViewData* m_viewRangePane;
 	CamViewData* m_viewAmpPane;
+	int m_nFrmRead;		// number of frames read
 
 public:
     DECLARE_EVENT_TABLE()
