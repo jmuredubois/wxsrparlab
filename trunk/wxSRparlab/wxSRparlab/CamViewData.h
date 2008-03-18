@@ -30,6 +30,8 @@ public:
 
 	//! init settings
 	int InitViewData();
+	wxMutex* m_mutexDataArray;
+	wxMutex* m_mutexBitmap;
 
 private:
 	int AllocLUT(); /* initialize LUT */
@@ -42,6 +44,10 @@ public:
 	/* Opening and closing */
 	void CloseView(wxCommandEvent& WXUNUSED(event)); //!< Closes the display
 	void StopView(wxCommandEvent& WXUNUSED(event));  //!< Disables the display
+
+	/* Changing interface buttons text */
+	void SetBtnTxtStop();
+	void SetBtnTxtAcqu();
 
 	/* Drawing bitmap */
 	void Draw( wxDC& dc );
@@ -64,7 +70,12 @@ public:
 		if(numPix*sizeof(T) > m_nDataWidth * m_nDataHeight *sizeof(T)){return -2;};
 		if(m_pDataArray == NULL){return -3;};
 
-		memcpy( (void*) m_pDataArray, (const void*) buf, numPix*sizeof(T));
+		wxMutexError errMutex= m_mutexDataArray->Lock();
+		if(errMutex == wxMUTEX_NO_ERROR)
+		{
+			memcpy( (void*) m_pDataArray, (const void*) buf, numPix*sizeof(T));
+			errMutex = m_mutexDataArray->Unlock();
+		}
 		T first = buf[0];
 		CamViewData::Map2rgb<T>(first);
 		CamViewData::m_DrawPanel->Refresh();
@@ -84,28 +95,34 @@ public:
 	if(m_pRGB       == NULL){return -2;};
 	if(m_pDataArray == NULL){return -3;};
 
-	T* data = (T*) m_pDataArray;
-	double invDyn = 1.0/ (m_dDispMax - m_dDispMin) * ( (double) m_nLUTlen);
-
-	int val = 0;
-	unsigned char *curPix, *curCol;
-	for(int i = 0 ; i <(m_nDataWidth * m_nDataHeight); i++)
+	wxMutexError errMutex= m_mutexDataArray->Lock();
+	if(errMutex == wxMUTEX_NO_ERROR)
 	{
-		val = (int)floor(( ((double)data[i]) - m_dDispMin ) * invDyn );
-		if(val <0){ val = 0;}
-		if(val > (m_nLUTlen-1) ) {val = (m_nLUTlen-1) ;}
+		T* data = (T*) m_pDataArray;
+		double invDyn = 1.0/ (m_dDispMax - m_dDispMin) * ( (double) m_nLUTlen);
+
+		int val = 0;
+		unsigned char *curPix, *curCol;
+		for(int i = 0 ; i <(m_nDataWidth * m_nDataHeight); i++)
+		{
+			val = (int)floor(( ((double)data[i]) - m_dDispMin ) * invDyn );
+			if(val <0){ val = 0;}
+			if(val > (m_nLUTlen-1) ) {val = (m_nLUTlen-1) ;}
 
 
-		curPix = &m_pRGB[m_nComp*i+0];
-		curCol = &m_pLUT[m_nComp*val];
-		memcpy( (void*) curPix, (const void*) curCol, m_nComp);
-	}
+			curPix = &m_pRGB[m_nComp*i+0];
+			curCol = &m_pLUT[m_nComp*val];
+			memcpy( (void*) curPix, (const void*) curCol, m_nComp);
+		}
+		errMutex = m_mutexDataArray->Unlock();
+	} //{errMutex == wxMUTEX_NO_ERROR)
 
 	//// convert data from raw image to wxImg 
 	//m_pWxImg = wxImage( m_nDataWidth, m_nDataHeight, m_pRGB, TRUE );
 	//m_pWxImg.SetAlpha( m_pAlpha, TRUE);
 	// convert to bitmap to be used by the window to draw
 	SetBitmap();
+
 	return res;
 };
 
@@ -163,7 +180,7 @@ protected:
 };
 
 
-//! enum used by the CamFrame class
+//! enum used by the CamViewData class
 enum CamViewDataEnum
 {
 	IDB_CloseViewData   = 256 ,

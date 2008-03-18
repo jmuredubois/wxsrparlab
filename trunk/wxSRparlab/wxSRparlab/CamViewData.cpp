@@ -68,6 +68,8 @@ CamViewData::~CamViewData()
 	if(m_pRGB   != NULL) { free((void*) m_pRGB  ); m_pRGB   = NULL; };
 	if(m_pAlpha != NULL) { free((void*) m_pAlpha); m_pAlpha = NULL; };
 	if(m_pLUT   != NULL) { free((void*) m_pLUT  ); m_pLUT   = NULL; };
+	if(m_mutexDataArray != NULL) { delete(m_mutexDataArray); m_mutexDataArray = NULL;};
+	if(m_mutexBitmap != NULL) { delete(m_mutexBitmap); m_mutexBitmap = NULL;};
 	if(m_pDataArray != NULL) { free((void*) m_pDataArray ); m_pDataArray = NULL; };
 	if(m_pWxImg != NULL) { delete( m_pWxImg ); m_pWxImg = NULL; };
 	if(m_pBitmap != NULL) { delete( m_pBitmap ); m_pBitmap = NULL; };
@@ -160,6 +162,8 @@ int CamViewData::AllocDataArray() //! Allocate dataArray buffer
 	if(m_pDataArray == NULL) { return -1; }; // return if malloc fails
 	memset((void*) m_pDataArray, 0x77, m_nDataWidth * m_nDataHeight *sizeof(double));
 
+	m_mutexDataArray = new wxMutex(wxMUTEX_DEFAULT);
+	m_mutexBitmap = new wxMutex(wxMUTEX_DEFAULT);
 	int i, c; // used in loops
 	/* double *data = (double*) m_pDataArray; */
 	unsigned short *data = (unsigned short*) m_pDataArray;
@@ -320,8 +324,13 @@ void CamViewData::Draw( wxDC& dc )
 		// if there is a new image to draw
 		if( (m_bNewImage) && (m_pBitmap!=NULL) )
 		{
-			dc.DrawBitmap( m_pBitmap[0] , x, y );
-			m_bNewImage = false;
+			wxMutexError errMutex= m_mutexBitmap->Lock();
+			if(errMutex == wxMUTEX_NO_ERROR)
+			{
+				dc.DrawBitmap( m_pBitmap[0] , x, y );
+				m_bNewImage = false;
+				errMutex = m_mutexBitmap->Unlock();
+			} //{errMutex == wxMUTEX_NO_ERROR)
 		} else
 		{
 			// draw inter frame ?
@@ -402,9 +411,32 @@ int CamViewData::SetBitmap()
 				scFact = ((double) hP / (double) m_nDataHeight);};
 	int wD = (int) floor(m_nDataWidth * scFact);
 	int hD = (int) floor(m_nDataHeight * scFact);
-	delete(m_pBitmap);
-	m_pBitmap = new wxBitmap( m_pWxImg->Scale(wD, hD) );
+
+	wxMutexError errMutex= m_mutexBitmap->Lock();
+	if(errMutex == wxMUTEX_NO_ERROR)
+	{
+		delete(m_pBitmap);
+		m_pBitmap = new wxBitmap( m_pWxImg->Scale(wD, hD) );
+		errMutex = m_mutexBitmap->Unlock();
+	} //{errMutex == wxMUTEX_NO_ERROR)
 
 	SetNewImage();
 	return res;
+};
+
+
+/* Changing interface buttons text */
+void CamViewData::SetBtnTxtStop()
+{
+	if(!m_buttonAcquire){return;};
+	m_buttonAcquire->SetLabel(wxT("Stop"));
+	return;
+};
+
+/* Changing interface buttons text */
+void CamViewData::SetBtnTxtAcqu()
+{
+	if(!m_buttonAcquire){return;};
+	m_buttonAcquire->SetLabel(wxT("Acquire"));
+	return;
 };

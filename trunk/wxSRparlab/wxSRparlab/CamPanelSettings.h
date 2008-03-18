@@ -39,6 +39,8 @@ public:
 	void CamPanelSettings::EnableRadioFrq();  //!< Enables the frequency radio panel
 	void CamPanelSettings::DisableRadioFilt(); //!< Disables the filter radio panel
 	void CamPanelSettings::EnableRadioFilt();  //!< Enables the fliter radio panel
+	void CamPanelSettings::DisableRadioReadMode(); //!< Disables the read mode radio panel
+	void CamPanelSettings::EnableRadioReadMode();  //!< Enables the read mode radio panel
 
 
 private:
@@ -50,6 +52,7 @@ private:
 	/* Radio boxes */
 	wxRadioBox* m_radioboxFrq;	//!< camera frq
 	wxRadioBox* m_radioboxSrFilt;	//!< libusbSR filtering
+	wxRadioBox* m_radioboxReadMode; //!< Read mode
 	
 	/* Check boxes */
 	wxCheckBox* m_ckBoxFixPtrn;

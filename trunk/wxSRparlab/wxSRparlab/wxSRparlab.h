@@ -40,6 +40,7 @@
 #include "wx/image.h"		//!< for images
 #include "wx/checkbox.h"	//!< for checkboxes
 #include "wx/ffile.h"		//!< for files
+#include "wx/thread.h"		//!< for threads
 
 #include <list>		//STL list
 
