@@ -29,18 +29,13 @@ public:
     // stopped with Delete() (but not when it is Kill()ed!)
     virtual void OnExit();
 
-    // write something to the text control
-    void ReadOneFrame( );
-
-public:
-    unsigned m_count;
+private:
     CamFrame *m_cFrm;
 };
 
 ThreadReadData::ThreadReadData(CamFrame *cFrm) 
-: wxThread(wxTHREAD_JOINABLE)
+: wxThread(wxTHREAD_DETACHED)//: wxThread(wxTHREAD_JOINABLE)
 {
-    m_count = 0;
     m_cFrm = cFrm;
 };
 
@@ -52,18 +47,6 @@ ThreadReadData::~ThreadReadData()
 	
 }
 
-void ThreadReadData::ReadOneFrame( )
-{
-    wxString msg;
-
-    // before doing any GUI calls we must ensure that this thread is the only
-    // one doing it!
-
-    wxMutexGuiEnter();
-
-    wxMutexGuiLeave();
-}
-
 void ThreadReadData::OnExit()
 {
  
@@ -73,28 +56,14 @@ void *ThreadReadData::Entry()
 {
     wxString text;
 
-    text.Printf(wxT("Thread 0x%lx started (priority = %u).\n"),
-                GetId(), GetPriority());
-    //WriteText(text);
-    // wxLogMessage(text); -- test wxLog thread safeness
-
     for ( ; ; )
     {
         // check if we were asked to exit
         if ( TestDestroy() )
             break;
-
-        text.Printf(wxT("[%u] Thread 0x%lx here.\n"), m_count, GetId());
-        //WriteText(text);
 		m_cFrm->AcqOneFrm();
-
-        // wxSleep() can't be called from non-GUI thread!
         wxThread::Sleep(100);
     }
-
-    text.Printf(wxT("Thread 0x%lx finished.\n"), GetId());
-    //WriteText(text);
-    // wxLogMessage(text); -- test wxLog thread safeness
 
     return NULL;
 }
@@ -129,11 +98,11 @@ CamFrame::CamFrame(wxFrame* parentFrm, const wxString& title, const wxPoint& pos
 CamFrame::~CamFrame()
 {
 	int res = -1;
+	if(m_bReadContinuously){ if(m_pThreadReadData != NULL){ m_pThreadReadData->Delete(); } } ;
 	if(m_sr		  != NULL) { res = SR_Close(m_sr);	m_sr = NULL; };
 	if(m_pSrBuf   != NULL) { free((void*) m_pSrBuf  ); m_pSrBuf   = NULL; };
 	if(m_pFile4ReadPha != NULL) { delete(m_pFile4ReadPha); m_pFile4ReadPha = NULL; };
 	if(m_pFile4ReadAmp != NULL) { delete(m_pFile4ReadAmp); m_pFile4ReadAmp = NULL; };
-	if(m_pThreadReadData != NULL) { delete(m_pThreadReadData); m_pThreadReadData = NULL; };
 }
 
 BEGIN_EVENT_TABLE(CamFrame, wxFrame)
@@ -185,7 +154,7 @@ int CamFrame::CreateAndSetNotebook(const wxString& title)
 	m_viewAmpPane = new CamViewData(m_camNB,wxT("Amplitude"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
 	m_viewAmpPane->InitViewData();
 	m_viewAmpPane->SetDispMin(0.0);
-	m_viewAmpPane->SetDispMax(4000.0);
+	m_viewAmpPane->SetDispMax(1000.0);
 
 	/* NBparadigm */
 	m_camNB->AddPage(m_settingsPane, wxT("Settings"), TRUE, -1);
@@ -255,7 +224,6 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	  wxDefaultPosition);
   if((OpenDialogPar->ShowModal()==wxID_OK) && (OpenDialogPha->ShowModal()==wxID_OK) && (OpenDialogAmp->ShowModal()==wxID_OK))
   {
-	  m_pThreadReadData = new ThreadReadData(this);
 	  wxString strPathPar = OpenDialogPar->GetPath();
 	  wxString strPathPha = OpenDialogPha->GetPath();
 	  wxString strPathAmp = OpenDialogAmp->GetPath();
@@ -307,8 +275,6 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   delete(OpenDialogAmp);
   if((m_pFile4ReadPha  != NULL) && (m_pFile4ReadAmp  != NULL) && (m_pFile4ReadPha->IsOpened()) && (m_pFile4ReadAmp->IsOpened()))
   {
-	  //m_pThreadReadData->Entry();
-	  m_pThreadReadData->Create();//Create(16384);
 	  return;
   }
   
@@ -344,6 +310,7 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   int res = 0;
   //_sr=0;//there are no valid device opened
   m_settingsPane->SetText(wxT("Close attempt"));
+  if(m_bReadContinuously){ if(m_pThreadReadData != NULL){ m_pThreadReadData->Delete(); } } ;
   m_settingsPane->DisableCloseSR();		// disable "Close" button
   m_settingsPane->DisableRadioFilt();	// disable filter selection
   m_settingsPane->DisableRadioFrq();	// disable frequency selection
@@ -354,7 +321,6 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   }
   if(m_pFile4ReadPha != NULL) { delete(m_pFile4ReadPha); m_pFile4ReadPha = NULL; };
   if(m_pFile4ReadAmp != NULL) { delete(m_pFile4ReadAmp); m_pFile4ReadAmp = NULL; };
-  if(m_pThreadReadData != NULL) { delete(m_pThreadReadData); m_pThreadReadData = NULL; };
   if(m_pSrBuf   != NULL) { free((void*) m_pSrBuf  ); m_pSrBuf   = NULL; };
   m_nSrBufSz = 0; 
   m_nCols = 0; 
@@ -366,26 +332,28 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
 //! Acquire 1 Frame
 void CamFrame::Acquire(wxCommandEvent& WXUNUSED(event))
 {
-  if(m_camReadMode==CAM_RD_ONESHOT)
+  if(m_camReadMode==CAM_RD_ONESHOT) // if one shot read is asked ...
   {
-	AcqOneFrm();
+	AcqOneFrm();					// ... do so
   }
-  else if(m_camReadMode==CAM_RD_CONTINU)
+  else if(m_camReadMode==CAM_RD_CONTINU)	// if continuous read is asked...
   {
-    if( ! m_bReadContinuously )
+    if( ! m_bReadContinuously )		// ... if reading was not in progress ...
 	{
 		m_settingsPane->DisableRadioReadMode();  //disallow changing read mode
-		m_bReadContinuously = true;
-		m_viewRangePane->SetBtnTxtStop();
-		m_viewAmpPane->SetBtnTxtStop();
+		m_bReadContinuously = true; // set reading flag
+		m_viewRangePane->SetBtnTxtStop();		// set new texts in ctrl buttons
+		m_viewAmpPane->SetBtnTxtStop();			//
 		m_settingsPane->DisableRadioFilt();	// disable filter selection
 		m_settingsPane->DisableRadioFrq();	// disable frequency selection
 
-		m_pThreadReadData->Resume();
+		m_pThreadReadData = new ThreadReadData(this);	// create reading thread...
+		m_pThreadReadData->Create();
+		m_pThreadReadData->Run();						// ... and run it.
 	} //( ! m_bReadContinuously )
-	else
+	else							// ... if reading was in progress ...
 	{
-		m_pThreadReadData->Pause();
+		m_pThreadReadData->Delete();  // ... kill (gracefully) reading thread
 		m_settingsPane->EnableRadioReadMode();  //allow changing read mode
 		m_bReadContinuously = false;
 		m_viewRangePane->SetBtnTxtAcqu();
@@ -413,6 +381,8 @@ void CamFrame::AcqOneFrm()
 	  m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[0], m_nRows*m_nCols);
 	  m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2], m_nRows*m_nCols);
 	  m_settingsPane->SetText(strR);
+	  m_viewRangePane->SetTxtInfo(strR);
+	  m_viewAmpPane->SetTxtInfo(strR);
 
 	  if( (m_pFile4ReadPha->Eof()) || (m_pFile4ReadAmp->Eof()) )
 	  {
@@ -429,6 +399,8 @@ void CamFrame::AcqOneFrm()
 	  m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 0), m_nRows*m_nCols);
 	  m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 1), m_nRows*m_nCols);
 	  m_settingsPane->SetText(strR);
+	  m_viewRangePane->SetTxtInfo(strR);
+	  m_viewAmpPane->SetTxtInfo(strR);
 	  m_nFrmRead +=1;
   }
   m_viewRangePane->SetNewImage();
