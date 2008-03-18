@@ -21,6 +21,14 @@
  */
 #include "wx/image.h" //!< for wxImages
 
+class ThreadReadData;
+
+//! enum used by the CamViewData class
+enum CamReadModeEnum
+{
+	CAM_RD_CONTINU = 1 ,
+	CAM_RD_ONESHOT = 2
+};
 
 /**
  * Camera frame class \n
@@ -43,6 +51,8 @@ public:
 	void OnCloseDev(wxCommandEvent& WXUNUSED(event));
 	void Acquire(wxCommandEvent& WXUNUSED(event));
 	void SetFreq(wxCommandEvent& event);
+	void SetReadMode(wxCommandEvent& event);
+	void AcqOneFrm();
 
 private:
 	SRCAM	m_sr;	// pointer for SR camera
@@ -54,10 +64,14 @@ private:
 	wxNotebook* m_camNB; //!< a notebook interface
 	wxFFile*		m_pFile4ReadPha; // PHASE file for read operation
 	wxFFile*		m_pFile4ReadAmp; // AMPLITUDE file for read operation
+	ThreadReadData*		m_pThreadReadData; // THREAD for reading data
 	CamPanelSettings* m_settingsPane;
 	CamViewData* m_viewRangePane;
 	CamViewData* m_viewAmpPane;
 	int m_nFrmRead;		// number of frames read
+	CamReadModeEnum  m_camReadMode;		// read  mode
+	bool m_bReadContinuously; 
+	ModulationFrq m_srFrq;		// SR frequency
 
 public:
     DECLARE_EVENT_TABLE()
@@ -73,6 +87,7 @@ enum CamFrameEnum
 	IDB_CloseDev = 5,
 	IDB_Acquire = 6, 
 	IDR_Freq = 7,
+	IDR_ReadMode = 8,
 	ID_ThisIsAStop = 255
 };
 

@@ -12,6 +12,92 @@
 #include "CamFrame.h"	//!< camera frame header file
 #include "CamPanelSettings.h" //!< camera settings panel header file
 
+// ----------------------------------------------------------------------------
+// GUI thread
+// ----------------------------------------------------------------------------
+
+class ThreadReadData : public wxThread
+{
+public:
+    ThreadReadData(CamFrame *cFrm);
+	~ThreadReadData();
+
+    // thread execution starts here
+    virtual void *Entry();
+
+    // called when the thread exits - whether it terminates normally or is
+    // stopped with Delete() (but not when it is Kill()ed!)
+    virtual void OnExit();
+
+    // write something to the text control
+    void ReadOneFrame( );
+
+public:
+    unsigned m_count;
+    CamFrame *m_cFrm;
+};
+
+ThreadReadData::ThreadReadData(CamFrame *cFrm) 
+: wxThread(wxTHREAD_JOINABLE)
+{
+    m_count = 0;
+    m_cFrm = cFrm;
+};
+
+/**
+ * Camera frame class destructor \n
+ */
+ThreadReadData::~ThreadReadData()
+{
+	
+}
+
+void ThreadReadData::ReadOneFrame( )
+{
+    wxString msg;
+
+    // before doing any GUI calls we must ensure that this thread is the only
+    // one doing it!
+
+    wxMutexGuiEnter();
+
+    wxMutexGuiLeave();
+}
+
+void ThreadReadData::OnExit()
+{
+ 
+}
+
+void *ThreadReadData::Entry()
+{
+    wxString text;
+
+    text.Printf(wxT("Thread 0x%lx started (priority = %u).\n"),
+                GetId(), GetPriority());
+    //WriteText(text);
+    // wxLogMessage(text); -- test wxLog thread safeness
+
+    for ( ; ; )
+    {
+        // check if we were asked to exit
+        if ( TestDestroy() )
+            break;
+
+        text.Printf(wxT("[%u] Thread 0x%lx here.\n"), m_count, GetId());
+        //WriteText(text);
+		m_cFrm->AcqOneFrm();
+
+        // wxSleep() can't be called from non-GUI thread!
+        wxThread::Sleep(100);
+    }
+
+    text.Printf(wxT("Thread 0x%lx finished.\n"), GetId());
+    //WriteText(text);
+    // wxLogMessage(text); -- test wxLog thread safeness
+
+    return NULL;
+}
 
 /**
  * Camera frame class constructor \n
@@ -31,6 +117,10 @@ CamFrame::CamFrame(wxFrame* parentFrm, const wxString& title, const wxPoint& pos
 	m_pFile4ReadPha = NULL;//new wxFFile();
 	m_pFile4ReadAmp = NULL;//new wxFFile();
 	m_nFrmRead = 0; // 0 frames read when creating
+	m_pThreadReadData = NULL;
+	m_camReadMode = CAM_RD_ONESHOT;
+	m_bReadContinuously = false; 
+	m_srFrq = MF_20MHz;
 }
 
 /**
@@ -43,6 +133,7 @@ CamFrame::~CamFrame()
 	if(m_pSrBuf   != NULL) { free((void*) m_pSrBuf  ); m_pSrBuf   = NULL; };
 	if(m_pFile4ReadPha != NULL) { delete(m_pFile4ReadPha); m_pFile4ReadPha = NULL; };
 	if(m_pFile4ReadAmp != NULL) { delete(m_pFile4ReadAmp); m_pFile4ReadAmp = NULL; };
+	if(m_pThreadReadData != NULL) { delete(m_pThreadReadData); m_pThreadReadData = NULL; };
 }
 
 BEGIN_EVENT_TABLE(CamFrame, wxFrame)
@@ -51,6 +142,7 @@ BEGIN_EVENT_TABLE(CamFrame, wxFrame)
 	EVT_BUTTON(IDB_CloseDev,  CamFrame::OnCloseDev)
 	EVT_BUTTON(IDB_Acquire,  CamFrame::Acquire)
 	EVT_RADIOBOX(IDR_Freq, CamFrame::SetFreq)
+	EVT_RADIOBOX(IDR_ReadMode, CamFrame::SetReadMode)
 END_EVENT_TABLE()
 
 /**
@@ -145,24 +237,25 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	  wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
 	  wxEmptyString,	// default file
 	  wxT("SR parameters files (*.sr2)|*.sr2|All files (*.*)|*.*"),	// file ext
-	  wxOPEN|wxCHANGE_DIR,
+	  wxFD_OPEN|wxFD_CHANGE_DIR,
 	  wxDefaultPosition);
   wxFileDialog* OpenDialogPha = new wxFileDialog(this, 
 	  wxT("Choose a SR PHASE file to open"),	// msg
 	  wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
 	  wxEmptyString,	// default file
 	  wxT("SR phase files (*.16b)|*.16b|All files (*.*)|*.*"),	// file ext
-	  wxOPEN|wxCHANGE_DIR,
+	  wxFD_OPEN|wxFD_CHANGE_DIR,
 	  wxDefaultPosition);
   wxFileDialog* OpenDialogAmp = new wxFileDialog(this, 
 	  wxT("Choose a SR AMPLITUDE file to open"),	// msg
 	  wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
 	  wxEmptyString,	// default file
 	  wxT("SR amplitude files (*.16b)|*.16b|All files (*.*)|*.*"),	// file ext
-	  wxOPEN|wxCHANGE_DIR,
+	  wxFD_OPEN|wxFD_CHANGE_DIR,
 	  wxDefaultPosition);
   if((OpenDialogPar->ShowModal()==wxID_OK) && (OpenDialogPha->ShowModal()==wxID_OK) && (OpenDialogAmp->ShowModal()==wxID_OK))
   {
+	  m_pThreadReadData = new ThreadReadData(this);
 	  wxString strPathPar = OpenDialogPar->GetPath();
 	  wxString strPathPha = OpenDialogPha->GetPath();
 	  wxString strPathAmp = OpenDialogAmp->GetPath();
@@ -194,7 +287,7 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 		delete(wxFparams);
 	    m_pFile4ReadPha = new wxFFile(strPathPha, "rb");
 	    m_pFile4ReadAmp = new wxFFile(strPathAmp, "rb");
-	    if ( (!(m_pFile4ReadAmp->IsOpened())) || (!(m_pFile4ReadAmp->IsOpened())))
+	    if ( (!(m_pFile4ReadAmp)) || (!(m_pFile4ReadAmp)) || (!(m_pFile4ReadAmp->IsOpened())) || (!(m_pFile4ReadAmp->IsOpened())))
 	    {
 		  res -=4;
 	    }
@@ -212,8 +305,10 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   delete(OpenDialogPar);
   delete(OpenDialogPha);
   delete(OpenDialogAmp);
-  if((m_pFile4ReadPha->IsOpened()) && (m_pFile4ReadAmp->IsOpened()))
+  if((m_pFile4ReadPha  != NULL) && (m_pFile4ReadAmp  != NULL) && (m_pFile4ReadPha->IsOpened()) && (m_pFile4ReadAmp->IsOpened()))
   {
+	  //m_pThreadReadData->Entry();
+	  m_pThreadReadData->Create();//Create(16384);
 	  return;
   }
   
@@ -259,6 +354,7 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   }
   if(m_pFile4ReadPha != NULL) { delete(m_pFile4ReadPha); m_pFile4ReadPha = NULL; };
   if(m_pFile4ReadAmp != NULL) { delete(m_pFile4ReadAmp); m_pFile4ReadAmp = NULL; };
+  if(m_pThreadReadData != NULL) { delete(m_pThreadReadData); m_pThreadReadData = NULL; };
   if(m_pSrBuf   != NULL) { free((void*) m_pSrBuf  ); m_pSrBuf   = NULL; };
   m_nSrBufSz = 0; 
   m_nCols = 0; 
@@ -267,13 +363,47 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   m_settingsPane->EnableOpenSR();	// enable "Open" button
   m_settingsPane->SetText(wxT("Close successfull"));
 }
-
 //! Acquire 1 Frame
 void CamFrame::Acquire(wxCommandEvent& WXUNUSED(event))
 {
+  if(m_camReadMode==CAM_RD_ONESHOT)
+  {
+	AcqOneFrm();
+  }
+  else if(m_camReadMode==CAM_RD_CONTINU)
+  {
+    if( ! m_bReadContinuously )
+	{
+		m_settingsPane->DisableRadioReadMode();  //disallow changing read mode
+		m_bReadContinuously = true;
+		m_viewRangePane->SetBtnTxtStop();
+		m_viewAmpPane->SetBtnTxtStop();
+		m_settingsPane->DisableRadioFilt();	// disable filter selection
+		m_settingsPane->DisableRadioFrq();	// disable frequency selection
+
+		m_pThreadReadData->Resume();
+	} //( ! m_bReadContinuously )
+	else
+	{
+		m_pThreadReadData->Pause();
+		m_settingsPane->EnableRadioReadMode();  //allow changing read mode
+		m_bReadContinuously = false;
+		m_viewRangePane->SetBtnTxtAcqu();
+		m_viewAmpPane->SetBtnTxtAcqu();
+		m_settingsPane->EnableRadioFilt();	// enable filter selection
+		m_settingsPane->EnableRadioFrq();	// enable frequency selection
+
+	} //( ! m_bReadContinuously )
+  }
+
+  return;
+};
+//! Acquire 1 Frame
+void CamFrame::AcqOneFrm()
+{
   int res = 0;
   wxString strR;
-  if((m_sr == NULL) && (m_pSrBuf != NULL) && (m_pFile4ReadPha->IsOpened()) && (m_pFile4ReadAmp->IsOpened()))
+  if((m_sr == NULL) && (m_pSrBuf != NULL) && (m_pFile4ReadPha  != NULL) && (m_pFile4ReadAmp  != NULL) && (m_pFile4ReadPha->IsOpened()) && (m_pFile4ReadAmp->IsOpened()))
   {
 	  res = m_pFile4ReadPha->Read(m_pSrBuf, m_nCols*m_nRows*2);
 	  res = m_pFile4ReadAmp->Read(&m_pSrBuf[m_nCols*m_nRows*2], m_nCols*m_nRows*2);
@@ -310,33 +440,54 @@ void CamFrame::SetFreq(wxCommandEvent&(event))
 {
   int res = 0;
   wxString strR;
-  ModulationFrq srFrq = MF_20MHz ;
+  //ModulationFrq srFrq = MF_20MHz ;
+  
+  wxString strF = event.GetString();
+  if( ( strF.Find(wxT("MHz")) != wxNOT_FOUND) )
+  {
+	  if( ( strF.Find(wxT("19")) != wxNOT_FOUND) )
+	  {
+		  m_srFrq = MF_19MHz;
+	  }
+	  if( ( strF.Find(wxT("20")) != wxNOT_FOUND) )
+	  {
+		  m_srFrq = MF_20MHz;
+	  }
+	  if( ( strF.Find(wxT("21")) != wxNOT_FOUND) )
+	  {
+		  m_srFrq = MF_21MHz;
+	  }
+	  if( ( strF.Find(wxT("30")) != wxNOT_FOUND) )
+	  {
+		  m_srFrq = MF_30MHz;
+	  }
+  }
+  strR.sprintf(wxT("Mod Frq dummy = %i "), m_srFrq);
+  m_settingsPane->SetText(strR);
   if((m_sr != NULL) )
   {
-	  wxString strF = event.GetString();
-	  if( ( strF.Find(wxT("MHz")) != wxNOT_FOUND) )
-	  {
-		  if( ( strF.Find(wxT("19")) != wxNOT_FOUND) )
-		  {
-			  srFrq = MF_19MHz;
-		  }
-		  if( ( strF.Find(wxT("20")) != wxNOT_FOUND) )
-		  {
-			  srFrq = MF_20MHz;
-		  }
-		  if( ( strF.Find(wxT("21")) != wxNOT_FOUND) )
-		  {
-			  srFrq = MF_21MHz;
-		  }
-		  if( ( strF.Find(wxT("30")) != wxNOT_FOUND) )
-		  {
-			  srFrq = MF_30MHz;
-		  }
-		  res = SR_SetModulationFrequency(m_sr, srFrq);
-	  }
-	  srFrq = SR_GetModulationFrequency(m_sr);
-	  strR.sprintf(wxT("Mod Frq = %i "), srFrq);
+	  res = SR_SetModulationFrequency(m_sr, m_srFrq);
+	  ModulationFrq srFrq = SR_GetModulationFrequency(m_sr);
+	  strR.sprintf(wxT("Mod Frq SR = %i "), srFrq);
 	  m_settingsPane->SetText(strR);
   }
 };
 
+//! Interface fct to set the read mode
+void CamFrame::SetReadMode(wxCommandEvent&(event))
+{
+  int res = 0;
+  wxString strR;
+  wxString strF = event.GetString();
+  if( ( strF.Find(wxT("Continuous")) != wxNOT_FOUND) )
+  {
+	  m_camReadMode = CAM_RD_CONTINU;
+	  strR.sprintf(wxT("Cam read mode = %s "), "Continuous");
+  }
+  else if( ( strF.Find(wxT("1 frame")) != wxNOT_FOUND) )
+  {
+	  m_camReadMode = CAM_RD_ONESHOT;
+	  strR.sprintf(wxT("Cam read mode = %s "), "One frame");
+  }
+  m_settingsPane->SetText(strR);
+};

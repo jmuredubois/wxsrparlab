@@ -50,12 +50,18 @@ int CamPanelSettings::InitSettings()
         wxT("Spatial filter"), wxDefaultPosition, wxDefaultSize,
         2, srFilter, 0, wxRA_SPECIFY_COLS);
 
+	wxString strReadMode[] = { wxT("Continuous"), wxT("1 frame")};
+
+    m_radioboxReadMode = new wxRadioBox(this, IDR_ReadMode, wxT("Read mode"),
+        wxDefaultPosition, wxDefaultSize, 2, strReadMode, 2, wxRA_SPECIFY_COLS);
+
 	m_statText = new wxStaticText( this, IDS_TEXT, wxT("0"));
 
 	/* sizer stuff  ...*/
     wxBoxSizer *sizerPanel = new wxBoxSizer(wxVERTICAL);
 
 	sizerPanel->Add(sizerButtons, 0, wxEXPAND);
+	sizerPanel->Add(m_radioboxReadMode, 0, wxEXPAND);
     sizerPanel->Add(m_radioboxFrq, 0, wxEXPAND);
     sizerPanel->Add(m_radioboxSrFilt, 0, wxEXPAND);
 
@@ -113,8 +119,18 @@ void CamPanelSettings::DisableRadioFilt()
 {
 	m_radioboxSrFilt->Disable();
 };
-//!< Enables the fliter radio panel
+//!< Enables the filter radio panel
 void CamPanelSettings::EnableRadioFilt()
 {
 	m_radioboxSrFilt->Enable();
+};
+//!< Disables the read mode radio panel
+void CamPanelSettings::DisableRadioReadMode()
+{
+	m_radioboxReadMode->Disable();
+};
+//!< Enables the read mode radio panel
+void CamPanelSettings::EnableRadioReadMode()
+{
+	m_radioboxReadMode->Enable();
 };
