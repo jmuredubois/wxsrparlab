@@ -250,12 +250,16 @@ int CamViewData::InitViewData()
 		sizerDrawText->Add(sizerText, 0, wxEXPAND);
 		sizerDrawText->Add(sizerDraw, 4, wxEXPAND);
 
+	m_textInfo = new wxStaticText(this, IDT_DispTxtInfo, wxT("Info"));
+
 	/* sizer stuff  ...*/
     wxBoxSizer *sizerPanel = new wxBoxSizer(wxVERTICAL);
 
 	sizerPanel->Add(sizerButtons, 0, wxEXPAND);
     sizerPanel->Add(m_radioboxDtype, 0, wxEXPAND);
 	sizerPanel->Add(sizerDrawText, 4, wxEXPAND);
+
+	sizerPanel->Add(m_textInfo, 0, wxEXPAND);
 
 
     this->SetSizerAndFit(sizerPanel);
@@ -401,20 +405,22 @@ int CamViewData::SetBitmap()
 {
 	int res = 0;
 	if(m_DrawPanel == NULL) { return -1;};
+	if(!(m_DrawPanel->IsShownOnScreen())){ return 0; };
 	if( (m_nDataWidth < 1) || (m_nDataWidth < 1)) { return -2;};
 	if(m_pWxImg == NULL) { return -3;};
 	int wP= 0; int hP = 0;
-	m_DrawPanel->GetSize(&wP, &hP);
-	if( (wP<1) || (hP<1)) { return res;};
-	double scFact = ((double) wP / (double) m_nDataWidth);
-	if (((double) hP / (double) m_nDataHeight) < scFact) {
-				scFact = ((double) hP / (double) m_nDataHeight);};
-	int wD = (int) floor(m_nDataWidth * scFact);
-	int hD = (int) floor(m_nDataHeight * scFact);
-
 	wxMutexError errMutex= m_mutexBitmap->Lock();
 	if(errMutex == wxMUTEX_NO_ERROR)
 	{
+		m_DrawPanel->GetSize(&wP, &hP);
+		if( (wP<1) || (hP<1)) { errMutex = m_mutexBitmap->Unlock(); return res;};
+		double scFact = ((double) wP / (double) m_nDataWidth);
+		if (((double) hP / (double) m_nDataHeight) < scFact) {
+				scFact = ((double) hP / (double) m_nDataHeight);};
+		int wD = (int) floor(m_nDataWidth * scFact);
+		int hD = (int) floor(m_nDataHeight * scFact);
+
+	
 		delete(m_pBitmap);
 		m_pBitmap = new wxBitmap( m_pWxImg->Scale(wD, hD) );
 		errMutex = m_mutexBitmap->Unlock();
@@ -440,3 +446,11 @@ void CamViewData::SetBtnTxtAcqu()
 	m_buttonAcquire->SetLabel(wxT("Acquire"));
 	return;
 };
+
+/* Changing info text */
+void CamViewData::SetTxtInfo(wxString text)
+{
+	if(!m_textInfo){return;};
+	m_textInfo->SetLabel(text);
+	return;
+}

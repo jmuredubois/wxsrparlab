@@ -49,6 +49,8 @@ public:
 	void SetBtnTxtStop();
 	void SetBtnTxtAcqu();
 
+	void SetTxtInfo(wxString text);
+
 	/* Drawing bitmap */
 	void Draw( wxDC& dc );
 	void SetNewImage();
@@ -144,6 +146,7 @@ private:
 	wxTextCtrl* m_textMax;
 	bool m_bTextInit;
 	wxPanel* m_DrawPanel;
+	wxStaticText* m_textInfo;
 
 	// Private data
 private:
@@ -188,5 +191,6 @@ enum CamViewDataEnum
 	IDT_DispMin = 258,
 	IDT_DispMax = 259,
 	IDP_DrawPanel = 260,
+	IDT_DispTxtInfo = 261,
 	ID_ThisIsAStop2 = 512
 };
