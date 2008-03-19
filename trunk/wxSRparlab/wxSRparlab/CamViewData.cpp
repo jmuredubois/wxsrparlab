@@ -31,7 +31,6 @@ CamViewData::CamViewData(wxWindow* parent, const wxString& title, const wxPoint&
 : wxPanel(parent, wxID_ANY, pos, size, wxBORDER_NONE, title)
 {
 	int res = 0;
-	m_bDrawing = false;
 	m_bNewImage = false;
 	m_bTextInit = false;
 
@@ -304,8 +303,11 @@ void CamViewData::OnSize( wxSizeEvent& even )
 ////////////////////////////////////////////////////////////////////
 void CamViewData::OnPaint( wxPaintEvent& event )
 {
-	wxPaintDC dc(m_DrawPanel);
-	Draw( dc );
+	if(m_DrawPanel->IsShownOnScreen())
+	{
+		wxPaintDC dc(m_DrawPanel);
+		Draw( dc );
+	}
 	event.Skip();
 }
 
@@ -319,28 +321,24 @@ void CamViewData::OnPaint( wxPaintEvent& event )
 void CamViewData::Draw( wxDC& dc )
 {
 	// check if dc available
-	if( !dc.Ok() || m_bDrawing == true ){ return; }
+	if( !dc.Ok() ){ return; }
+	wxMutexError errMutex= m_mutexBitmap->Lock();
+	if(errMutex == wxMUTEX_NO_ERROR)
+	{
 
-		m_bDrawing = true;
 
+		//wxMutexGUIEnter();
 		int x,y,w,h;
 		dc.GetClippingBox( &x, &y, &w, &h );
-		// if there is a new image to draw
-		if( (m_bNewImage) && (m_pBitmap!=NULL) )
+		if( (m_pBitmap!=NULL) )
 		{
-			wxMutexError errMutex= m_mutexBitmap->Lock();
-			if(errMutex == wxMUTEX_NO_ERROR)
-			{
-				dc.DrawBitmap( m_pBitmap[0] , x, y );
-				m_bNewImage = false;
-				errMutex = m_mutexBitmap->Unlock();
-			} //{errMutex == wxMUTEX_NO_ERROR)
-		} else
-		{
-			// draw inter frame ?
+			this->SetBitmap();
+			dc.DrawBitmap( m_pBitmap[0] , x, y );
 		}
+		//wxMutexGUILeave();
 
-		m_bDrawing = false;
+		errMutex = m_mutexBitmap->Unlock();
+	} //{errMutex == wxMUTEX_NO_ERROR)
 
 	return;
 }
@@ -405,7 +403,6 @@ int CamViewData::SetBitmap()
 {
 	int res = 0;
 	if(m_DrawPanel == NULL) { return -1;};
-	if(!(m_DrawPanel->IsShownOnScreen())){ return 0; };
 	if( (m_nDataWidth < 1) || (m_nDataWidth < 1)) { return -2;};
 	if(m_pWxImg == NULL) { return -3;};
 	int wP= 0; int hP = 0;
@@ -426,7 +423,6 @@ int CamViewData::SetBitmap()
 		errMutex = m_mutexBitmap->Unlock();
 	} //{errMutex == wxMUTEX_NO_ERROR)
 
-	SetNewImage();
 	return res;
 };
 
