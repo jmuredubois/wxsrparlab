@@ -82,6 +82,7 @@ CamFrame::CamFrame(wxFrame* parentFrm, const wxString& title, const wxPoint& pos
 	m_camNB = NULL;
 	m_sr = NULL;
 	m_pSrBuf = NULL; m_nRows = 0; m_nCols = 0; m_nSrBufSz = 0;
+	m_mutexSrBuf = new wxMutex(wxMUTEX_DEFAULT);
 
 	m_pFile4ReadPha = NULL;//new wxFFile();
 	m_pFile4ReadAmp = NULL;//new wxFFile();
@@ -100,6 +101,7 @@ CamFrame::~CamFrame()
 	int res = -1;
 	if(m_bReadContinuously){ if(m_pThreadReadData != NULL){ m_pThreadReadData->Delete(); } } ;
 	if(m_sr		  != NULL) { res = SR_Close(m_sr);	m_sr = NULL; };
+	if(m_mutexSrBuf != NULL) { delete(m_mutexSrBuf); m_mutexSrBuf = NULL;};
 	if(m_pSrBuf   != NULL) { free((void*) m_pSrBuf  ); m_pSrBuf   = NULL; };
 	if(m_pFile4ReadPha != NULL) { delete(m_pFile4ReadPha); m_pFile4ReadPha = NULL; };
 	if(m_pFile4ReadAmp != NULL) { delete(m_pFile4ReadAmp); m_pFile4ReadAmp = NULL; };
@@ -203,21 +205,21 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 
   wxFileDialog* OpenDialogPar = new wxFileDialog(this, 
 	  wxT("Choose a SR parameters file to open"),	// msg
-	  wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
+	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
 	  wxEmptyString,	// default file
 	  wxT("SR parameters files (*.sr2)|*.sr2|All files (*.*)|*.*"),	// file ext
 	  wxFD_OPEN|wxFD_CHANGE_DIR,
 	  wxDefaultPosition);
   wxFileDialog* OpenDialogPha = new wxFileDialog(this, 
 	  wxT("Choose a SR PHASE file to open"),	// msg
-	  wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
+	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
 	  wxEmptyString,	// default file
 	  wxT("SR phase files (*.16b)|*.16b|All files (*.*)|*.*"),	// file ext
 	  wxFD_OPEN|wxFD_CHANGE_DIR,
 	  wxDefaultPosition);
   wxFileDialog* OpenDialogAmp = new wxFileDialog(this, 
 	  wxT("Choose a SR AMPLITUDE file to open"),	// msg
-	  wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
+	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
 	  wxEmptyString,	// default file
 	  wxT("SR amplitude files (*.16b)|*.16b|All files (*.*)|*.*"),	// file ext
 	  wxFD_OPEN|wxFD_CHANGE_DIR,
@@ -261,9 +263,13 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	    }
  
 	    strR.sprintf(wxT("cam serial %i - %ix%i  - %i"), serial, m_nRows, m_nCols, m_nSrBufSz); // ... change text ...
-	    m_pSrBuf = (unsigned char*) malloc(m_nSrBufSz);
-	    memset(m_pSrBuf, 0x77, m_nSrBufSz);
-	  //
+		wxMutexError errMutex= m_mutexSrBuf->Lock();
+		if(errMutex == wxMUTEX_NO_ERROR)
+		{
+			m_pSrBuf = (unsigned char*) malloc(m_nSrBufSz);
+			memset(m_pSrBuf, 0x77, m_nSrBufSz);
+			errMutex = m_mutexSrBuf->Unlock();
+		} //{errMutex == wxMUTEX_NO_ERROR)
 	    res = m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[0], m_nRows*m_nCols);
 	    res = m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2], m_nRows*m_nCols);
  
@@ -285,11 +291,16 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	  m_nCols = (int) SR_GetCols(m_sr); 
 	  m_nRows = (int) SR_GetRows(m_sr); 
 	  strR.sprintf(wxT("cam serial %i - %ix%i  - %i"), serial, m_nRows, m_nCols, m_nSrBufSz); // ... change text ...
-	  m_pSrBuf = (unsigned char*) malloc(m_nSrBufSz);
-	  memset(m_pSrBuf, 0x77, m_nSrBufSz);
-	  res = SR_SetBuffer(m_sr, (void*) m_pSrBuf , m_nSrBufSz);
-	  res = SR_Acquire(m_sr, AM_COR_FIX_PTRN );//|| AM_COR_LED_NON_LIN );
-	  //
+	  wxMutexError errMutex= m_mutexSrBuf->Lock();
+	  if(errMutex == wxMUTEX_NO_ERROR)
+	  {
+		m_pSrBuf = (unsigned char*) malloc(m_nSrBufSz);
+		memset(m_pSrBuf, 0x77, m_nSrBufSz);
+		res = SR_SetBuffer(m_sr, (void*) m_pSrBuf , m_nSrBufSz);
+		res = SR_Acquire(m_sr, AM_COR_FIX_PTRN );//|| AM_COR_LED_NON_LIN );
+	    errMutex = m_mutexSrBuf->Unlock();
+	  } //{errMutex == wxMUTEX_NO_ERROR)
+
 	  res = m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 0), m_nRows*m_nCols);
 	  res = m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 1), m_nRows*m_nCols);
   }
@@ -321,6 +332,7 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   }
   if(m_pFile4ReadPha != NULL) { delete(m_pFile4ReadPha); m_pFile4ReadPha = NULL; };
   if(m_pFile4ReadAmp != NULL) { delete(m_pFile4ReadAmp); m_pFile4ReadAmp = NULL; };
+  if(m_mutexSrBuf != NULL) { delete(m_mutexSrBuf); m_mutexSrBuf = NULL;};
   if(m_pSrBuf   != NULL) { free((void*) m_pSrBuf  ); m_pSrBuf   = NULL; };
   m_nSrBufSz = 0; 
   m_nCols = 0; 
@@ -373,10 +385,15 @@ void CamFrame::AcqOneFrm()
   wxString strR;
   if((m_sr == NULL) && (m_pSrBuf != NULL) && (m_pFile4ReadPha  != NULL) && (m_pFile4ReadAmp  != NULL) && (m_pFile4ReadPha->IsOpened()) && (m_pFile4ReadAmp->IsOpened()))
   {
-	  res = m_pFile4ReadPha->Read(m_pSrBuf, m_nCols*m_nRows*2);
-	  res = m_pFile4ReadAmp->Read(&m_pSrBuf[m_nCols*m_nRows*2], m_nCols*m_nRows*2);
-	  m_nFrmRead +=1;
-	  // ... change text ...
+	  wxMutexError errMutex= m_mutexSrBuf->Lock();
+	  if(errMutex == wxMUTEX_NO_ERROR)
+	  {
+		res = m_pFile4ReadPha->Read(m_pSrBuf, m_nCols*m_nRows*2);
+		res = m_pFile4ReadAmp->Read(&m_pSrBuf[m_nCols*m_nRows*2], m_nCols*m_nRows*2);
+		m_nFrmRead +=1;
+		errMutex = m_mutexSrBuf->Unlock();
+	  } //{errMutex == wxMUTEX_NO_ERROR)
+	  
 	  strR.sprintf(wxT("frm:%05u - pixFileRead %i - %ix%i  - %i"), m_nFrmRead, res, m_nRows, m_nCols, m_nSrBufSz);
 	  m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[0], m_nRows*m_nCols);
 	  m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2], m_nRows*m_nCols);
@@ -393,8 +410,12 @@ void CamFrame::AcqOneFrm()
   }
   if((m_sr != NULL) && (m_pSrBuf != NULL) )
   {
-	  // ... change text ...
-	  res = SR_Acquire(m_sr, AM_COR_FIX_PTRN || AM_COR_LED_NON_LIN );
+	  wxMutexError errMutex= m_mutexSrBuf->Lock();
+	  if(errMutex == wxMUTEX_NO_ERROR)
+	  {
+	    res = SR_Acquire(m_sr, AM_COR_FIX_PTRN || AM_COR_LED_NON_LIN );
+	    errMutex = m_mutexSrBuf->Unlock();
+	  } //{errMutex == wxMUTEX_NO_ERROR)
 	  strR.sprintf(wxT("frm:%05u - pixRead %i - %ix%i  - %i"), m_nFrmRead, res, m_nRows, m_nCols, m_nSrBufSz);
 	  m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 0), m_nRows*m_nCols);
 	  m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 1), m_nRows*m_nCols);
@@ -403,8 +424,10 @@ void CamFrame::AcqOneFrm()
 	  m_viewAmpPane->SetTxtInfo(strR);
 	  m_nFrmRead +=1;
   }
-  m_viewRangePane->SetNewImage();
-  m_viewAmpPane->SetNewImage();
+  //m_viewRangePane->SetNewImage();
+  //m_viewAmpPane->SetNewImage();
+  //if((m_viewRangePane->IsShownOnScreen())){ m_viewRangePane->SetNewImage();};
+  //if((m_viewAmpPane->IsShownOnScreen())){ m_viewAmpPane->SetNewImage();};
 };
 
 //! Interface fct to set the modulation frequency

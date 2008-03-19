@@ -58,6 +58,7 @@ private:
 	SRCAM	m_sr;	// pointer for SR camera
 	//! buffer where the SR camera will return the data
 	unsigned char       *m_pSrBuf;
+	wxMutex* m_mutexSrBuf;
 	int m_nSrBufSz ;
 	int m_nRows;
 	int m_nCols;

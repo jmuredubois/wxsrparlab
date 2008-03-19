@@ -72,17 +72,17 @@ public:
 		if(numPix*sizeof(T) > m_nDataWidth * m_nDataHeight *sizeof(T)){return -2;};
 		if(m_pDataArray == NULL){return -3;};
 
+		T first = buf[0];
+
 		wxMutexError errMutex= m_mutexDataArray->Lock();
 		if(errMutex == wxMUTEX_NO_ERROR)
 		{
 			memcpy( (void*) m_pDataArray, (const void*) buf, numPix*sizeof(T));
 			errMutex = m_mutexDataArray->Unlock();
 		}
-		T first = buf[0];
-		CamViewData::Map2rgb<T>(first);
-		CamViewData::m_DrawPanel->Refresh();
-		CamViewData::m_DrawPanel->Update();
-		CamViewData::Refresh();
+		this->Map2rgb<T>(first);
+		m_DrawPanel->Refresh();
+		if(this->IsShownOnScreen()){ this->Refresh();};
 
 		return res;
 	};
@@ -119,12 +119,6 @@ public:
 		errMutex = m_mutexDataArray->Unlock();
 	} //{errMutex == wxMUTEX_NO_ERROR)
 
-	//// convert data from raw image to wxImg 
-	//m_pWxImg = wxImage( m_nDataWidth, m_nDataHeight, m_pRGB, TRUE );
-	//m_pWxImg.SetAlpha( m_pAlpha, TRUE);
-	// convert to bitmap to be used by the window to draw
-	SetBitmap();
-
 	return res;
 };
 
@@ -152,7 +146,6 @@ private:
 private:
 	wxImage*	m_pWxImg;	// pointer to image  (Dev. Indep.)
 	wxBitmap*	m_pBitmap;	// wxBitmap to paint (Dev. Dep.)
-  	bool	m_bDrawing;
 	bool	m_bNewImage;
 
 // private methods
