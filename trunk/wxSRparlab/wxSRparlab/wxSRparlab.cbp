@@ -33,6 +33,8 @@
 					<Add library="wsock32" />
 					<Add library="wxmsw28d_core" />
 					<Add library="wxbase28d" />
+					<Add library="kernel32" />
+					<Add library="user32" />
 					<Add directory="C:\Program Files\MESA\Swissranger\libusbSR" />
 					<Add directory="D:\wxWidgets-2.8.6\lib\vc_lib" />
 				</Linker>
