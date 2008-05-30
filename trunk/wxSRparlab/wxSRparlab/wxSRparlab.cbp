@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="wxSRparlab" />
+		<Option pch_mode="2" />
+		<Option compiler="msvc8" />
+		<Build>
+			<Target title="Debug Win32">
+				<Option output="$(JMU_BUILDS)\Debug\bin\wxSRparlab" prefix_auto="1" extension_auto="1" />
+				<Option object_output="$(JMU_BUILDS)\Debug\obj\wxSRparlab" />
+				<Option type="0" />
+				<Option compiler="msvc8" />
+				<Compiler>
+					<Add option="/MDd" />
+					<Add option="/Od" />
+					<Add option="/W3" />
+					<Add option="/ZI" />
+					<Add directory="C:\Program Files\MESA\Swissranger\libusbSR" />
+					<Add directory="D:\wxWidgets-2.8.6\include\msvc" />
+					<Add directory="D:\wxWidgets-2.8.6\include\" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="C:\Program Files\MESA\Swissranger\libusbSR" />
+					<Add directory="D:\wxWidgets-2.8.6\include\msvc" />
+					<Add directory="D:\wxWidgets-2.8.6\include\" />
+				</ResourceCompiler>
+				<Linker>
+					<Add library="comctl32" />
+					<Add library="rpcrt4" />
+					<Add library="winmm" />
+					<Add library="advapi32" />
+					<Add library="wsock32" />
+					<Add library="wxmsw28d_core" />
+					<Add library="wxbase28d" />
+					<Add directory="C:\Program Files\MESA\Swissranger\libusbSR" />
+					<Add directory="D:\wxWidgets-2.8.6\lib\vc_lib" />
+				</Linker>
+			</Target>
+			<Target title="Release Win32">
+				<Option output="wxSRparlab" prefix_auto="1" extension_auto="1" />
+				<Option object_output="$(JMU_BUILDS)\Release\obj\wxSRparlab" />
+				<Option type="0" />
+				<Option compiler="msvc8" />
+				<Compiler>
+					<Add option="/W3" />
+					<Add option="/Zi" />
+					<Add option="/MD" />
+					<Add directory="C:\Program Files\MESA\Swissranger\libusbSR" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="C:\Program Files\MESA\Swissranger\libusbSR" />
+				</ResourceCompiler>
+				<Linker>
+					<Add directory="C:\Program Files\MESA\Swissranger\libusbSR" />
+				</Linker>
+			</Target>
+		</Build>
+		<Unit filename="C:\Program Files\MESA\Swissranger\libusbSR\definesSR.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="C:\Program Files\MESA\Swissranger\libusbSR\libusbSR.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="CMainWnd.cpp" />
+		<Unit filename="CMainWnd.h" />
+		<Unit filename="CamFrame.cpp" />
+		<Unit filename="CamFrame.h" />
+		<Unit filename="CamPanelSettings.h" />
+		<Unit filename="CamPanelSettinsgs.cpp" />
+		<Unit filename="CamViewData.cpp" />
+		<Unit filename="CamViewData.h" />
+		<Unit filename="srDummy.cpp" />
+		<Unit filename="srDummy.h" />
+		<Unit filename="wxSRparlab.h" />
+		<Unit filename="wxSrApp.cpp" />
+		<Unit filename="wxSrApp.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
