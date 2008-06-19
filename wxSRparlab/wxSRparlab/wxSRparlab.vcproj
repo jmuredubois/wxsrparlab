@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(JMU_MESA_LIBUSBSR)&quot;;&quot;$(WXWIN)/include/msvc&quot;;&quot;$(WXWIN)/include/&quot;"
+				AdditionalIncludeDirectories="&quot;$(JMU_MESA_LIBUSBSR)&quot;;&quot;$(WXWIN)/include/msvc&quot;;&quot;$(WXWIN)/include&quot;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -116,12 +116,14 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(JMU_MESA_LIBUSBSR)&quot;;&quot;$(WXWIN)/include/msvc&quot;;&quot;$(WXWIN)/include/&quot;"
+				AdditionalIncludeDirectories="&quot;$(JMU_MESA_LIBUSBSR)&quot;;&quot;$(WXWIN)/include/msvc&quot;;&quot;$(WXWIN)/include&quot;"
+				PreprocessorDefinitions="NDEBUG"
 				RuntimeLibrary="2"
-				UsePrecompiledHeader="1"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderThrough="wxSRparlab.h"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
+				DebugInformationFormat="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -134,8 +136,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="comctl32.lib rpcrt4.lib winmm.lib advapi32.lib wsock32.lib wxmsw28_core.lib wxbase28.lib"
 				AdditionalLibraryDirectories="&quot;$(JMU_MESA_LIBUSBSR)&quot;;&quot;$(WXWIN)\lib\vc_dl&quot;;&quot;$(WXWIN)\lib\vc_lib&quot;"
-				GenerateDebugInformation="true"
+				GenerateDebugInformation="false"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
