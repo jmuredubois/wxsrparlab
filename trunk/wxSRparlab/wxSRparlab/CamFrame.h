@@ -53,11 +53,15 @@ public:
 	void SetFreq(wxCommandEvent& event);
 	void SetReadMode(wxCommandEvent& event);
 	void AcqOneFrm();
+	void CoordTrf();
 
 private:
 	SRCAM	m_sr;	// pointer for SR camera
 	//! buffer where the SR camera will return the data
 	unsigned char       *m_pSrBuf;
+	unsigned short      *m_pSrZ;
+	short      *m_pSrX;
+	short      *m_pSrY;
 	wxMutex* m_mutexSrBuf;
 	int m_nSrBufSz ;
 	int m_nRows;
