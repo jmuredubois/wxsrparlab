@@ -86,22 +86,7 @@ int CamViewData::AllocLUT() //! Allocate LUT
 
 	int i, c; // variables used in loops
 
-	/* gray ramp LUT */
-	c = 0; unsigned char R, G, B;
-	R = 0; G = 0; B = 0;
-	for(i = 0 ; i <(m_nLUTlen); i++)
-	{
-		m_pLUT[m_nComp*i+0] = R;
-		m_pLUT[m_nComp*i+1] = G;
-		m_pLUT[m_nComp*i+2] = B;
-		c +=1;
-		if (c >= m_nLUTlen)
-		{
-			c = 0;
-		}
-		R=c;G=c;B=c;
-	}
-	/* ENDOF: gray ramp LUT */
+	#include "lutDef.h"
 	return 0;
 }
 /**
