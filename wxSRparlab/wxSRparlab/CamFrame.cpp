@@ -92,6 +92,8 @@ CamFrame::CamFrame(wxFrame* parentFrm, const wxString& title, const wxPoint& pos
 	m_camReadMode = CAM_RD_ONESHOT;
 	m_bReadContinuously = false; 
 	m_srFrq = MF_20MHz;
+	m_maxMM[0]= 5000.0f; m_maxMM[1]= 7142.8571f;m_maxMM[2]= 7500.0f;m_maxMM[3]= 7894.7368f;
+	//! @todo:  HARDCODED values for m_maxMM -> check with libusbSR driver settings
 }
 
 /**
@@ -510,10 +512,10 @@ void CamFrame::CoordTrf()
 			  z = (sqrt( 
 				   ( 
 				     ( 
-					   ((float) pSrBuf[r*m_nCols+c]) / 65535.0f * 7500.0f 
+					   ((float) pSrBuf[r*m_nCols+c]) / 65535.0f * m_maxMM[m_srFrq] 
 					 )
 					*( 
-					   ((float) pSrBuf[r*m_nCols+c]) / 65535.0f * 7500.0f 
+					   ((float) pSrBuf[r*m_nCols+c]) / 65535.0f * m_maxMM[m_srFrq] 
 					 )
 					 * ((focal * focal) / ((focal * focal) + xc*xc + yc*yc)))));
 
