@@ -94,6 +94,7 @@ CamFrame::CamFrame(wxFrame* parentFrm, const wxString& title, const wxPoint& pos
 	m_srFrq = MF_20MHz;
 	m_maxMM[0]= 5000.0f; m_maxMM[1]= 7142.8571f;m_maxMM[2]= 7500.0f;m_maxMM[3]= 7894.7368f;
 	//! @todo:  HARDCODED values for m_maxMM -> check with libusbSR driver settings
+	m_fFocal = 8.0f; m_fPixSzX = 0.04f; m_fPixSzY = 0.04f; m_fCenterX = 85.0f; m_fCenterY = 76.7f;
 }
 
 /**
@@ -259,6 +260,7 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	  if ( (wxFparams->IsOpened()) )
 	  {
 	    int tmp = 0; // DANGER = 1 int must be 4 bytes
+		float tmpFlt = 0;
 		if(sizeof(int)!=4)
 		{
 			res-=64; 
@@ -269,15 +271,29 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 		else // (sizeof(int)!=4)
 		{
 	      size_t readBytes= wxFparams->Read(&tmp, sizeof(int));
-		  m_nRows = tmp;
+		  if(readBytes==sizeof(int)) {m_nRows = tmp;};
 		  readBytes= wxFparams->Read(&tmp, sizeof(int));
-		  m_nCols = tmp;
+		  if(readBytes==sizeof(int)) {m_nCols = tmp;};
 		  readBytes= wxFparams->Read(&tmp, sizeof(int));
-		  int numImg = tmp;
+		  if(readBytes==sizeof(int)) {int numImg = tmp;};
 		  readBytes = wxFparams->Read(&tmp, sizeof(int));
-		  int bytesPerSample = tmp;
+		  if(readBytes==sizeof(int)) {int bytesPerSample = tmp;}
 		  readBytes= wxFparams->Read(&tmp, sizeof(int));
-		  m_nSrBufSz = tmp;
+		  if(readBytes==sizeof(int)) {m_nSrBufSz = tmp;};
+		  /*		float focal = 8.0f;   //mm
+					float pixSzX = 0.04f; //mm
+					float pixSzY = 0.04f; //mm
+					float centerX = 95.1f ; float centerY = 56.3f ; // pixels*/
+		  readBytes = wxFparams->Read(&tmpFlt, sizeof(float));
+		  if(readBytes==sizeof(float)) { m_fFocal = tmpFlt;};
+		  readBytes = wxFparams->Read(&tmpFlt, sizeof(float));
+		  if(readBytes==sizeof(float)) { m_fPixSzX = tmpFlt;};
+		  readBytes = wxFparams->Read(&tmpFlt, sizeof(float));
+		  if(readBytes==sizeof(float)) { m_fPixSzY = tmpFlt;};
+		  readBytes = wxFparams->Read(&tmpFlt, sizeof(float));
+		  if(readBytes==sizeof(float)) { m_fCenterX = tmpFlt;};
+		  readBytes = wxFparams->Read(&tmpFlt, sizeof(float));
+		  if(readBytes==sizeof(float)) { m_fCenterY = tmpFlt;};
 		} // (sizeof(int)!=4)
 		delete(wxFparams);
 	    m_pFile4ReadPha = new wxFFile(strPathPha, "rb");
@@ -496,18 +512,14 @@ void CamFrame::CoordTrf()
   wxString strR;
   if((m_pSrBuf != NULL) && (m_pSrZ!=NULL) && (m_pSrY!=NULL) && (m_pSrX!=NULL) )
   {
-	  float focal = 8.0f;   //mm
-	  float pixSzX = 0.04f; //mm
-	  float pixSzY = 0.04f; //mm
-	  float centerX = 95.1f ; float centerY = 56.3f ; // pixels
 	  float xc = 0; float yc= 0; float x, y, z;
 	  unsigned short *pSrBuf = (unsigned short*) m_pSrBuf;
 	  for(int r = 0; r< m_nRows; r++)
 	  {
 		  for(int c = 0; c< m_nCols; c++)
 		  {
-			  xc = -(c -centerX) * pixSzX;
-			  yc = -(r -centerY) * pixSzY;
+			  xc = -(c -m_fCenterX) * m_fPixSzX;
+			  yc = -(r -m_fCenterY) * m_fPixSzY;
 
 			  z = (sqrt( 
 				   ( 
@@ -517,10 +529,10 @@ void CamFrame::CoordTrf()
 					*( 
 					   ((float) pSrBuf[r*m_nCols+c]) / 65535.0f * m_maxMM[m_srFrq] 
 					 )
-					 * ((focal * focal) / ((focal * focal) + xc*xc + yc*yc)))));
+					 * ((m_fFocal * m_fFocal) / ((m_fFocal * m_fFocal) + xc*xc + yc*yc)))));
 
-			  x =(( xc * z) / focal); 
-			  y =(( yc * z) / focal); 
+			  x =(( xc * z) / m_fFocal); 
+			  y =(( yc * z) / m_fFocal); 
 
 			  m_pSrZ[r*m_nCols+c] = (unsigned short) z ;
 			  m_pSrY[r*m_nCols+c] = (short) y ;

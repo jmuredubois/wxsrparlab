@@ -81,6 +81,7 @@ private:
 	bool m_bReadContinuously;	//! flag for continuous read
 	ModulationFrq m_srFrq;		//! SR frequency
 	float m_maxMM[4];			//! table for maximum depth value according to frequency
+	float m_fFocal; float m_fPixSzX; float m_fPixSzY; float m_fCenterX; float m_fCenterY;
 
 public:
     DECLARE_EVENT_TABLE()
