@@ -88,6 +88,7 @@ CamFrame::CamFrame(wxFrame* parentFrm, const wxString& title, const wxPoint& pos
 	m_pFile4ReadPha = NULL;//new wxFFile();
 	m_pFile4ReadAmp = NULL;//new wxFFile();
 	m_nFrmRead = 0; // 0 frames read when creating
+	m_nSerialSR = 0;
 	m_pThreadReadData = NULL;
 	m_camReadMode = CAM_RD_ONESHOT;
 	m_bReadContinuously = false; 
@@ -280,6 +281,8 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 		  if(readBytes==sizeof(int)) {int bytesPerSample = tmp;}
 		  readBytes= wxFparams->Read(&tmp, sizeof(int));
 		  if(readBytes==sizeof(int)) {m_nSrBufSz = tmp;};
+		  readBytes= wxFparams->Read(&tmp, sizeof(int));
+		  if(readBytes==sizeof(int)) {m_nSerialSR = tmp;};
 		  /*		float focal = 8.0f;   //mm
 					float pixSzX = 0.04f; //mm
 					float pixSzY = 0.04f; //mm
@@ -394,6 +397,7 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   m_nCols = 0; 
   m_nRows = 0;
   m_nFrmRead = 0;
+  m_nSerialSR = 0;
   m_settingsPane->EnableOpenSR();	// enable "Open" button
   m_settingsPane->SetText(wxT("Close successfull"));
 }
