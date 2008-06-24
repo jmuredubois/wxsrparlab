@@ -471,19 +471,19 @@ void CamFrame::CoordTrf()
 			  z = (sqrt( 
 				   ( 
 				     ( 
-					   ((float) pSrBuf[r+c*m_nRows]) / 65535.0f * 7500.0f 
+					   ((float) pSrBuf[r*m_nCols+c]) / 65535.0f * 7500.0f 
 					 )
 					*( 
-					   ((float) pSrBuf[r+c*m_nRows]) / 65535.0f * 7500.0f 
+					   ((float) pSrBuf[r*m_nCols+c]) / 65535.0f * 7500.0f 
 					 )
 					 * ((focal * focal) / ((focal * focal) + xc*xc + yc*yc)))));
 
 			  x =(( xc * z) / focal); 
 			  y =(( yc * z) / focal); 
 
-			  m_pSrZ[r+c*m_nRows] = (unsigned short) z ;
-			  m_pSrY[r+c*m_nRows] = (short) y ;
-			  m_pSrX[r+c*m_nRows] = (short) x ;
+			  m_pSrZ[r*m_nCols+c] = (unsigned short) z ;
+			  m_pSrY[r*m_nCols+c] = (short) y ;
+			  m_pSrX[r*m_nCols+c] = (short) x ;
 		  }
 	  }
   }
