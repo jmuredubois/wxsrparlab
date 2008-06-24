@@ -152,20 +152,39 @@ int CamFrame::CreateAndSetNotebook(const wxString& title)
 	m_settingsPane = new CamPanelSettings(m_camNB,wxT("Settings"), wxPoint(-1,-1), wxSize(-1,-1)); /* NBparadigm */
 	m_settingsPane->InitSettings();
 
-	// %%%%%% Camview window
+	// %%%%%% RANGE panel
 	m_viewRangePane = new CamViewData(m_camNB,wxT("Range"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
 	m_viewRangePane->InitViewData();
 
-	// %%%%%% Camview window
+	// %%%%%% AMPLITUDE panel
 	m_viewAmpPane = new CamViewData(m_camNB,wxT("Amplitude"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
 	m_viewAmpPane->InitViewData();
 	m_viewAmpPane->SetDispMin(0.0);
 	m_viewAmpPane->SetDispMax(1000.0);
 
+	// %%%%%% Z panel
+	m_viewZPane = new CamViewData(m_camNB,wxT("Z [mm]"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
+	m_viewZPane->InitViewData();
+	m_viewZPane->SetDispMin(0.0);
+	m_viewZPane->SetDispMax(3500.0);
+	// %%%%%% Y panel
+	m_viewYPane = new CamViewData(m_camNB,wxT("Y [mm]"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
+	m_viewYPane->InitViewData();
+	m_viewYPane->SetDispMin(-1000.0);
+	m_viewYPane->SetDispMax(1000.0);
+	// %%%%%% Z panel
+	m_viewXPane = new CamViewData(m_camNB,wxT("X [mm]"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
+	m_viewXPane->InitViewData();
+	m_viewXPane->SetDispMin(-1000.0);
+	m_viewXPane->SetDispMax(1000.0);
+
 	/* NBparadigm */
 	m_camNB->AddPage(m_settingsPane, wxT("Settings"), TRUE, -1);
 	m_camNB->AddPage(m_viewRangePane, wxT("Range"), FALSE, -1);
 	m_camNB->AddPage(m_viewAmpPane, wxT("Amplitude"), FALSE, -1);
+	m_camNB->AddPage(m_viewZPane, wxT("Z [mm]"), FALSE, -1);
+	m_camNB->AddPage(m_viewYPane, wxT("Y [mm]"), FALSE, -1);
+	m_camNB->AddPage(m_viewXPane, wxT("X [mm]"), FALSE, -1);
 	/* EO NBparadigm */
 
 	return res;
@@ -278,8 +297,10 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 			errMutex = m_mutexSrBuf->Unlock();
 		} //{errMutex == wxMUTEX_NO_ERROR)
 	    res = m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[0], m_nRows*m_nCols);
-	    //res = m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2], m_nRows*m_nCols);
-		res = m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrZ[0], m_nRows*m_nCols);
+	    res = m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2], m_nRows*m_nCols);
+		res = m_viewZPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrZ[0], m_nRows*m_nCols);
+		res = m_viewXPane->SetDataArray<short>((short*) &m_pSrX[0], m_nRows*m_nCols);
+		res = m_viewYPane->SetDataArray<short>((short*) &m_pSrY[0], m_nRows*m_nCols);
  
 	    m_settingsPane->SetText(strR);
 	  } // (wxFparams->IsOpened())
@@ -313,8 +334,10 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	  } //{errMutex == wxMUTEX_NO_ERROR)
 
 	  res = m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 0), m_nRows*m_nCols);
-	  //res = m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 1), m_nRows*m_nCols);
-	  res = m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrZ[0], m_nRows*m_nCols);
+	  res = m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 1), m_nRows*m_nCols);
+	  res = m_viewZPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrZ[0], m_nRows*m_nCols);
+	  res = m_viewXPane->SetDataArray<short>((short*) &m_pSrX[0], m_nRows*m_nCols);
+	  res = m_viewYPane->SetDataArray<short>((short*) &m_pSrY[0], m_nRows*m_nCols);
   }
   m_settingsPane->SetText(strR);
 }
@@ -370,7 +393,10 @@ void CamFrame::Acquire(wxCommandEvent& WXUNUSED(event))
 		m_settingsPane->DisableRadioReadMode();  //disallow changing read mode
 		m_bReadContinuously = true; // set reading flag
 		m_viewRangePane->SetBtnTxtStop();		// set new texts in ctrl buttons
-		m_viewAmpPane->SetBtnTxtStop();			//
+		m_viewAmpPane->SetBtnTxtStop();			// ...
+		m_viewZPane->SetBtnTxtStop();			// ...
+		m_viewYPane->SetBtnTxtStop();			// ...
+		m_viewXPane->SetBtnTxtStop();			// ...
 		m_settingsPane->DisableRadioFilt();	// disable filter selection
 		m_settingsPane->DisableRadioFrq();	// disable frequency selection
 
@@ -383,8 +409,11 @@ void CamFrame::Acquire(wxCommandEvent& WXUNUSED(event))
 		m_pThreadReadData->Delete();  // ... kill (gracefully) reading thread
 		m_settingsPane->EnableRadioReadMode();  //allow changing read mode
 		m_bReadContinuously = false;
-		m_viewRangePane->SetBtnTxtAcqu();
-		m_viewAmpPane->SetBtnTxtAcqu();
+		m_viewRangePane->SetBtnTxtAcqu();		// set new texts in ctrl buttons
+		m_viewAmpPane->SetBtnTxtAcqu();			// ...
+		m_viewZPane->SetBtnTxtAcqu();			// ...
+		m_viewYPane->SetBtnTxtAcqu();			// ...
+		m_viewXPane->SetBtnTxtAcqu();			// ...
 		m_settingsPane->EnableRadioFilt();	// enable filter selection
 		m_settingsPane->EnableRadioFrq();	// enable frequency selection
 
@@ -412,11 +441,16 @@ void CamFrame::AcqOneFrm()
 	  
 	  strR.sprintf(wxT("frm:%05u - pixFileRead %i - %ix%i  - %i"), m_nFrmRead, res, m_nRows, m_nCols, m_nSrBufSz);
 	  m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[0], m_nRows*m_nCols);
-	  //m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2], m_nRows*m_nCols);
-	  m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrZ[0], m_nRows*m_nCols);
+	  m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2], m_nRows*m_nCols);
+	  m_viewZPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrZ[0], m_nRows*m_nCols);
+	  m_viewYPane->SetDataArray<short>((short*) &m_pSrY[0], m_nRows*m_nCols);
+	  m_viewXPane->SetDataArray<short>((short*) &m_pSrX[0], m_nRows*m_nCols);
 	  m_settingsPane->SetText(strR);
 	  m_viewRangePane->SetTxtInfo(strR);
 	  m_viewAmpPane->SetTxtInfo(strR);
+	  m_viewZPane->SetTxtInfo(strR);
+	  m_viewYPane->SetTxtInfo(strR);
+	  m_viewXPane->SetTxtInfo(strR);
 
 	  if( (m_pFile4ReadPha->Eof()) || (m_pFile4ReadAmp->Eof()) )
 	  {
@@ -435,11 +469,16 @@ void CamFrame::AcqOneFrm()
 	  } //{errMutex == wxMUTEX_NO_ERROR)
 	  strR.sprintf(wxT("frm:%05u - pixRead %i - %ix%i  - %i"), m_nFrmRead, res, m_nRows, m_nCols, m_nSrBufSz);
 	  m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 0), m_nRows*m_nCols);
-	  //m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 1), m_nRows*m_nCols);
-	  m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrZ[0], m_nRows*m_nCols);
+	  m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 1), m_nRows*m_nCols);
+	  m_viewZPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrZ[0], m_nRows*m_nCols);
+	  m_viewYPane->SetDataArray<short>((short*) &m_pSrY[0], m_nRows*m_nCols);
+	  m_viewXPane->SetDataArray<short>((short*) &m_pSrX[0], m_nRows*m_nCols);
 	  m_settingsPane->SetText(strR);
 	  m_viewRangePane->SetTxtInfo(strR);
 	  m_viewAmpPane->SetTxtInfo(strR);
+	  m_viewZPane->SetTxtInfo(strR);
+	  m_viewYPane->SetTxtInfo(strR);
+	  m_viewXPane->SetTxtInfo(strR);
 	  m_nFrmRead +=1;
   }
   //m_viewRangePane->SetNewImage();

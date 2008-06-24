@@ -70,9 +70,12 @@ private:
 	wxFFile*		m_pFile4ReadPha; // PHASE file for read operation
 	wxFFile*		m_pFile4ReadAmp; // AMPLITUDE file for read operation
 	ThreadReadData*		m_pThreadReadData; // THREAD for reading data
-	CamPanelSettings* m_settingsPane;
-	CamViewData* m_viewRangePane;
-	CamViewData* m_viewAmpPane;
+	CamPanelSettings* m_settingsPane;	//! panel for CAMERA SETTINGS
+	CamViewData* m_viewRangePane;		//! panel for RANGE data display
+	CamViewData* m_viewAmpPane;			//! panel for AMPLITUDE data display
+	CamViewData* m_viewZPane;			//! panel for Z data display
+	CamViewData* m_viewYPane;			//! panel for Y data display
+	CamViewData* m_viewXPane;			//! panel for X data display
 	int m_nFrmRead;		// number of frames read
 	CamReadModeEnum  m_camReadMode;		// read  mode
 	bool m_bReadContinuously; 
