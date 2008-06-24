@@ -77,6 +77,7 @@ private:
 	CamViewData* m_viewYPane;			//! panel for Y data display
 	CamViewData* m_viewXPane;			//! panel for X data display
 	int m_nFrmRead;		//! number of frames read
+	int m_nSerialSR;		//! SR serial
 	CamReadModeEnum  m_camReadMode;		//! read  mode
 	bool m_bReadContinuously;	//! flag for continuous read
 	ModulationFrq m_srFrq;		//! SR frequency
