@@ -76,10 +76,11 @@ private:
 	CamViewData* m_viewZPane;			//! panel for Z data display
 	CamViewData* m_viewYPane;			//! panel for Y data display
 	CamViewData* m_viewXPane;			//! panel for X data display
-	int m_nFrmRead;		// number of frames read
-	CamReadModeEnum  m_camReadMode;		// read  mode
-	bool m_bReadContinuously; 
-	ModulationFrq m_srFrq;		// SR frequency
+	int m_nFrmRead;		//! number of frames read
+	CamReadModeEnum  m_camReadMode;		//! read  mode
+	bool m_bReadContinuously;	//! flag for continuous read
+	ModulationFrq m_srFrq;		//! SR frequency
+	float m_maxMM[4];			//! table for maximum depth value according to frequency
 
 public:
     DECLARE_EVENT_TABLE()
