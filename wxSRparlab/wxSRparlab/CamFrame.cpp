@@ -257,7 +257,7 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	  wxString strPathPha = OpenDialogPha->GetPath();
 	  wxString strPathAmp = OpenDialogAmp->GetPath();
 		// Sets our current document to the file the user selected
-	  wxFFile* wxFparams = new wxFFile(strPathPar, "rb");
+	  wxFFile* wxFparams = new wxFFile(strPathPar, wxT("rb"));
 	  if ( (wxFparams->IsOpened()) )
 	  {
 	    int tmp = 0; // DANGER = 1 int must be 4 bytes
@@ -299,8 +299,8 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 		  if(readBytes==sizeof(float)) { m_fCenterY = tmpFlt;};
 		} // (sizeof(int)!=4)
 		delete(wxFparams);
-	    m_pFile4ReadPha = new wxFFile(strPathPha, "rb");
-	    m_pFile4ReadAmp = new wxFFile(strPathAmp, "rb");
+	    m_pFile4ReadPha = new wxFFile(strPathPha, wxT("rb"));
+	    m_pFile4ReadAmp = new wxFFile(strPathAmp, wxT("rb"));
 	    if ( (!(m_pFile4ReadAmp)) || (!(m_pFile4ReadAmp)) || (!(m_pFile4ReadAmp->IsOpened())) || (!(m_pFile4ReadAmp->IsOpened())))
 	    {
 		  res -=4;
