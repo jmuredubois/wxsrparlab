@@ -1,0 +1,338 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1AD513C30E1212BD00318A8E /* CamFrame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1AD513B50E1212BD00318A8E /* CamFrame.cpp */; };
+		1AD513C40E1212BD00318A8E /* CamPanelSettinsgs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1AD513B80E1212BD00318A8E /* CamPanelSettinsgs.cpp */; };
+		1AD513C50E1212BD00318A8E /* CamViewData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1AD513B90E1212BD00318A8E /* CamViewData.cpp */; };
+		1AD513C60E1212BD00318A8E /* CMainWnd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1AD513BB0E1212BD00318A8E /* CMainWnd.cpp */; };
+		1AD513C70E1212BD00318A8E /* srDummy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1AD513BE0E1212BD00318A8E /* srDummy.cpp */; };
+		1AD513C80E1212BD00318A8E /* wxSrApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1AD513C00E1212BD00318A8E /* wxSrApp.cpp */; };
+		1AD513DD0E12135700318A8E /* libwx_base_carbonu-2.8.0.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AD513CD0E12135700318A8E /* libwx_base_carbonu-2.8.0.4.0.dylib */; };
+		1AD513DE0E12135700318A8E /* libwx_base_carbonu_net-2.8.0.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AD513CE0E12135700318A8E /* libwx_base_carbonu_net-2.8.0.4.0.dylib */; };
+		1AD513DF0E12135700318A8E /* libwx_base_carbonu_xml-2.8.0.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AD513CF0E12135700318A8E /* libwx_base_carbonu_xml-2.8.0.4.0.dylib */; };
+		1AD513E00E12135700318A8E /* libwx_macu-2.8.0.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AD513D00E12135700318A8E /* libwx_macu-2.8.0.4.0.dylib */; };
+		1AD513E10E12135700318A8E /* libwx_macu_adv-2.8.0.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AD513D10E12135700318A8E /* libwx_macu_adv-2.8.0.4.0.dylib */; };
+		1AD513E20E12135700318A8E /* libwx_macu_aui-2.8.0.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AD513D20E12135700318A8E /* libwx_macu_aui-2.8.0.4.0.dylib */; };
+		1AD513E30E12135700318A8E /* libwx_macu_core-2.8.0.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AD513D30E12135700318A8E /* libwx_macu_core-2.8.0.4.0.dylib */; };
+		1AD513E40E12135700318A8E /* libwx_macu_gl-2.8.0.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AD513D40E12135700318A8E /* libwx_macu_gl-2.8.0.4.0.dylib */; };
+		1AD513E50E12135700318A8E /* libwx_macu_html-2.8.0.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AD513D50E12135700318A8E /* libwx_macu_html-2.8.0.4.0.dylib */; };
+		1AD513E60E12135700318A8E /* libwx_macu_qa-2.8.0.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AD513D60E12135700318A8E /* libwx_macu_qa-2.8.0.4.0.dylib */; };
+		1AD513E70E12135700318A8E /* libwx_macu_richtext-2.8.0.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AD513D70E12135700318A8E /* libwx_macu_richtext-2.8.0.4.0.dylib */; };
+		1AD513E80E12135700318A8E /* libwx_macu_xrc-2.8.0.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AD513D80E12135700318A8E /* libwx_macu_xrc-2.8.0.4.0.dylib */; };
+		1AD513E90E12135700318A8E /* libwxjpeg-2.8.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AD513D90E12135700318A8E /* libwxjpeg-2.8.a */; };
+		1AD513EA0E12135700318A8E /* libwxpng-2.8.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AD513DA0E12135700318A8E /* libwxpng-2.8.a */; };
+		1AD513EB0E12135700318A8E /* libwxregexu-2.8.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AD513DB0E12135700318A8E /* libwxregexu-2.8.a */; };
+		1AD513EC0E12135700318A8E /* libwxtiff-2.8.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AD513DC0E12135700318A8E /* libwxtiff-2.8.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1AD513AC0E1211E800318A8E /* wxSRparlabMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = wxSRparlabMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1AD513AF0E1211E800318A8E /* wxSRparlabMac-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "wxSRparlabMac-Info.plist"; sourceTree = "<group>"; };
+		1AD513B50E1212BD00318A8E /* CamFrame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CamFrame.cpp; path = ../CamFrame.cpp; sourceTree = SOURCE_ROOT; };
+		1AD513B60E1212BD00318A8E /* CamFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CamFrame.h; path = ../CamFrame.h; sourceTree = SOURCE_ROOT; };
+		1AD513B70E1212BD00318A8E /* CamPanelSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CamPanelSettings.h; path = ../CamPanelSettings.h; sourceTree = SOURCE_ROOT; };
+		1AD513B80E1212BD00318A8E /* CamPanelSettinsgs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CamPanelSettinsgs.cpp; path = ../CamPanelSettinsgs.cpp; sourceTree = SOURCE_ROOT; };
+		1AD513B90E1212BD00318A8E /* CamViewData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CamViewData.cpp; path = ../CamViewData.cpp; sourceTree = SOURCE_ROOT; };
+		1AD513BA0E1212BD00318A8E /* CamViewData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CamViewData.h; path = ../CamViewData.h; sourceTree = SOURCE_ROOT; };
+		1AD513BB0E1212BD00318A8E /* CMainWnd.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CMainWnd.cpp; path = ../CMainWnd.cpp; sourceTree = SOURCE_ROOT; };
+		1AD513BC0E1212BD00318A8E /* CMainWnd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CMainWnd.h; path = ../CMainWnd.h; sourceTree = SOURCE_ROOT; };
+		1AD513BD0E1212BD00318A8E /* lutDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lutDef.h; path = ../lutDef.h; sourceTree = SOURCE_ROOT; };
+		1AD513BE0E1212BD00318A8E /* srDummy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = srDummy.cpp; path = ../srDummy.cpp; sourceTree = SOURCE_ROOT; };
+		1AD513BF0E1212BD00318A8E /* srDummy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = srDummy.h; path = ../srDummy.h; sourceTree = SOURCE_ROOT; };
+		1AD513C00E1212BD00318A8E /* wxSrApp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = wxSrApp.cpp; path = ../wxSrApp.cpp; sourceTree = SOURCE_ROOT; };
+		1AD513C10E1212BD00318A8E /* wxSrApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wxSrApp.h; path = ../wxSrApp.h; sourceTree = SOURCE_ROOT; };
+		1AD513C20E1212BD00318A8E /* wxSRparlab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wxSRparlab.h; path = ../wxSRparlab.h; sourceTree = SOURCE_ROOT; };
+		1AD513CD0E12135700318A8E /* libwx_base_carbonu-2.8.0.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libwx_base_carbonu-2.8.0.4.0.dylib"; path = "/software/wxMac-2.8.7/build-release/lib/libwx_base_carbonu-2.8.0.4.0.dylib"; sourceTree = "<absolute>"; };
+		1AD513CE0E12135700318A8E /* libwx_base_carbonu_net-2.8.0.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libwx_base_carbonu_net-2.8.0.4.0.dylib"; path = "/software/wxMac-2.8.7/build-release/lib/libwx_base_carbonu_net-2.8.0.4.0.dylib"; sourceTree = "<absolute>"; };
+		1AD513CF0E12135700318A8E /* libwx_base_carbonu_xml-2.8.0.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libwx_base_carbonu_xml-2.8.0.4.0.dylib"; path = "/software/wxMac-2.8.7/build-release/lib/libwx_base_carbonu_xml-2.8.0.4.0.dylib"; sourceTree = "<absolute>"; };
+		1AD513D00E12135700318A8E /* libwx_macu-2.8.0.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libwx_macu-2.8.0.4.0.dylib"; path = "/software/wxMac-2.8.7/build-release/lib/libwx_macu-2.8.0.4.0.dylib"; sourceTree = "<absolute>"; };
+		1AD513D10E12135700318A8E /* libwx_macu_adv-2.8.0.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libwx_macu_adv-2.8.0.4.0.dylib"; path = "/software/wxMac-2.8.7/build-release/lib/libwx_macu_adv-2.8.0.4.0.dylib"; sourceTree = "<absolute>"; };
+		1AD513D20E12135700318A8E /* libwx_macu_aui-2.8.0.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libwx_macu_aui-2.8.0.4.0.dylib"; path = "/software/wxMac-2.8.7/build-release/lib/libwx_macu_aui-2.8.0.4.0.dylib"; sourceTree = "<absolute>"; };
+		1AD513D30E12135700318A8E /* libwx_macu_core-2.8.0.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libwx_macu_core-2.8.0.4.0.dylib"; path = "/software/wxMac-2.8.7/build-release/lib/libwx_macu_core-2.8.0.4.0.dylib"; sourceTree = "<absolute>"; };
+		1AD513D40E12135700318A8E /* libwx_macu_gl-2.8.0.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libwx_macu_gl-2.8.0.4.0.dylib"; path = "/software/wxMac-2.8.7/build-release/lib/libwx_macu_gl-2.8.0.4.0.dylib"; sourceTree = "<absolute>"; };
+		1AD513D50E12135700318A8E /* libwx_macu_html-2.8.0.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libwx_macu_html-2.8.0.4.0.dylib"; path = "/software/wxMac-2.8.7/build-release/lib/libwx_macu_html-2.8.0.4.0.dylib"; sourceTree = "<absolute>"; };
+		1AD513D60E12135700318A8E /* libwx_macu_qa-2.8.0.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libwx_macu_qa-2.8.0.4.0.dylib"; path = "/software/wxMac-2.8.7/build-release/lib/libwx_macu_qa-2.8.0.4.0.dylib"; sourceTree = "<absolute>"; };
+		1AD513D70E12135700318A8E /* libwx_macu_richtext-2.8.0.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libwx_macu_richtext-2.8.0.4.0.dylib"; path = "/software/wxMac-2.8.7/build-release/lib/libwx_macu_richtext-2.8.0.4.0.dylib"; sourceTree = "<absolute>"; };
+		1AD513D80E12135700318A8E /* libwx_macu_xrc-2.8.0.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libwx_macu_xrc-2.8.0.4.0.dylib"; path = "/software/wxMac-2.8.7/build-release/lib/libwx_macu_xrc-2.8.0.4.0.dylib"; sourceTree = "<absolute>"; };
+		1AD513D90E12135700318A8E /* libwxjpeg-2.8.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libwxjpeg-2.8.a"; path = "/software/wxMac-2.8.7/build-release/lib/libwxjpeg-2.8.a"; sourceTree = "<absolute>"; };
+		1AD513DA0E12135700318A8E /* libwxpng-2.8.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libwxpng-2.8.a"; path = "/software/wxMac-2.8.7/build-release/lib/libwxpng-2.8.a"; sourceTree = "<absolute>"; };
+		1AD513DB0E12135700318A8E /* libwxregexu-2.8.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libwxregexu-2.8.a"; path = "/software/wxMac-2.8.7/build-release/lib/libwxregexu-2.8.a"; sourceTree = "<absolute>"; };
+		1AD513DC0E12135700318A8E /* libwxtiff-2.8.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libwxtiff-2.8.a"; path = "/software/wxMac-2.8.7/build-release/lib/libwxtiff-2.8.a"; sourceTree = "<absolute>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1AD513AA0E1211E800318A8E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1AD513DD0E12135700318A8E /* libwx_base_carbonu-2.8.0.4.0.dylib in Frameworks */,
+				1AD513DE0E12135700318A8E /* libwx_base_carbonu_net-2.8.0.4.0.dylib in Frameworks */,
+				1AD513DF0E12135700318A8E /* libwx_base_carbonu_xml-2.8.0.4.0.dylib in Frameworks */,
+				1AD513E00E12135700318A8E /* libwx_macu-2.8.0.4.0.dylib in Frameworks */,
+				1AD513E10E12135700318A8E /* libwx_macu_adv-2.8.0.4.0.dylib in Frameworks */,
+				1AD513E20E12135700318A8E /* libwx_macu_aui-2.8.0.4.0.dylib in Frameworks */,
+				1AD513E30E12135700318A8E /* libwx_macu_core-2.8.0.4.0.dylib in Frameworks */,
+				1AD513E40E12135700318A8E /* libwx_macu_gl-2.8.0.4.0.dylib in Frameworks */,
+				1AD513E50E12135700318A8E /* libwx_macu_html-2.8.0.4.0.dylib in Frameworks */,
+				1AD513E60E12135700318A8E /* libwx_macu_qa-2.8.0.4.0.dylib in Frameworks */,
+				1AD513E70E12135700318A8E /* libwx_macu_richtext-2.8.0.4.0.dylib in Frameworks */,
+				1AD513E80E12135700318A8E /* libwx_macu_xrc-2.8.0.4.0.dylib in Frameworks */,
+				1AD513E90E12135700318A8E /* libwxjpeg-2.8.a in Frameworks */,
+				1AD513EA0E12135700318A8E /* libwxpng-2.8.a in Frameworks */,
+				1AD513EB0E12135700318A8E /* libwxregexu-2.8.a in Frameworks */,
+				1AD513EC0E12135700318A8E /* libwxtiff-2.8.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1AD5139C0E1211C200318A8E = {
+			isa = PBXGroup;
+			children = (
+				1AD513CD0E12135700318A8E /* libwx_base_carbonu-2.8.0.4.0.dylib */,
+				1AD513CE0E12135700318A8E /* libwx_base_carbonu_net-2.8.0.4.0.dylib */,
+				1AD513CF0E12135700318A8E /* libwx_base_carbonu_xml-2.8.0.4.0.dylib */,
+				1AD513D00E12135700318A8E /* libwx_macu-2.8.0.4.0.dylib */,
+				1AD513D10E12135700318A8E /* libwx_macu_adv-2.8.0.4.0.dylib */,
+				1AD513D20E12135700318A8E /* libwx_macu_aui-2.8.0.4.0.dylib */,
+				1AD513D30E12135700318A8E /* libwx_macu_core-2.8.0.4.0.dylib */,
+				1AD513D40E12135700318A8E /* libwx_macu_gl-2.8.0.4.0.dylib */,
+				1AD513D50E12135700318A8E /* libwx_macu_html-2.8.0.4.0.dylib */,
+				1AD513D60E12135700318A8E /* libwx_macu_qa-2.8.0.4.0.dylib */,
+				1AD513D70E12135700318A8E /* libwx_macu_richtext-2.8.0.4.0.dylib */,
+				1AD513D80E12135700318A8E /* libwx_macu_xrc-2.8.0.4.0.dylib */,
+				1AD513D90E12135700318A8E /* libwxjpeg-2.8.a */,
+				1AD513DA0E12135700318A8E /* libwxpng-2.8.a */,
+				1AD513DB0E12135700318A8E /* libwxregexu-2.8.a */,
+				1AD513DC0E12135700318A8E /* libwxtiff-2.8.a */,
+				1AD513B50E1212BD00318A8E /* CamFrame.cpp */,
+				1AD513B60E1212BD00318A8E /* CamFrame.h */,
+				1AD513B70E1212BD00318A8E /* CamPanelSettings.h */,
+				1AD513B80E1212BD00318A8E /* CamPanelSettinsgs.cpp */,
+				1AD513B90E1212BD00318A8E /* CamViewData.cpp */,
+				1AD513BA0E1212BD00318A8E /* CamViewData.h */,
+				1AD513BB0E1212BD00318A8E /* CMainWnd.cpp */,
+				1AD513BC0E1212BD00318A8E /* CMainWnd.h */,
+				1AD513BD0E1212BD00318A8E /* lutDef.h */,
+				1AD513BE0E1212BD00318A8E /* srDummy.cpp */,
+				1AD513BF0E1212BD00318A8E /* srDummy.h */,
+				1AD513C00E1212BD00318A8E /* wxSrApp.cpp */,
+				1AD513C10E1212BD00318A8E /* wxSrApp.h */,
+				1AD513C20E1212BD00318A8E /* wxSRparlab.h */,
+				1AD513AD0E1211E800318A8E /* Products */,
+				1AD513AF0E1211E800318A8E /* wxSRparlabMac-Info.plist */,
+			);
+			sourceTree = "<group>";
+		};
+		1AD513AD0E1211E800318A8E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1AD513AC0E1211E800318A8E /* wxSRparlabMac.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1AD513AB0E1211E800318A8E /* wxSRparlabMac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1AD513B20E1211E900318A8E /* Build configuration list for PBXNativeTarget "wxSRparlabMac" */;
+			buildPhases = (
+				1AD513A80E1211E800318A8E /* Resources */,
+				1AD513A90E1211E800318A8E /* Sources */,
+				1AD513AA0E1211E800318A8E /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = wxSRparlabMac;
+			productName = wxSRparlabMac;
+			productReference = 1AD513AC0E1211E800318A8E /* wxSRparlabMac.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1AD5139E0E1211C200318A8E /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1AD513A10E1211C200318A8E /* Build configuration list for PBXProject "wxSRparlabMac" */;
+			compatibilityVersion = "Xcode 2.4";
+			hasScannedForEncodings = 0;
+			mainGroup = 1AD5139C0E1211C200318A8E;
+			productRefGroup = 1AD513AD0E1211E800318A8E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1AD513AB0E1211E800318A8E /* wxSRparlabMac */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1AD513A80E1211E800318A8E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1AD513A90E1211E800318A8E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1AD513C30E1212BD00318A8E /* CamFrame.cpp in Sources */,
+				1AD513C40E1212BD00318A8E /* CamPanelSettinsgs.cpp in Sources */,
+				1AD513C50E1212BD00318A8E /* CamViewData.cpp in Sources */,
+				1AD513C60E1212BD00318A8E /* CMainWnd.cpp in Sources */,
+				1AD513C70E1212BD00318A8E /* srDummy.cpp in Sources */,
+				1AD513C80E1212BD00318A8E /* wxSrApp.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1AD5139F0E1211C200318A8E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = Debug;
+		};
+		1AD513A00E1211C200318A8E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			name = Release;
+		};
+		1AD513B00E1211E800318A8E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				HEADER_SEARCH_PATHS = (
+					"/software/wxMac-2.8.7/build-release/lib/wx/include/mac-unicode-release-2.8",
+					"/software/wxMac-2.8.7/include",
+					"software/wxMac-2.8.7/contrib/include",
+				);
+				INFOPLIST_FILE = "wxSRparlabMac-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"/software/wxMac-2.8.7/build-release/lib\"";
+				OTHER_CFLAGS = (
+					"-D_FILE_OFFSET_BITS=64",
+					"-D_LARGE_FILES",
+					"-D__WXMAC__",
+				);
+				OTHER_LDFLAGS = (
+					"-framework",
+					IOKit,
+					"-framework",
+					Carbon,
+					"-framework",
+					System,
+					"-liconv",
+					"-framework",
+					Cocoa,
+					"-framework",
+					QuickTime,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = wxSRparlabMac;
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = NO;
+			};
+			name = Debug;
+		};
+		1AD513B10E1211E800318A8E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				HEADER_SEARCH_PATHS = (
+					"/software/wxMac-2.8.7/build-release/lib/wx/include/mac-unicode-release-2.8",
+					"/software/wxMac-2.8.7/include",
+					"software/wxMac-2.8.7/contrib/include",
+				);
+				INFOPLIST_FILE = "wxSRparlabMac-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"/software/wxMac-2.8.7/build-release/lib\"";
+				OTHER_CFLAGS = (
+					"-D_FILE_OFFSET_BITS=64",
+					"-D_LARGE_FILES",
+					"-D__WXMAC__",
+				);
+				OTHER_LDFLAGS = (
+					"-framework",
+					IOKit,
+					"-framework",
+					Carbon,
+					"-framework",
+					System,
+					"-liconv",
+					"-framework",
+					Cocoa,
+					"-framework",
+					QuickTime,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = wxSRparlabMac;
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1AD513A10E1211C200318A8E /* Build configuration list for PBXProject "wxSRparlabMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1AD5139F0E1211C200318A8E /* Debug */,
+				1AD513A00E1211C200318A8E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1AD513B20E1211E900318A8E /* Build configuration list for PBXNativeTarget "wxSRparlabMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1AD513B00E1211E800318A8E /* Debug */,
+				1AD513B10E1211E800318A8E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1AD5139E0E1211C200318A8E /* Project object */;
+}
