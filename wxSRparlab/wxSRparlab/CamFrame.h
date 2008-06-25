@@ -77,12 +77,14 @@ private:
 	CamViewData* m_viewYPane;			//! panel for Y data display
 	CamViewData* m_viewXPane;			//! panel for X data display
 	int m_nFrmRead;		//! number of frames read
-	int m_nSerialSR;		//! SR serial
+	unsigned int m_nSerialSR;		//! SR serial
 	CamReadModeEnum  m_camReadMode;		//! read  mode
 	bool m_bReadContinuously;	//! flag for continuous read
 	ModulationFrq m_srFrq;		//! SR frequency
 	float m_maxMM[4];			//! table for maximum depth value according to frequency
 	float m_fFocal; float m_fPixSzX; float m_fPixSzY; float m_fCenterX; float m_fCenterY;
+	float m_maxMMr;
+	int	  m_mfrqInt;
 
 public:
     DECLARE_EVENT_TABLE()
