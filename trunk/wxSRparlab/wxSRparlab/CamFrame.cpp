@@ -95,7 +95,9 @@ CamFrame::CamFrame(wxFrame* parentFrm, const wxString& title, const wxPoint& pos
 	m_srFrq = MF_20MHz;
 	m_maxMM[0]= 5000.0f; m_maxMM[1]= 7142.8571f;m_maxMM[2]= 7500.0f;m_maxMM[3]= 7894.7368f;
 	//! @todo:  HARDCODED values for m_maxMM -> check with libusbSR driver settings
-	m_fFocal = 8.0f; m_fPixSzX = 0.04f; m_fPixSzY = 0.04f; m_fCenterX = 85.0f; m_fCenterY = 76.7f;
+	m_fFocal = 8.0f; m_fPixSzX = 0.04f; m_fPixSzY = 0.04f; m_fCenterX = 88.0f; m_fCenterY = 72.0f;
+	m_maxMMr = 7500.0f;
+	m_mfrqInt = 2;
 }
 
 /**
@@ -281,8 +283,10 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 		  if(readBytes==sizeof(int)) {int bytesPerSample = tmp;}
 		  readBytes= wxFparams->Read(&tmp, sizeof(int));
 		  if(readBytes==sizeof(int)) {m_nSrBufSz = tmp;};
-		  readBytes= wxFparams->Read(&tmp, sizeof(int));
-		  if(readBytes==sizeof(int)) {m_nSerialSR = tmp;};
+		  readBytes= wxFparams->Read(&tmp, sizeof(unsigned int));
+		  if(readBytes==sizeof(unsigned int)) {m_nSerialSR = (unsigned int)tmp;};
+		  readBytes = wxFparams->Read(&tmp, sizeof(int));
+		  if(readBytes==sizeof(int)) {int m_frqInt = tmp; m_srFrq = (ModulationFrq) tmp;};
 		  /*		float focal = 8.0f;   //mm
 					float pixSzX = 0.04f; //mm
 					float pixSzY = 0.04f; //mm
@@ -297,6 +301,8 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 		  if(readBytes==sizeof(float)) { m_fCenterX = tmpFlt;};
 		  readBytes = wxFparams->Read(&tmpFlt, sizeof(float));
 		  if(readBytes==sizeof(float)) { m_fCenterY = tmpFlt;};
+		  readBytes = wxFparams->Read(&tmpFlt, sizeof(float));
+		  if(readBytes==sizeof(float)) { m_maxMMr = tmpFlt;};
 		} // (sizeof(int)!=4)
 		delete(wxFparams);
 	    m_pFile4ReadPha = new wxFFile(strPathPha, wxT("rb"));
