@@ -18,7 +18,7 @@
 #endif
 
 #define wxUSE_GUI 1		//!< using wxWidgets GUI components
-#define __WXDEBUG__		//!< using debug version of wxWidgets
+//#define __WXDEBUG__		//!< using debug version of wxWidgets
 
 /** the environment variable WXWIN should point to a valid wxWidget 
  *  installation \n
