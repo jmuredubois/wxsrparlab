@@ -276,6 +276,8 @@ int CViewSrVtk::addSrCam(int vtkSub)
 	//srLabelActor[vtkSub]->SetCamera(cam0);
 	if(vtkSub==0){ srLabelActor[vtkSub]->GetProperty()->SetColor(0.0,0.0,1.0); }; // BLUE for 0-th cam
 	if(vtkSub==1){ srLabelActor[vtkSub]->GetProperty()->SetColor(1.0,0.0,0.0); }; // RED  for 1-st add cam
+	if(vtkSub==2){ srLabelActor[vtkSub]->GetProperty()->SetColor(0.0,1.0,0.0); }; // GREENfor 2-nd add cam
+	if(vtkSub==3){ srLabelActor[vtkSub]->GetProperty()->SetColor(0.7,0.0,0.7); }; // PURPLfor 3-rd add cam
 
 	return res;
 }
@@ -477,9 +479,9 @@ int CViewSrVtk::addDataAct(int vtkSub)
 	int rows = 144; int cols = 176; // HARDCODED BAD BAD BAD or not in first add?
 	float x,y,z;
 	float xMin, xMax, yMin, yMax;
-	xMin = -3000.0f; xMax = 3000.0f;	// some bogus init value
-	yMin = -2000.0f; yMax = 2000.0f;	// some bogus init value
-	z = 250.0f;							// some bogus init value
+	xMin = -22.0f; xMax = 22.0f;	// some bogus init value
+	yMin = -32.0f; yMax = 32.0f;	// some bogus init value
+	z = 25.0f;							// some bogus init value
 	float pt[3];
 	int i = 0;int iv1 = 0; int iv2 = 0; int iv3 = 0; //loop counters
 	for (row = 0 ; row <rows; row++)	// loop on all rows
@@ -546,83 +548,6 @@ int CViewSrVtk::addDataAct(int vtkSub)
 
 	return res;
 }
-
-///**
-// * Updates the TOF points
-// */
-//int CViewSrVtk::updateTOFcurrent(SRCAM sr, SRPARLAB srPL, int vtkSub)
-//{
-//	int res = 0;
-//	if(!sr){return -1;};
-//	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-//
-//	if((!_x[vtkSub]) || (!_y[vtkSub]) || (!_z[vtkSub]) ){ allocXYZ(sr, vtkSub); };
-//
-//	int rows=(int)SR_GetRows(sr);
-//	int cols=(int)SR_GetCols(sr);
-//	int num=(int)SR_GetRows(sr)*(int)SR_GetCols(sr);
-//	SR_CoordTrfUint16(sr, _x[vtkSub],_y[vtkSub],_z[vtkSub], sizeof(short),sizeof(short), sizeof(WORD));
-//
-//	//pcoords->Reset();
-//	//pcoords->SetNumberOfComponents(3);
-//
-//	// We ask pcoords to allocate room for at least 25344 tuples
-//	// and set the number of tuples to 4.
-//	if(num != 25344)
-//	{
-//		pcoords[vtkSub]->SetNumberOfTuples(num);
-//	}
-//
-//	float pt[3];
-//	int row = 0; int col = 0;
-//	int i = 0; int iv1 = 0; int iv2 = 0; int iv3 = 0;
-//	for (row = 0 ; row <rows; row++)
-//    {
-//		for (col = 0; col<cols; col++)
-//		{
-//			pt[2] = (float) ((_z[vtkSub])[i]);
-//			pt[1] = (float) ((_y[vtkSub])[i]);
-//			pt[0] = (float) ((_x[vtkSub])[i]);
-//			pcoords[vtkSub]->SetTuple((iv1+iv2), pt);
-//			//dData[vtkSub]->SetValue((iv1+iv2),(float)((_z[vtkSub])[i]));
-//			i++; // le i++ doit être ici, il faut commencer à zéro !!!
-//			iv2+=rows;
-//			iv3++;
-//			if(iv3>=cols)
-//			{
-//				iv2 = 0;
-//				iv3 = 0;
-//				iv1 += 1;
-//			}
-//		}
-//    }
-//
-//	dataPoints[vtkSub]->Modified();
-//	pdata[vtkSub]->Update();
-//
-//
-//	i = 0;iv1 = 0; iv2 = 0; iv3 = 0;
-//	for (row = 0 ; row <rows; row++)
-//    {
-//		for (col = 0; col<cols; col++)
-//		{
-//			dData[vtkSub]->SetValue((iv1+iv2),(float)(pdata[vtkSub]->GetOutput()->GetPoints()->GetPoint(iv1+iv2)[2]));		// make sure that depth data is the transformed value; :-( unable to avoid loop yet :-(
-//			i++; // le i++ doit être ici, il faut commencer à zéro !!!
-//			iv2+=rows;
-//			iv3++;
-//			if(iv3>=cols)
-//			{
-//				iv2 = 0;
-//				iv3 = 0;
-//				iv1 += 1;
-//			}
-//		}
-//    }
-//
-//	data[vtkSub]->Modified();
-//	renWin->Render();
-//	return res;
-//}
 
 /**
  * Updates the TOF points
@@ -903,6 +828,8 @@ int CViewSrVtk::addBGDataAct(int vtkSub)
 
 	if(vtkSub==0){ BGdataActor[vtkSub]->GetProperty()->SetColor(0.0,0.0,1.0); }; // BLUE for 0-th cam
 	if(vtkSub==1){ BGdataActor[vtkSub]->GetProperty()->SetColor(1.0,0.0,0.0); }; // RED  for 1-st add cam
+	if(vtkSub==2){ BGdataActor[vtkSub]->GetProperty()->SetColor(0.0,1.0,0.0); }; // GREENfor 2-nd add cam
+	if(vtkSub==3){ BGdataActor[vtkSub]->GetProperty()->SetColor(0.7,0.0,0.7); }; // PURPLfor 3-rd add cam
 
 	//BGdataWriter[vtkSub]->SetInput(BGdata[vtkSub]); // write StructuredGrid data
 	BGdataWriter[vtkSub]->SetInput(BGcamTranFilter[vtkSub]->GetOutputDataObject(0)); // 20080118 transf
