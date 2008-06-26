@@ -18,7 +18,6 @@
 #endif
 
 #define wxUSE_GUI 1		//!< using wxWidgets GUI components
-//#define __WXDEBUG__		//!< using debug version of wxWidgets
 
 /** the environment variable WXWIN should point to a valid wxWidget 
  *  installation \n
@@ -63,3 +62,9 @@
 #include <math.h>
 
 #define NUMCAMS 4	//!< number of SR cams
+
+#define SAFE_FREE(p)       { if(p) { delete (p);     (p)=0; } }
+
+#ifdef JMU_USE_VTK
+	#include "wxSRvtkView.h"
+#endif

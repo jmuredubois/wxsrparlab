@@ -17,6 +17,7 @@
 class SrApp;		// main application
 class MainWnd;		// main window
 class CamFrame;		// camera frame
+class CViewSrVtk;	// vtk window
 
 /**
  * Main application class
@@ -32,4 +33,5 @@ private:
 	MainWnd		*_mainWnd;		//!< pointer to main window
 	int			_numCams;		//!< count of cameras
 	std::list<CamFrame*> m_camFrm;		//!< list of camFrames
+	CViewSrVtk	*_vtkWin ; //!< pointer to vtk window
 };

@@ -36,6 +36,7 @@ bool SrApp::OnInit()
 	//! - inits private vars to safe defaults \n
 	_mainWnd = NULL;
 	_numCams = NUMCAMS;
+	_vtkWin = NULL;
 
 	//! - creates a new main window \n
     _mainWnd = new MainWnd( _T("wxSRparlab"), wxPoint(050,050), wxSize(250,100) );
@@ -74,6 +75,10 @@ bool SrApp::OnInit()
     // loop and the application will run. If we returned false here, the
     // application would exit immediately.
 
+  #ifdef JMU_USE_VTK
+	_vtkWin = new CViewSrVtk(NULL);
+  #endif
+
     return TRUE;
 } 
 
@@ -85,5 +90,6 @@ bool SrApp::OnInit()
 int SrApp::OnExit()
 {
 	int res = 0;
+	if(_vtkWin){ delete(_vtkWin); _vtkWin =NULL; };
 	return res;
 }
