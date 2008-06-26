@@ -198,7 +198,7 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="1"
+				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="wxSRparlab.h"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"

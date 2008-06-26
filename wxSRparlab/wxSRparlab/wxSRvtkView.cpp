@@ -6,15 +6,15 @@
  * Constructor for CViewSrVtk
  *
  */
-CViewSrVtk::CViewSrVtk(MainWnd* pWnd)
+CViewSrVtk::CViewSrVtk(wxFrame* pWnd)
 {
 	_x = (short**) malloc( _vtkSubMax * sizeof(short*)); 
 	_y = (short**) malloc( _vtkSubMax* sizeof(short*));
-	_z = (WORD**) malloc( _vtkSubMax* sizeof(WORD*));
+	_z = (unsigned short**) malloc( _vtkSubMax* sizeof(unsigned short*));
 
 	_xBG = (short**) malloc( _vtkSubMax* sizeof(short*));
 	_yBG = (short**) malloc( _vtkSubMax* sizeof(short*));
-	_zBG = (WORD**) malloc( _vtkSubMax* sizeof(WORD*));
+	_zBG = (unsigned short**) malloc( _vtkSubMax* sizeof(unsigned short*));
 
 	_srX = (double*) malloc(_vtkSubMax* sizeof(double)); memset((void*)_srX, 0x0, _vtkSubMax* sizeof(double));
 	_srY = (double*) malloc(_vtkSubMax* sizeof(double)); memset((void*)_srY, 0x0, _vtkSubMax* sizeof(double));
@@ -627,77 +627,79 @@ int CViewSrVtk::addDataAct(int vtkSub)
 /**
  * Updates the TOF points
  */
-int CViewSrVtk::updateTOFcurrent(unsigned short *z, short y, short x, int vtkSub)
+int CViewSrVtk::updateTOFcurrent(int rows, int cols, unsigned short *z, short *y, short *x, int vtkSub)
 {
 	int res = 0;
-	////if(!sr){return -1;};
-	//if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
+	//if(!sr){return -1;};
+	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
 
-	//if((!_x[vtkSub]) || (!_y[vtkSub]) || (!_z[vtkSub]) ){ allocXYZ(sr, vtkSub); };
+	if((!_x[vtkSub]) || (!_y[vtkSub]) || (!_z[vtkSub]) ){ allocXYZ(rows, cols, vtkSub); };
 
-	//int rows=(int)SR_GetRows(sr);
-	//int cols=(int)SR_GetCols(sr);
-	//int num=(int)SR_GetRows(sr)*(int)SR_GetCols(sr);
-	////SR_CoordTrfUint16(sr, _x[vtkSub],_y[vtkSub],_z[vtkSub], sizeof(short),sizeof(short), sizeof(WORD));
+	int num=rows*cols;
+	//SR_CoordTrfUint16(sr, _x[vtkSub],_y[vtkSub],_z[vtkSub], sizeof(short),sizeof(short), sizeof(WORD));
+	memcpy((void*)_x[vtkSub], (void*) x, num*sizeof(short) );
+	memcpy((void*)_y[vtkSub], (void*) y, num*sizeof(short) );
+	memcpy((void*)_z[vtkSub], (void*) z, num*sizeof(unsigned short) );
+	
 
-	////pcoords->Reset();
-	////pcoords->SetNumberOfComponents(3);
+	//pcoords->Reset();
+	//pcoords->SetNumberOfComponents(3);
 
-	//// We ask pcoords to allocate room for at least 25344 tuples
-	//// and set the number of tuples to 4.
-	//if(num != 25344)
-	//{
-	//	pcoords[vtkSub]->SetNumberOfTuples(num);
-	//}
+	// We ask pcoords to allocate room for at least 25344 tuples
+	// and set the number of tuples to 4.
+	if(num != 25344)
+	{
+		pcoords[vtkSub]->SetNumberOfTuples(num);
+	}
 
-	//float pt[3];
-	//int row = 0; int col = 0;
-	//int i = 0; int iv1 = 0; int iv2 = 0; int iv3 = 0;
-	//for (row = 0 ; row <rows; row++)
- //   {
-	//	for (col = 0; col<cols; col++)
-	//	{
-	//		pt[2] = (float) ((_z[vtkSub])[i]);
-	//		pt[1] = (float) ((_y[vtkSub])[i]);
-	//		pt[0] = (float) ((_x[vtkSub])[i]);
-	//		pcoords[vtkSub]->SetTuple((iv1+iv2), pt);
-	//		//dData[vtkSub]->SetValue((iv1+iv2),(float)((_z[vtkSub])[i]));
-	//		i++; // le i++ doit être ici, il faut commencer à zéro !!!
-	//		iv2+=rows;
-	//		iv3++;
-	//		if(iv3>=cols)
-	//		{
-	//			iv2 = 0;
-	//			iv3 = 0;
-	//			iv1 += 1;
-	//		}
-	//	}
- //   }
+	float pt[3];
+	int row = 0; int col = 0;
+	int i = 0; int iv1 = 0; int iv2 = 0; int iv3 = 0;
+	for (row = 0 ; row <rows; row++)
+    {
+		for (col = 0; col<cols; col++)
+		{
+			pt[2] = (float) ((_z[vtkSub])[i]);
+			pt[1] = (float) ((_y[vtkSub])[i]);
+			pt[0] = (float) ((_x[vtkSub])[i]);
+			pcoords[vtkSub]->SetTuple((iv1+iv2), pt);
+			//dData[vtkSub]->SetValue((iv1+iv2),(float)((_z[vtkSub])[i]));
+			i++; // le i++ doit être ici, il faut commencer à zéro !!!
+			iv2+=rows;
+			iv3++;
+			if(iv3>=cols)
+			{
+				iv2 = 0;
+				iv3 = 0;
+				iv1 += 1;
+			}
+		}
+    }
 
-	//dataPoints[vtkSub]->Modified();
-	//pdata[vtkSub]->Update();
+	dataPoints[vtkSub]->Modified();
+	pdata[vtkSub]->Update();
 
 
-	//i = 0;iv1 = 0; iv2 = 0; iv3 = 0;
-	//for (row = 0 ; row <rows; row++)
- //   {
-	//	for (col = 0; col<cols; col++)
-	//	{
-	//		dData[vtkSub]->SetValue((iv1+iv2),(float)(pdata[vtkSub]->GetOutput()->GetPoints()->GetPoint(iv1+iv2)[2]));		// make sure that depth data is the transformed value; :-( unable to avoid loop yet :-(
-	//		i++; // le i++ doit être ici, il faut commencer à zéro !!!
-	//		iv2+=rows;
-	//		iv3++;
-	//		if(iv3>=cols)
-	//		{
-	//			iv2 = 0;
-	//			iv3 = 0;
-	//			iv1 += 1;
-	//		}
-	//	}
- //   }
+	i = 0;iv1 = 0; iv2 = 0; iv3 = 0;
+	for (row = 0 ; row <rows; row++)
+    {
+		for (col = 0; col<cols; col++)
+		{
+			dData[vtkSub]->SetValue((iv1+iv2),(float)(pdata[vtkSub]->GetOutput()->GetPoints()->GetPoint(iv1+iv2)[2]));		// make sure that depth data is the transformed value; :-( unable to avoid loop yet :-(
+			i++; // le i++ doit être ici, il faut commencer à zéro !!!
+			iv2+=rows;
+			iv3++;
+			if(iv3>=cols)
+			{
+				iv2 = 0;
+				iv3 = 0;
+				iv1 += 1;
+			}
+		}
+    }
 
-	//data[vtkSub]->Modified();
-	//renWin->Render();
+	data[vtkSub]->Modified();
+	renWin->Render();
 	return res;
 }
 
@@ -738,19 +740,18 @@ int CViewSrVtk::freeDataAct(int vtkSub)
 /**
  * alloc buffers for xyz values
  */
-int CViewSrVtk::allocXYZ(SRCAM sr, int vtkSub)
+int CViewSrVtk::allocXYZ(int rows, int cols, int vtkSub)
 {
 	int res = 0;
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
+	if((rows>512) || (rows<0) || (cols>512) || (cols<0)){ return -2;};
 
 	if((_x[vtkSub]) || (_y[vtkSub]) || (_z[vtkSub]) ){ freeXYZ(vtkSub);};
 
-	int rows=(int)SR_GetRows(sr);
-	int cols=(int)SR_GetCols(sr);
-	int num=(int)SR_GetRows(sr)*(int)SR_GetCols(sr);
-	_x[vtkSub] = (short*) malloc(num*sizeof(WORD)); memset( (LPVOID) _x[vtkSub], 0x00, SR_GetCols(sr)*SR_GetRows(sr)*sizeof(short));
-	_y[vtkSub] = (short*) malloc(num*sizeof(WORD)); memset( (LPVOID) _y[vtkSub], 0x00, SR_GetCols(sr)*SR_GetRows(sr)*sizeof(short));
-	_z[vtkSub] = (WORD*)  malloc(num*sizeof(WORD)); memset( (LPVOID) _z[vtkSub], 0x00, SR_GetCols(sr)*SR_GetRows(sr)*sizeof(WORD));
+	int num=rows*cols;
+	_x[vtkSub] = (short*) malloc(num*sizeof(short)); memset( (LPVOID) _x[vtkSub], 0x00, rows*cols*sizeof(short));
+	_y[vtkSub] = (short*) malloc(num*sizeof(short)); memset( (LPVOID) _y[vtkSub], 0x00, rows*cols*sizeof(short));
+	_z[vtkSub] = (unsigned short*)  malloc(num*sizeof(unsigned short)); memset( (LPVOID) _z[vtkSub], 0x00, rows*cols*sizeof(unsigned short));
 
 	data[vtkSub]->SetWholeExtent(0,rows-1,0,cols-1,0,0);
 	data[vtkSub]->ComputeBounds();
@@ -776,27 +777,7 @@ int CViewSrVtk::freeXYZ(int vtkSub)
 }
 
 /**
- * alloc buffers for xyz values
- */
-int CViewSrVtk::allocXYZbg(SRCAM sr, int vtkSub)
-{
-	int res = 0;
-	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-
-	if((_xBG[vtkSub]) || (_yBG[vtkSub]) || (_zBG[vtkSub]) ){ freeXYZbg(vtkSub);};
-
-	int rows=(int)SR_GetRows(sr);
-	int cols=(int)SR_GetCols(sr);
-	int num=(int)SR_GetRows(sr)*(int)SR_GetCols(sr);
-	_xBG[vtkSub] = (short*) malloc(num*sizeof(WORD)); memset( (LPVOID) _xBG[vtkSub], 0x00, SR_GetCols(sr)*SR_GetRows(sr)*sizeof(short));
-	_yBG[vtkSub] = (short*) malloc(num*sizeof(WORD)); memset( (LPVOID) _yBG[vtkSub], 0x00, SR_GetCols(sr)*SR_GetRows(sr)*sizeof(short));
-	_zBG[vtkSub] = (WORD*)  malloc(num*sizeof(WORD)); memset( (LPVOID) _zBG[vtkSub], 0x00, SR_GetCols(sr)*SR_GetRows(sr)*sizeof(WORD));
-
-	return res;
-}
-
-/**
- * alloc buffers for xyz values
+ * alloc BG buffers for xyz values
  */
 int CViewSrVtk::allocXYZbg(int rows, int cols, int vtkSub)
 {
@@ -806,9 +787,9 @@ int CViewSrVtk::allocXYZbg(int rows, int cols, int vtkSub)
 	if((_xBG[vtkSub]) || (_yBG[vtkSub]) || (_zBG[vtkSub]) ){ freeXYZbg(vtkSub);};
 
 	int num=rows*cols;
-	_xBG[vtkSub] = (short*) malloc(num*sizeof(WORD)); memset( (LPVOID) _xBG[vtkSub], 0x00, rows*cols*sizeof(short));
-	_yBG[vtkSub] = (short*) malloc(num*sizeof(WORD)); memset( (LPVOID) _yBG[vtkSub], 0x00, rows*cols*sizeof(short));
-	_zBG[vtkSub] = (WORD*)  malloc(num*sizeof(WORD)); memset( (LPVOID) _zBG[vtkSub], 0x00, rows*cols*sizeof(WORD));
+	_xBG[vtkSub] = (short*) malloc(num*sizeof(short)); memset( (LPVOID) _xBG[vtkSub], 0x00, rows*cols*sizeof(short));
+	_yBG[vtkSub] = (short*) malloc(num*sizeof(short)); memset( (LPVOID) _yBG[vtkSub], 0x00, rows*cols*sizeof(short));
+	_zBG[vtkSub] = (unsigned short*)  malloc(num*sizeof(unsigned short)); memset( (LPVOID) _zBG[vtkSub], 0x00, rows*cols*sizeof(unsigned short));
 
 	return res;
 }
