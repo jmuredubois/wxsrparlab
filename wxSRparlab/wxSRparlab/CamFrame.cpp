@@ -475,7 +475,9 @@ void CamFrame::AcqOneFrm()
 	  m_viewZPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrZ[0], m_nRows*m_nCols);
 	  m_viewYPane->SetDataArray<short>((short*) &m_pSrY[0], m_nRows*m_nCols);
 	  m_viewXPane->SetDataArray<short>((short*) &m_pSrX[0], m_nRows*m_nCols);
-	  _vtkWin->updateTOFcurrent(m_nRows, m_nCols, m_pSrZ, m_pSrY, m_pSrX,_vtkSub);
+	  #ifdef JMU_USE_VTK
+		_vtkWin->updateTOFcurrent(m_nRows, m_nCols, m_pSrZ, m_pSrY, m_pSrX,_vtkSub);
+      #endif
 	  m_settingsPane->SetText(strR);
 	  m_viewRangePane->SetTxtInfo(strR);
 	  m_viewAmpPane->SetTxtInfo(strR);
