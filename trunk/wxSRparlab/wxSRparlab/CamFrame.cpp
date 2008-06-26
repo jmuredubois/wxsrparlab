@@ -98,6 +98,8 @@ CamFrame::CamFrame(wxFrame* parentFrm, const wxString& title, const wxPoint& pos
 	m_fFocal = 8.0f; m_fPixSzX = 0.04f; m_fPixSzY = 0.04f; m_fCenterX = 88.0f; m_fCenterY = 72.0f;
 	m_maxMMr = 7500.0f;
 	m_mfrqInt = 2;
+	_vtkWin=NULL;
+	_vtkSub = 0;
 }
 
 /**
@@ -473,6 +475,7 @@ void CamFrame::AcqOneFrm()
 	  m_viewZPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrZ[0], m_nRows*m_nCols);
 	  m_viewYPane->SetDataArray<short>((short*) &m_pSrY[0], m_nRows*m_nCols);
 	  m_viewXPane->SetDataArray<short>((short*) &m_pSrX[0], m_nRows*m_nCols);
+	  _vtkWin->updateTOFcurrent(m_nRows, m_nCols, m_pSrZ, m_pSrY, m_pSrX,_vtkSub);
 	  m_settingsPane->SetText(strR);
 	  m_viewRangePane->SetTxtInfo(strR);
 	  m_viewAmpPane->SetTxtInfo(strR);
@@ -607,4 +610,13 @@ void CamFrame::SetReadMode(wxCommandEvent&(event))
 	  strR.sprintf(wxT("Cam read mode = %s "), "One frame");
   }
   m_settingsPane->SetText(strR);
+};
+
+void CamFrame::SetVtkWin(CViewSrVtk *vtkWin, int vtkSub)
+{
+	_vtkWin = vtkWin;
+	if( (vtkSub > -1) && (vtkSub < NUMCAMS))
+	{
+		_vtkSub = vtkSub;
+	}
 };

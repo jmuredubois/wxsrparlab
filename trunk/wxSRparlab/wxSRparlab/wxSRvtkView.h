@@ -54,11 +54,11 @@
  */
 class CViewSrVtk{
 public:
-	CViewSrVtk(MainWnd* pWnd);
+	CViewSrVtk(wxFrame* pWnd);
 	~CViewSrVtk();
 
 	//int updateTOFcurrent(SRCAM sr, SRPARLAB srPL, int vtkSub){};
-	int updateTOFcurrent(unsigned short *z, short y, short x, int vtkSub);
+	int updateTOFcurrent(int rows, int cols, unsigned short *z, short *y, short *x, int vtkSub);
 	//int updateTOFcurrent(SRCAM sr, SRPARLAB srPL, int vtkSub, char* fname){};
 
 	//int updateTOFbg(SRCAM sr, SRPARLAB srPL, int vtkSub);
@@ -123,17 +123,16 @@ private:
   
   short		**_x;
   short		**_y;
-  WORD		**_z;
+  unsigned short **_z;
 
   short		**_xBG;
   short		**_yBG;
-  WORD		**_zBG;
+  unsigned short **_zBG;
 
-  int allocXYZ(SRCAM sr,int vtkSub);
+  int allocXYZ(int rows, int cols, int vtkSub);
   int freeXYZ(int vtkSub);
 
 
-  int allocXYZbg(SRCAM sr,int vtkSub);
   int allocXYZbg(int rows, int cols,int vtkSub);
   int freeXYZbg(int vtkSub);
   int addBGDataAct(int vtkSub);

@@ -54,7 +54,10 @@ bool SrApp::OnInit()
 	wxSize	sz = wxSize(220,400);	// size for camFrame
 	wxString lab;					// title string for camFrame
 	wxString labT;					// title string for camFrame
-	
+
+  #ifdef JMU_USE_VTK
+	_vtkWin = new CViewSrVtk(NULL);
+  #endif
 
 	//! - for the max number of cameras ...
 	for(int i = 0; i<_numCams; i++){
@@ -64,6 +67,7 @@ bool SrApp::OnInit()
 		CamFrame *camFrm = new CamFrame( _mainWnd, lab, pos, sz );
 		camFrm->Show(TRUE);
 		camFrm->CreateAndSetNotebook(labT);
+		camFrm->SetVtkWin(_vtkWin, i);
 		m_camFrm.push_back(camFrm);
 		pos += incr; //... increment position.
 	} // ENDOF for loop on _numCams
@@ -74,10 +78,6 @@ bool SrApp::OnInit()
 	// success: wxApp::OnRun() will be called which will enter the main message
     // loop and the application will run. If we returned false here, the
     // application would exit immediately.
-
-  #ifdef JMU_USE_VTK
-	_vtkWin = new CViewSrVtk(NULL);
-  #endif
 
     return TRUE;
 } 
