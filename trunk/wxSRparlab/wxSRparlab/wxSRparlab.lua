@@ -29,9 +29,11 @@ package.excludes = {
 package.buildflags = {"no-pch","no-main"}
 --package.defines = {""}
 if (OS == "windows") then
-  package.includepaths = {
-    string.format('%s%s',os.getenv("WXWIN"), "/include")
-  }
+  tinsert(package.includepaths,
+    {
+      string.format('%s%s',os.getenv("WXWIN"), "/include")
+    }
+  )
   if (target =="vs2005") then
 	tinsert(package.includepaths, 
 	  {
