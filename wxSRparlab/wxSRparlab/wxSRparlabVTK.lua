@@ -86,7 +86,6 @@ end
 
 
 --package includes for VTK
-if (OS == "windows") then
 tinsert(package.includepaths,
   {
     string.format('%s',os.getenv("JMU_VTKBINBASE")),
@@ -100,22 +99,10 @@ tinsert(package.includepaths,
 )
 tinsert(package.libpaths,
   {
-    string.format('%s%s',os.getenv("JMU_VTKBINBASE"), "/bin/release")
+    string.format('%s%s',os.getenv("JMU_VTKBINBASE"), "/bin") --for MacOSX version
+	string.format('%s%s',os.getenv("JMU_VTKBINBASE"), "/bin/release") --for WinXP version
   }
 )
-end
-if (OS == "macosx") then
-tinsert(package.includepaths,
-  {
-    string.format('%s',os.getenv("JMU_VTKSRCBASE"))
-  }
-)
-tinsert(package.libpaths,
-  {
-    string.format('%s',os.getenv("JMU_VTKBINBASE"))
-  }
-)
-end
 tinsert(package.links,
   {
     "vtkGraphics", "vtkRendering", "vtkCommon", "vtkFiltering", "vtkIO", "vtkHybrid"
