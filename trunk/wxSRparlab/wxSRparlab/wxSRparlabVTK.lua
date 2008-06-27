@@ -3,11 +3,11 @@ package.guid = "F0174772-C16D-4CED-8E0E-3B1348DB3631"
 package.kind = "winexe"
 package.language = "c++"
 
-project.configs = {"DebugVTK", "ReleaseVTK"}
+package.configs = {"DebugVTK", "ReleaseVTK"}
 
 package.targetprefix = ""
---package.config["Debug"].target = string.format('%s%s%s',os.getenv("JMU_BUILDS"), "/Debug/bin",package.name)
---package.config["Release"].target = string.format('%s%s%s',os.getenv("JMU_BUILDS"), "/Release/bin",package.name)
+--package.config["DebugVTK"].target = string.format('%s%s%s',os.getenv("JMU_BUILDS"), "/Debug/bin",package.name)
+--package.config["ReleaseVTK"].target = string.format('%s%s%s',os.getenv("JMU_BUILDS"), "/Release/bin",package.name)
 
 package.config["DebugVTK"].bindir = string.format('%s%s',os.getenv("JMU_BUILDS"), "/Debug/bin")
 package.config["ReleaseVTK"].bindir = string.format('%s%s',os.getenv("JMU_BUILDS"), "/Release/bin")
