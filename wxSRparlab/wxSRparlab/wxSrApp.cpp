@@ -41,6 +41,7 @@ bool SrApp::OnInit()
 	//! - creates a new main window \n
     _mainWnd = new MainWnd( _T("wxSRparlab"), wxPoint(050,050), wxSize(250,100) );
 	if(_mainWnd != NULL){
+		_mainWnd->Init();
 		_mainWnd->Show(TRUE); // show the main window
 	}
 	else{
@@ -57,6 +58,7 @@ bool SrApp::OnInit()
 
   #ifdef JMU_USE_VTK
 	_vtkWin = new CViewSrVtk(NULL);
+	_mainWnd->SetVtkWin(_vtkWin);
   #endif
 
 	//! - for the max number of cameras ...
