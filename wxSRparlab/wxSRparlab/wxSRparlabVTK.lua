@@ -3,6 +3,8 @@ package.guid = "F0174772-C16D-4CED-8E0E-3B1348DB3631"
 package.kind = "winexe"
 package.language = "c++"
 
+project.configs = {"DebugVTK", "ReleaseVTK"}
+
 package.targetprefix = ""
 --package.config["Debug"].target = string.format('%s%s%s',os.getenv("JMU_BUILDS"), "/Debug/bin",package.name)
 --package.config["Release"].target = string.format('%s%s%s',os.getenv("JMU_BUILDS"), "/Release/bin",package.name)
@@ -26,6 +28,8 @@ package.excludes = {
 
 package.buildflags = {"no-pch","no-main"}
 --package.defines = {""}
+
+--- setup of wxWidgets build options
 if (OS == "windows") then
   tinsert(package.includepaths,
     {
@@ -48,7 +52,6 @@ if (OS == "windows") then
 end
 
 tinsert(package.config["ReleaseVTK"].buildflags, {"optimize-speed"})
-
 
 --addoption("--with-shared-wxwin", "link wxWidgets as a shared library")
 -- --Configure a C/C++ package to use wxWidgets
@@ -79,7 +82,33 @@ if (OS == "windows") then
   tinsert(package.config["ReleaseVTK"].links, {"wxmsw28_core", "wxbase28"})
 end
 
----end
+---END OF package includes for wxWidgets
+
+
+--package includes for VTK
+tinsert(package.includepaths,
+  {
+    string.format('%s',os.getenv("JMU_VTKBINBASE")),
+    string.format('%s%s',os.getenv("JMU_VTKSRCBASE"), "/Graphics"),
+	string.format('%s%s',os.getenv("JMU_VTKSRCBASE"), "/Rendering"),
+	string.format('%s%s',os.getenv("JMU_VTKSRCBASE"), "/Common"),
+	string.format('%s%s',os.getenv("JMU_VTKSRCBASE"), "/Filtering"),
+	string.format('%s%s',os.getenv("JMU_VTKSRCBASE"), "/IO"),
+	string.format('%s%s',os.getenv("JMU_VTKSRCBASE"), "/Hybrid")
+  }
+)
+tinsert(package.libpaths,
+  {
+    string.format('%s%s',os.getenv("JMU_VTKBINBASE"), "/bin/release")
+  }
+)
+tinsert(package.links,
+  {
+    "vtkGraphics", "vtkRendering", "vtkCommon", "vtkFiltering", "vtkIO", "vtkHybrid"
+  }
+)
+tinsert(package.defines, { "JMU_USE_VTK" } )
+--ENDO OFpackage includes for VTK
 
 -- --http://wiki.wxwindows.org/WxMac_Issues
 if (OS == "macosx") then
