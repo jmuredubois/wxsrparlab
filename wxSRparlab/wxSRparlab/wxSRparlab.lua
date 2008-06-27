@@ -32,14 +32,18 @@ if (OS == "windows") then
   package.includepaths = {
     string.format('%s%s',os.getenv("WXWIN"), "/include")
   }
-  package.libpaths = {
-    string.format('%s%s',os.getenv("WXWIN"), "/lib/vc_dll"),
-    string.format('%s%s',os.getenv("WXWIN"), "/lib/vc_lib"),
-  }
   if (target =="vs2005") then
-	package.includepaths = {
-      string.format('%s%s',os.getenv("WXWIN"), "/include/msvc")
-	}
+	tinsert(package.includepaths, 
+	  {
+		string.format('%s%s',os.getenv("WXWIN"), "/include/msvc")
+	  }
+	)
+	tinsert( package.libpaths, 
+      {
+        string.format('%s%s',os.getenv("WXWIN"), "/lib/vc_dll"),
+        string.format('%s%s',os.getenv("WXWIN"), "/lib/vc_lib"),
+      }
+	)
   end
 end
 
