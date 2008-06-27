@@ -86,6 +86,7 @@ end
 
 
 --package includes for VTK
+if (OS == "windows") then
 tinsert(package.includepaths,
   {
     string.format('%s',os.getenv("JMU_VTKBINBASE")),
@@ -102,6 +103,19 @@ tinsert(package.libpaths,
     string.format('%s%s',os.getenv("JMU_VTKBINBASE"), "/bin/release")
   }
 )
+end
+if (OS == "macosx") then
+tinsert(package.includepaths,
+  {
+    string.format('%s',os.getenv("JMU_VTKSRCBASE"))
+  }
+)
+tinsert(package.libpaths,
+  {
+    string.format('%s',os.getenv("JMU_VTKBINBASE"))
+  }
+)
+end
 tinsert(package.links,
   {
     "vtkGraphics", "vtkRendering", "vtkCommon", "vtkFiltering", "vtkIO", "vtkHybrid"
@@ -115,7 +129,7 @@ if (OS == "macosx") then
 --  	string.format('%s%s',"cd ",string.format('%s%s',os.getenv("JMU_BUILDS"), "/Debug/bin")
 --),
   package.postbuildcommands = {
-  	string.format('%s%s%s%s%s',"rm -f -r -v ",os.getenv("JMU_BUILDS"), "/Debug/bin",package.name, ".app"),
+  	string.format('%s%s%s%s%s',"rm -f -r -v ",os.getenv("JMU_BUILDS"), "/Debug/bin/",package.name, ".app"),
   	string.format('%s%s%s%s%s',"mkdir ",os.getenv("JMU_BUILDS"), "/Debug/bin/",package.name, ".app"),
   	string.format('%s%s%s%s%s',"mkdir ",os.getenv("JMU_BUILDS"), "/Debug/bin/",package.name, ".app/Contents"),
   	string.format('%s%s%s%s%s',"mkdir ",os.getenv("JMU_BUILDS"), "/Debug/bin/",package.name, ".app/Contents/MacOS"),

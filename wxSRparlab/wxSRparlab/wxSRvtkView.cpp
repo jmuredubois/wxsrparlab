@@ -8,7 +8,7 @@
  */
 CViewSrVtk::CViewSrVtk(wxFrame* pWnd)
 {
-	_x = (short**) malloc( _vtkSubMax * sizeof(short*)); 
+	_x = (short**) malloc( _vtkSubMax * sizeof(short*));
 	_y = (short**) malloc( _vtkSubMax* sizeof(short*));
 	_z = (unsigned short**) malloc( _vtkSubMax* sizeof(unsigned short*));
 
@@ -47,7 +47,7 @@ CViewSrVtk::CViewSrVtk(wxFrame* pWnd)
 	BGdataMapper = (vtkPolyDataMapper**) malloc( _vtkSubMax * sizeof(vtkPolyDataMapper*));
 	BGdataActor = (vtkActor**) malloc( _vtkSubMax * sizeof(vtkActor*));
 
-	
+
 	BGdataPoints = (vtkPoints**) malloc( _vtkSubMax * sizeof(vtkPoints*));
 	BGpdata = (vtkStructuredGridGeometryFilter**) malloc( _vtkSubMax * sizeof(vtkStructuredGridGeometryFilter*));
 	BGpcoords = (vtkFloatArray**) malloc( _vtkSubMax * sizeof(vtkFloatArray*));
@@ -235,7 +235,7 @@ CViewSrVtk::~CViewSrVtk()
 	free(BGdataMapper);
 	free(BGdataActor);
 
-	
+
 	free(BGdataPoints);
 	free(BGpdata);
 	free(BGpcoords);
@@ -397,7 +397,7 @@ int CViewSrVtk::addDepthLUT()
 int CViewSrVtk::changeDepthRange(float minval, float maxval)
 {
 	int res = 0;
-	
+
 	for(int i=0; i< _vtkSubMax; i++)
 	{
 		dataMapper[i]->SetScalarRange((double) minval, (double) maxval);		//!< HARDCODED SCALAR RANGE FOR DEPTH LUT
@@ -453,7 +453,7 @@ int CViewSrVtk::freeScalarBar()
 
 /**
  * Creates a data actor
- *  -> 
+ *  ->
  *  --> freeDataAct must be called in cleanup
  */
 int CViewSrVtk::addDataAct(int vtkSub)
@@ -521,7 +521,7 @@ int CViewSrVtk::addDataAct(int vtkSub)
 	data[vtkSub]->SetDimensions(144,176,1);
 
 	camTranFilter[vtkSub]->SetInput(data[vtkSub]);	// 20080118 transf
-	
+
 	pdata[vtkSub] = vtkStructuredGridGeometryFilter::New();
 	// 20080118 transf	pdata[vtkSub]->SetInput(data[vtkSub]);
 	pdata[vtkSub]->SetInput(camTranFilter[vtkSub]->GetOutputDataObject(0)); // 20080118 transf
@@ -565,7 +565,7 @@ int CViewSrVtk::updateTOFcurrent(int rows, int cols, unsigned short *z, short *y
 	memcpy((void*)_x[vtkSub], (void*) x, num*sizeof(short) );
 	memcpy((void*)_y[vtkSub], (void*) y, num*sizeof(short) );
 	memcpy((void*)_z[vtkSub], (void*) z, num*sizeof(unsigned short) );
-	
+
 
 	//pcoords->Reset();
 	//pcoords->SetNumberOfComponents(3);
@@ -639,7 +639,7 @@ int CViewSrVtk::updateTOFcurrent(int rows, int cols, unsigned short *z, short *y
 //	if(res!=0){return -2;};
 //	dataWriter[vtkSub]->SetFileName(fname);
 //	res+=dataWriter[vtkSub]->Write();
-//	
+//
 //	return res;
 //}
 /**
@@ -674,9 +674,9 @@ int CViewSrVtk::allocXYZ(int rows, int cols, int vtkSub)
 	if((_x[vtkSub]) || (_y[vtkSub]) || (_z[vtkSub]) ){ freeXYZ(vtkSub);};
 
 	int num=rows*cols;
-	_x[vtkSub] = (short*) malloc(num*sizeof(short)); memset( (LPVOID) _x[vtkSub], 0x00, rows*cols*sizeof(short));
-	_y[vtkSub] = (short*) malloc(num*sizeof(short)); memset( (LPVOID) _y[vtkSub], 0x00, rows*cols*sizeof(short));
-	_z[vtkSub] = (unsigned short*)  malloc(num*sizeof(unsigned short)); memset( (LPVOID) _z[vtkSub], 0x00, rows*cols*sizeof(unsigned short));
+	_x[vtkSub] = (short*) malloc(num*sizeof(short)); memset( (void*) _x[vtkSub], 0x00, rows*cols*sizeof(short));
+	_y[vtkSub] = (short*) malloc(num*sizeof(short)); memset( (void*) _y[vtkSub], 0x00, rows*cols*sizeof(short));
+	_z[vtkSub] = (unsigned short*)  malloc(num*sizeof(unsigned short)); memset( (void*) _z[vtkSub], 0x00, rows*cols*sizeof(unsigned short));
 
 	data[vtkSub]->SetWholeExtent(0,rows-1,0,cols-1,0,0);
 	data[vtkSub]->ComputeBounds();
@@ -695,8 +695,8 @@ int CViewSrVtk::freeXYZ(int vtkSub)
 	int res = 0;
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
 
-	SAFE_FREE(_x[vtkSub]); 
-	SAFE_FREE(_y[vtkSub]); 
+	SAFE_FREE(_x[vtkSub]);
+	SAFE_FREE(_y[vtkSub]);
 	SAFE_FREE(_z[vtkSub]);
 	return res;
 }
@@ -712,9 +712,9 @@ int CViewSrVtk::allocXYZbg(int rows, int cols, int vtkSub)
 	if((_xBG[vtkSub]) || (_yBG[vtkSub]) || (_zBG[vtkSub]) ){ freeXYZbg(vtkSub);};
 
 	int num=rows*cols;
-	_xBG[vtkSub] = (short*) malloc(num*sizeof(short)); memset( (LPVOID) _xBG[vtkSub], 0x00, rows*cols*sizeof(short));
-	_yBG[vtkSub] = (short*) malloc(num*sizeof(short)); memset( (LPVOID) _yBG[vtkSub], 0x00, rows*cols*sizeof(short));
-	_zBG[vtkSub] = (unsigned short*)  malloc(num*sizeof(unsigned short)); memset( (LPVOID) _zBG[vtkSub], 0x00, rows*cols*sizeof(unsigned short));
+	_xBG[vtkSub] = (short*) malloc(num*sizeof(short)); memset( (void*) _xBG[vtkSub], 0x00, rows*cols*sizeof(short));
+	_yBG[vtkSub] = (short*) malloc(num*sizeof(short)); memset( (void*) _yBG[vtkSub], 0x00, rows*cols*sizeof(short));
+	_zBG[vtkSub] = (unsigned short*)  malloc(num*sizeof(unsigned short)); memset( (void*) _zBG[vtkSub], 0x00, rows*cols*sizeof(unsigned short));
 
 	return res;
 }
@@ -727,8 +727,8 @@ int CViewSrVtk::freeXYZbg(int vtkSub)
 	int res = 0;
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
 
-	SAFE_FREE(_xBG[vtkSub]); 
-	SAFE_FREE(_yBG[vtkSub]); 
+	SAFE_FREE(_xBG[vtkSub]);
+	SAFE_FREE(_yBG[vtkSub]);
 	SAFE_FREE(_zBG[vtkSub]);
 	return res;
 }
@@ -742,11 +742,11 @@ int CViewSrVtk::addBGDataAct(int vtkSub)
 
 	int rows = 144; // HARDCODED BAD BAD BAD
 	int cols = 176;
-	
+
 	if((!_xBG[vtkSub]) || (!_yBG[vtkSub]) || (!_zBG[vtkSub]) ){ allocXYZbg(rows, cols, vtkSub); };
 
 	int num = rows * cols;
-	
+
 	BGdataPoints[vtkSub] = vtkPoints::New();
 	// Create a float array which represents the points.
     BGpcoords[vtkSub] = vtkFloatArray::New();
@@ -854,7 +854,7 @@ int CViewSrVtk::addBGDataAct(int vtkSub)
 //	if(!sr){return -1;};
 //	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
 //
-//	if((!_xBG[vtkSub]) || (!_yBG[vtkSub]) || (!_zBG[vtkSub]) ){ 
+//	if((!_xBG[vtkSub]) || (!_yBG[vtkSub]) || (!_zBG[vtkSub]) ){
 //		allocXYZbg(sr, vtkSub); };
 //	if(!(srPL)) return -1;
 //
@@ -872,7 +872,7 @@ int CViewSrVtk::addBGDataAct(int vtkSub)
 //
 //	WORD* phaBg = PL_GetBGImage(srPL, 0);
 //	WORD* ampBg = PL_GetBGImage(srPL, 1);
-//	WORD* zBG = PL_GetZbgImage(srPL); 
+//	WORD* zBG = PL_GetZbgImage(srPL);
 //
 //	SR_SetBuffer(sr, (LPVOID) phaBg, SR_GetBufferSize(sr)); //touchy
 //	SR_CoordTrfUint16(sr, _xBG[vtkSub],_yBG[vtkSub],0, sizeof(short),sizeof(short), sizeof(WORD));
@@ -882,7 +882,7 @@ int CViewSrVtk::addBGDataAct(int vtkSub)
 //	// WATCH OUT, THE BG DATA MUST BE IN SR BUFFER WHEN THIS FCT IS CALLED !!!
 //	//SR_CoordTrfUint16(sr, _xBG,_yBG,_zBG, sizeof(short),sizeof(short), sizeof(WORD));
 //
-//	
+//
 //	// We ask pcoords to allocate room for at least 25344 tuples
 //	// and set the number of tuples to 4.
 //	if(num!=25344)
@@ -959,7 +959,7 @@ int CViewSrVtk::addBGDataAct(int vtkSub)
 //	if(res!=0){return -2;};
 //	BGdataWriter[vtkSub]->SetFileName(fname);
 //	res+=BGdataWriter[vtkSub]->Write();
-//	
+//
 //	return res;
 //}
 
