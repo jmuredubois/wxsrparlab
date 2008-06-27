@@ -99,7 +99,7 @@ tinsert(package.includepaths,
 )
 tinsert(package.libpaths,
   {
-    string.format('%s%s',os.getenv("JMU_VTKBINBASE"), "/bin") --for MacOSX version
+    string.format('%s%s',os.getenv("JMU_VTKBINBASE"), "/bin"), --for MacOSX version
 	string.format('%s%s',os.getenv("JMU_VTKBINBASE"), "/bin/release") --for WinXP version
   }
 )
