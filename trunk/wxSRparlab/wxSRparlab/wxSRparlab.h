@@ -1,5 +1,5 @@
 /*
- * wxSRparlab.h 
+ * wxSRparlab.h
  * Top level header file for wxSRparlab
  *
  * @author: James Mure-Dubois
@@ -19,17 +19,17 @@
 
 #define wxUSE_GUI 1		//!< using wxWidgets GUI components
 
-/** the environment variable WXWIN should point to a valid wxWidget 
+/** the environment variable WXWIN should point to a valid wxWidget
  *  installation \n
  *  - "$(WXWIN)/include"  should be added to the include path \n
- *  - config specific: "$(WXWIN)/include/vc_lib/msvc/" should 
+ *  - config specific: "$(WXWIN)/include/vc_lib/msvc/" should
  *    be added to the include path for "setup.h"
  */
-#include "wx/wxprec.h"
-#ifndef  WX_PRECOMP
-  #include "wx/wx.h"
-#endif //precompiled headers
-//#include "wx/wx.h"			//!< base for wxWindows
+//#include "wx/wxprec.h"
+//#ifndef  WX_PRECOMP
+//  #include "wx/wx.h"
+//#endif //precompiled headers
+#include "wx/wx.h"			//!< base for wxWindows
 #include "wx/mdi.h"			//!< used for MDI interface
 #include "wx/panel.h"		//!< for panels (used in tabbed interface)
 #include "wx/notebook.h"	//!< for notebook (tabbed interface)
@@ -44,7 +44,7 @@
 #include <list>		//STL list
 
 /** on win32 machine, wxWidgets needs those 5 libs, \n
- *  comctl32.lib rpcrt4.lib winmm.lib advapi32.lib wsock32.lib 
+ *  comctl32.lib rpcrt4.lib winmm.lib advapi32.lib wsock32.lib
  *  according to http://www.wxwidgets.org/wiki/index.php/MSVC
  *  (accessed on 2007.10.19)
  */
