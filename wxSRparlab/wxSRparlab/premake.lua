@@ -30,13 +30,17 @@ package.buildflags = {"no-pch","no-main"}
 --package.defines = {""}
 if (OS == "windows") then
   package.includepaths = {
-    string.format('%s%s',os.getenv("WXWIN"), "/include"),
-    string.format('%s%s',os.getenv("WXWIN"), "/include/msvc")
+    string.format('%s%s',os.getenv("WXWIN"), "/include")
   }
   package.libpaths = {
     string.format('%s%s',os.getenv("WXWIN"), "/lib/vc_dll"),
     string.format('%s%s',os.getenv("WXWIN"), "/lib/vc_lib"),
   }
+  if (target =="vs2005") then
+	package.includepaths = {
+      string.format('%s%s',os.getenv("WXWIN"), "/include/msvc")
+	}
+  end
 end
 
 tinsert(package.config["Release"].buildflags, {"optimize-speed"})
