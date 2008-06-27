@@ -24,14 +24,16 @@ package.excludes = {
 
 package.buildflags = {"no-pch","no-main"}
 --package.defines = {""}
-package.includepaths = {
-  string.format('%s%s',os.getenv("WXWIN"), "/include"),
-  string.format('%s%s',os.getenv("WXWIN"), "/include/msvc")
-}
-package.libpaths = {
-  string.format('%s%s',os.getenv("WXWIN"), "/lib/vc_dll"),
-  string.format('%s%s',os.getenv("WXWIN"), "/lib/vc_lib"),
-}
+if (OS == "windows") then
+  package.includepaths = {
+    string.format('%s%s',os.getenv("WXWIN"), "/include"),
+    string.format('%s%s',os.getenv("WXWIN"), "/include/msvc")
+  }
+  package.libpaths = {
+    string.format('%s%s',os.getenv("WXWIN"), "/lib/vc_dll"),
+    string.format('%s%s',os.getenv("WXWIN"), "/lib/vc_lib"),
+  }
+end
 
 tinsert(package.config["Release"].buildflags, {"optimize-speed"})
 
@@ -46,6 +48,10 @@ end
 
 if (OS == "linux") then
   tinsert(package.buildoptions, "`wx-config --cxxflags` -W -Wall -ansi -pedantic")
+  tinsert(package.linkoptions,  "`wx-config --libs`")
+end
+if (OS == "macosx") then
+  tinsert(package.buildoptions, "`wx-config --cxxflags` -W -Wall -ansi")
   tinsert(package.linkoptions,  "`wx-config --libs`")
 end
 
