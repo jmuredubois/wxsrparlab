@@ -98,8 +98,10 @@ CamFrame::CamFrame(wxFrame* parentFrm, const wxString& title, const wxPoint& pos
 	m_fFocal = 8.0f; m_fPixSzX = 0.04f; m_fPixSzY = 0.04f; m_fCenterX = 88.0f; m_fCenterY = 72.0f;
 	m_maxMMr = 7500.0f;
 	m_mfrqInt = 2;
+#ifdef JMU_USE_VTK
 	_vtkWin=NULL;
 	_vtkSub = 0;
+#endif
 }
 
 /**
@@ -614,6 +616,7 @@ void CamFrame::SetReadMode(wxCommandEvent&(event))
   m_settingsPane->SetText(strR);
 };
 
+#ifdef JMU_USE_VTK
 void CamFrame::SetVtkWin(CViewSrVtk *vtkWin, int vtkSub)
 {
 	_vtkWin = vtkWin;
@@ -622,3 +625,4 @@ void CamFrame::SetVtkWin(CViewSrVtk *vtkWin, int vtkSub)
 		_vtkSub = vtkSub;
 	}
 };
+#endif
