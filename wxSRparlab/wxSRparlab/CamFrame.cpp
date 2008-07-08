@@ -464,8 +464,8 @@ void CamFrame::AcqOneFrm()
 	  wxMutexError errMutex= m_mutexSrBuf->Lock();
 	  if(errMutex == wxMUTEX_NO_ERROR)
 	  {
-		res = m_pFile4ReadPha->Read(m_pSrBuf, m_nCols*m_nRows*2);
-		res = m_pFile4ReadAmp->Read(&m_pSrBuf[m_nCols*m_nRows*2], m_nCols*m_nRows*2);
+		res = m_pFile4ReadPha->Read(m_pSrBuf, (int)m_nCols*(int)m_nRows*2);
+		res = m_pFile4ReadAmp->Read(&m_pSrBuf[(int)m_nCols*(int)m_nRows*2], (int)m_nCols*(int)m_nRows*2);
 		m_nFrmRead +=1;
 		CoordTrf();
 		errMutex = m_mutexSrBuf->Unlock();

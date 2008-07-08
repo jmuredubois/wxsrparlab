@@ -121,9 +121,9 @@ void MainWnd::SetZMax(double val)
 	_zMax = val;
 	_txtZMax->GetValue().Printf(wxT("%d"), val);
 	_txtZMax->SetModified(true);
-	#ifdef JMU_USE_VTK
+#ifdef JMU_USE_VTK
 	if(_vtkWin != NULL){_vtkWin->changeDepthRange( (float) _zMin, (float) _zMax); };
-	#endif
+#endif
 }
 
 /* acting on chaged text value */
@@ -135,9 +135,9 @@ void MainWnd::TextChangedZMin(wxCommandEvent &)
 	if( strVal.ToDouble(& val) ) /* read value as double*/
 	{
 		SetZMin(val);
-		#ifdef JMU_USE_VTK
+#ifdef JMU_USE_VTK
 		if(_vtkWin != NULL){_vtkWin->changeDepthRange( (float) _zMin, (float) _zMax); };
-		#endif
+#endif
 	}
 	else
 	{

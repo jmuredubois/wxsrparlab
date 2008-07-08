@@ -111,7 +111,7 @@ private:
   vtkPolyDataMapper					**dataMapper;	//!< mapper for TOF data
   //vtkHedgeHog *hedgehog;
   vtkActor							**dataActor;		//!< actor for TOF data
-  vtkExtractGrid	**subSample;	//!< used to subsample structured grid (for FASTER rendering)
+  //vtkExtractGrid	**subSample;	//!< used to subsample structured grid (for FASTER rendering)
 
   // Create a float array which represents the points.
   vtkFloatArray** pcoords;

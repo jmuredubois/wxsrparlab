@@ -84,8 +84,6 @@ int CamViewData::AllocLUT() //! Allocate LUT
 
 	memset((void*) m_pLUT, 0x77, m_nComp* m_nLUTlen *sizeof(unsigned char)); // init LUT memory zone
 
-	int i, c; // variables used in loops
-
 	#include "lutDef.h"
 	return 0;
 }
