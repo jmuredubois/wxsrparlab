@@ -69,7 +69,9 @@ bool SrApp::OnInit()
 		CamFrame *camFrm = new CamFrame( _mainWnd, lab, pos, sz );
 		camFrm->Show(TRUE);
 		camFrm->CreateAndSetNotebook(labT);
+#ifdef JMU_USE_VTK
 		camFrm->SetVtkWin(_vtkWin, i);
+#endif
 		m_camFrm.push_back(camFrm);
 		pos += incr; //... increment position.
 	} // ENDOF for loop on _numCams
@@ -92,6 +94,8 @@ bool SrApp::OnInit()
 int SrApp::OnExit()
 {
 	int res = 0;
+	#ifdef JMU_USE_VTK
 	if(_vtkWin){ delete(_vtkWin); _vtkWin =NULL; };
+	#endif
 	return res;
 }

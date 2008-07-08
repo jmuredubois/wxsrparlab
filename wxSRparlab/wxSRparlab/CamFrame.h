@@ -22,7 +22,9 @@
 #include "wx/image.h" //!< for wxImages
 
 class ThreadReadData;
+#ifdef JMU_USE_VTK
 class CViewSrVtk;
+#endif
 
 //! enum used by the CamViewData class
 enum CamReadModeEnum
@@ -55,7 +57,9 @@ public:
 	void SetReadMode(wxCommandEvent& event);
 	void AcqOneFrm();
 	void CoordTrf();
+#ifdef JMU_USE_VTK
 	void SetVtkWin(CViewSrVtk *vtkWin, int vtkSub);
+#endif
 
 private:
 	SRCAM	m_sr;	// pointer for SR camera
@@ -87,8 +91,10 @@ private:
 	float m_fFocal; float m_fPixSzX; float m_fPixSzY; float m_fCenterX; float m_fCenterY;
 	float m_maxMMr;
 	int	  m_mfrqInt;
+#ifdef JMU_USE_VTK
 	CViewSrVtk	*_vtkWin ; //!< pointer to vtk window
 	int _vtkSub;
+#endif
 
 public:
     DECLARE_EVENT_TABLE()
