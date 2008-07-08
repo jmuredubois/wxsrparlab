@@ -56,10 +56,10 @@ bool SrApp::OnInit()
 	wxString lab;					// title string for camFrame
 	wxString labT;					// title string for camFrame
 
-  #ifdef JMU_USE_VTK
+#ifdef JMU_USE_VTK
 	_vtkWin = new CViewSrVtk(NULL);
 	_mainWnd->SetVtkWin(_vtkWin);
-  #endif
+#endif
 
 	//! - for the max number of cameras ...
 	for(int i = 0; i<_numCams; i++){
@@ -94,8 +94,8 @@ bool SrApp::OnInit()
 int SrApp::OnExit()
 {
 	int res = 0;
-	#ifdef JMU_USE_VTK
+#ifdef JMU_USE_VTK
 	if(_vtkWin){ delete(_vtkWin); _vtkWin =NULL; };
-	#endif
+#endif
 	return res;
 }

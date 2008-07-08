@@ -1,4 +1,5 @@
 ///* gray ramp LUT */
+//  int i, c; // variables used in loops
 //	c = 0; unsigned char R, G, B;
 //	R = 0; G = 0; B = 0;
 //	for(i = 0 ; i <(m_nLUTlen); i++)
