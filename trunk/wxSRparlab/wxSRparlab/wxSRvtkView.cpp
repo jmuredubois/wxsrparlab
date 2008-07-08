@@ -83,9 +83,12 @@ CViewSrVtk::CViewSrVtk(wxFrame* pWnd)
 #endif// VTKNOTRANSFORM
 
 
-	_srX[1] = camTranMat[1]->GetElement(0,3);
-	_srY[1] = camTranMat[1]->GetElement(1,3);
-	_srZ[1] = camTranMat[1]->GetElement(2,3);
+	for(int i=0; i<_vtkSubMax; i++)
+	{
+		_srX[i] = camTranMat[i]->GetElement(0,3);
+		_srY[i] = camTranMat[i]->GetElement(1,3);
+		_srZ[i] = camTranMat[i]->GetElement(2,3);
+	}
 
 	for(int i=0; i<_vtkSubMax; i++)
 	{
@@ -175,6 +178,13 @@ CViewSrVtk::~CViewSrVtk()
 	renderer->Delete();
 	// delete the interactor
 	iren->Delete();
+
+	SAFE_FREE(_srX);
+	SAFE_FREE(_srY);
+	SAFE_FREE(_srZ);
+	SAFE_FREE(_srNX);
+	SAFE_FREE(_srNY);
+	SAFE_FREE(_srNZ);
 
 	for(int i=0; i<_vtkSubMax; i++)
 	{
@@ -650,9 +660,9 @@ int CViewSrVtk::freeDataAct(int vtkSub)
 	int res = 0;
 
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-	//pdata->SetInputConnection(data->GetOutputPort());
-	//dataPoints->Delete();
-	//pcoords->Delete();
+	//pdata[vtkSub]->SetInputConnection(data[vtkSub]->GetOutputPort());
+	dataPoints[vtkSub]->Delete();
+	pcoords[vtkSub]->Delete();
 	freeXYZ(vtkSub);
 	data[vtkSub]->Delete();
 	pdata[vtkSub]->Delete();
