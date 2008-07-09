@@ -18,6 +18,7 @@ BEGIN_EVENT_TABLE(MainWnd, wxFrame)
 	EVT_TEXT(IDT_zMin, MainWnd::TextChangedZMin)
 	EVT_TEXT(IDT_zMax, MainWnd::TextChangedZMax)
 	EVT_BUTTON(IDB_AcqAll, MainWnd::AcqAll)
+	EVT_CHECKBOX(IDC_visVtk, MainWnd::SetVisVtk)
 END_EVENT_TABLE()
 
 IMPLEMENT_APP(SrApp)
@@ -110,13 +111,40 @@ void MainWnd::Init()
 
 	_buttAcqAll = new wxButton(this, IDB_AcqAll, wxT("Acq. All") );
 
-	wxBoxSizer *sizerZscale = new wxBoxSizer(wxHORIZONTAL);
-		sizerZscale->Add(_buttAcqAll, 0, wxEXPAND);
-	    sizerZscale->Add(_txtZMin, 0, wxEXPAND);
-		sizerZscale->AddStretchSpacer();
-	    sizerZscale->Add(_txtZMax, 0, wxEXPAND);
+	wxSizerFlags flagsExpand(1);
+	flagsExpand.Expand();
 
-	this->SetSizerAndFit(sizerZscale);
+	wxBoxSizer *sizerZscale = new wxBoxSizer(wxHORIZONTAL);
+		sizerZscale->Add(_buttAcqAll, flagsExpand);
+	    sizerZscale->Add(_txtZMin, flagsExpand);
+		sizerZscale->AddStretchSpacer();
+	    sizerZscale->Add(_txtZMax, flagsExpand);
+
+	wxGridBagSizer *sizerCamVisCol = new wxGridBagSizer();
+	wxString labT;					// title string for camFrame
+	//! - for the max number of cameras ...
+	for(int i = 0; i<_numCams; i++){
+		labT.sprintf(wxT("Cam %i"), i); // ... change title text ...
+		wxCheckBox *chkBox = new wxCheckBox(this, IDC_visVtk, labT);
+		sizerCamVisCol->Add(chkBox, wxGBPosition(i,0));
+		_visVtk.push_back(chkBox);
+	} // ENDOF for loop on _numCams
+
+	/*_visVtk0 = new wxCheckBox(this, IDC_visVtk0, wxT("Cam. 0"));
+	_visVtk1 = new wxCheckBox(this, IDC_visVtk1, wxT("Cam. 1"));
+	_visVtk2 = new wxCheckBox(this, IDC_visVtk2, wxT("Cam. 2"));
+	_visVtk3 = new wxCheckBox(this, IDC_visVtk3, wxT("Cam. 3"));
+
+		sizerCamVisCol->Add(_visVtk0, wxGBPosition(0,1)); 
+		sizerCamVisCol->Add(_visVtk1, wxGBPosition(1,1)); 
+		sizerCamVisCol->Add(_visVtk2, wxGBPosition(2,1)); 
+		sizerCamVisCol->Add(_visVtk3, wxGBPosition(3,1)); */
+		
+
+	wxBoxSizer *sizerPanel = new wxBoxSizer(wxVERTICAL);
+		sizerPanel->Add(sizerCamVisCol, flagsExpand);
+		sizerPanel->Add(sizerZscale, flagsExpand);
+	this->SetSizerAndFit(sizerPanel);
 }
 
 /**
@@ -210,6 +238,17 @@ void MainWnd::TextChangedZMax(wxCommandEvent &)
 
 /* acting on "AcquireAll" value button*/
 void MainWnd::AcqAll(wxCommandEvent& event)
+{
+	std::list<CamFrame*>::iterator it;  // get iterator on the camera frames
+	for ( it=m_camFrm.begin() ; it != m_camFrm.end(); it++ )
+	{
+		it._Ptr->_Myval->Acquire(event);
+	}
+
+}
+
+/* acting on visVTK checkbox*/
+void MainWnd::SetVisVtk(wxCommandEvent& event)
 {
 	std::list<CamFrame*>::iterator it;  // get iterator on the camera frames
 	for ( it=m_camFrm.begin() ; it != m_camFrm.end(); it++ )
