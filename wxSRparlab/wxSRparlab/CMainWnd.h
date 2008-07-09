@@ -39,7 +39,7 @@ public:
 	void SetZMax(double val);
 	void TextChangedZMin(wxCommandEvent &);
 	void TextChangedZMax(wxCommandEvent &);
-	void SetVtkWin(CViewSrVtk *vtkWin);
+	void AcqAll(wxCommandEvent& event);
 
     DECLARE_EVENT_TABLE()
 
@@ -52,6 +52,7 @@ private:
 	int			_numCams;		//!< count of cameras
 	std::list<CamFrame*> m_camFrm;		//!< list of camFrames
 	CViewSrVtk	*_vtkWin ; //!< pointer to vtk window
+	wxButton* _buttAcqAll; //!< Acquire image camera
 };
 
 //! enum used by main wnd
@@ -60,5 +61,6 @@ enum MainWndEnum
     ID_Quit = 1,
     ID_About,
 	IDT_zMin,
-	IDT_zMax
+	IDT_zMax,
+	IDB_AcqAll
 };

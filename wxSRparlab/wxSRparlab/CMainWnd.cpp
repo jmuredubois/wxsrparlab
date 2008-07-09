@@ -17,6 +17,7 @@ BEGIN_EVENT_TABLE(MainWnd, wxFrame)
     EVT_MENU(ID_About, MainWnd::OnAbout)
 	EVT_TEXT(IDT_zMin, MainWnd::TextChangedZMin)
 	EVT_TEXT(IDT_zMax, MainWnd::TextChangedZMax)
+	EVT_BUTTON(IDB_AcqAll, MainWnd::AcqAll)
 END_EVENT_TABLE()
 
 IMPLEMENT_APP(SrApp)
@@ -65,6 +66,8 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
     //SetStatusText( _T("Welcome to wxSRparlab!") );
 	wxString strW = date1 + strM + strU + strP;
 	SetStatusText(strW);
+
+	_buttAcqAll = NULL;
 }
 
 /**
@@ -105,7 +108,10 @@ void MainWnd::Init()
 	_txtZMax = new wxTextCtrl( this, IDT_zMax, wxT("3500.0"));
 	_txtMinMaxInit = true; _txtZMin->SetModified(true); _txtZMax->SetModified(true);
 
+	_buttAcqAll = new wxButton(this, IDB_AcqAll, wxT("Acq. All") );
+
 	wxBoxSizer *sizerZscale = new wxBoxSizer(wxHORIZONTAL);
+		sizerZscale->Add(_buttAcqAll, 0, wxEXPAND);
 	    sizerZscale->Add(_txtZMin, 0, wxEXPAND);
 		sizerZscale->AddStretchSpacer();
 	    sizerZscale->Add(_txtZMax, 0, wxEXPAND);
@@ -202,7 +208,13 @@ void MainWnd::TextChangedZMax(wxCommandEvent &)
 	}
 }
 
-void MainWnd::SetVtkWin(CViewSrVtk *vtkWin)
+/* acting on "AcquireAll" value button*/
+void MainWnd::AcqAll(wxCommandEvent& event)
 {
-	_vtkWin = vtkWin;
-};
+	std::list<CamFrame*>::iterator it;  // get iterator on the camera frames
+	for ( it=m_camFrm.begin() ; it != m_camFrm.end(); it++ )
+	{
+		it._Ptr->_Myval->Acquire(event);
+	}
+
+}
