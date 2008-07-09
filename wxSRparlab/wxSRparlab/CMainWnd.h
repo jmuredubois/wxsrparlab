@@ -10,7 +10,8 @@
 #include "wxSRparlab.h" //!< top-level header file
 #include "wxSrApp.h"	//!< this class header file
 
-class CViewSrVtk;
+class CamFrame;		// camera frame
+class CViewSrVtk;	// vtk window
 
 /**
  * Main window class \n
@@ -25,6 +26,9 @@ public:
 
 	//! init
 	void Init();
+
+	//! init
+	void AddChildren();
 
 	//! Quit(..) method
     void OnQuit(wxCommandEvent& event);
@@ -45,6 +49,8 @@ private:
 	double	_zMin;
 	double	_zMax;
 	bool _txtMinMaxInit;
+	int			_numCams;		//!< count of cameras
+	std::list<CamFrame*> m_camFrm;		//!< list of camFrames
 	CViewSrVtk	*_vtkWin ; //!< pointer to vtk window
 };
 
