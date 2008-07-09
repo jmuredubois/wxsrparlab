@@ -1,3 +1,4 @@
+/*
 Transformation matrix for SR3100 camera (left) :
     0.9589    0.0111   -0.2835         0
          0    0.9992    0.0390         0
@@ -9,6 +10,7 @@ Transformation matrix for SR3000 camera (right) :
          0    0.9884    0.1519   65.5484
     0.2064   -0.1486    0.9671   89.1489
          0         0         0    1.0000
+*/
 
 camTranMat[0]->SetElement(0,0,+000.9589);
 camTranMat[0]->SetElement(0,1,+00.01108);
