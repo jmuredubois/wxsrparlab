@@ -65,6 +65,8 @@ public:
 	//int updateTOFbg(SRCAM sr, SRPARLAB srPL, int vtkSub, char*fname);
 
 	int changeDepthRange(float minVal, float maxVal);
+	int hideDataAct(int vtkSub, bool doHide);
+	int Render();
 
 private:
 	static const int _vtkSubMax = NUMCAMS ; // VTKSUBMAX undeclared identifier bug 20080114

@@ -991,3 +991,31 @@ int CViewSrVtk::freeBGDataAct(int vtkSub)
 
 	return res;
 }
+
+/**
+ * Hides a data actor
+ */
+int CViewSrVtk::hideDataAct(int vtkSub, bool doHide)
+{
+	int res = 0;
+	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
+	if(doHide)
+	{
+		dataActor[vtkSub]->GetProperty()->SetOpacity(0.0);
+	}
+	else
+	{
+		dataActor[vtkSub]->GetProperty()->SetOpacity(1.0);
+	}
+	return res;
+}
+
+/**
+ * Renders
+ */
+int CViewSrVtk::Render()
+{
+	int res = 0;
+	renWin->Render();
+	return res;
+}
