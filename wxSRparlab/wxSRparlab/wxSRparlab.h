@@ -40,6 +40,7 @@
 #include "wx/checkbox.h"	//!< for checkboxes
 #include "wx/ffile.h"		//!< for files
 #include "wx/thread.h"		//!< for threads
+#include "wx/gbsizer.h"		//!< for grid bag sizer
 
 #include <list>		//STL list
 

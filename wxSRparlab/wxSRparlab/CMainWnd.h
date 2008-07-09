@@ -40,6 +40,7 @@ public:
 	void TextChangedZMin(wxCommandEvent &);
 	void TextChangedZMax(wxCommandEvent &);
 	void AcqAll(wxCommandEvent& event);
+	void SetVisVtk(wxCommandEvent& event);
 
     DECLARE_EVENT_TABLE()
 
@@ -53,6 +54,11 @@ private:
 	std::list<CamFrame*> m_camFrm;		//!< list of camFrames
 	CViewSrVtk	*_vtkWin ; //!< pointer to vtk window
 	wxButton* _buttAcqAll; //!< Acquire image camera
+	std::list<wxCheckBox*> _visVtk;		//!< list of visibility checkboxes
+	//wxCheckBox* _visVtk0;		//!< visibility checkbox for cam0
+	//wxCheckBox* _visVtk1;		//!< visibility checkbox for cam0
+	//wxCheckBox* _visVtk2;		//!< visibility checkbox for cam0
+	//wxCheckBox* _visVtk3;		//!< visibility checkbox for cam0
 };
 
 //! enum used by main wnd
@@ -62,5 +68,10 @@ enum MainWndEnum
     ID_About,
 	IDT_zMin,
 	IDT_zMax,
-	IDB_AcqAll
+	IDB_AcqAll,
+	IDC_visVtk
+	/*IDC_visVtk0,
+	IDC_visVtk1,
+	IDC_visVtk2,
+	IDC_visVtk3*/
 };
