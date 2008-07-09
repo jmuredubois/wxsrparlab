@@ -126,6 +126,7 @@ void MainWnd::Init()
 	for(int i = 0; i<_numCams; i++){
 		labT.sprintf(wxT("Cam %i"), i); // ... change title text ...
 		wxCheckBox *chkBox = new wxCheckBox(this, IDC_visVtk, labT);
+		chkBox->SetValue(true);
 		sizerCamVisCol->Add(chkBox, wxGBPosition(i,0));
 		_visVtk.push_back(chkBox);
 	} // ENDOF for loop on _numCams
@@ -250,10 +251,16 @@ void MainWnd::AcqAll(wxCommandEvent& event)
 /* acting on visVTK checkbox*/
 void MainWnd::SetVisVtk(wxCommandEvent& event)
 {
-	std::list<CamFrame*>::iterator it;  // get iterator on the camera frames
-	for ( it=m_camFrm.begin() ; it != m_camFrm.end(); it++ )
+	int i = 0;
+	std::list<wxCheckBox*>::iterator it;  // get iterator on the camera frames
+#ifdef JMU_USE_VTK
+	for ( it=_visVtk.begin() ; it != _visVtk.end(); it++ )
 	{
-		it._Ptr->_Myval->Acquire(event);
-	}
 
+		if(!_vtkWin){return;};
+		_vtkWin->hideDataAct(i, !it._Ptr->_Myval->IsChecked());
+		i++;
+	}
+	_vtkWin->Render();
+#endif
 }
