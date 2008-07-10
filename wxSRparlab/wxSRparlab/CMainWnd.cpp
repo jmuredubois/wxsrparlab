@@ -114,33 +114,33 @@ void MainWnd::Init()
 	wxSizerFlags flagsExpand(1);
 	flagsExpand.Expand();
 
+	wxSizerFlags flagsNoExpand(1);
+
 	wxBoxSizer *sizerZscale = new wxBoxSizer(wxHORIZONTAL);
-		sizerZscale->Add(_buttAcqAll, flagsExpand);
-	    sizerZscale->Add(_txtZMin, flagsExpand);
+		sizerZscale->Add(_buttAcqAll, flagsNoExpand);
+	    sizerZscale->Add(_txtZMin, flagsNoExpand);
 		sizerZscale->AddStretchSpacer();
-	    sizerZscale->Add(_txtZMax, flagsExpand);
+	    sizerZscale->Add(_txtZMax, flagsNoExpand);
 
 	wxGridBagSizer *sizerCamVisCol = new wxGridBagSizer();
-	wxString labT;					// title string for camFrame
+	wxString colors[] = { wxT("Z"), wxT("Amp."), wxT("R"),
+        wxT("G"), wxT("B"), wxT("W"), wxT("K") };
+
+	wxString labT;					// descr string for cam visibility checkbox
 	//! - for the max number of cameras ...
 	for(int i = 0; i<_numCams; i++){
-		labT.sprintf(wxT("Cam %i"), i); // ... change title text ...
-		wxCheckBox *chkBox = new wxCheckBox(this, IDC_visVtk, labT);
+		labT.sprintf(wxT("Cam %i"), i); // ... change checkbox text ...
+		wxCheckBox *chkBox = new wxCheckBox(this, IDC_visVtk, labT);	
 		chkBox->SetValue(true);
 		sizerCamVisCol->Add(chkBox, wxGBPosition(i,0));
-		_visVtk.push_back(chkBox);
+		_visVtk.push_back(chkBox);	// add visibility checkbox to container
+
+		wxRadioBox *colBox = new wxRadioBox(this, IDC_colVtk, wxT("Color"), 
+			wxDefaultPosition, wxDefaultSize, 7, colors, 0, wxRA_SPECIFY_COLS );
+		sizerCamVisCol->Add(colBox, wxGBPosition(i,1));
+		//sizerCamVisCol->SetItemSpan(colBox, wxGBSpan(1,7));
+		_colVtk.push_back(colBox);
 	} // ENDOF for loop on _numCams
-
-	/*_visVtk0 = new wxCheckBox(this, IDC_visVtk0, wxT("Cam. 0"));
-	_visVtk1 = new wxCheckBox(this, IDC_visVtk1, wxT("Cam. 1"));
-	_visVtk2 = new wxCheckBox(this, IDC_visVtk2, wxT("Cam. 2"));
-	_visVtk3 = new wxCheckBox(this, IDC_visVtk3, wxT("Cam. 3"));
-
-		sizerCamVisCol->Add(_visVtk0, wxGBPosition(0,1));
-		sizerCamVisCol->Add(_visVtk1, wxGBPosition(1,1));
-		sizerCamVisCol->Add(_visVtk2, wxGBPosition(2,1));
-		sizerCamVisCol->Add(_visVtk3, wxGBPosition(3,1)); */
-
 
 	wxBoxSizer *sizerPanel = new wxBoxSizer(wxVERTICAL);
 		sizerPanel->Add(sizerCamVisCol, flagsExpand);
@@ -251,13 +251,28 @@ void MainWnd::AcqAll(wxCommandEvent& event)
 /* acting on visVTK checkbox*/
 void MainWnd::SetVisVtk(wxCommandEvent& event)
 {
+#ifdef JMU_USE_VTK
 	int i = 0;
 	std::vector<wxCheckBox*>::iterator it;  // get iterator on the camera frames
-#ifdef JMU_USE_VTK
 	for ( it=_visVtk.begin() ; it != _visVtk.end(); it++, i++ )
 	{
 		if(!_vtkWin){return;};
 		_vtkWin->hideDataAct(i, !( (*it)->IsChecked() ) );
+	}
+	_vtkWin->Render();
+#endif
+}
+
+/* acting on colVTK radio box*/
+void MainWnd::SetColVtk(wxCommandEvent& event)
+{
+#ifdef JMU_USE_VTK
+	int i = 0;
+	std::vector<wxRadioBox*>::iterator it;  // get iterator on the camera frames
+	for ( it=_colVtk.begin() ; it != _colVtk.end(); it++, i++ )
+	{
+		if(!_vtkWin){return;};
+		//_vtkWin->hideDataAct(i, !( (*it)->IsChecked() ) );
 	}
 	_vtkWin->Render();
 #endif
