@@ -9,5 +9,6 @@
 // #include "camTranMats/camTrfMat_20080229.cpp"
 // #include "camTranMats/camTrfMat_20080611.cpp"
 // #include "camTranMats/camTrfMat_20080616_doorOpen.cpp"
-#include "camTranMats/camTrfMat_20080618_paralax.cpp"
+// #include "camTranMats/camTrfMat_20080618_paralax.cpp"
 // #include "camTranMats/camTrfMat_20080618_paralax2.cpp"
+#include "camTranMats/camTrfMat_20080707_cmpSteRansac.cpp"
