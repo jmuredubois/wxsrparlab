@@ -101,7 +101,7 @@ void MainWnd::OnAbout(wxCommandEvent& WXUNUSED(event))
 /**
  * Main window init \n
  * The method: \n
- * 
+ *
  */
 void MainWnd::Init()
 {
@@ -136,11 +136,11 @@ void MainWnd::Init()
 	_visVtk2 = new wxCheckBox(this, IDC_visVtk2, wxT("Cam. 2"));
 	_visVtk3 = new wxCheckBox(this, IDC_visVtk3, wxT("Cam. 3"));
 
-		sizerCamVisCol->Add(_visVtk0, wxGBPosition(0,1)); 
-		sizerCamVisCol->Add(_visVtk1, wxGBPosition(1,1)); 
-		sizerCamVisCol->Add(_visVtk2, wxGBPosition(2,1)); 
+		sizerCamVisCol->Add(_visVtk0, wxGBPosition(0,1));
+		sizerCamVisCol->Add(_visVtk1, wxGBPosition(1,1));
+		sizerCamVisCol->Add(_visVtk2, wxGBPosition(2,1));
 		sizerCamVisCol->Add(_visVtk3, wxGBPosition(3,1)); */
-		
+
 
 	wxBoxSizer *sizerPanel = new wxBoxSizer(wxVERTICAL);
 		sizerPanel->Add(sizerCamVisCol, flagsExpand);
@@ -151,7 +151,7 @@ void MainWnd::Init()
 /**
  * Main window init \n
  * The method: \n
- * 
+ *
  */
 void MainWnd::AddChildren()
 {
@@ -240,10 +240,12 @@ void MainWnd::TextChangedZMax(wxCommandEvent &)
 /* acting on "AcquireAll" value button*/
 void MainWnd::AcqAll(wxCommandEvent& event)
 {
-	std::list<CamFrame*>::iterator it;  // get iterator on the camera frames
+	std::vector<CamFrame*>::iterator it;  // get iterator on the camera frames
+	int i = 0;
 	for ( it=m_camFrm.begin() ; it != m_camFrm.end(); it++ )
 	{
-		it._Ptr->_Myval->Acquire(event);
+		m_camFrm[i]->Acquire(event);
+		i++;
 	}
 
 }
@@ -252,13 +254,13 @@ void MainWnd::AcqAll(wxCommandEvent& event)
 void MainWnd::SetVisVtk(wxCommandEvent& event)
 {
 	int i = 0;
-	std::list<wxCheckBox*>::iterator it;  // get iterator on the camera frames
+	std::vector<wxCheckBox*>::iterator it;  // get iterator on the camera frames
 #ifdef JMU_USE_VTK
 	for ( it=_visVtk.begin() ; it != _visVtk.end(); it++ )
 	{
 
 		if(!_vtkWin){return;};
-		_vtkWin->hideDataAct(i, !it._Ptr->_Myval->IsChecked());
+		_vtkWin->hideDataAct(i, !_visVtk[i]->IsChecked());
 		i++;
 	}
 	_vtkWin->Render();
