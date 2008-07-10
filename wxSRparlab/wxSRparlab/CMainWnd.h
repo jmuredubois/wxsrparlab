@@ -22,7 +22,7 @@ class MainWnd: public wxFrame //!< main window class
 {
 public:
 	//!Constructor
-    MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size); 
+    MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size);
 
 	//! init
 	void Init();
@@ -51,10 +51,10 @@ private:
 	double	_zMax;
 	bool _txtMinMaxInit;
 	int			_numCams;		//!< count of cameras
-	std::list<CamFrame*> m_camFrm;		//!< list of camFrames
+	std::vector<CamFrame*> m_camFrm;		//!< list of camFrames
 	CViewSrVtk	*_vtkWin ; //!< pointer to vtk window
 	wxButton* _buttAcqAll; //!< Acquire image camera
-	std::list<wxCheckBox*> _visVtk;		//!< list of visibility checkboxes
+	std::vector<wxCheckBox*> _visVtk;		//!< list of visibility checkboxes
 	//wxCheckBox* _visVtk0;		//!< visibility checkbox for cam0
 	//wxCheckBox* _visVtk1;		//!< visibility checkbox for cam0
 	//wxCheckBox* _visVtk2;		//!< visibility checkbox for cam0

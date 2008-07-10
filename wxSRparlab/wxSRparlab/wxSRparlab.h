@@ -43,6 +43,8 @@
 #include "wx/gbsizer.h"		//!< for grid bag sizer
 
 #include <list>		//STL list
+#include <vector>		//STL list
+
 
 /** on win32 machine, wxWidgets needs those 5 libs, \n
  *  comctl32.lib rpcrt4.lib winmm.lib advapi32.lib wsock32.lib
