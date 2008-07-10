@@ -241,11 +241,9 @@ void MainWnd::TextChangedZMax(wxCommandEvent &)
 void MainWnd::AcqAll(wxCommandEvent& event)
 {
 	std::vector<CamFrame*>::iterator it;  // get iterator on the camera frames
-	int i = 0;
 	for ( it=m_camFrm.begin() ; it != m_camFrm.end(); it++ )
 	{
-		m_camFrm[i]->Acquire(event);
-		i++;
+		(*it)->Acquire(event);
 	}
 
 }
@@ -256,12 +254,10 @@ void MainWnd::SetVisVtk(wxCommandEvent& event)
 	int i = 0;
 	std::vector<wxCheckBox*>::iterator it;  // get iterator on the camera frames
 #ifdef JMU_USE_VTK
-	for ( it=_visVtk.begin() ; it != _visVtk.end(); it++ )
+	for ( it=_visVtk.begin() ; it != _visVtk.end(); it++, i++ )
 	{
-
 		if(!_vtkWin){return;};
-		_vtkWin->hideDataAct(i, !_visVtk[i]->IsChecked());
-		i++;
+		_vtkWin->hideDataAct(i, !( (*it)->IsChecked() ) );
 	}
 	_vtkWin->Render();
 #endif
