@@ -1001,11 +1001,11 @@ int CViewSrVtk::hideDataAct(int vtkSub, bool doHide)
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
 	if(doHide)
 	{
-		dataActor[vtkSub]->GetProperty()->SetOpacity(0.0);
+		dataActor[vtkSub]->VisibilityOff();
 	}
 	else
 	{
-		dataActor[vtkSub]->GetProperty()->SetOpacity(1.0);
+		dataActor[vtkSub]->VisibilityOn();
 	}
 	return res;
 }
