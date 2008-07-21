@@ -41,6 +41,7 @@ CViewSrVtk::CViewSrVtk(wxFrame* pWnd)
 	pdata = (vtkStructuredGridGeometryFilter**) malloc( _vtkSubMax * sizeof(vtkStructuredGridGeometryFilter*));
 	pcoords = (vtkFloatArray**) malloc( _vtkSubMax * sizeof(vtkFloatArray*));
 	dData = (vtkFloatArray**) malloc( _vtkSubMax * sizeof(vtkFloatArray*));
+	aData = (vtkFloatArray**) malloc( _vtkSubMax * sizeof(vtkFloatArray*));
 
 
 	BGdata = (vtkStructuredGrid**) malloc( _vtkSubMax * sizeof(vtkStructuredGrid*));
@@ -243,6 +244,7 @@ CViewSrVtk::~CViewSrVtk()
 	free(pdata);
 	free(pcoords);
 	free(dData);
+	free(aData);
 
 
 	free(BGdata);
@@ -418,6 +420,8 @@ int CViewSrVtk::addGrayLUT()
 	grayLUT->SetRampToLinear();
 	grayLUT->SetHueRange(0.0, 0.0);
 	grayLUT->SetSaturationRange(0.0, 0.0);
+	grayLUT->SetValueRange(0.0, 1.0);
+	grayLUT->SetNumberOfTableValues(256);
 	return res;
 }
 /**
@@ -564,14 +568,17 @@ int CViewSrVtk::addDataAct(int vtkSub)
 	// Create a float array which represents the points.
     pcoords[vtkSub] = vtkFloatArray::New();
 	dData[vtkSub] = vtkFloatArray::New();	// scalar depth associated to each point (for coloring)
+	aData[vtkSub] = vtkFloatArray::New();	// scalar depth associated to each point (for coloring)
 	// Note that by default, an array has 1 component.
     // We have to change it to 3 for points
     pcoords[vtkSub]->SetNumberOfComponents(3);
 	dData[vtkSub]->SetNumberOfComponents(1);
+	aData[vtkSub]->SetNumberOfComponents(1);
 	// We ask pcoords to allocate room for at least 25344 tuples
 	// and set the number of tuples to 4.
 	pcoords[vtkSub]->SetNumberOfTuples(25344);
 	dData[vtkSub]->SetNumberOfTuples(25344);
+	aData[vtkSub]->SetNumberOfTuples(25344);
 
 	// Assign each tuple
 	int row,col;
@@ -594,6 +601,7 @@ int CViewSrVtk::addDataAct(int vtkSub)
 			pt[0] = x;
 			pcoords[vtkSub]->SetTuple((iv1+iv2), pt);
 			dData[vtkSub]->SetValue((iv1+iv2),z);
+			aData[vtkSub]->SetValue((iv1+iv2),100.0f);
 			i++; // le i++ doit être ici, il faut commencer à zéro !!!
 			iv2+=rows;
 			iv3++;
@@ -710,6 +718,86 @@ int CViewSrVtk::updateTOFcurrent(int rows, int cols, unsigned short *z, short *y
 		for (col = 0; col<cols; col++)
 		{
 			dData[vtkSub]->SetValue((iv1+iv2),(float)(pdata[vtkSub]->GetOutput()->GetPoints()->GetPoint(iv1+iv2)[2]));		// make sure that depth data is the transformed value; :-( unable to avoid loop yet :-(
+			i++; // le i++ doit être ici, il faut commencer à zéro !!!
+			iv2+=rows;
+			iv3++;
+			if(iv3>=cols)
+			{
+				iv2 = 0;
+				iv3 = 0;
+				iv1 += 1;
+			}
+		}
+    }
+
+	data[vtkSub]->Modified();
+	renWin->Render();
+	return res;
+}
+
+/**
+ * Updates the TOF points
+ */
+int CViewSrVtk::updateTOFcurrent(int rows, int cols, unsigned short *z, short *y, short *x, unsigned short* amp, int vtkSub)
+{
+	int res = 0;
+	//if(!sr){return -1;};
+	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
+
+	if((!_x[vtkSub]) || (!_y[vtkSub]) || (!_z[vtkSub]) ){ allocXYZ(rows, cols, vtkSub); };
+
+	int num=rows*cols;
+	//SR_CoordTrfUint16(sr, _x[vtkSub],_y[vtkSub],_z[vtkSub], sizeof(short),sizeof(short), sizeof(WORD));
+	memcpy((void*)_x[vtkSub], (void*) x, num*sizeof(short) );
+	memcpy((void*)_y[vtkSub], (void*) y, num*sizeof(short) );
+	memcpy((void*)_z[vtkSub], (void*) z, num*sizeof(unsigned short) );
+
+
+	//pcoords->Reset();
+	//pcoords->SetNumberOfComponents(3);
+
+	// We ask pcoords to allocate room for at least 25344 tuples
+	// and set the number of tuples to 4.
+	if(num != 25344)
+	{
+		pcoords[vtkSub]->SetNumberOfTuples(num);
+	}
+
+	float pt[3];
+	int row = 0; int col = 0;
+	int i = 0; int iv1 = 0; int iv2 = 0; int iv3 = 0;
+	for (row = 0 ; row <rows; row++)
+    {
+		for (col = 0; col<cols; col++)
+		{
+			pt[2] = (float) ((_z[vtkSub])[i]);
+			pt[1] = (float) ((_y[vtkSub])[i]);
+			pt[0] = (float) ((_x[vtkSub])[i]);
+			pcoords[vtkSub]->SetTuple((iv1+iv2), pt);
+			//dData[vtkSub]->SetValue((iv1+iv2),(float)((_z[vtkSub])[i]));
+			i++; // le i++ doit être ici, il faut commencer à zéro !!!
+			iv2+=rows;
+			iv3++;
+			if(iv3>=cols)
+			{
+				iv2 = 0;
+				iv3 = 0;
+				iv1 += 1;
+			}
+		}
+    }
+
+	dataPoints[vtkSub]->Modified();
+	pdata[vtkSub]->Update();
+
+
+	i = 0;iv1 = 0; iv2 = 0; iv3 = 0;
+	for (row = 0 ; row <rows; row++)
+    {
+		for (col = 0; col<cols; col++)
+		{
+			dData[vtkSub]->SetValue((iv1+iv2),(float)(pdata[vtkSub]->GetOutput()->GetPoints()->GetPoint(iv1+iv2)[2]));		// make sure that depth data is the transformed value; :-( unable to avoid loop yet :-(
+			aData[vtkSub]->SetValue((iv1+iv2),(float) amp[i]) ;		// make sure that depth data is the transformed value; :-( unable to avoid loop yet :-(
 			i++; // le i++ doit être ici, il faut commencer à zéro !!!
 			iv2+=rows;
 			iv3++;
@@ -1117,6 +1205,7 @@ int CViewSrVtk::setDataMapperColorDepth(int vtkSub)
 {
 	int res = 0;
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
+	data[vtkSub]->GetPointData()->SetScalars(dData[vtkSub]);
 	dataMapper[vtkSub]->SetLookupTable(depthLUT);  // sets color
 	return res;
 }
@@ -1127,6 +1216,7 @@ int CViewSrVtk::setDataMapperColorGray(int vtkSub)
 {
 	int res = 0;
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
+	data[vtkSub]->GetPointData()->SetScalars(aData[vtkSub]);
 	dataMapper[vtkSub]->SetLookupTable(grayLUT);  // sets color
 	return res;
 }
