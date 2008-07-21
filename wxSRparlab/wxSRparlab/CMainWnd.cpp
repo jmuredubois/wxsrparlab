@@ -119,10 +119,10 @@ void MainWnd::Init()
 	wxSizerFlags flagsNoExpand(1);
 
 	wxBoxSizer *sizerZscale = new wxBoxSizer(wxHORIZONTAL);
-		sizerZscale->Add(_buttAcqAll, flagsNoExpand);
-	    sizerZscale->Add(_txtZMin, flagsNoExpand);
+		sizerZscale->Add(_buttAcqAll, flagsExpand);
+	    sizerZscale->Add(_txtZMin, flagsExpand);
 		sizerZscale->AddStretchSpacer();
-	    sizerZscale->Add(_txtZMax, flagsNoExpand);
+	    sizerZscale->Add(_txtZMax, flagsExpand);
 
 	wxGridBagSizer *sizerCamVisCol = new wxGridBagSizer();
 	wxString colors[] = { wxT("Z"), wxT("Amp."), wxT("R"),
@@ -144,14 +144,14 @@ void MainWnd::Init()
 		_colVtk.push_back(colBox);
 	} // ENDOF for loop on _numCams
 
-	wxBoxSizer *sizerPanel = new wxBoxSizer(wxVERTICAL);
-		sizerPanel->Add(sizerCamVisCol, flagsExpand);
-		sizerPanel->Add(sizerZscale, flagsExpand);
-
-	bgPanel->SetSizerAndFit(sizerPanel); // fit sizer to bg panel
+	wxGridBagSizer *sizerPanel = new wxGridBagSizer();
+		sizerPanel->Add(sizerCamVisCol, wxGBPosition(0,0), wxGBSpan(8,4));
+		sizerPanel->Add(sizerZscale, wxGBPosition(8,0), wxGBSpan(2,4));
 
 	wxBoxSizer *sizerFrame = new wxBoxSizer(wxVERTICAL); // create sizer for frame
 		sizerFrame->Add(bgPanel, flagsExpand);
+
+	bgPanel->SetSizerAndFit(sizerPanel); // fit sizer to bg panel
 	this->SetSizerAndFit(sizerFrame);
 }
 
@@ -285,21 +285,21 @@ void MainWnd::SetColVtk(wxCommandEvent& event)
 		double r, g, b; r=0.0; g=0.0; b=0.0;
 		if(  strCol.IsSameAs(wxT("Z"))  )
 		{
-			//_vtkWin->setDataActColorZ(i);
+			_vtkWin->setDataMapperColorDepth(i);
 		}
 		if(  strCol.IsSameAs(wxT("Amp."))  )
 		{
-			//_vtkWin->setDataActColorAmp(i);
+			_vtkWin->setDataMapperColorGray(i);
 		}
 		if(  strCol.IsSameAs(wxT("R")) || strCol.IsSameAs(wxT("G")) || strCol.IsSameAs(wxT("B"))
 			 || strCol.IsSameAs(wxT("W")) || strCol.IsSameAs(wxT("K")))
 		{
-			if(  strCol.IsSameAs(wxT("R"))  ) { r=1.0; g=0.0; b=0.0;} ;
-			if(  strCol.IsSameAs(wxT("G"))  ) { r=0.0; g=1.0; b=0.0;} ;
-			if(  strCol.IsSameAs(wxT("B"))  ) { r=0.0; g=0.0; b=1.0;} ;
-			if(  strCol.IsSameAs(wxT("W"))  ) { r=1.0; g=1.0; b=1.0;} ;
-			if(  strCol.IsSameAs(wxT("K"))  ) { r=0.0; g=0.0; b=0.0;} ;
-			_vtkWin->setDataActColorRGB(i,r,g,b);
+			if(  strCol.IsSameAs(wxT("R"))  ) { _vtkWin->setDataMapperColorR(i);/*/r=1.0; g=0.0; b=0.0;/**/} ;
+			if(  strCol.IsSameAs(wxT("G"))  ) { _vtkWin->setDataMapperColorG(i);/*/r=0.0; g=1.0; b=0.0;/**/} ;
+			if(  strCol.IsSameAs(wxT("B"))  ) { _vtkWin->setDataMapperColorB(i);/*/r=0.0; g=0.0; b=1.0;/**/} ;
+			if(  strCol.IsSameAs(wxT("W"))  ) { _vtkWin->setDataMapperColorW(i);/*/r=1.0; g=1.0; b=1.0;/**/} ;
+			if(  strCol.IsSameAs(wxT("K"))  ) { _vtkWin->setDataMapperColorK(i);/*/r=0.0; g=0.0; b=0.0;/**/} ;
+			/*/_vtkWin->setDataActColorRGB(i,r,g,b);/**/
 		}
 	}
 	_vtkWin->Render();

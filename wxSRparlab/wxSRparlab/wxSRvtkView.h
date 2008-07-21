@@ -67,6 +67,13 @@ public:
 	int changeDepthRange(float minVal, float maxVal);
 	int hideDataAct(int vtkSub, bool doHide);
 	int setDataActColorRGB(int vtkSub, double r, double g, double b);
+	int setDataMapperColorDepth(int vtkSub);
+	int setDataMapperColorGray(int vtkSub);
+	int setDataMapperColorR(int vtkSub);
+	int setDataMapperColorG(int vtkSub);
+	int setDataMapperColorB(int vtkSub);
+	int setDataMapperColorW(int vtkSub);
+	int setDataMapperColorK(int vtkSub);
 	int Render();
 
 private:
@@ -102,6 +109,16 @@ private:
   vtkLookupTable	*depthLUT;	//!< LUT for depth data display
   int addDepthLUT();
   int freeDepthLUT();
+  vtkLookupTable	*grayLUT;	//!< LUT for depth data display
+  int addGrayLUT();
+  int freeGrayLUT();
+  vtkLookupTable	*rLUT;	//!< LUT for depth data display
+  vtkLookupTable	*gLUT;	//!< LUT for depth data display
+  vtkLookupTable	*bLUT;	//!< LUT for depth data display
+  vtkLookupTable	*wLUT;	//!< LUT for depth data display
+  vtkLookupTable	*kLUT;	//!< LUT for depth data display
+  int addPlainLUT();
+  int freePlainLUT();
 
   vtkScalarBarActor	*depthSca;  //!< scalar bar for depth values
   int addScalarBar();
