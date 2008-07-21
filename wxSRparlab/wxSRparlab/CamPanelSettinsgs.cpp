@@ -68,7 +68,7 @@ int CamPanelSettings::InitSettings()
 	sizerPanel->Add(m_statText, 1, wxEXPAND);
 
 
-    this->SetSizer(sizerPanel);
+    this->SetSizerAndFit(sizerPanel);
 
 	return res;
 }

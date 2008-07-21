@@ -66,6 +66,7 @@ public:
 
 	int changeDepthRange(float minVal, float maxVal);
 	int hideDataAct(int vtkSub, bool doHide);
+	int setDataActColorRGB(int vtkSub, double r, double g, double b);
 	int Render();
 
 private:
