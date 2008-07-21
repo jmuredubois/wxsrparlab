@@ -1011,6 +1011,18 @@ int CViewSrVtk::hideDataAct(int vtkSub, bool doHide)
 }
 
 /**
+ * Sets a data actor color
+ */
+int CViewSrVtk::setDataActColorRGB(int vtkSub, double r, double g, double b)
+{
+	int res = 0;
+	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
+	dataActor[vtkSub]->GetProperty()->SetColor(r,g,b);  // sets color
+	return res;
+}
+
+
+/**
  * Renders
  */
 int CViewSrVtk::Render()

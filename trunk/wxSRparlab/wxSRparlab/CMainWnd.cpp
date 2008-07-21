@@ -19,6 +19,7 @@ BEGIN_EVENT_TABLE(MainWnd, wxFrame)
 	EVT_TEXT(IDT_zMax, MainWnd::TextChangedZMax)
 	EVT_BUTTON(IDB_AcqAll, MainWnd::AcqAll)
 	EVT_CHECKBOX(IDC_visVtk, MainWnd::SetVisVtk)
+	EVT_RADIOBOX(IDC_colVtk, MainWnd::SetColVtk)
 END_EVENT_TABLE()
 
 IMPLEMENT_APP(SrApp)
@@ -105,11 +106,12 @@ void MainWnd::OnAbout(wxCommandEvent& WXUNUSED(event))
  */
 void MainWnd::Init()
 {
-    _txtZMin = new wxTextCtrl( this, IDT_zMin, wxT("0.0"));
-	_txtZMax = new wxTextCtrl( this, IDT_zMax, wxT("3500.0"));
+	wxPanel *bgPanel = new wxPanel(this); // a panel to contain our controls
+    _txtZMin = new wxTextCtrl( bgPanel, IDT_zMin, wxT("0.0"));
+	_txtZMax = new wxTextCtrl( bgPanel, IDT_zMax, wxT("3500.0"));
 	_txtMinMaxInit = true; _txtZMin->SetModified(true); _txtZMax->SetModified(true);
 
-	_buttAcqAll = new wxButton(this, IDB_AcqAll, wxT("Acq. All") );
+	_buttAcqAll = new wxButton(bgPanel, IDB_AcqAll, wxT("Acq. All") );
 
 	wxSizerFlags flagsExpand(1);
 	flagsExpand.Expand();
@@ -130,12 +132,12 @@ void MainWnd::Init()
 	//! - for the max number of cameras ...
 	for(int i = 0; i<_numCams; i++){
 		labT.sprintf(wxT("Cam %i"), i); // ... change checkbox text ...
-		wxCheckBox *chkBox = new wxCheckBox(this, IDC_visVtk, labT);	
+		wxCheckBox *chkBox = new wxCheckBox(bgPanel, IDC_visVtk, labT);	
 		chkBox->SetValue(true);
 		sizerCamVisCol->Add(chkBox, wxGBPosition(i,0));
 		_visVtk.push_back(chkBox);	// add visibility checkbox to container
 
-		wxRadioBox *colBox = new wxRadioBox(this, IDC_colVtk, wxT("Color"), 
+		wxRadioBox *colBox = new wxRadioBox(bgPanel, IDC_colVtk, wxT("Color"), 
 			wxDefaultPosition, wxDefaultSize, 7, colors, 0, wxRA_SPECIFY_COLS );
 		sizerCamVisCol->Add(colBox, wxGBPosition(i,1));
 		//sizerCamVisCol->SetItemSpan(colBox, wxGBSpan(1,7));
@@ -145,7 +147,12 @@ void MainWnd::Init()
 	wxBoxSizer *sizerPanel = new wxBoxSizer(wxVERTICAL);
 		sizerPanel->Add(sizerCamVisCol, flagsExpand);
 		sizerPanel->Add(sizerZscale, flagsExpand);
-	this->SetSizerAndFit(sizerPanel);
+
+	bgPanel->SetSizerAndFit(sizerPanel); // fit sizer to bg panel
+
+	wxBoxSizer *sizerFrame = new wxBoxSizer(wxVERTICAL); // create sizer for frame
+		sizerFrame->Add(bgPanel, flagsExpand);
+	this->SetSizerAndFit(sizerFrame);
 }
 
 /**
@@ -272,7 +279,28 @@ void MainWnd::SetColVtk(wxCommandEvent& event)
 	for ( it=_colVtk.begin() ; it != _colVtk.end(); it++, i++ )
 	{
 		if(!_vtkWin){return;};
-		//_vtkWin->hideDataAct(i, !( (*it)->IsChecked() ) );
+		/* wxString colors[] = { wxT("Z"), wxT("Amp."), wxT("R"),
+        wxT("G"), wxT("B"), wxT("W"), wxT("K") };*/
+		wxString strCol = (*it)->GetStringSelection();
+		double r, g, b; r=0.0; g=0.0; b=0.0;
+		if(  strCol.IsSameAs(wxT("Z"))  )
+		{
+			//_vtkWin->setDataActColorZ(i);
+		}
+		if(  strCol.IsSameAs(wxT("Amp."))  )
+		{
+			//_vtkWin->setDataActColorAmp(i);
+		}
+		if(  strCol.IsSameAs(wxT("R")) || strCol.IsSameAs(wxT("G")) || strCol.IsSameAs(wxT("B"))
+			 || strCol.IsSameAs(wxT("W")) || strCol.IsSameAs(wxT("K")))
+		{
+			if(  strCol.IsSameAs(wxT("R"))  ) { r=1.0; g=0.0; b=0.0;} ;
+			if(  strCol.IsSameAs(wxT("G"))  ) { r=0.0; g=1.0; b=0.0;} ;
+			if(  strCol.IsSameAs(wxT("B"))  ) { r=0.0; g=0.0; b=1.0;} ;
+			if(  strCol.IsSameAs(wxT("W"))  ) { r=1.0; g=1.0; b=1.0;} ;
+			if(  strCol.IsSameAs(wxT("K"))  ) { r=0.0; g=0.0; b=0.0;} ;
+			_vtkWin->setDataActColorRGB(i,r,g,b);
+		}
 	}
 	_vtkWin->Render();
 #endif
