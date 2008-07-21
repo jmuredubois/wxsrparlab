@@ -140,6 +140,8 @@ CViewSrVtk::CViewSrVtk(wxFrame* pWnd)
 	};
 	// create a depth LUT
 	addDepthLUT();
+	addGrayLUT();
+	addPlainLUT();
 	// add a scalar bar
 	addScalarBar();
 
@@ -208,6 +210,8 @@ CViewSrVtk::~CViewSrVtk()
 	freeSrBox();
 	// free depth LUT
 	freeDepthLUT();
+	freeGrayLUT();
+	freePlainLUT();
 	// free scalar bar
 	freeScalarBar();
 
@@ -391,6 +395,7 @@ int CViewSrVtk::addDepthLUT()
 {
 	int res = 0;
 	depthLUT = vtkLookupTable::New();
+	depthLUT->SetRampToLinear();
 
 	for(int i=0; i<_vtkSubMax; i++)
 	{
@@ -398,6 +403,66 @@ int CViewSrVtk::addDepthLUT()
 		dataMapper[i]->SetLookupTable(depthLUT);
 	}
 
+	return res;
+}
+
+/**
+ * Creates the gray LUT
+ *  -> Creates a new object that must be deleted
+ *  --> freeGrayLUT() must be called
+ */
+int CViewSrVtk::addGrayLUT()
+{
+	int res = 0;
+	grayLUT = vtkLookupTable::New();
+	grayLUT->SetRampToLinear();
+	grayLUT->SetHueRange(0.0, 0.0);
+	grayLUT->SetSaturationRange(0.0, 0.0);
+	return res;
+}
+/**
+ * Creates the plain LUTs
+ *  -> Creates new objects that must be deleted
+ *  --> freePlainLUT() must be called
+ */
+int CViewSrVtk::addPlainLUT()
+{
+	int res = 0;
+	rLUT = vtkLookupTable::New();
+	gLUT = vtkLookupTable::New();
+	bLUT = vtkLookupTable::New();
+	wLUT = vtkLookupTable::New();
+	kLUT = vtkLookupTable::New();
+
+	rLUT->SetRampToLinear();
+	rLUT->SetHueRange(1.0, 1.0);
+	rLUT->SetSaturationRange(1.0, 1.0);
+	rLUT->SetValueRange(1.0, 1.0);
+	rLUT->SetNumberOfTableValues(1);
+
+	gLUT->SetRampToLinear();
+	gLUT->SetHueRange(0.33333, 0.33333);
+	gLUT->SetSaturationRange(1.0, 1.0);
+	gLUT->SetValueRange(1.0, 1.0);
+	gLUT->SetNumberOfTableValues(1);
+
+	bLUT->SetRampToLinear();
+	bLUT->SetHueRange(0.66666, 0.66666);
+	bLUT->SetSaturationRange(1.0, 1.0);
+	bLUT->SetValueRange(1.0, 1.0);
+	bLUT->SetNumberOfTableValues(1);
+
+	wLUT->SetRampToLinear();
+	wLUT->SetHueRange(0.0, 0.0);
+	wLUT->SetSaturationRange(0.0, 0.0);
+	wLUT->SetValueRange(1.0, 1.0);
+	wLUT->SetNumberOfTableValues(1);
+
+	kLUT->SetRampToLinear();
+	kLUT->SetHueRange(0.0, 0.0);
+	kLUT->SetSaturationRange(1.0, 1.0);
+	kLUT->SetValueRange(0.0, 0.0);
+	kLUT->SetNumberOfTableValues(1);
 	return res;
 }
 
@@ -426,6 +491,30 @@ int CViewSrVtk::freeDepthLUT()
 {
 	int res = 0;
 	depthLUT->Delete();
+	return res;
+}
+
+/**
+ * Frees the gray LUT
+ */
+int CViewSrVtk::freeGrayLUT()
+{
+	int res = 0;
+	grayLUT->Delete();
+	return res;
+}
+
+/**
+ * Frees the plain LUTs
+ */
+int CViewSrVtk::freePlainLUT()
+{
+	int res = 0;
+	rLUT->Delete();
+	gLUT->Delete();
+	bLUT->Delete();
+	wLUT->Delete();
+	kLUT->Delete();
 	return res;
 }
 
@@ -1021,7 +1110,76 @@ int CViewSrVtk::setDataActColorRGB(int vtkSub, double r, double g, double b)
 	return res;
 }
 
-
+/**
+ * Sets a data actor color
+ */
+int CViewSrVtk::setDataMapperColorDepth(int vtkSub)
+{
+	int res = 0;
+	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
+	dataMapper[vtkSub]->SetLookupTable(depthLUT);  // sets color
+	return res;
+}
+/**
+ * Sets a data actor color
+ */
+int CViewSrVtk::setDataMapperColorGray(int vtkSub)
+{
+	int res = 0;
+	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
+	dataMapper[vtkSub]->SetLookupTable(grayLUT);  // sets color
+	return res;
+}
+/**
+ * Sets a data actor color
+ */
+int CViewSrVtk::setDataMapperColorR(int vtkSub)
+{
+	int res = 0;
+	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
+	dataMapper[vtkSub]->SetLookupTable(rLUT);  // sets color
+	return res;
+}
+/**
+ * Sets a data actor color
+ */
+int CViewSrVtk::setDataMapperColorG(int vtkSub)
+{
+	int res = 0;
+	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
+	dataMapper[vtkSub]->SetLookupTable(gLUT);  // sets color
+	return res;
+}
+/**
+ * Sets a data actor color
+ */
+int CViewSrVtk::setDataMapperColorB(int vtkSub)
+{
+	int res = 0;
+	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
+	dataMapper[vtkSub]->SetLookupTable(bLUT);  // sets color
+	return res;
+}
+/**
+ * Sets a data actor color
+ */
+int CViewSrVtk::setDataMapperColorW(int vtkSub)
+{
+	int res = 0;
+	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
+	dataMapper[vtkSub]->SetLookupTable(wLUT);  // sets color
+	return res;
+}
+/**
+ * Sets a data actor color
+ */
+int CViewSrVtk::setDataMapperColorK(int vtkSub)
+{
+	int res = 0;
+	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
+	dataMapper[vtkSub]->SetLookupTable(kLUT);  // sets color
+	return res;
+}
 /**
  * Renders
  */
