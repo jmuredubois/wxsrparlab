@@ -171,13 +171,6 @@ private:
   vtkFloatArray** BGpcoords;
   vtkFloatArray** BGdData;
 
-  double* _srX;
-  double* _srY;
-  double* _srZ;
-  double* _srNX;
-  double* _srNY;
-  double* _srNZ;
-
   vtkTransform			**camTran;			//!< transformation between camera coordinates
   vtkMatrix4x4			**camTranMat;		//!< 4D transformation matrix
   vtkTransformFilter	**camTranFilter;	//!< filter for transformation between camera coordinates

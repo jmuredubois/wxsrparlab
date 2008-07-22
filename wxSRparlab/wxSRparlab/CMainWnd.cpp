@@ -99,7 +99,7 @@ void MainWnd::OnQuit(wxCommandEvent& WXUNUSED(event))
  */
 void MainWnd::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
-	wxMessageBox(_T("This is a wxWindows SR application sample. /n Author: J. Mure-Dubois - Copyright 2008."),
+	wxMessageBox(_T("This is a wxWindows SR application sample. \n Author: J. Mure-Dubois - Copyright 2008."),
         _T("About wxSRparlab"), wxOK | wxICON_INFORMATION, this);
 }
 
