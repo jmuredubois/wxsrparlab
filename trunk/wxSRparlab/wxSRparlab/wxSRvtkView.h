@@ -58,7 +58,7 @@ public:
 	~CViewSrVtk();
 
 	//int updateTOFcurrent(SRCAM sr, SRPARLAB srPL, int vtkSub){};
-	int updateTOFcurrent(int rows, int cols, unsigned short *z, short *y, short *x, int vtkSub);
+	//int updateTOFcurrent(int rows, int cols, unsigned short *z, short *y, short *x, int vtkSub);
 	int updateTOFcurrent(int rows, int cols, unsigned short *z, short *y, short *x, unsigned short* amp, int vtkSub);
 	//int updateTOFcurrent(SRCAM sr, SRPARLAB srPL, int vtkSub, char* fname){};
 
