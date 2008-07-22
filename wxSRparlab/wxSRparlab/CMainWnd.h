@@ -25,32 +25,41 @@ public:
     MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size);
 
 	//! init
-	void Init();
+	void Init();	//!< initializes many controls
 
 	//! init
-	void AddChildren();
+	void AddChildren();	//!< add children: camera frames
 
 	//! Quit(..) method
-    void OnQuit(wxCommandEvent& event);
+    void OnQuit(wxCommandEvent& event);	//!< cleanup
 	//! About(..) method
-    void OnAbout(wxCommandEvent& event);
+    void OnAbout(wxCommandEvent& event); //!< about box
 
-	void SetZMin(double val);
-	void SetZMax(double val);
-	void TextChangedZMin(wxCommandEvent &);
-	void TextChangedZMax(wxCommandEvent &);
-	void AcqAll(wxCommandEvent& event);
-	void SetVisVtk(wxCommandEvent& event);
-	void SetColVtk(wxCommandEvent& event);
+	void SetZMin(double val);	//!< set min Z for vtk display
+	void SetZMax(double val);	//!< set max Z for vtk display
+	void TextChangedZMin(wxCommandEvent &);	//!< react on event changed min Z
+	void TextChangedZMax(wxCommandEvent &); //!< react on event changed max Z
+	void SetAmpMin(double val);	//!< set min amp for vtk display
+	void SetAmpMax(double val);	//!< set max amp for vtk display
+	void TextChangedAmpMin(wxCommandEvent &); //!< react on event changed min amp
+	void TextChangedAmpMax(wxCommandEvent &); //!< react on event changed max amp
+	void AcqAll(wxCommandEvent& event);	//!< send Acquire command to all cams
+	void SetVisVtk(wxCommandEvent& event); //!< react on event changed visibility
+	void SetColVtk(wxCommandEvent& event); //!< react on event changed color options
 
     DECLARE_EVENT_TABLE()
 
 private:
-	wxTextCtrl *_txtZMin;
-	wxTextCtrl *_txtZMax;
-	double	_zMin;
-	double	_zMax;
-	bool _txtMinMaxInit;
+	wxTextCtrl *_txtZMin;		//!< control text : min Z
+	wxTextCtrl *_txtZMax;		//!< control text : max Z
+	double	_zMin;				//!< stored min Z
+	double	_zMax;				//!< stored max Z
+	bool _txtMinMaxInit;		//!< helper var: ensure Z ctrl txt are initialized
+	wxTextCtrl *_txtAmpMin;		//!< control txt : min amp
+	wxTextCtrl *_txtAmpMax;		//!< control txt : max amp
+	double _ampMin;				//!< stored min amp
+	double _ampMax;				//!< stored max amp
+	bool _txtAmpInit;			//!< helper var: ensure amp ctrl txt are initialized
 	int			_numCams;		//!< count of cameras
 	std::vector<CamFrame*> m_camFrm;		//!< list of camFrames
 	CViewSrVtk	*_vtkWin ; //!< pointer to vtk window
@@ -66,6 +75,8 @@ enum MainWndEnum
     ID_About,
 	IDT_zMin,
 	IDT_zMax,
+	IDT_ampMin,
+	IDT_ampMax,
 	IDB_AcqAll,
 	IDC_visVtk,
 	IDC_colVtk

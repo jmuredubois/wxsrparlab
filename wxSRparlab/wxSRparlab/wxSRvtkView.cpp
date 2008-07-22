@@ -473,20 +473,37 @@ int CViewSrVtk::addPlainLUT()
 /**
  * Changes the depth range
  */
-int CViewSrVtk::changeDepthRange(float minval, float maxval)
+int CViewSrVtk::changeDepthRange(float minVal, float maxVal)
 {
 	int res = 0;
 
 	for(int i=0; i< _vtkSubMax; i++)
 	{
-		dataMapper[i]->SetScalarRange((double) minval, (double) maxval);		//!< HARDCODED SCALAR RANGE FOR DEPTH LUT
+		dataMapper[i]->SetScalarRange((double) minVal, (double) maxVal);
 		dataMapper[i]->Modified();
-		BGdataMapper[i]->SetScalarRange((double) minval, (double) maxval);		//!< HARDCODED SCALAR RANGE FOR DEPTH LUT
+		BGdataMapper[i]->SetScalarRange((double) minVal, (double) maxVal);
 		BGdataMapper[i]->Modified();
 	}
 	renWin->Render();
 	return res;
 }
+
+/**
+ * Changes the depth range
+ */
+int CViewSrVtk::changeAmpRange(float minAmp, float maxAmp)
+{
+	int res = 0;
+
+	for(int i=0; i< _vtkSubMax; i++)
+	{
+		dataMapper[i]->SetScalarRange((double) minAmp, (double) maxAmp);
+		dataMapper[i]->Modified();
+	}
+	renWin->Render();
+	return res;
+}
+
 
 /**
  * Frees the depth LUT

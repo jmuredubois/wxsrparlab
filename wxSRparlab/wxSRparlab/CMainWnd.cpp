@@ -17,6 +17,8 @@ BEGIN_EVENT_TABLE(MainWnd, wxFrame)
     EVT_MENU(ID_About, MainWnd::OnAbout)
 	EVT_TEXT(IDT_zMin, MainWnd::TextChangedZMin)
 	EVT_TEXT(IDT_zMax, MainWnd::TextChangedZMax)
+	EVT_TEXT(IDT_ampMin, MainWnd::TextChangedAmpMin)
+	EVT_TEXT(IDT_ampMax, MainWnd::TextChangedAmpMax)
 	EVT_BUTTON(IDB_AcqAll, MainWnd::AcqAll)
 	EVT_CHECKBOX(IDC_visVtk, MainWnd::SetVisVtk)
 	EVT_RADIOBOX(IDC_colVtk, MainWnd::SetColVtk)
@@ -58,9 +60,14 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
 	_txtZMin = NULL;
 	_txtZMax = NULL;
 	_txtMinMaxInit = false;
-
 	_zMin = 100.0;
 	_zMax = 3500.0;
+
+	_txtAmpMin = NULL;
+	_txtAmpMax = NULL;
+	_txtAmpInit = false;
+	_ampMin = 0.000;
+	_ampMax = 2000.0;
 
 	_vtkWin = NULL;
 
@@ -82,8 +89,6 @@ void MainWnd::OnQuit(wxCommandEvent& WXUNUSED(event))
 #ifdef JMU_USE_VTK
 	if(_vtkWin){ delete(_vtkWin); _vtkWin =NULL; };
 #endif
-	//if(_txtZMin !=NULL){_txtZMin->Close(); _txtZMin = NULL;};
-	//if(_txtZMin !=NULL){_txtZMax->Close(); _txtZMax = NULL;};
     Close(TRUE);
 }
 
@@ -94,7 +99,7 @@ void MainWnd::OnQuit(wxCommandEvent& WXUNUSED(event))
  */
 void MainWnd::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
-    wxMessageBox(_T("This is a wxWindows SR application sample"),
+	wxMessageBox(_T("This is a wxWindows SR application sample. /n Author: J. Mure-Dubois - Copyright 2008."),
         _T("About wxSRparlab"), wxOK | wxICON_INFORMATION, this);
 }
 
@@ -107,22 +112,40 @@ void MainWnd::OnAbout(wxCommandEvent& WXUNUSED(event))
 void MainWnd::Init()
 {
 	wxPanel *bgPanel = new wxPanel(this); // a panel to contain our controls
+	wxSizerFlags flagsExpand(1); flagsExpand.Expand(); // sizer flags for expanding sizer
+	wxSizerFlags flagsNoExpand(1);	// sizer flags for non-expanding sizer
+
+	// depth min and max text controls
     _txtZMin = new wxTextCtrl( bgPanel, IDT_zMin, wxT("0.0"));
 	_txtZMax = new wxTextCtrl( bgPanel, IDT_zMax, wxT("3500.0"));
 	_txtMinMaxInit = true; _txtZMin->SetModified(true); _txtZMax->SetModified(true);
 
-	_buttAcqAll = new wxButton(bgPanel, IDB_AcqAll, wxT("Acq. All") );
-
-	wxSizerFlags flagsExpand(1);
-	flagsExpand.Expand();
-
-	wxSizerFlags flagsNoExpand(1);
-
 	wxBoxSizer *sizerZscale = new wxBoxSizer(wxHORIZONTAL);
-		sizerZscale->Add(_buttAcqAll, flagsExpand);
+		//sizerZscale->Add(_buttAcqAll, flagsExpand);
 	    sizerZscale->Add(_txtZMin, flagsExpand);
 		sizerZscale->AddStretchSpacer();
 	    sizerZscale->Add(_txtZMax, flagsExpand);
+
+	// amplitude min and max controls
+	_txtAmpMin = new wxTextCtrl( bgPanel, IDT_ampMin, wxString::Format(wxT("%d"), _ampMin) ); 
+	_txtAmpMax = new wxTextCtrl( bgPanel, IDT_ampMax, wxString::Format(wxT("%d"), _ampMax) );
+	_txtAmpInit = true; _txtAmpMin->SetModified(true); _txtAmpMax->SetModified(true);
+	
+	wxBoxSizer *sizerAmpScale = new wxBoxSizer(wxHORIZONTAL);
+	    sizerAmpScale->Add(_txtAmpMin, flagsExpand);
+		sizerAmpScale->AddStretchSpacer();
+	    sizerAmpScale->Add(_txtAmpMax, flagsExpand);
+
+	wxFlexGridSizer *sizerZAmpScales = new wxFlexGridSizer(2,1,0,0);
+		sizerZAmpScales->Add( sizerZscale, flagsExpand);
+		sizerZAmpScales->Add( sizerAmpScale, flagsExpand);
+		
+
+	_buttAcqAll = new wxButton(bgPanel, IDB_AcqAll, wxT("Acq. All") );
+
+	wxFlexGridSizer *sizerAcqScales = new wxFlexGridSizer(1,2,0,0);
+		sizerAcqScales->Add(_buttAcqAll, flagsExpand);
+		sizerAcqScales->Add( sizerZAmpScales, flagsExpand);
 
 	wxGridBagSizer *sizerCamVisCol = new wxGridBagSizer();
 	wxString colors[] = { wxT("Z"), wxT("Amp."), wxT("R"),
@@ -146,7 +169,7 @@ void MainWnd::Init()
 
 	wxGridBagSizer *sizerPanel = new wxGridBagSizer();
 		sizerPanel->Add(sizerCamVisCol, wxGBPosition(0,0), wxGBSpan(8,4));
-		sizerPanel->Add(sizerZscale, wxGBPosition(8,0), wxGBSpan(2,4));
+		sizerPanel->Add(sizerAcqScales, wxGBPosition(8,0), wxGBSpan(2,4));
 
 	wxBoxSizer *sizerFrame = new wxBoxSizer(wxVERTICAL); // create sizer for frame
 		sizerFrame->Add(bgPanel, flagsExpand);
@@ -195,6 +218,9 @@ void MainWnd::SetZMin(double val)
 	_zMin = val;
 	_txtZMin->GetValue().Printf(wxT("%d"), val);
 	_txtZMin->SetModified(true);
+#ifdef JMU_USE_VTK
+	if(_vtkWin != NULL){_vtkWin->changeDepthRange( (float) _zMin, (float) _zMax); };
+#endif
 }
 /* Setting display min value*/
 void MainWnd::SetZMax(double val)
@@ -216,9 +242,6 @@ void MainWnd::TextChangedZMin(wxCommandEvent &)
 	if( strVal.ToDouble(& val) ) /* read value as double*/
 	{
 		SetZMin(val);
-#ifdef JMU_USE_VTK
-		if(_vtkWin != NULL){_vtkWin->changeDepthRange( (float) _zMin, (float) _zMax); };
-#endif
 	}
 	else
 	{
@@ -241,6 +264,61 @@ void MainWnd::TextChangedZMax(wxCommandEvent &)
 	{
 		_txtZMax->DiscardEdits();
 		_txtZMax->GetValue().Printf(wxT("%d"), _zMax);
+	}
+}
+
+/* Setting display min value*/
+void MainWnd::SetAmpMin(double val)
+{
+	_ampMin = val;
+	_txtAmpMin->GetValue().Printf(wxT("%d"), val);
+	_txtAmpMin->SetModified(true);
+#ifdef JMU_USE_VTK
+	if(_vtkWin != NULL){_vtkWin->changeAmpRange( (float) _ampMin, (float) _ampMax); };
+#endif
+}
+/* Setting display min value*/
+void MainWnd::SetAmpMax(double val)
+{
+	_ampMax = val;
+	_txtAmpMax->GetValue().Printf(wxT("%d"), val);
+	_txtAmpMax->SetModified(true);
+#ifdef JMU_USE_VTK
+	if(_vtkWin != NULL){_vtkWin->changeAmpRange( (float) _ampMin, (float) _ampMax); };
+#endif
+}
+
+/* acting on changed text value */
+void MainWnd::TextChangedAmpMin(wxCommandEvent &)
+{
+	double val = 0;
+	if( !_txtAmpInit){return ;};
+	wxString strVal = _txtAmpMin->GetValue();
+	if( strVal.ToDouble(& val) ) /* read value as double*/
+	{
+		SetAmpMin(val);
+	}
+	else
+	{
+		_txtAmpMin->DiscardEdits();
+		_txtAmpMin->GetValue().Printf(wxT("%d"), _ampMin);
+	}
+}
+
+/* acting on changed text value */
+void MainWnd::TextChangedAmpMax(wxCommandEvent &)
+{
+	double val = 0;
+	if( !_txtAmpInit){return ;};
+	wxString strVal = _txtAmpMax->GetValue();
+	if( strVal.ToDouble(& val) ) /* read value as double*/
+	{
+		SetAmpMax(val);
+	}
+	else
+	{
+		_txtAmpMax->DiscardEdits();
+		_txtAmpMax->GetValue().Printf(wxT("%d"), _ampMax);
 	}
 }
 
@@ -286,10 +364,12 @@ void MainWnd::SetColVtk(wxCommandEvent& event)
 		if(  strCol.IsSameAs(wxT("Z"))  )
 		{
 			_vtkWin->setDataMapperColorDepth(i);
+			SetZMin(_zMin); // trick to update data Mapper
 		}
 		if(  strCol.IsSameAs(wxT("Amp."))  )
 		{
 			_vtkWin->setDataMapperColorGray(i);
+			SetAmpMin(_ampMin); // trick to update data Mapper
 		}
 		if(  strCol.IsSameAs(wxT("R")) || strCol.IsSameAs(wxT("G")) || strCol.IsSameAs(wxT("B"))
 			 || strCol.IsSameAs(wxT("W")) || strCol.IsSameAs(wxT("K")))
