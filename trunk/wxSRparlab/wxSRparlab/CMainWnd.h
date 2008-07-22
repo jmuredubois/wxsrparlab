@@ -23,6 +23,7 @@ class MainWnd: public wxFrame //!< main window class
 public:
 	//!Constructor
     MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size);
+	~MainWnd();
 
 	//! init
 	void Init();	//!< initializes many controls
