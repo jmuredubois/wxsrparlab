@@ -159,29 +159,28 @@ CViewSrVtk::CViewSrVtk(wxFrame* pWnd)
  */
 CViewSrVtk::~CViewSrVtk()
 {
-	// delete the render window
-	renWin->Delete();
-	// delete the renderer
-	renderer->Delete();
-	// delete the interactor
-	iren->Delete();
 
 	for(int i=0; i<_vtkSubMax; i++)
 	{
+		freeSrCam(i);  // free camera shape
+
+		BGdataWriter[i]->Delete();
+		dataWriter[i]->Delete();
+		// free data actor
+		freeBGDataAct(i);
+		// free data actor
+		freeDataAct(i);
+
 		camTran[i]->Delete();
 		camTranMat[i]->Delete();
 		camTranFilter[i]->Delete();
 		BGcamTranFilter[i]->Delete();
 	};
+
 	free(camTran);
 	free(camTranFilter);
 	free(BGcamTranFilter);
 
-	// free camera shape
-	for(int i=0; i<_vtkSubMax; i++)
-	{
-		freeSrCam(i);
-	};
 	// free axes
 	freeSrAxes();
 	// free FoV box
@@ -193,15 +192,12 @@ CViewSrVtk::~CViewSrVtk()
 	// free scalar bar
 	freeScalarBar();
 
-	for(int i=0; i<_vtkSubMax; i++)
-	{
-		BGdataWriter[i]->Delete();
-		dataWriter[i]->Delete();
-		// free data actor
-		freeBGDataAct(i);
-		// free data actor
-		freeDataAct(i);
-	};
+	// delete the interactor
+	iren->Delete();
+	// delete the renderer
+	renderer->Delete();
+	// delete the render window
+	renWin->Delete();
 
 	free(BGdataWriter);
 	free(dataWriter);
@@ -754,6 +750,8 @@ int CViewSrVtk::freeDataAct(int vtkSub)
 	freeXYZ(vtkSub);
 	data[vtkSub]->Delete();
 	pdata[vtkSub]->Delete();
+	dData[vtkSub]->Delete();
+	aData[vtkSub]->Delete();
 	dataMapper[vtkSub]->Delete();
 	dataActor[vtkSub]->Delete();
 	//subSample->Delete();
@@ -1068,6 +1066,7 @@ int CViewSrVtk::freeBGDataAct(int vtkSub)
 	freeXYZbg(vtkSub);
 	BGdata[vtkSub]->Delete();
 	BGpdata[vtkSub]->Delete();
+	BGdData[vtkSub]->Delete();
 	BGdataMapper[vtkSub]->Delete();
 	BGdataActor[vtkSub]->Delete();
 
