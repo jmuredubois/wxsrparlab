@@ -16,14 +16,6 @@ CViewSrVtk::CViewSrVtk(wxFrame* pWnd)
 	_yBG = (short**) malloc( _vtkSubMax* sizeof(short*));
 	_zBG = (unsigned short**) malloc( _vtkSubMax* sizeof(unsigned short*));
 
-	_srX = (double*) malloc(_vtkSubMax* sizeof(double)); memset((void*)_srX, 0x0, _vtkSubMax* sizeof(double));
-	_srY = (double*) malloc(_vtkSubMax* sizeof(double)); memset((void*)_srY, 0x0, _vtkSubMax* sizeof(double));
-	_srZ = (double*) malloc(_vtkSubMax* sizeof(double)); memset((void*)_srZ, 0x0, _vtkSubMax* sizeof(double));
-
-	_srNX = (double*) malloc(_vtkSubMax* sizeof(double)); memset((void*)_srNX, 0x0, _vtkSubMax* sizeof(double));
-	_srNY = (double*) malloc(_vtkSubMax* sizeof(double)); memset((void*)_srNY, 0x0, _vtkSubMax* sizeof(double));
-	_srNZ = (double*) malloc(_vtkSubMax* sizeof(double)); memset((void*)_srNZ, 0x0, _vtkSubMax* sizeof(double));
-
 	srCube = (vtkCubeSource**) malloc( _vtkSubMax * sizeof(vtkCubeSource*));
 	srCubeMapper = (vtkPolyDataMapper**) malloc( _vtkSubMax * sizeof(vtkPolyDataMapper*));
 	srCubeActor = (vtkActor**) malloc( _vtkSubMax * sizeof(vtkActor*));
@@ -86,16 +78,8 @@ CViewSrVtk::CViewSrVtk(wxFrame* pWnd)
 
 	for(int i=0; i<_vtkSubMax; i++)
 	{
-		_srX[i] = camTranMat[i]->GetElement(0,3);
-		_srY[i] = camTranMat[i]->GetElement(1,3);
-		_srZ[i] = camTranMat[i]->GetElement(2,3);
-	}
-
-	for(int i=0; i<_vtkSubMax; i++)
-	{
 		camTran[i] = vtkTransform::New();
 		camTran[i]->SetMatrix(camTranMat[i]);
-		//camTran[i]->Translate( _srX[i],  _srY[i],  _srZ[i]);
 		camTranFilter[i] = vtkTransformFilter::New();
 		camTranFilter[i]->SetTransform(camTran[i]);
 		BGcamTranFilter[i] = vtkTransformFilter::New();
@@ -182,13 +166,6 @@ CViewSrVtk::~CViewSrVtk()
 	// delete the interactor
 	iren->Delete();
 
-	SAFE_FREE(_srX);
-	SAFE_FREE(_srY);
-	SAFE_FREE(_srZ);
-	SAFE_FREE(_srNX);
-	SAFE_FREE(_srNY);
-	SAFE_FREE(_srNZ);
-
 	for(int i=0; i<_vtkSubMax; i++)
 	{
 		camTran[i]->Delete();
@@ -273,7 +250,7 @@ int CViewSrVtk::addSrCam(int vtkSub)
     srCube[vtkSub]->SetXLength( 55.0 );			//!< HARDCODED SR CAMERA DIMENSIONS
     srCube[vtkSub]->SetYLength( 75.0 );
     srCube[vtkSub]->SetZLength( 55.0 );
-	srCube[vtkSub]->SetCenter( _srX[vtkSub],  _srY[vtkSub],  _srZ[vtkSub]);
+	srCube[vtkSub]->SetCenter( camTranMat[vtkSub]->GetElement(0,3),  camTranMat[vtkSub]->GetElement(1,3),  camTranMat[vtkSub]->GetElement(2,3));
     srCubeMapper[vtkSub] = vtkPolyDataMapper::New();
     srCubeMapper[vtkSub]->SetInputConnection(srCube[vtkSub]->GetOutputPort());
     srCubeActor[vtkSub] = vtkActor::New();
@@ -287,7 +264,7 @@ int CViewSrVtk::addSrCam(int vtkSub)
     srLabelActor[vtkSub] = vtkFollower::New();
     srLabelActor[vtkSub]->SetMapper(srLabelMapper[vtkSub]);
     srLabelActor[vtkSub]->SetScale(50.0,50.0,50.0);				//!< HARDCODED SR CAMERA LABEL TEXT SIZE
-	srLabelActor[vtkSub]->SetPosition( _srX[vtkSub],  _srY[vtkSub],  _srZ[vtkSub]);
+	srLabelActor[vtkSub]->SetPosition( camTranMat[vtkSub]->GetElement(0,3),  camTranMat[vtkSub]->GetElement(1,3),  camTranMat[vtkSub]->GetElement(2,3));
     srLabelActor[vtkSub]->AddPosition(-50.0,-50.0,-50.0);				//!< HARDCODED SR CAMERA LABEL TEXT POSITION
 	//srLabelActor[vtkSub]->SetCamera(cam0);
 	if(vtkSub==0){ srLabelActor[vtkSub]->GetProperty()->SetColor(0.0,0.0,1.0); }; // BLUE for 0-th cam
