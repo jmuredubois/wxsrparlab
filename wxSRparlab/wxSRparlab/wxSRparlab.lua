@@ -22,6 +22,8 @@ package.excludes = {
   "libusbSR.h",
   "wxSRvtkView.h",
   "wxSRvtkView.cpp",
+  "camVtkView.h",
+  "camVtkView.cpp",
   "camTranMats.cpp",
 }
 --]]
