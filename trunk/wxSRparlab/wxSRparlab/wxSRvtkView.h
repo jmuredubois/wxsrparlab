@@ -66,6 +66,7 @@ public:
 	//int updateTOFbg(SRCAM sr, SRPARLAB srPL, int vtkSub, char*fname);
 
 	int changeDepthRange(float minVal, float maxVal);
+	int changeAmpRange(float minAmp, float maxAmp);
 	int hideDataAct(int vtkSub, bool doHide);
 	int setDataActColorRGB(int vtkSub, double r, double g, double b);
 	int setDataMapperColorDepth(int vtkSub);
