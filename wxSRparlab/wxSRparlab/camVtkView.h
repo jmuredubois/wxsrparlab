@@ -70,6 +70,9 @@ public:
 
 	int changeDepthRange(float minVal, float maxVal);
 	int changeAmpRange(float minAmp, float maxAmp);
+	void SetDepthLUT(vtkLookupTable* LUT);
+	void SetGrayLUT(vtkLookupTable* LUT);
+	void SetPlainLUT(vtkLookupTable* LUTr, vtkLookupTable* LUTg, vtkLookupTable* LUTb, vtkLookupTable* LUTw, vtkLookupTable* LUTk);
 	void hideDataAct(bool doHide);
 	void setDataActColorRGB( double r, double g, double b);
 	void setDataMapperColorDepth();
@@ -96,15 +99,12 @@ private:
   int		freeSrCam(); //!< adds the sr cam actor to the current view
 
   vtkLookupTable	*depthLUT;	//!< LUT for depth data display
-  void SetDepthLUT(vtkLookupTable* LUT);
   vtkLookupTable	*grayLUT;	//!< LUT for depth data display
-  void SetGrayLUT(vtkLookupTable* LUT);
   vtkLookupTable	*rLUT;	//!< LUT for depth data display
   vtkLookupTable	*gLUT;	//!< LUT for depth data display
   vtkLookupTable	*bLUT;	//!< LUT for depth data display
   vtkLookupTable	*wLUT;	//!< LUT for depth data display
   vtkLookupTable	*kLUT;	//!< LUT for depth data display
-  void SetPlainLUT(vtkLookupTable* LUTr, vtkLookupTable* LUTg, vtkLookupTable* LUTb, vtkLookupTable* LUTw, vtkLookupTable* LUTk);
 
   vtkStructuredGrid					*data;			//!< read TOF depth data
   vtkPoints							*dataPoints;    //!< points vtk objects to store SR dara
