@@ -555,7 +555,6 @@ int CViewSrVtk::freeScalarBar()
  */
 int CViewSrVtk::addDataAct(int vtkSub)
 {
-	int res = 0;
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
 
 	dataPoints[vtkSub] = vtkPoints::New();
@@ -647,7 +646,7 @@ int CViewSrVtk::addDataAct(int vtkSub)
 	dataWriter[vtkSub]->SetFileTypeToBinary();
 #endif
 
-	return res;
+	return vtkSub;
 }
 
 /**
@@ -655,7 +654,6 @@ int CViewSrVtk::addDataAct(int vtkSub)
  */
 int CViewSrVtk::updateTOFcurrent(int rows, int cols, unsigned short *z, short *y, short *x, int vtkSub)
 {
-	int res = 0;
 	//if(!sr){return -1;};
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
 
@@ -726,7 +724,7 @@ int CViewSrVtk::updateTOFcurrent(int rows, int cols, unsigned short *z, short *y
 
 	data[vtkSub]->Modified();
 	renWin->Render();
-	return res;
+	return vtkSub;
 }
 
 /**
@@ -734,7 +732,6 @@ int CViewSrVtk::updateTOFcurrent(int rows, int cols, unsigned short *z, short *y
  */
 int CViewSrVtk::updateTOFcurrent(int rows, int cols, unsigned short *z, short *y, short *x, unsigned short* amp, int vtkSub)
 {
-	int res = 0;
 	//if(!sr){return -1;};
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
 
@@ -806,7 +803,7 @@ int CViewSrVtk::updateTOFcurrent(int rows, int cols, unsigned short *z, short *y
 
 	data[vtkSub]->Modified();
 	renWin->Render();
-	return res;
+	return vtkSub;
 }
 
 ///**
@@ -828,8 +825,6 @@ int CViewSrVtk::updateTOFcurrent(int rows, int cols, unsigned short *z, short *y
  */
 int CViewSrVtk::freeDataAct(int vtkSub)
 {
-	int res = 0;
-
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
 	//pdata[vtkSub]->SetInputConnection(data[vtkSub]->GetOutputPort());
 	dataPoints[vtkSub]->Delete();
@@ -840,7 +835,7 @@ int CViewSrVtk::freeDataAct(int vtkSub)
 	dataMapper[vtkSub]->Delete();
 	dataActor[vtkSub]->Delete();
 	//subSample->Delete();
-	return res;
+	return vtkSub;
 }
 
 /**
@@ -848,7 +843,6 @@ int CViewSrVtk::freeDataAct(int vtkSub)
  */
 int CViewSrVtk::allocXYZ(int rows, int cols, int vtkSub)
 {
-	int res = 0;
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
 	if((rows>512) || (rows<0) || (cols>512) || (cols<0)){ return -2;};
 
@@ -865,7 +859,7 @@ int CViewSrVtk::allocXYZ(int rows, int cols, int vtkSub)
 	data[vtkSub]->GetDimensions(dim);
 	data[vtkSub]->SetDimensions(rows,cols,1);
 
-	return res;
+	return vtkSub;
 }
 
 /**
@@ -873,13 +867,12 @@ int CViewSrVtk::allocXYZ(int rows, int cols, int vtkSub)
  */
 int CViewSrVtk::freeXYZ(int vtkSub)
 {
-	int res = 0;
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
 
 	SAFE_FREE(_x[vtkSub]);
 	SAFE_FREE(_y[vtkSub]);
 	SAFE_FREE(_z[vtkSub]);
-	return res;
+	return vtkSub;
 }
 
 /**
@@ -887,7 +880,6 @@ int CViewSrVtk::freeXYZ(int vtkSub)
  */
 int CViewSrVtk::allocXYZbg(int rows, int cols, int vtkSub)
 {
-	int res = 0;
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
 
 	if((_xBG[vtkSub]) || (_yBG[vtkSub]) || (_zBG[vtkSub]) ){ freeXYZbg(vtkSub);};
@@ -897,7 +889,7 @@ int CViewSrVtk::allocXYZbg(int rows, int cols, int vtkSub)
 	_yBG[vtkSub] = (short*) malloc(num*sizeof(short)); memset( (void*) _yBG[vtkSub], 0x00, rows*cols*sizeof(short));
 	_zBG[vtkSub] = (unsigned short*)  malloc(num*sizeof(unsigned short)); memset( (void*) _zBG[vtkSub], 0x00, rows*cols*sizeof(unsigned short));
 
-	return res;
+	return vtkSub;
 }
 
 /**
@@ -905,20 +897,18 @@ int CViewSrVtk::allocXYZbg(int rows, int cols, int vtkSub)
  */
 int CViewSrVtk::freeXYZbg(int vtkSub)
 {
-	int res = 0;
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
 
 	SAFE_FREE(_xBG[vtkSub]);
 	SAFE_FREE(_yBG[vtkSub]);
 	SAFE_FREE(_zBG[vtkSub]);
-	return res;
+	return vtkSub;
 }
 /**
  * Updates the TOF background points
  */
 int CViewSrVtk::addBGDataAct(int vtkSub)
 {
-	int res = 0;
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
 
 	int rows = 144; // HARDCODED BAD BAD BAD
@@ -1023,7 +1013,7 @@ int CViewSrVtk::addBGDataAct(int vtkSub)
 
 	renWin->Render();
 	BGdataActor[vtkSub]->VisibilityOff();
-	return res;
+	return vtkSub;
 }
 
 /**
@@ -1149,7 +1139,6 @@ int CViewSrVtk::addBGDataAct(int vtkSub)
  */
 int CViewSrVtk::freeBGDataAct(int vtkSub)
 {
-	int res = 0;
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
 
 	BGdataPoints[vtkSub]->Delete();
@@ -1160,7 +1149,7 @@ int CViewSrVtk::freeBGDataAct(int vtkSub)
 	BGdataMapper[vtkSub]->Delete();
 	BGdataActor[vtkSub]->Delete();
 
-	return res;
+	return vtkSub;
 }
 
 /**
@@ -1168,17 +1157,10 @@ int CViewSrVtk::freeBGDataAct(int vtkSub)
  */
 int CViewSrVtk::hideDataAct(int vtkSub, bool doHide)
 {
-	int res = 0;
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-	if(doHide)
-	{
-		dataActor[vtkSub]->VisibilityOff();
-	}
-	else
-	{
-		dataActor[vtkSub]->VisibilityOn();
-	}
-	return res;
+	if(doHide){ dataActor[vtkSub]->VisibilityOff();}
+	else{ dataActor[vtkSub]->VisibilityOn();}
+	return vtkSub;
 }
 
 /**
@@ -1186,10 +1168,9 @@ int CViewSrVtk::hideDataAct(int vtkSub, bool doHide)
  */
 int CViewSrVtk::setDataActColorRGB(int vtkSub, double r, double g, double b)
 {
-	int res = 0;
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
 	dataActor[vtkSub]->GetProperty()->SetColor(r,g,b);  // sets color
-	return res;
+	return vtkSub;
 }
 
 /**
@@ -1197,72 +1178,65 @@ int CViewSrVtk::setDataActColorRGB(int vtkSub, double r, double g, double b)
  */
 int CViewSrVtk::setDataMapperColorDepth(int vtkSub)
 {
-	int res = 0;
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
 	data[vtkSub]->GetPointData()->SetScalars(dData[vtkSub]);
 	dataMapper[vtkSub]->SetLookupTable(depthLUT);  // sets color
-	return res;
+	return vtkSub;
 }
 /**
  * Sets a data actor color
  */
 int CViewSrVtk::setDataMapperColorGray(int vtkSub)
 {
-	int res = 0;
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
 	data[vtkSub]->GetPointData()->SetScalars(aData[vtkSub]);
 	dataMapper[vtkSub]->SetLookupTable(grayLUT);  // sets color
-	return res;
+	return vtkSub;
 }
 /**
  * Sets a data actor color
  */
 int CViewSrVtk::setDataMapperColorR(int vtkSub)
 {
-	int res = 0;
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
 	dataMapper[vtkSub]->SetLookupTable(rLUT);  // sets color
-	return res;
+	return vtkSub;
 }
 /**
  * Sets a data actor color
  */
 int CViewSrVtk::setDataMapperColorG(int vtkSub)
 {
-	int res = 0;
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
 	dataMapper[vtkSub]->SetLookupTable(gLUT);  // sets color
-	return res;
+	return vtkSub;
 }
 /**
  * Sets a data actor color
  */
 int CViewSrVtk::setDataMapperColorB(int vtkSub)
 {
-	int res = 0;
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
 	dataMapper[vtkSub]->SetLookupTable(bLUT);  // sets color
-	return res;
+	return vtkSub;
 }
 /**
  * Sets a data actor color
  */
 int CViewSrVtk::setDataMapperColorW(int vtkSub)
 {
-	int res = 0;
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
 	dataMapper[vtkSub]->SetLookupTable(wLUT);  // sets color
-	return res;
+	return vtkSub;
 }
 /**
  * Sets a data actor color
  */
 int CViewSrVtk::setDataMapperColorK(int vtkSub)
 {
-	int res = 0;
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
 	dataMapper[vtkSub]->SetLookupTable(kLUT);  // sets color
-	return res;
+	return vtkSub;
 }
 /**
  * Renders
