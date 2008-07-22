@@ -39,6 +39,7 @@ CViewSrVtk::CViewSrVtk(wxFrame* pWnd)
 		cam->SetDepthLUT(depthLUT);
 		cam->SetGrayLUT(grayLUT);
 		cam->SetPlainLUT(rLUT, gLUT, bLUT, wLUT, kLUT);
+		cam->setTrfMat();
 		cameras.push_back(cam);
 	};
 	// add axes
@@ -82,16 +83,17 @@ CViewSrVtk::~CViewSrVtk()
 	{
 		delete((*it));
 	}
+	int res = 0;
 	// free axes
-	freeSrAxes();
+	res+= freeSrAxes();
 	// free FoV box
-	freeSrBox();
+	res+= freeSrBox();
 	// free depth LUT
-	freeDepthLUT();
-	freeGrayLUT();
-	freePlainLUT();
+	res+= freeDepthLUT();
+	res+= freeGrayLUT();
+	res+= freePlainLUT();
 	// free scalar bar
-	freeScalarBar();
+	res+= freeScalarBar();
 };
 
 
@@ -103,8 +105,6 @@ CViewSrVtk::~CViewSrVtk()
  */
 int CViewSrVtk::addSrBox(int xLen, int yLen, int zLen, int xC, int yC, int zC)
 {
-	int res = 0;
-
 	srBox = vtkCubeSource::New();
     srBox->SetXLength( (double) xLen );			//!< HARDCODED FoV OUTLINE BOX DIMENSIONS
     srBox->SetYLength( (double) yLen );
@@ -116,8 +116,7 @@ int CViewSrVtk::addSrBox(int xLen, int yLen, int zLen, int xC, int yC, int zC)
     srBoxMapper->SetInputConnection(srBoxOutline->GetOutputPort());
     srBoxActor = vtkActor::New();
     srBoxActor->SetMapper(srBoxMapper);			//!< HARDCODED SR CAMERA LABEL TEXT POSITION
-
-	return res;
+	return srBoxActor->GetReferenceCount();
 }
 
 /**
@@ -125,14 +124,12 @@ int CViewSrVtk::addSrBox(int xLen, int yLen, int zLen, int xC, int yC, int zC)
  */
 int CViewSrVtk::freeSrBox()
 {
-	int res = 0;
-
+	int res = srBoxActor->GetReferenceCount();
 	srBox->Delete();
 	srBoxOutline->Delete();
 	srBoxMapper->Delete();
 	srBoxActor->Delete();
-
-	return res;
+	return res-1;
 }
 
 /**
@@ -142,16 +139,13 @@ int CViewSrVtk::freeSrBox()
  */
 int CViewSrVtk::addSrAxes()
 {
-	int res = 0;
-
 	axes = vtkAxes::New();
     axes->SetOrigin(0.0,0.0,0.0);
     axesMapper = vtkPolyDataMapper::New();
     axesMapper->SetInputConnection(axes->GetOutputPort());
     axesActor = vtkActor::New();
     axesActor->SetMapper(axesMapper);
-
-	return res;
+	return axesActor->GetReferenceCount();
 }
 
 /**
@@ -159,13 +153,11 @@ int CViewSrVtk::addSrAxes()
  */
 int CViewSrVtk::freeSrAxes()
 {
-	int res = 0;
-
+	int res = axesActor->GetReferenceCount();
 	axes->Delete();
 	axesMapper->Delete();
 	axesActor->Delete();
-
-	return res;
+	return res-1;
 }
 
 /**
@@ -175,17 +167,9 @@ int CViewSrVtk::freeSrAxes()
  */
 int CViewSrVtk::addDepthLUT()
 {
-	int res = 0;
 	depthLUT = vtkLookupTable::New();
 	depthLUT->SetRampToLinear();
-
-	//for(int i=0; i<_vtkSubMax; i++)
-	//{
-	//	dataMapper[i]->SetScalarRange(0.0,4500.0);		//!< HARDCODED SCALAR RANGE FOR DEPTH LUT
-	//	dataMapper[i]->SetLookupTable(depthLUT);
-	//}
-
-	return res;
+	return depthLUT->GetReferenceCount();
 }
 
 /**
@@ -195,14 +179,13 @@ int CViewSrVtk::addDepthLUT()
  */
 int CViewSrVtk::addGrayLUT()
 {
-	int res = 0;
 	grayLUT = vtkLookupTable::New();
 	grayLUT->SetRampToLinear();
 	grayLUT->SetHueRange(0.0, 0.0);
 	grayLUT->SetSaturationRange(0.0, 0.0);
 	grayLUT->SetValueRange(0.0, 1.0);
 	grayLUT->SetNumberOfTableValues(256);
-	return res;
+	return grayLUT->GetReferenceCount();
 }
 /**
  * Creates the plain LUTs
@@ -211,7 +194,6 @@ int CViewSrVtk::addGrayLUT()
  */
 int CViewSrVtk::addPlainLUT()
 {
-	int res = 0;
 	rLUT = vtkLookupTable::New();
 	gLUT = vtkLookupTable::New();
 	bLUT = vtkLookupTable::New();
@@ -247,7 +229,8 @@ int CViewSrVtk::addPlainLUT()
 	kLUT->SetSaturationRange(1.0, 1.0);
 	kLUT->SetValueRange(0.0, 0.0);
 	kLUT->SetNumberOfTableValues(1);
-	return res;
+
+	return rLUT->GetReferenceCount();
 }
 
 /**
@@ -255,18 +238,15 @@ int CViewSrVtk::addPlainLUT()
  */
 int CViewSrVtk::changeDepthRange(float minVal, float maxVal)
 {
-	int res = 0;
-
-	for(int i=0; i< _vtkSubMax; i++)
+	int res = _vtkSubMax;
+	int i = 0;
+	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
+	for ( it=cameras.begin() ; it != cameras.end(); it++, i++ )
 	{
-		//TODO = iterate on cameras vector
-		//dataMapper[i]->SetScalarRange((double) minVal, (double) maxVal);
-		//dataMapper[i]->Modified();
-		//BGdataMapper[i]->SetScalarRange((double) minVal, (double) maxVal);
-		//BGdataMapper[i]->Modified();
+		(*it)->changeDepthRange(minVal, maxVal);
 	}
 	renWin->Render();
-	return res;
+	return res-i;
 }
 
 /**
@@ -274,16 +254,15 @@ int CViewSrVtk::changeDepthRange(float minVal, float maxVal)
  */
 int CViewSrVtk::changeAmpRange(float minAmp, float maxAmp)
 {
-	int res = 0;
-
-	for(int i=0; i< _vtkSubMax; i++)
+	int res = _vtkSubMax;
+	int i = 0;
+	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
+	for ( it=cameras.begin() ; it != cameras.end(); it++, i++ )
 	{
-		//TODO = iterate on cameras vector
-		//dataMapper[i]->SetScalarRange((double) minAmp, (double) maxAmp);
-		//dataMapper[i]->Modified();
+		(*it)->changeAmpRange(minAmp, maxAmp);
 	}
 	renWin->Render();
-	return res;
+	return res-i;
 }
 
 
@@ -292,9 +271,9 @@ int CViewSrVtk::changeAmpRange(float minAmp, float maxAmp)
  */
 int CViewSrVtk::freeDepthLUT()
 {
-	int res = 0;
+	int res = depthLUT->GetReferenceCount();
 	depthLUT->Delete();
-	return res;
+	return res-1;
 }
 
 /**
@@ -302,9 +281,9 @@ int CViewSrVtk::freeDepthLUT()
  */
 int CViewSrVtk::freeGrayLUT()
 {
-	int res = 0;
+	int res = grayLUT->GetReferenceCount();
 	grayLUT->Delete();
-	return res;
+	return res-1;
 }
 
 /**
@@ -312,13 +291,13 @@ int CViewSrVtk::freeGrayLUT()
  */
 int CViewSrVtk::freePlainLUT()
 {
-	int res = 0;
+	int res = rLUT->GetReferenceCount();;
 	rLUT->Delete();
 	gLUT->Delete();
 	bLUT->Delete();
 	wLUT->Delete();
 	kLUT->Delete();
-	return res;
+	return res-1;
 }
 
 /**
@@ -328,8 +307,6 @@ int CViewSrVtk::freePlainLUT()
  */
 int CViewSrVtk::addScalarBar()
 {
-	int res = 0;
-
 	depthSca = vtkScalarBarActor::New();
     depthSca->SetLookupTable(depthLUT);
     depthSca->SetTitle("Depth (mm)");
@@ -339,8 +316,7 @@ int CViewSrVtk::addScalarBar()
     depthSca->SetWidth(0.9);
     depthSca->SetHeight(0.05);
 	depthSca->SetLabelFormat("%4.0f");
-
-	return res;
+	return depthSca->GetReferenceCount();
 }
 
 /**
@@ -348,9 +324,9 @@ int CViewSrVtk::addScalarBar()
  */
 int CViewSrVtk::freeScalarBar()
 {
-	int res = 0;
+	int res = depthSca->GetReferenceCount();
 	depthSca->Delete();
-	return res;
+	return res-1;
 }
 
 
@@ -361,9 +337,14 @@ int CViewSrVtk::updateTOFcurrent(int rows, int cols, unsigned short *z, short *y
 {
 	//if(!sr){return -1;};
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-
-	// TODO -> call good camera update
-
+	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
+	for ( it=cameras.begin() ; it != cameras.end(); it++)
+	{
+		if( (*it)->getVtkSub() == vtkSub )
+		{
+			(*it)->updateTOFcurrent(rows, cols, z, y, x, amp);
+		}
+	}
 	renWin->Render();
 	return vtkSub;
 }
@@ -509,9 +490,14 @@ int CViewSrVtk::updateTOFcurrent(int rows, int cols, unsigned short *z, short *y
 int CViewSrVtk::hideDataAct(int vtkSub, bool doHide)
 {
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-	// TODO: iterate on cameras vector
-	//if(doHide){ dataActor[vtkSub]->VisibilityOff();}
-	//else{ dataActor[vtkSub]->VisibilityOn();}
+	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
+	for ( it=cameras.begin() ; it != cameras.end(); it++ )
+	{
+		if( (*it)->getVtkSub() == vtkSub )
+		{
+			(*it)->hideDataAct(doHide);
+		}
+	}
 	return vtkSub;
 }
 
@@ -521,8 +507,14 @@ int CViewSrVtk::hideDataAct(int vtkSub, bool doHide)
 int CViewSrVtk::setDataActColorRGB(int vtkSub, double r, double g, double b)
 {
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-	// TODO: iterate on cameras vector
-	//dataActor[vtkSub]->GetProperty()->SetColor(r,g,b);  // sets color
+	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
+	for ( it=cameras.begin() ; it != cameras.end(); it++)
+	{
+		if( (*it)->getVtkSub() == vtkSub )
+		{
+			(*it)->setDataActColorRGB(r, g, b);
+		}
+	}
 	return vtkSub;
 }
 
@@ -532,9 +524,14 @@ int CViewSrVtk::setDataActColorRGB(int vtkSub, double r, double g, double b)
 int CViewSrVtk::setDataMapperColorDepth(int vtkSub)
 {
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-	// TODO: iterate on cameras vector
-	//data[vtkSub]->GetPointData()->SetScalars(dData[vtkSub]);
-	//dataMapper[vtkSub]->SetLookupTable(depthLUT);  // sets color
+	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
+	for ( it=cameras.begin() ; it != cameras.end(); it++)
+	{
+		if( (*it)->getVtkSub() == vtkSub )
+		{
+			(*it)->setDataMapperColorDepth();
+		}
+	}
 	return vtkSub;
 }
 /**
@@ -543,9 +540,14 @@ int CViewSrVtk::setDataMapperColorDepth(int vtkSub)
 int CViewSrVtk::setDataMapperColorGray(int vtkSub)
 {
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-	// TODO: iterate on cameras vector
-	//data[vtkSub]->GetPointData()->SetScalars(aData[vtkSub]);
-	//dataMapper[vtkSub]->SetLookupTable(grayLUT);  // sets color
+	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
+	for ( it=cameras.begin() ; it != cameras.end(); it++)
+	{
+		if( (*it)->getVtkSub() == vtkSub )
+		{
+			(*it)->setDataMapperColorGray();
+		}
+	}
 	return vtkSub;
 }
 /**
@@ -554,8 +556,14 @@ int CViewSrVtk::setDataMapperColorGray(int vtkSub)
 int CViewSrVtk::setDataMapperColorR(int vtkSub)
 {
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-	// TODO: iterate on cameras vector
-	//dataMapper[vtkSub]->SetLookupTable(rLUT);  // sets color
+	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
+	for ( it=cameras.begin() ; it != cameras.end(); it++)
+	{
+		if( (*it)->getVtkSub() == vtkSub )
+		{
+			(*it)->setDataMapperColorR();
+		}
+	}
 	return vtkSub;
 }
 /**
@@ -564,8 +572,14 @@ int CViewSrVtk::setDataMapperColorR(int vtkSub)
 int CViewSrVtk::setDataMapperColorG(int vtkSub)
 {
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-	// TODO: iterate on cameras vector
-	//dataMapper[vtkSub]->SetLookupTable(gLUT);  // sets color
+	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
+	for ( it=cameras.begin() ; it != cameras.end(); it++)
+	{
+		if( (*it)->getVtkSub() == vtkSub )
+		{
+			(*it)->setDataMapperColorG();
+		}
+	}
 	return vtkSub;
 }
 /**
@@ -574,8 +588,14 @@ int CViewSrVtk::setDataMapperColorG(int vtkSub)
 int CViewSrVtk::setDataMapperColorB(int vtkSub)
 {
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-	// TODO: iterate on cameras vector
-	//dataMapper[vtkSub]->SetLookupTable(bLUT);  // sets color
+	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
+	for ( it=cameras.begin() ; it != cameras.end(); it++)
+	{
+		if( (*it)->getVtkSub() == vtkSub )
+		{
+			(*it)->setDataMapperColorB();
+		}
+	}
 	return vtkSub;
 }
 /**
@@ -584,8 +604,14 @@ int CViewSrVtk::setDataMapperColorB(int vtkSub)
 int CViewSrVtk::setDataMapperColorW(int vtkSub)
 {
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-	// TODO: iterate on cameras vector
-	//dataMapper[vtkSub]->SetLookupTable(wLUT);  // sets color
+	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
+	for ( it=cameras.begin() ; it != cameras.end(); it++)
+	{
+		if( (*it)->getVtkSub() == vtkSub )
+		{
+			(*it)->setDataMapperColorW();
+		}
+	}
 	return vtkSub;
 }
 /**
@@ -594,8 +620,14 @@ int CViewSrVtk::setDataMapperColorW(int vtkSub)
 int CViewSrVtk::setDataMapperColorK(int vtkSub)
 {
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-	// TODO: iterate on cameras vector
-	//dataMapper[vtkSub]->SetLookupTable(kLUT);  // sets color
+	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
+	for ( it=cameras.begin() ; it != cameras.end(); it++)
+	{
+		if( (*it)->getVtkSub() == vtkSub )
+		{
+			(*it)->setDataMapperColorK();
+		}
+	}
 	return vtkSub;
 }
 /**
