@@ -133,7 +133,7 @@ int CamVtkView::addSrCam()
     srLabelActor->SetScale(50.0,50.0,50.0);				//!< HARDCODED SR CAMERA LABEL TEXT SIZE
 	srLabelActor->SetPosition( camTranMat->GetElement(0,3),  camTranMat->GetElement(1,3),  camTranMat->GetElement(2,3));
     srLabelActor->AddPosition(-50.0,-50.0,-50.0);				//!< HARDCODED SR CAMERA LABEL TEXT POSITION
-	//srLabelActor->SetCamera(cam0);
+	srLabelActor->SetCamera(renderer->GetActiveCamera());
 	if(_vtkSub==0){ srLabelActor->GetProperty()->SetColor(0.0,0.0,1.0); }; // BLUE for 0-th cam
 	if(_vtkSub==1){ srLabelActor->GetProperty()->SetColor(1.0,0.0,0.0); }; // RED  for 1-st add cam
 	if(_vtkSub==2){ srLabelActor->GetProperty()->SetColor(0.0,1.0,0.0); }; // GREENfor 2-nd add cam
