@@ -79,6 +79,14 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
 	_buttAcqAll = NULL;
 }
 
+
+MainWnd::~MainWnd()
+{
+#ifdef JMU_USE_VTK
+	if(_vtkWin){ delete(_vtkWin); _vtkWin =NULL; };
+#endif
+}
+
 /**
  * Main window close \n
  * The method: \n
@@ -325,8 +333,9 @@ void MainWnd::TextChangedAmpMax(wxCommandEvent &)
 /* acting on "AcquireAll" value button*/
 void MainWnd::AcqAll(wxCommandEvent& event)
 {
+	int i = 0; //debug
 	std::vector<CamFrame*>::iterator it;  // get iterator on the camera frames
-	for ( it=m_camFrm.begin() ; it != m_camFrm.end(); it++ )
+	for ( it=m_camFrm.begin() ; it != m_camFrm.end(); it++, i++)
 	{
 		(*it)->Acquire(event);
 	}

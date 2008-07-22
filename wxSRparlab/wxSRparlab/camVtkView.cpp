@@ -80,14 +80,14 @@ CamVtkView::~CamVtkView()
 
 	int res = 0;
 	// free camera shape
-	res-= freeSrCam();
+	res+= freeSrCam();
 
 	BGdataWriter->Delete();
 	dataWriter->Delete();
 	// free data actor
-	res-= freeBGDataAct();
+	res+= freeBGDataAct();
 	// free data actor
-	res-= freeDataAct();
+	res+= freeDataAct();
 };
 
 int CamVtkView::setVtkSub(int vtkSub)
