@@ -47,6 +47,7 @@
 #include "wxSRparlab.h"
 #include "CMainWnd.h"
 
+class CamVtkView; // a class to represent ONE camera of the scene
 
 /**
  * Class CViewSrVtk :
@@ -85,6 +86,7 @@ private:
   vtkRenderWindowInteractor *iren;			//!< renderer interactor
   vtkCamera					*cam0;			//! camera for view
   vtkLight					*light0;		//! light (ambient)
+  std::vector<CamVtkView*>	cameras;
 
   vtkCubeSource			**srCube;			//!< cube to represent TOF camera
   vtkPolyDataMapper		**srCubeMapper;		//!< mapper for TOF camera
