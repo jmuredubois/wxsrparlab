@@ -58,7 +58,8 @@ public:
 	~CamVtkView();
 
 	int setVtkSub(int vtkSub);
-	int setTrfMat(vtkMatrix4x4 &trfMat);
+	int getVtkSub();
+	int setTrfMat();
 
 	//int updateTOFcurrent(SRCAM sr, SRPARLAB srPL, int vtkSub){};
 	int updateTOFcurrent(int rows, int cols, unsigned short *z, short *y, short *x);

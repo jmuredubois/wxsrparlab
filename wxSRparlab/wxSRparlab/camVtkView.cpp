@@ -18,6 +18,17 @@ CamVtkView::CamVtkView(int vtkSub, vtkRenderWindow* ParRenWin, vtkRenderer* ParR
 	_zBG = NULL;
 	camTranMat = vtkMatrix4x4::New();
 
+#ifndef VTKNOTRANSFORM
+	if(_vtkSub == 0)
+	{
+		#include "camTranMats/camTrfMat_20080707_cmpSteRansac_cam00.cpp"
+	}
+	if(_vtkSub == 1)
+	{
+		#include "camTranMats/camTrfMat_20080707_cmpSteRansac_cam01.cpp"
+	}
+#endif// VTKNOTRANSFORM
+
 	dataWriter = vtkStructuredGridWriter::New();
 	BGdataWriter = vtkStructuredGridWriter::New();
 
@@ -67,15 +78,16 @@ CamVtkView::~CamVtkView()
 	camTranFilter->Delete();
 	BGcamTranFilter->Delete();
 
+	int res = 0;
 	// free camera shape
-	freeSrCam();
+	res-= freeSrCam();
 
 	BGdataWriter->Delete();
 	dataWriter->Delete();
 	// free data actor
-	freeBGDataAct();
+	res-= freeBGDataAct();
 	// free data actor
-	freeDataAct();
+	res-= freeDataAct();
 };
 
 int CamVtkView::setVtkSub(int vtkSub)
@@ -84,22 +96,26 @@ int CamVtkView::setVtkSub(int vtkSub)
 	_vtkSub = vtkSub;
 	return _vtkSub;
 }
+int CamVtkView::getVtkSub()
+{
+	return _vtkSub;
+}
 
-int CamVtkView::setTrfMat(vtkMatrix4x4 &trfMat)
+int CamVtkView::setTrfMat()
 {
 	int res = 0;
 #ifndef VTKNOTRANSFORM
-	switch(_vtkSub)
+	if(_vtkSub == 0)
 	{
-	case 0 :
-		{
-			#include "camTranMats/camTrfMat_20080707_cmpSteRansac_cam00.cpp";
-		}
-	case 1 :
-		{
-			#include "camTranMats/camTrfMat_20080707_cmpSteRansac_cam01.cpp";
-		}
+		#include "camTranMats/camTrfMat_20080707_cmpSteRansac_cam00.cpp"
 	}
+	if(_vtkSub == 1)
+	{
+		#include "camTranMats/camTrfMat_20080707_cmpSteRansac_cam01.cpp"
+	}
+	camTranMat->Modified();
+	//res = freeSrCam();
+	//res += addSrCam();
 #endif// VTKNOTRANSFORM
 	return res;
 }
@@ -111,8 +127,6 @@ int CamVtkView::setTrfMat(vtkMatrix4x4 &trfMat)
  */
 int CamVtkView::addSrCam()
 {
-	int res = 0;
-
 	srCube = vtkCubeSource::New();
     srCube->SetXLength( 55.0 );			//!< HARDCODED SR CAMERA DIMENSIONS
     srCube->SetYLength( 75.0 );
@@ -139,7 +153,7 @@ int CamVtkView::addSrCam()
 	if(_vtkSub==2){ srLabelActor->GetProperty()->SetColor(0.0,1.0,0.0); }; // GREENfor 2-nd add cam
 	if(_vtkSub==3){ srLabelActor->GetProperty()->SetColor(0.7,0.0,0.7); }; // PURPLfor 3-rd add cam
 
-	return res;
+	return srLabelActor->GetReferenceCount();
 }
 
 /**
@@ -147,16 +161,14 @@ int CamVtkView::addSrCam()
  */
 int CamVtkView::freeSrCam()
 {
-	int res = 0;
-
+	int res = srLabelActor->GetReferenceCount();
 	srCube->Delete();
 	srCubeMapper->Delete();
 	srCubeActor->Delete();
 	srLabel->Delete();
 	srLabelMapper->Delete();
 	srLabelActor->Delete();
-
-	return res;
+	return res-1;
 }
 
 /**
@@ -479,18 +491,18 @@ int CamVtkView::updateTOFcurrent(int rows, int cols, unsigned short *z, short *y
  */
 int CamVtkView::freeDataAct()
 {
-	int res = 0;
-
+	int res = dataActor->GetReferenceCount();
 	//pdata->SetInputConnection(data->GetOutputPort());
 	dataPoints->Delete();
 	pcoords->Delete();
 	freeXYZ();
 	data->Delete();
 	pdata->Delete();
+	dData->Delete();
+	aData->Delete();
 	dataMapper->Delete();
 	dataActor->Delete();
-	//subSample->Delete();
-	return res;
+	return res-1;
 }
 
 /**
@@ -790,8 +802,7 @@ int CamVtkView::addBGDataAct()
  */
 int CamVtkView::freeBGDataAct()
 {
-	int res = 0;
-
+	int res = BGdataActor->GetReferenceCount();
 	BGdataPoints->Delete();
 	BGpcoords->Delete();
 	freeXYZbg();
@@ -799,8 +810,7 @@ int CamVtkView::freeBGDataAct()
 	BGpdata->Delete();
 	BGdataMapper->Delete();
 	BGdataActor->Delete();
-
-	return res;
+	return res-1;
 }
 
 /**
@@ -808,8 +818,18 @@ int CamVtkView::freeBGDataAct()
  */
 void CamVtkView::hideDataAct(bool doHide)
 {
-	if(doHide){ dataActor->VisibilityOff();}
-	else{ dataActor->VisibilityOn();}
+	if(doHide)
+	{ 
+		dataActor->VisibilityOff();
+		srCubeActor->VisibilityOff();
+		srLabelActor->VisibilityOff();
+	}
+	else
+	{ 
+		dataActor->VisibilityOn();
+		srCubeActor->VisibilityOn();
+		srLabelActor->VisibilityOn();
+	}
 }
 
 /**
