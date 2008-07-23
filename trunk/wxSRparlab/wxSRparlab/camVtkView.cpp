@@ -147,7 +147,9 @@ int CamVtkView::addSrCam()
     srCubeActor->GetProperty()->SetColor(0.0,0.0,1.0);	//!< HARDCODED SR CAMERA COLOR
 
     srLabel = vtkVectorText::New();
-    srLabel->SetText("TOF camera");						//!< HARDCODED SR CAMERA LABEL TEXT
+	char camLab[64];
+	sprintf(camLab, "TOF cam.%d", _vtkSub);
+    srLabel->SetText(camLab);						//!< HARDCODED SR CAMERA LABEL TEXT
     srLabelMapper = vtkPolyDataMapper::New();
     srLabelMapper->SetInputConnection(srLabel->GetOutputPort());
     srLabelActor = vtkFollower::New();
