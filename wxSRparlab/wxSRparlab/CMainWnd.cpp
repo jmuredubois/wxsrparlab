@@ -224,9 +224,7 @@ void MainWnd::SetZMin(double val)
 	_zMin = val;
 	_txtZMin->GetValue().Printf(wxT("%d"), val);
 	_txtZMin->SetModified(true);
-#ifdef JMU_USE_VTK
-	if(_vtkWin != NULL){_vtkWin->changeDepthRange( (float) _zMin, (float) _zMax); };
-#endif
+	SetZVtk();
 }
 /* Setting display min value*/
 void MainWnd::SetZMax(double val)
@@ -234,8 +232,22 @@ void MainWnd::SetZMax(double val)
 	_zMax = val;
 	_txtZMax->GetValue().Printf(wxT("%d"), val);
 	_txtZMax->SetModified(true);
+	SetZVtk();
+}
+/* Setting vtk display value*/
+void MainWnd::SetZVtk()
+{
 #ifdef JMU_USE_VTK
-	if(_vtkWin != NULL){_vtkWin->changeDepthRange( (float) _zMin, (float) _zMax); };
+	if(_vtkWin != NULL){
+		std::vector<CamFrame*>::iterator itCam;  // get iterator on the camera frames
+		for ( itCam  =m_camFrm.begin();
+		      itCam !=m_camFrm.end(); 
+		      itCam++)
+		{
+			(*itCam)->GetCamVtk()->changeDepthRange((float) _zMin, (float) _zMax);
+		}
+		_vtkWin->Render();
+	}
 #endif
 }
 
@@ -279,9 +291,7 @@ void MainWnd::SetAmpMin(double val)
 	_ampMin = val;
 	_txtAmpMin->GetValue().Printf(wxT("%d"), val);
 	_txtAmpMin->SetModified(true);
-#ifdef JMU_USE_VTK
-	if(_vtkWin != NULL){_vtkWin->changeAmpRange( (float) _ampMin, (float) _ampMax); };
-#endif
+	SetAmpVtk();
 }
 /* Setting display min value*/
 void MainWnd::SetAmpMax(double val)
@@ -289,8 +299,22 @@ void MainWnd::SetAmpMax(double val)
 	_ampMax = val;
 	_txtAmpMax->GetValue().Printf(wxT("%d"), val);
 	_txtAmpMax->SetModified(true);
+	SetAmpVtk();
+}
+/* Setting vtk display value*/
+void MainWnd::SetAmpVtk()
+{
 #ifdef JMU_USE_VTK
-	if(_vtkWin != NULL){_vtkWin->changeAmpRange( (float) _ampMin, (float) _ampMax); };
+	if(_vtkWin != NULL){ 
+		std::vector<CamFrame*>::iterator itCam;  // get iterator on the camera frames
+		for ( itCam  =m_camFrm.begin();
+		      itCam !=m_camFrm.end(); 
+		      itCam++)
+		{
+			(*itCam)->GetCamVtk()->changeAmpRange((float) _ampMin, (float) _ampMax);
+		}
+		_vtkWin->Render();
+	}
 #endif
 }
 
@@ -345,11 +369,14 @@ void MainWnd::SetVisVtk(wxCommandEvent& event)
 {
 #ifdef JMU_USE_VTK
 	int i = 0;
-	std::vector<wxCheckBox*>::iterator it;  // get iterator on the camera frames
-	for ( it=_visVtk.begin() ; it != _visVtk.end(); it++, i++ )
+	std::vector<wxCheckBox*>::iterator itCtrl;  // get iterator on the controls
+	std::vector<CamFrame*>::iterator itCam;  // get iterator on the camera frames
+	for ( itCtrl  =_visVtk.begin(), itCam  =m_camFrm.begin();
+		  itCtrl !=_visVtk.end()  , itCam !=m_camFrm.end(); 
+		  itCtrl++, itCam++, i++ )
 	{
 		if(!_vtkWin){return;};
-		_vtkWin->hideDataAct(i, !( (*it)->IsChecked() ) );
+		(*itCam)->GetCamVtk()->hideDataAct( (*itCtrl)->IsChecked() );
 	}
 	_vtkWin->Render();
 #endif
@@ -360,33 +387,36 @@ void MainWnd::SetColVtk(wxCommandEvent& event)
 {
 #ifdef JMU_USE_VTK
 	int i = 0;
-	std::vector<wxRadioBox*>::iterator it;  // get iterator on the camera frames
-	for ( it=_colVtk.begin() ; it != _colVtk.end(); it++, i++ )
+	std::vector<wxRadioBox*>::iterator itCtrl;  // get iterator on the controls
+	std::vector<CamFrame*>::iterator itCam;  // get iterator on the camera frames
+	for ( itCtrl  =_colVtk.begin(), itCam  =m_camFrm.begin();
+		  itCtrl !=_colVtk.end()  , itCam !=m_camFrm.end(); 
+		  itCtrl++, itCam++, i++ )
 	{
 		if(!_vtkWin){return;};
 		/* wxString colors[] = { wxT("Z"), wxT("Amp."), wxT("R"),
         wxT("G"), wxT("B"), wxT("W"), wxT("K") };*/
-		wxString strCol = (*it)->GetStringSelection();
+		wxString strCol = (*itCtrl)->GetStringSelection();
 		double r, g, b; r=0.0; g=0.0; b=0.0;
 		if(  strCol.IsSameAs(wxT("Z"))  )
 		{
-			_vtkWin->setDataMapperColorDepth(i);
+			(*itCam)->GetCamVtk()->setDataMapperColorDepth();
 			SetZMin(_zMin); // trick to update data Mapper
 		}
 		if(  strCol.IsSameAs(wxT("Amp."))  )
 		{
-			_vtkWin->setDataMapperColorGray(i);
+			(*itCam)->GetCamVtk()->setDataMapperColorGray();
 			SetAmpMin(_ampMin); // trick to update data Mapper
 		}
 		if(  strCol.IsSameAs(wxT("R")) || strCol.IsSameAs(wxT("G")) || strCol.IsSameAs(wxT("B"))
 			 || strCol.IsSameAs(wxT("W")) || strCol.IsSameAs(wxT("K")))
 		{
-			if(  strCol.IsSameAs(wxT("R"))  ) { _vtkWin->setDataMapperColorR(i);/*/r=1.0; g=0.0; b=0.0;/**/} ;
-			if(  strCol.IsSameAs(wxT("G"))  ) { _vtkWin->setDataMapperColorG(i);/*/r=0.0; g=1.0; b=0.0;/**/} ;
-			if(  strCol.IsSameAs(wxT("B"))  ) { _vtkWin->setDataMapperColorB(i);/*/r=0.0; g=0.0; b=1.0;/**/} ;
-			if(  strCol.IsSameAs(wxT("W"))  ) { _vtkWin->setDataMapperColorW(i);/*/r=1.0; g=1.0; b=1.0;/**/} ;
-			if(  strCol.IsSameAs(wxT("K"))  ) { _vtkWin->setDataMapperColorK(i);/*/r=0.0; g=0.0; b=0.0;/**/} ;
-			/*/_vtkWin->setDataActColorRGB(i,r,g,b);/**/
+			if(  strCol.IsSameAs(wxT("R"))  ) { (*itCam)->GetCamVtk()->setDataMapperColorR();/*/r=1.0; g=0.0; b=0.0;/**/} ;
+			if(  strCol.IsSameAs(wxT("G"))  ) { (*itCam)->GetCamVtk()->setDataMapperColorG();/*/r=0.0; g=1.0; b=0.0;/**/} ;
+			if(  strCol.IsSameAs(wxT("B"))  ) { (*itCam)->GetCamVtk()->setDataMapperColorB();/*/r=0.0; g=0.0; b=1.0;/**/} ;
+			if(  strCol.IsSameAs(wxT("W"))  ) { (*itCam)->GetCamVtk()->setDataMapperColorW();/*/r=1.0; g=1.0; b=1.0;/**/} ;
+			if(  strCol.IsSameAs(wxT("K"))  ) { (*itCam)->GetCamVtk()->setDataMapperColorK();/*/r=0.0; g=0.0; b=0.0;/**/} ;
+			/*/(*itCam)->GetCamVtk()->setDataActColorRGB(r,g,b);/**/
 		}
 	}
 	_vtkWin->Render();

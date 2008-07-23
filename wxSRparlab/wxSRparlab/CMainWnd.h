@@ -38,10 +38,12 @@ public:
 
 	void SetZMin(double val);	//!< set min Z for vtk display
 	void SetZMax(double val);	//!< set max Z for vtk display
+	void SetZVtk();
 	void TextChangedZMin(wxCommandEvent &);	//!< react on event changed min Z
 	void TextChangedZMax(wxCommandEvent &); //!< react on event changed max Z
 	void SetAmpMin(double val);	//!< set min amp for vtk display
 	void SetAmpMax(double val);	//!< set max amp for vtk display
+	void SetAmpVtk();
 	void TextChangedAmpMin(wxCommandEvent &); //!< react on event changed min amp
 	void TextChangedAmpMax(wxCommandEvent &); //!< react on event changed max amp
 	void AcqAll(wxCommandEvent& event);	//!< send Acquire command to all cams

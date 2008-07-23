@@ -12,6 +12,7 @@
 #include "CMainWnd.h"	//!< main window header file
 #include "CamPanelSettings.h" //!< camera settings panel header file
 #include "CamViewData.h" //!< camera view panel header file
+#include "CamVtkView.h" //!< camera vtk view header file
 
 
 
@@ -24,6 +25,7 @@
 class ThreadReadData;
 #ifdef JMU_USE_VTK
 class CViewSrVtk;
+class CamVtkView;
 #endif
 
 //! enum used by the CamViewData class
@@ -59,6 +61,7 @@ public:
 	void CoordTrf();
 #ifdef JMU_USE_VTK
 	void SetVtkWin(CViewSrVtk *vtkWin, int vtkSub);
+	CamVtkView* GetCamVtk(){return _camVtk;};
 #endif
 
 private:
@@ -94,6 +97,7 @@ private:
 #ifdef JMU_USE_VTK
 	CViewSrVtk	*_vtkWin ; //!< pointer to vtk window
 	int _vtkSub;
+	CamVtkView *_camVtk; //!< point to vtk camera structure
 #endif
 
 public:

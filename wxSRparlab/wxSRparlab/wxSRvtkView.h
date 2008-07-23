@@ -16,6 +16,7 @@
 #include "vtkRenderWindow.h"		// requires $(JMU_VTKSRCBASE)/Rendering
 #include "vtkRenderWindowInteractor.h"	// requires $(JMU_VTKSRCBASE)/Rendering
 #include "vtkRenderer.h"		// requires $(JMU_VTKSRCBASE)/Rendering
+#include "vtkRendererCollection.h"		// requires $(JMU_VTKSRCBASE)/Rendering
 #include "vtkFloatArray.h"		// requires $(JMU_VTKSRCBASE)/Common
 #include "vtkDoubleArray.h"		// requires $(JMU_VTKSRCBASE)/Common
 
@@ -77,6 +78,14 @@ public:
 	int setDataMapperColorB(int vtkSub);
 	int setDataMapperColorW(int vtkSub);
 	int setDataMapperColorK(int vtkSub);
+	vtkLookupTable* GetDepthLUT(){return depthLUT;};
+	vtkLookupTable* GetGrayLUT(){return grayLUT;};
+	vtkLookupTable* GetRLUT(){return rLUT;};
+	vtkLookupTable* GetGLUT(){return gLUT;};
+	vtkLookupTable* GetBLUT(){return bLUT;};
+	vtkLookupTable* GetWLUT(){return wLUT;};
+	vtkLookupTable* GetKLUT(){return kLUT;};
+	vtkRenderWindow* GetRenWin(){return renWin;};
 	int Render();
 
 private:
