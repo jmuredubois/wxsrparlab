@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(JMU_MESA_LIBUSBSR)&quot;;&quot;$(WXWIN)/include/msvc&quot;;&quot;$(WXWIN)/include&quot;"
+				AdditionalIncludeDirectories="&quot;$(JMU_MESA_LIBUSBSR)&quot;;&quot;$(WXWIN)/include/msvc&quot;;&quot;$(WXWIN)/include&quot;;&quot;$(JMU_TICPP)&quot;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -60,9 +60,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib rpcrt4.lib winmm.lib advapi32.lib wsock32.lib wxmsw28d_core.lib wxbase28d.lib"
+				AdditionalDependencies="comctl32.lib rpcrt4.lib winmm.lib advapi32.lib wsock32.lib wxmsw28d_core.lib wxbase28d.lib ticppd.lib"
 				OutputFile="$(OutDir)/$(ProjectName).exe"
-				AdditionalLibraryDirectories="&quot;$(JMU_MESA_LIBUSBSR)&quot;;&quot;$(WXWIN)\lib\vc_dl&quot;;&quot;$(WXWIN)\lib\vc_lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(JMU_MESA_LIBUSBSR)&quot;;&quot;$(WXWIN)\lib\vc_dl&quot;;&quot;$(WXWIN)\lib\vc_lib&quot;;&quot;$(JMU_TICPP)/lib&quot;"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -116,7 +116,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(JMU_MESA_LIBUSBSR)&quot;;&quot;$(WXWIN)/include/msvc&quot;;&quot;$(WXWIN)/include&quot;"
+				AdditionalIncludeDirectories="&quot;$(JMU_MESA_LIBUSBSR)&quot;;&quot;$(WXWIN)/include/msvc&quot;;&quot;$(WXWIN)/include&quot;;&quot;$(JMU_TICPP)&quot;"
 				PreprocessorDefinitions="NDEBUG"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -136,8 +136,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib rpcrt4.lib winmm.lib advapi32.lib wsock32.lib wxmsw28_core.lib wxbase28.lib"
-				AdditionalLibraryDirectories="&quot;$(JMU_MESA_LIBUSBSR)&quot;;&quot;$(WXWIN)\lib\vc_dl&quot;;&quot;$(WXWIN)\lib\vc_lib&quot;"
+				AdditionalDependencies="comctl32.lib rpcrt4.lib winmm.lib advapi32.lib wsock32.lib wxmsw28_core.lib wxbase28.lib ticpp.lib"
+				AdditionalLibraryDirectories="&quot;$(JMU_MESA_LIBUSBSR)&quot;;&quot;$(WXWIN)\lib\vc_dl&quot;;&quot;$(WXWIN)\lib\vc_lib&quot;;&quot;$(JMU_TICPP)/lib&quot;"
 				GenerateDebugInformation="false"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -193,7 +193,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(JMU_MESA_LIBUSBSR)&quot;;&quot;$(WXWIN)/include/msvc&quot;;&quot;$(WXWIN)/include&quot;;&quot;$(JMU_VTKSRCBASE)/Graphics&quot;;&quot;$(JMU_VTKSRCBASE)/Rendering&quot;;&quot;$(JMU_VTKSRCBASE)/Common&quot;;&quot;$(JMU_VTKSRCBASE)/Filtering&quot;;&quot;$(JMU_VTKSRCBASE)/IO&quot;;&quot;$(JMU_VTKSRCBASE)/Hybrid&quot;;&quot;$(JMU_VTKBINBASE)&quot;"
+				AdditionalIncludeDirectories="&quot;$(JMU_MESA_LIBUSBSR)&quot;;&quot;$(WXWIN)/include/msvc&quot;;&quot;$(WXWIN)/include&quot;;&quot;$(JMU_VTKSRCBASE)/Graphics&quot;;&quot;$(JMU_VTKSRCBASE)/Rendering&quot;;&quot;$(JMU_VTKSRCBASE)/Common&quot;;&quot;$(JMU_VTKSRCBASE)/Filtering&quot;;&quot;$(JMU_VTKSRCBASE)/IO&quot;;&quot;$(JMU_VTKSRCBASE)/Hybrid&quot;;&quot;$(JMU_VTKBINBASE)&quot;;&quot;$(JMU_TICPP)&quot;"
 				PreprocessorDefinitions="JMU_USE_VTK"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -215,9 +215,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib rpcrt4.lib winmm.lib advapi32.lib wsock32.lib wxmsw28d_core.lib wxbase28d.lib vtkGraphics.lib vtkRendering.lib vtkCommon.lib vtkFiltering.lib vtkIO.lib vtkHybrid.lib"
+				AdditionalDependencies="comctl32.lib rpcrt4.lib winmm.lib advapi32.lib wsock32.lib wxmsw28d_core.lib wxbase28d.lib vtkGraphics.lib vtkRendering.lib vtkCommon.lib vtkFiltering.lib vtkIO.lib vtkHybrid.lib ticppd.lib"
 				OutputFile="$(OutDir)/$(ProjectName)VTK.exe"
-				AdditionalLibraryDirectories="&quot;$(JMU_MESA_LIBUSBSR)&quot;;&quot;$(WXWIN)\lib\vc_dl&quot;;&quot;$(WXWIN)\lib\vc_lib&quot;;&quot;$(JMU_VTKBINBASE)/bin/release&quot;"
+				AdditionalLibraryDirectories="&quot;$(JMU_MESA_LIBUSBSR)&quot;;&quot;$(WXWIN)\lib\vc_dl&quot;;&quot;$(WXWIN)\lib\vc_lib&quot;;&quot;$(JMU_VTKBINBASE)/bin/release&quot;;&quot;$(JMU_TICPP)/lib&quot;"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(TargetDir)$(TargetName)VTK.pdb"
 				TargetMachine="1"
@@ -272,7 +272,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(JMU_MESA_LIBUSBSR)&quot;;&quot;$(WXWIN)/include/msvc&quot;;&quot;$(WXWIN)/include&quot;;&quot;$(JMU_VTKSRCBASE)/Graphics&quot;;&quot;$(JMU_VTKSRCBASE)/Rendering&quot;;&quot;$(JMU_VTKSRCBASE)/Common&quot;;&quot;$(JMU_VTKSRCBASE)/Filtering&quot;;&quot;$(JMU_VTKSRCBASE)/IO&quot;;&quot;$(JMU_VTKSRCBASE)/Hybrid&quot;;&quot;$(JMU_VTKBINBASE)&quot;"
+				AdditionalIncludeDirectories="&quot;$(JMU_MESA_LIBUSBSR)&quot;;&quot;$(WXWIN)/include/msvc&quot;;&quot;$(WXWIN)/include&quot;;&quot;$(JMU_VTKSRCBASE)/Graphics&quot;;&quot;$(JMU_VTKSRCBASE)/Rendering&quot;;&quot;$(JMU_VTKSRCBASE)/Common&quot;;&quot;$(JMU_VTKSRCBASE)/Filtering&quot;;&quot;$(JMU_VTKSRCBASE)/IO&quot;;&quot;$(JMU_VTKSRCBASE)/Hybrid&quot;;&quot;$(JMU_VTKBINBASE)&quot;;&quot;$(JMU_TICPP)&quot;"
 				PreprocessorDefinitions="NDEBUG;JMU_USE_VTK"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -292,9 +292,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib rpcrt4.lib winmm.lib advapi32.lib wsock32.lib wxmsw28_core.lib wxbase28.lib vtkGraphics.lib vtkRendering.lib vtkCommon.lib vtkFiltering.lib vtkIO.lib vtkHybrid.lib"
+				AdditionalDependencies="comctl32.lib rpcrt4.lib winmm.lib advapi32.lib wsock32.lib wxmsw28_core.lib wxbase28.lib vtkGraphics.lib vtkRendering.lib vtkCommon.lib vtkFiltering.lib vtkIO.lib vtkHybrid.lib ticpp.lib"
 				OutputFile="$(OutDir)/$(ProjectName)VTK.exe"
-				AdditionalLibraryDirectories="&quot;$(JMU_MESA_LIBUSBSR)&quot;;&quot;$(WXWIN)\lib\vc_dl&quot;;&quot;$(WXWIN)\lib\vc_lib&quot;;&quot;$(JMU_VTKBINBASE)/bin/release&quot;"
+				AdditionalLibraryDirectories="&quot;$(JMU_MESA_LIBUSBSR)&quot;;&quot;$(WXWIN)\lib\vc_dl&quot;;&quot;$(WXWIN)\lib\vc_lib&quot;;&quot;$(JMU_VTKBINBASE)/bin/release&quot;;&quot;$(JMU_TICPP)/lib&quot;"
 				GenerateDebugInformation="false"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"

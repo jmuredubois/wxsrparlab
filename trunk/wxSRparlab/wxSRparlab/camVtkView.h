@@ -47,6 +47,8 @@
 #include "wxSRparlab.h"
 #include "CMainWnd.h"
 
+#define TIXML_USE_TICPP
+#include "ticpp.h" //Open source XML parser
 
 /**
  * Class CViewSrVtk :
@@ -59,7 +61,7 @@ public:
 
 	int setVtkSub(int vtkSub);
 	int getVtkSub();
-	int setTrfMat();
+	int setTrfMat(char* fn);
 
 	//int updateTOFcurrent(SRCAM sr, SRPARLAB srPL, int vtkSub){};
 	int updateTOFcurrent(int rows, int cols, unsigned short *z, short *y, short *x);
