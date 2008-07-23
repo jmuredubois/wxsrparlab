@@ -32,16 +32,6 @@ CViewSrVtk::CViewSrVtk(wxFrame* pWnd)
 	addGrayLUT();
 	addPlainLUT();
 
-	// add a shape representing the camera
-	/*for(int i=0; i<_vtkSubMax; i++)
-	{
-		CamVtkView* cam = new CamVtkView(i, renWin, depthLUT);
-		cam->SetDepthLUT(depthLUT);
-		cam->SetGrayLUT(grayLUT);
-		cam->SetPlainLUT(rLUT, gLUT, bLUT, wLUT, kLUT);
-		cam->setTrfMat();
-		cameras.push_back(cam);
-	};*/
 	// add axes
 	addSrAxes();
 	// add a FoV outline
@@ -240,11 +230,6 @@ int CViewSrVtk::changeDepthRange(float minVal, float maxVal)
 {
 	int res = _vtkSubMax;
 	int i = 0;
-	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
-	for ( it=cameras.begin() ; it != cameras.end(); it++, i++ )
-	{
-		(*it)->changeDepthRange(minVal, maxVal);
-	}
 	renWin->Render();
 	return res-i;
 }
@@ -256,11 +241,6 @@ int CViewSrVtk::changeAmpRange(float minAmp, float maxAmp)
 {
 	int res = _vtkSubMax;
 	int i = 0;
-	//std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
-	//for ( it=cameras.begin() ; it != cameras.end(); it++, i++ )
-	//{
-	//	(*it)->changeAmpRange(minAmp, maxAmp);
-	//}
 	renWin->Render();
 	return res-i;
 }
@@ -337,14 +317,6 @@ int CViewSrVtk::updateTOFcurrent(int rows, int cols, unsigned short *z, short *y
 {
 	//if(!sr){return -1;};
 	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
-	for ( it=cameras.begin() ; it != cameras.end(); it++)
-	{
-		if( (*it)->getVtkSub() == vtkSub )
-		{
-			(*it)->updateTOFcurrent(rows, cols, z, y, x, amp);
-		}
-	}
 	renWin->Render();
 	return vtkSub;
 }

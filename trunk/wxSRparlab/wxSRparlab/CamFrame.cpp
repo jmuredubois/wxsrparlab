@@ -480,8 +480,8 @@ void CamFrame::AcqOneFrm()
 	  m_viewYPane->SetDataArray<short>((short*) &m_pSrY[0], m_nRows*m_nCols);
 	  m_viewXPane->SetDataArray<short>((short*) &m_pSrX[0], m_nRows*m_nCols);
 	  #ifdef JMU_USE_VTK
-		//_vtkWin->updateTOFcurrent(m_nRows, m_nCols, m_pSrZ, m_pSrY, m_pSrX,_vtkSub);
-		_vtkWin->updateTOFcurrent(m_nRows, m_nCols, m_pSrZ, m_pSrY, m_pSrX, (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2],_vtkSub);
+		//_vtkWin->updateTOFcurrent(m_nRows, m_nCols, m_pSrZ, m_pSrY, m_pSrX, (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2],_vtkSub);
+		_camVtk->updateTOFcurrent(m_nRows, m_nCols, m_pSrZ, m_pSrY, m_pSrX, (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2]);
       #endif
 	  m_settingsPane->SetText(strR);
 	  m_viewRangePane->SetTxtInfo(strR);
