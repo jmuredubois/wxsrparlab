@@ -51,6 +51,7 @@ public:
     DECLARE_EVENT_TABLE()
 
 private:
+	wxPanel *_bgPanel; //!< background panel for main wnd
 	wxTextCtrl *_txtZMin;		//!< control text : min Z
 	wxTextCtrl *_txtZMax;		//!< control text : max Z
 	double	_zMin;				//!< stored min Z
@@ -67,6 +68,7 @@ private:
 	wxButton* _buttAcqAll; //!< Acquire image camera
 	std::vector<wxCheckBox*> _visVtk;		//!< list of visibility checkboxes
 	std::vector<wxRadioBox*> _colVtk;		//!< list of vtk color options
+	wxGridBagSizer *_sizerCamVisCol;
 };
 
 //! enum used by main wnd

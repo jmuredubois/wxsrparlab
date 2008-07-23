@@ -119,13 +119,13 @@ void MainWnd::OnAbout(wxCommandEvent& WXUNUSED(event))
  */
 void MainWnd::Init()
 {
-	wxPanel *bgPanel = new wxPanel(this); // a panel to contain our controls
+	_bgPanel = new wxPanel(this); // a panel to contain our controls
 	wxSizerFlags flagsExpand(1); flagsExpand.Expand(); // sizer flags for expanding sizer
 	wxSizerFlags flagsNoExpand(1);	// sizer flags for non-expanding sizer
 
 	// depth min and max text controls
-    _txtZMin = new wxTextCtrl( bgPanel, IDT_zMin, wxT("0.0"));
-	_txtZMax = new wxTextCtrl( bgPanel, IDT_zMax, wxT("3500.0"));
+    _txtZMin = new wxTextCtrl( _bgPanel, IDT_zMin, wxT("0.0"));
+	_txtZMax = new wxTextCtrl( _bgPanel, IDT_zMax, wxT("3500.0"));
 	_txtMinMaxInit = true; _txtZMin->SetModified(true); _txtZMax->SetModified(true);
 
 	wxBoxSizer *sizerZscale = new wxBoxSizer(wxHORIZONTAL);
@@ -135,8 +135,8 @@ void MainWnd::Init()
 	    sizerZscale->Add(_txtZMax, flagsExpand);
 
 	// amplitude min and max controls
-	_txtAmpMin = new wxTextCtrl( bgPanel, IDT_ampMin, wxString::Format(wxT("%d"), _ampMin) ); 
-	_txtAmpMax = new wxTextCtrl( bgPanel, IDT_ampMax, wxString::Format(wxT("%d"), _ampMax) );
+	_txtAmpMin = new wxTextCtrl( _bgPanel, IDT_ampMin, wxString::Format(wxT("%d"), _ampMin) ); 
+	_txtAmpMax = new wxTextCtrl( _bgPanel, IDT_ampMax, wxString::Format(wxT("%d"), _ampMax) );
 	_txtAmpInit = true; _txtAmpMin->SetModified(true); _txtAmpMax->SetModified(true);
 	
 	wxBoxSizer *sizerAmpScale = new wxBoxSizer(wxHORIZONTAL);
@@ -149,40 +149,22 @@ void MainWnd::Init()
 		sizerZAmpScales->Add( sizerAmpScale, flagsExpand);
 		
 
-	_buttAcqAll = new wxButton(bgPanel, IDB_AcqAll, wxT("Acq. All") );
+	_buttAcqAll = new wxButton(_bgPanel, IDB_AcqAll, wxT("Acq. All") );
 
 	wxFlexGridSizer *sizerAcqScales = new wxFlexGridSizer(1,2,0,0);
 		sizerAcqScales->Add(_buttAcqAll, flagsExpand);
 		sizerAcqScales->Add( sizerZAmpScales, flagsExpand);
 
-	wxGridBagSizer *sizerCamVisCol = new wxGridBagSizer();
-	wxString colors[] = { wxT("Z"), wxT("Amp."), wxT("R"),
-        wxT("G"), wxT("B"), wxT("W"), wxT("K") };
-
-	wxString labT;					// descr string for cam visibility checkbox
-	//! - for the max number of cameras ...
-	for(int i = 0; i<_numCams; i++){
-		labT.sprintf(wxT("Cam %i"), i); // ... change checkbox text ...
-		wxCheckBox *chkBox = new wxCheckBox(bgPanel, IDC_visVtk, labT);	
-		chkBox->SetValue(true);
-		sizerCamVisCol->Add(chkBox, wxGBPosition(i,0));
-		_visVtk.push_back(chkBox);	// add visibility checkbox to container
-
-		wxRadioBox *colBox = new wxRadioBox(bgPanel, IDC_colVtk, wxT("Color"), 
-			wxDefaultPosition, wxDefaultSize, 7, colors, 0, wxRA_SPECIFY_COLS );
-		sizerCamVisCol->Add(colBox, wxGBPosition(i,1));
-		//sizerCamVisCol->SetItemSpan(colBox, wxGBSpan(1,7));
-		_colVtk.push_back(colBox);
-	} // ENDOF for loop on _numCams
+	_sizerCamVisCol = new wxGridBagSizer();
 
 	wxGridBagSizer *sizerPanel = new wxGridBagSizer();
-		sizerPanel->Add(sizerCamVisCol, wxGBPosition(0,0), wxGBSpan(8,4));
+		sizerPanel->Add(_sizerCamVisCol, wxGBPosition(0,0), wxGBSpan(8,4));
 		sizerPanel->Add(sizerAcqScales, wxGBPosition(8,0), wxGBSpan(2,4));
 
 	wxBoxSizer *sizerFrame = new wxBoxSizer(wxVERTICAL); // create sizer for frame
-		sizerFrame->Add(bgPanel, flagsExpand);
+		sizerFrame->Add(_bgPanel, flagsExpand);
 
-	bgPanel->SetSizerAndFit(sizerPanel); // fit sizer to bg panel
+	_bgPanel->SetSizerAndFit(sizerPanel); // fit sizer to bg panel
 	this->SetSizerAndFit(sizerFrame);
 }
 
@@ -204,6 +186,9 @@ void MainWnd::AddChildren()
 	_vtkWin = new CViewSrVtk(NULL);
 #endif
 
+	wxString colors[] = { wxT("Z"), wxT("Amp."), wxT("R"),
+        wxT("G"), wxT("B"), wxT("W"), wxT("K") };
+
 	//! - for the max number of cameras ...
 	for(int i = 0; i<_numCams; i++){
 		lab.sprintf(wxT("Camera %i"), i); // ... change title text ...
@@ -217,7 +202,20 @@ void MainWnd::AddChildren()
 #endif
 		m_camFrm.push_back(camFrm);
 		pos += incr; //... increment position.
+
+		//labT.sprintf(wxT("Cam %i"), i); // ... change checkbox text ...
+		wxCheckBox *chkBox = new wxCheckBox(_bgPanel, IDC_visVtk, labT);	
+		chkBox->SetValue(true);
+		_sizerCamVisCol->Add(chkBox, wxGBPosition(i,0));
+		_visVtk.push_back(chkBox);	// add visibility checkbox to container
+
+		wxRadioBox *colBox = new wxRadioBox(_bgPanel, IDC_colVtk, wxT("Color"), 
+			wxDefaultPosition, wxDefaultSize, 7, colors, 0, wxRA_SPECIFY_COLS );
+		_sizerCamVisCol->Add(colBox, wxGBPosition(i,1));
+		//sizerCamVisCol->SetItemSpan(colBox, wxGBSpan(1,7));
+		_colVtk.push_back(colBox);
 	} // ENDOF for loop on _numCams
+	//this->SendSizeEvent();
 }
 
 /* Setting display min value*/
