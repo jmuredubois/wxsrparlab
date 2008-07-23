@@ -33,15 +33,15 @@ CViewSrVtk::CViewSrVtk(wxFrame* pWnd)
 	addPlainLUT();
 
 	// add a shape representing the camera
-	for(int i=0; i<_vtkSubMax; i++)
+	/*for(int i=0; i<_vtkSubMax; i++)
 	{
-		CamVtkView* cam = new CamVtkView(i, renWin, renderer, depthLUT);
+		CamVtkView* cam = new CamVtkView(i, renWin, depthLUT);
 		cam->SetDepthLUT(depthLUT);
 		cam->SetGrayLUT(grayLUT);
 		cam->SetPlainLUT(rLUT, gLUT, bLUT, wLUT, kLUT);
 		cam->setTrfMat();
 		cameras.push_back(cam);
-	};
+	};*/
 	// add axes
 	addSrAxes();
 	// add a FoV outline
@@ -256,11 +256,11 @@ int CViewSrVtk::changeAmpRange(float minAmp, float maxAmp)
 {
 	int res = _vtkSubMax;
 	int i = 0;
-	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
-	for ( it=cameras.begin() ; it != cameras.end(); it++, i++ )
-	{
-		(*it)->changeAmpRange(minAmp, maxAmp);
-	}
+	//std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
+	//for ( it=cameras.begin() ; it != cameras.end(); it++, i++ )
+	//{
+	//	(*it)->changeAmpRange(minAmp, maxAmp);
+	//}
 	renWin->Render();
 	return res-i;
 }

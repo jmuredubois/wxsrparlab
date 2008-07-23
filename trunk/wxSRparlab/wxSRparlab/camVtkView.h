@@ -54,7 +54,7 @@
  */
 class CamVtkView{
 public:
-	CamVtkView(int vtkSub, vtkRenderWindow* ParRenWin, vtkRenderer* ParRenderer, vtkLookupTable* LUT);
+	CamVtkView(int vtkSub, vtkRenderWindow* ParRenWin, vtkLookupTable* LUT);
 	~CamVtkView();
 
 	int setVtkSub(int vtkSub);

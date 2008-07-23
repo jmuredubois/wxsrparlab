@@ -101,6 +101,7 @@ CamFrame::CamFrame(wxFrame* parentFrm, const wxString& title, const wxPoint& pos
 #ifdef JMU_USE_VTK
 	_vtkWin=NULL;
 	_vtkSub = 0;
+	_camVtk = NULL;
 #endif
 }
 
@@ -111,6 +112,7 @@ CamFrame::~CamFrame()
 {
 	int res = -1;
 	if(m_bReadContinuously){ if(m_pThreadReadData != NULL){ m_pThreadReadData->Delete(); } } ;
+	if(_camVtk != NULL) { delete(_camVtk); _camVtk = NULL; } ;
 	if(m_sr		  != NULL) { res = SR_Close(m_sr);	m_sr = NULL; };
 	if(m_mutexSrBuf != NULL) { delete(m_mutexSrBuf); m_mutexSrBuf = NULL;};
 	if(m_pSrBuf   != NULL) { free((void*) m_pSrBuf  ); m_pSrBuf   = NULL; };
@@ -624,6 +626,12 @@ void CamFrame::SetVtkWin(CViewSrVtk *vtkWin, int vtkSub)
 	if( (vtkSub > -1) && (vtkSub < NUMCAMS))
 	{
 		_vtkSub = vtkSub;
+		_camVtk = new CamVtkView(_vtkSub, _vtkWin->GetRenWin(), _vtkWin->GetDepthLUT());
+		_camVtk->SetDepthLUT(_vtkWin->GetDepthLUT());
+		_camVtk->SetGrayLUT(_vtkWin->GetGrayLUT());
+		_camVtk->SetPlainLUT(_vtkWin->GetRLUT(), _vtkWin->GetGLUT(), _vtkWin->GetBLUT(), _vtkWin->GetWLUT(), _vtkWin->GetKLUT());
+		_camVtk->setTrfMat();
+		//cameras.push_back(cam);
 	}
 };
 #endif

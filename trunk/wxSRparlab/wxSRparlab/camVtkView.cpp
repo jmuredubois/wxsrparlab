@@ -6,7 +6,7 @@
  * Constructor for CViewSrVtk
  *
  */
-CamVtkView::CamVtkView(int vtkSub, vtkRenderWindow* ParRenWin, vtkRenderer* ParRenderer, vtkLookupTable* LUT)
+CamVtkView::CamVtkView(int vtkSub, vtkRenderWindow* ParRenWin, vtkLookupTable* LUT)
 {
 	_vtkSub = vtkSub;
 	_x = NULL;
@@ -43,7 +43,7 @@ CamVtkView::CamVtkView(int vtkSub, vtkRenderWindow* ParRenWin, vtkRenderer* ParR
 	// setup the parent window
 	renWin = ParRenWin;
 	// add a renderer
-	renderer = ParRenderer;
+	renderer = ParRenWin->GetRenderers()->GetFirstRenderer();
 	// add an interactor
 
 	// add a shape representing the camera
