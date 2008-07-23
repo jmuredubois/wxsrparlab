@@ -11,6 +11,10 @@
 #define DUMMYSR //!< use this flag to disable SR fcts
 
 #ifndef DUMMYSR
+    #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
+	#define _CRT_SECURE_NO_DEPRECATE
+	// Windows Header Files:
+	#include <windows.h>
 	#include "libusbSR.h"
 	#pragma comment( lib, "libusbSR" )
 #else
