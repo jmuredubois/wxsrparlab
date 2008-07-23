@@ -376,7 +376,7 @@ void MainWnd::SetVisVtk(wxCommandEvent& event)
 		  itCtrl++, itCam++, i++ )
 	{
 		if(!_vtkWin){return;};
-		(*itCam)->GetCamVtk()->hideDataAct( (*itCtrl)->IsChecked() );
+		(*itCam)->GetCamVtk()->hideDataAct( !((*itCtrl)->IsChecked()) );
 	}
 	_vtkWin->Render();
 #endif
