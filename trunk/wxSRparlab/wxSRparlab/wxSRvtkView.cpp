@@ -38,10 +38,12 @@ CViewSrVtk::CViewSrVtk(wxFrame* pWnd)
 	addSrBox(3000,3000,4000,0,0,2000);
 	
 	// add a scalar bar
-	addScalarBar();
+	addScalarBarDepth();
+	addScalarBarAmp();
 
     renderer->AddActor(srBoxActor);
     renderer->AddActor(depthSca);
+	renderer->AddActor(ampSca);
 	//BGdataActor->Register(renderer);
     renderer->AddActor(axesActor);
     renderer->SetBackground(0.2,0.2,0.4);		//!< HARDCODED BACKGROUND COLOR
@@ -83,7 +85,8 @@ CViewSrVtk::~CViewSrVtk()
 	res+= freeGrayLUT();
 	res+= freePlainLUT();
 	// free scalar bar
-	res+= freeScalarBar();
+	res+= freeScalarBarDepth();
+	res+= freeScalarBarAmp();
 };
 
 
@@ -285,7 +288,7 @@ int CViewSrVtk::freePlainLUT()
  *  -> Creates new objects that must be deleted
  *  --> freeScalarBar() must be called
  */
-int CViewSrVtk::addScalarBar()
+int CViewSrVtk::addScalarBarDepth()
 {
 	depthSca = vtkScalarBarActor::New();
     depthSca->SetLookupTable(depthLUT);
@@ -302,10 +305,38 @@ int CViewSrVtk::addScalarBar()
 /**
  * Frees the scalar bar
  */
-int CViewSrVtk::freeScalarBar()
+int CViewSrVtk::freeScalarBarDepth()
 {
 	int res = depthSca->GetReferenceCount();
 	depthSca->Delete();
+	return res-1;
+}
+/**
+ * Creates the scalar bar
+ *  -> Creates new objects that must be deleted
+ *  --> freeScalarBar() must be called
+ */
+int CViewSrVtk::addScalarBarAmp()
+{
+	ampSca = vtkScalarBarActor::New();
+    ampSca->SetLookupTable(grayLUT);
+    ampSca->SetTitle("Amplitude (a.u.)");
+    ampSca->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
+    ampSca->GetPositionCoordinate()->SetValue(0.05,0.90);
+    ampSca->SetOrientationToHorizontal();
+    ampSca->SetWidth(0.9);
+    ampSca->SetHeight(0.05);
+	ampSca->SetLabelFormat("%5.0f");
+	return ampSca->GetReferenceCount();
+}
+
+/**
+ * Frees the scalar bar
+ */
+int CViewSrVtk::freeScalarBarAmp()
+{
+	int res = ampSca->GetReferenceCount();
+	ampSca->Delete();
 	return res-1;
 }
 

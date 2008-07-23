@@ -27,6 +27,14 @@ CamVtkView::CamVtkView(int vtkSub, vtkRenderWindow* ParRenWin, vtkLookupTable* L
 	{
 		#include "camTranMats/camTrfMat_20080707_cmpSteRansac_cam01.cpp"
 	}
+	if(_vtkSub == 2)
+	{
+		#include "camTranMats/camTrfMat_20080707_cmpSteRansac_cam00.cpp"
+	}
+	if(_vtkSub == 3)
+	{
+		#include "camTranMats/camTrfMat_20080707_cmpSteRansac_cam01.cpp"
+	}
 #endif// VTKNOTRANSFORM
 
 	dataWriter = vtkStructuredGridWriter::New();
