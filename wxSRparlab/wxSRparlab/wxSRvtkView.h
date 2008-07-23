@@ -123,7 +123,11 @@ private:
   int freePlainLUT();
 
   vtkScalarBarActor	*depthSca;  //!< scalar bar for depth values
-  int addScalarBar();
-  int freeScalarBar();
+  int addScalarBarDepth();
+  int freeScalarBarDepth();
+
+  vtkScalarBarActor	*ampSca;  //!< scalar bar for depth values
+  int addScalarBarAmp();
+  int freeScalarBarAmp();
 
 };
