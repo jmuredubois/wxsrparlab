@@ -110,7 +110,8 @@ private:
   vtkStructuredGrid					*data;			//!< read TOF depth data
   vtkPoints							*dataPoints;    //!< points vtk objects to store SR dara
   vtkStructuredGridGeometryFilter	*pdata;			//!< geometry filter to obtain PolyData
-  vtkPolyDataMapper					*dataMapper;	//!< mapper for TOF data
+  vtkPolyDataMapper					*dataMapperZ;	//!< mapper for TOF data
+  vtkPolyDataMapper					*dataMapperAmp;	//!< mapper for TOF data
   vtkActor							*dataActor;		//!< actor for TOF data
 
   // Create a float array which represents the points.
@@ -142,7 +143,7 @@ private:
   vtkStructuredGrid					*BGdata;			//!< read TOF depth data
   vtkPoints							*BGdataPoints;    //!< points vtk objects to store SR dara
   vtkStructuredGridGeometryFilter	*BGpdata;			//!< geometry filter to obtain PolyData
-  vtkPolyDataMapper					*BGdataMapper;	//!< mapper for TOF data
+  vtkPolyDataMapper					*BGdataMapperZ;	//!< mapper for TOF data
   vtkActor							*BGdataActor;		//!< actor for TOF data
 
   // Create a float array which represents the points.
