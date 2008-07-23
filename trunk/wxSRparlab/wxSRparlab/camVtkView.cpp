@@ -177,10 +177,10 @@ int CamVtkView::freeSrCam()
 int CamVtkView::changeDepthRange(float minVal, float maxVal)
 {
 	int res = 0;
-	dataMapper->SetScalarRange((double) minVal, (double) maxVal);
-	dataMapper->Modified();
-	BGdataMapper->SetScalarRange((double) minVal, (double) maxVal);
-	BGdataMapper->Modified();
+	dataMapperZ->SetScalarRange((double) minVal, (double) maxVal);
+	dataMapperZ->Modified();
+	BGdataMapperZ->SetScalarRange((double) minVal, (double) maxVal);
+	BGdataMapperZ->Modified();
 	return res;
 }
 
@@ -190,8 +190,8 @@ int CamVtkView::changeDepthRange(float minVal, float maxVal)
 int CamVtkView::changeAmpRange(float minAmp, float maxAmp)
 {
 	int res = 0;
-	dataMapper->SetScalarRange((double) minAmp, (double) maxAmp);
-	dataMapper->Modified();
+	dataMapperAmp->SetScalarRange((double) minAmp, (double) maxAmp);
+	dataMapperAmp->Modified();
 	return res;
 }
 
@@ -292,12 +292,16 @@ int CamVtkView::addDataAct()
 	pdata = vtkStructuredGridGeometryFilter::New();
 	// 20080118 transf	pdata->SetInput(data);
 	pdata->SetInput(camTranFilter->GetOutputDataObject(0)); // 20080118 transf
-    dataMapper = vtkPolyDataMapper::New();
+    dataMapperZ = vtkPolyDataMapper::New();
+	dataMapperZ->SetInputConnection(pdata->GetOutputPort());
 
-	dataMapper->SetInputConnection(pdata->GetOutputPort());
+	dataMapperAmp = vtkPolyDataMapper::New();
+	dataMapperAmp->SetInputConnection(pdata->GetOutputPort());
 
     dataActor = vtkActor::New();
-    dataActor->SetMapper(dataMapper);
+    dataActor->SetMapper(dataMapperZ);
+	dataMapperZ->Register(dataActor);
+	dataMapperAmp->Register(dataActor);
     dataActor->GetProperty()->SetRepresentationToPoints();
 	dataActor->GetProperty()->SetPointSize(3.0);			//! HARD CODED POINT SIZE
 	dataActor->GetProperty()->SetDiffuse(0.0);
@@ -500,7 +504,14 @@ int CamVtkView::freeDataAct()
 	pdata->Delete();
 	dData->Delete();
 	aData->Delete();
-	dataMapper->Delete();
+	/*while(dataMapperZ->GetReferenceCount()>1){
+		dataMapperZ->Delete();
+	};*/
+	dataMapperZ->Delete();
+	/*while(dataMapperAmp->GetReferenceCount()>1){
+		dataMapperAmp->Delete();
+	};*/
+	dataMapperAmp->Delete();
 	dataActor->Delete();
 	return res-1;
 }
@@ -647,13 +658,13 @@ int CamVtkView::addBGDataAct()
 	BGpdata = vtkStructuredGridGeometryFilter::New();
 	// 20080118 transf	pBGpdata->SetInput(BGdata);
 	BGpdata->SetInput(BGcamTranFilter->GetOutputDataObject(0)); // 20080118 transf
-    BGdataMapper = vtkPolyDataMapper::New();
+    BGdataMapperZ = vtkPolyDataMapper::New();
 
-	BGdataMapper->SetInputConnection(BGpdata->GetOutputPort());
-	//BGdataMapper->ScalarVisibilityOff();
+	BGdataMapperZ->SetInputConnection(BGpdata->GetOutputPort());
+	//BGdataMapperZ->ScalarVisibilityOff();
 
     BGdataActor = vtkActor::New();
-    BGdataActor->SetMapper(BGdataMapper);
+    BGdataActor->SetMapper(BGdataMapperZ);
     BGdataActor->GetProperty()->SetOpacity(.2);
 	//BGdataActor->VisibilityOff();
 	BGdataActor->GetProperty()->SetRepresentationToSurface();
@@ -808,7 +819,7 @@ int CamVtkView::freeBGDataAct()
 	freeXYZbg();
 	BGdata->Delete();
 	BGpdata->Delete();
-	BGdataMapper->Delete();
+	BGdataMapperZ->Delete();
 	BGdataActor->Delete();
 	return res-1;
 }
@@ -846,7 +857,9 @@ void CamVtkView::setDataActColorRGB(double r, double g, double b)
 void CamVtkView::setDataMapperColorDepth()
 {
 	data->GetPointData()->SetScalars(dData);
-	dataMapper->SetLookupTable(depthLUT);  // sets color
+	dataMapperZ->SetLookupTable(depthLUT);  // sets color
+	dataActor->SetMapper(dataMapperZ);
+
 }
 /**
  * Sets a data actor color
@@ -854,40 +867,46 @@ void CamVtkView::setDataMapperColorDepth()
 void CamVtkView::setDataMapperColorGray()
 {
 	data->GetPointData()->SetScalars(aData);
-	dataMapper->SetLookupTable(grayLUT);  // sets color
+	dataMapperAmp->SetLookupTable(grayLUT);  // sets color
+	dataActor->SetMapper(dataMapperAmp);
 }
 /**
  * Sets a data actor color
  */
 void CamVtkView::setDataMapperColorR()
 {
-	dataMapper->SetLookupTable(rLUT);  // sets color
+	dataMapperAmp->SetLookupTable(rLUT);  // sets color
+	dataActor->SetMapper(dataMapperAmp);
 }
 /**
  * Sets a data actor color
  */
 void CamVtkView::setDataMapperColorG()
 {
-	dataMapper->SetLookupTable(gLUT);  // sets color
+	dataMapperAmp->SetLookupTable(gLUT);  // sets color
+	dataActor->SetMapper(dataMapperAmp);
 }
 /**
  * Sets a data actor color
  */
 void CamVtkView::setDataMapperColorB()
 {
-	dataMapper->SetLookupTable(bLUT);  // sets color
+	dataMapperAmp->SetLookupTable(bLUT);  // sets color
+	dataActor->SetMapper(dataMapperAmp);
 }
 /**
  * Sets a data actor color
  */
 void CamVtkView::setDataMapperColorW()
 {
-	dataMapper->SetLookupTable(wLUT);  // sets color
+	dataMapperAmp->SetLookupTable(wLUT);  // sets color
+	dataActor->SetMapper(dataMapperAmp);
 }
 /**
  * Sets a data actor color
  */
 void CamVtkView::setDataMapperColorK()
 {
-	dataMapper->SetLookupTable(kLUT);  // sets color
+	dataMapperAmp->SetLookupTable(kLUT);  // sets color
+	dataActor->SetMapper(dataMapperAmp);
 }
