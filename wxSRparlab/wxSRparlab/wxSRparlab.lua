@@ -85,6 +85,21 @@ end
 
 ---end
 
+--package includes for TICPP
+tinsert(package.config["Debug"].links,   { "ticppd"})
+tinsert(package.config["Release"].links,   { "ticpp"})
+tinsert(package.includepaths,
+  {
+    string.format('%s',os.getenv("JMU_TICPP"))
+  }
+)
+tinsert( package.libpaths, 
+  {
+    string.format('%s%s',os.getenv("JMU_TICPP"), "/lib")
+  }
+)
+--END OF package includes for TICPP
+
 -- --http://wiki.wxwindows.org/WxMac_Issues
 if (OS == "macosx") then
 --  	string.format('%s%s',"cd ",string.format('%s%s',os.getenv("JMU_BUILDS"), "/Debug/bin")

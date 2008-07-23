@@ -109,22 +109,29 @@ int CamVtkView::getVtkSub()
 	return _vtkSub;
 }
 
-int CamVtkView::setTrfMat()
+int CamVtkView::setTrfMat(char* fn)
 {
 	int res = 0;
-#ifndef VTKNOTRANSFORM
-	if(_vtkSub == 0)
+
+	fn = "C:\\Documents and Settings\\murej\\My Documents\\svnSandbox\\trunk\\wxSRparlab\\wxSRparlab\\camTranMats\\TestTrfMat.xml";
+	try
 	{
-		#include "camTranMats/camTrfMat_20080707_cmpSteRansac_cam00.cpp"
+		ticpp::Document doc( fn );
+		doc.LoadFile();
+
+		double val0;
+		ticpp::Element* pRow = doc.FirstChildElement()->FirstChildElement("Row");
+		pRow->GetAttribute("val0", &val0);
+
 	}
-	if(_vtkSub == 1)
+	catch( ticpp::Exception& ex )
 	{
-		#include "camTranMats/camTrfMat_20080707_cmpSteRansac_cam01.cpp"
+		std::cout << ex.what();
+		return -1;
 	}
 	camTranMat->Modified();
 	//res = freeSrCam();
 	//res += addSrCam();
-#endif// VTKNOTRANSFORM
 	return res;
 }
 

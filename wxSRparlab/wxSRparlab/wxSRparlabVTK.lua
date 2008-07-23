@@ -109,7 +109,22 @@ tinsert(package.links,
   }
 )
 tinsert(package.defines, { "JMU_USE_VTK" } )
---ENDO OFpackage includes for VTK
+--END OF package includes for VTK
+
+--package includes for TICPP
+tinsert(package.config["DebugVTK"].links,   { "ticppd"})
+tinsert(package.config["ReleaseVTK"].links,   { "ticpp"})
+tinsert(package.includepaths,
+  {
+    string.format('%s',os.getenv("JMU_TICPP"))
+  }
+)
+tinsert( package.libpaths, 
+  {
+    string.format('%s%s',os.getenv("JMU_TICPP"), "/lib")
+  }
+)
+--END OF package includes for TICPP
 
 -- --http://wiki.wxwindows.org/WxMac_Issues
 if (OS == "macosx") then

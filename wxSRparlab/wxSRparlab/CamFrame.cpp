@@ -638,8 +638,8 @@ void CamFrame::SetVtkWin(CViewSrVtk *vtkWin, int vtkSub)
 		_camVtk->SetDepthLUT(_vtkWin->GetDepthLUT());
 		_camVtk->SetGrayLUT(_vtkWin->GetGrayLUT());
 		_camVtk->SetPlainLUT(_vtkWin->GetRLUT(), _vtkWin->GetGLUT(), _vtkWin->GetBLUT(), _vtkWin->GetWLUT(), _vtkWin->GetKLUT());
-		_camVtk->setTrfMat();
-		//cameras.push_back(cam);
+		char toto[] = "toto";
+		_camVtk->setTrfMat(toto);
 	}
 };
 #endif

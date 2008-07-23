@@ -68,6 +68,9 @@
 
 #include <math.h>
 
+#define TIXML_USE_TICPP
+#include "ticpp.h" //Open source XML parser
+
 #define NUMCAMS 4	//!< number of SR cams
 
 #define SAFE_FREE(p)       { if(p) { delete (p);     (p)=0; } }
