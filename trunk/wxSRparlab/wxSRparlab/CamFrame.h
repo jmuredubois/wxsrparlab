@@ -12,7 +12,9 @@
 #include "CMainWnd.h"	//!< main window header file
 #include "CamPanelSettings.h" //!< camera settings panel header file
 #include "CamViewData.h" //!< camera view panel header file
+#ifdef JMU_USE_VTK
 #include "CamVtkView.h" //!< camera vtk view header file
+#endif
 
 
 

@@ -112,7 +112,9 @@ CamFrame::~CamFrame()
 {
 	int res = -1;
 	if(m_bReadContinuously){ if(m_pThreadReadData != NULL){ m_pThreadReadData->Delete(); } } ;
+#ifdef JMU_USE_VTK
 	if(_camVtk != NULL) { delete(_camVtk); _camVtk = NULL; } ;
+#endif
 	if(m_sr		  != NULL) { res = SR_Close(m_sr);	m_sr = NULL; };
 	if(m_mutexSrBuf != NULL) { delete(m_mutexSrBuf); m_mutexSrBuf = NULL;};
 	if(m_pSrBuf   != NULL) { free((void*) m_pSrBuf  ); m_pSrBuf   = NULL; };
