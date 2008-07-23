@@ -8,9 +8,9 @@
  * @version: 2007.11.07
  */
 
-#ifdef DUMMYSR
-
 #include "wxSRparlab.h"
+
+#ifdef DUMMYSR
 #include "srDummy.h"
 
 //--------- interfaces for C++, Delphi etc. ------------
@@ -315,4 +315,4 @@ int SR_SetAutoIllumination(SRCAM srCam, unsigned char minIntTime, unsigned char 
 
 
 //#define _countof(array) (sizeof(array)/sizeof(array[0]))
-#endif //DUMMYSR
+#endif /* DUMMYSR */
