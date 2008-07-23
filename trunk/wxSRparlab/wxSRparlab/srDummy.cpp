@@ -8,6 +8,8 @@
  * @version: 2007.11.07
  */
 
+#ifdef DUMMYSR
+
 #include "wxSRparlab.h"
 #include "srDummy.h"
 
@@ -313,3 +315,4 @@ int SR_SetAutoIllumination(SRCAM srCam, unsigned char minIntTime, unsigned char 
 
 
 //#define _countof(array) (sizeof(array)/sizeof(array[0]))
+#endif //DUMMYSR
