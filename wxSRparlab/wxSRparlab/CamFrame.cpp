@@ -218,7 +218,7 @@ int CamFrame::CreateAndSetNotebook(const wxString& title)
 //! Opens SR device
 void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 {
-  int res = 0;
+  unsigned int res = 0;
   //logPrintf("swissrangerTester: SR_Open device");
   m_settingsPane->SetText(wxT("Open attempt"));
   m_settingsPane->DisableOpenSR();		// disable "Open" button
@@ -226,18 +226,19 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   m_settingsPane->EnableRadioFrq();		// enable frequency selection
   m_settingsPane->EnableCloseSR();	// enable "Close" button
   wxString strR;
-  int serial = 0;
+  unsigned int serial = 0;
   if(m_sr == NULL)
   {
 	  res = -1;
 		res = SR_OpenUSB(& m_sr);
 		//Returns the serial number (if existing) of the camera
   }
-  strR.sprintf(wxT("cam open %i"), res); // ... change title text ...
+  strR.sprintf(wxT("cam open %u"), res); // ... change title text ...
   if(m_sr != NULL)
   {
 	  serial =  SR_ReadSerial(m_sr); 
-	  strR.sprintf(wxT("cam serial %i"), serial); // ... change title text ...
+	  strR.sprintf(wxT("cam serial %u"), serial); // ... change title text ...
+	  m_nSerialSR = serial;
   }
 
   wxFileDialog* OpenDialogPar = new wxFileDialog(this, 
@@ -320,7 +321,7 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 		  res -=4;
 	    }
  
-	    strR.sprintf(wxT("cam serial %i - %ix%i  - %i"), serial, m_nRows, m_nCols, m_nSrBufSz); // ... change text ...
+	    strR.sprintf(wxT("cam serial %u posing as %u \n - %ix%i  - %i"), serial, m_nSerialSR, m_nRows, m_nCols, m_nSrBufSz); // ... change text ...
 		wxMutexError errMutex= m_mutexSrBuf->Lock();
 		if(errMutex == wxMUTEX_NO_ERROR)
 		{
@@ -354,7 +355,7 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	  m_nSrBufSz = (int) SR_GetBufferSize(m_sr); 
 	  m_nCols = (int) SR_GetCols(m_sr); 
 	  m_nRows = (int) SR_GetRows(m_sr); 
-	  strR.sprintf(wxT("cam serial %i - %ix%i  - %i"), serial, m_nRows, m_nCols, m_nSrBufSz); // ... change text ...
+	  strR.sprintf(wxT("cam serial %u - %ix%i  - %i"), serial, m_nRows, m_nCols, m_nSrBufSz); // ... change text ...
 	  wxMutexError errMutex= m_mutexSrBuf->Lock();
 	  if(errMutex == wxMUTEX_NO_ERROR)
 	  {
@@ -465,6 +466,7 @@ void CamFrame::AcqOneFrm()
   wxString strR;
   if((m_sr == NULL) && (m_pSrBuf != NULL) && (m_pSrZ!=NULL) && (m_pSrY!=NULL) && (m_pSrX!=NULL)&&(m_pFile4ReadPha  != NULL) && (m_pFile4ReadAmp  != NULL) && (m_pFile4ReadPha->IsOpened()) && (m_pFile4ReadAmp->IsOpened()))
   {
+	  // if reading from file ...
 	  wxMutexError errMutex= m_mutexSrBuf->Lock();
 	  if(errMutex == wxMUTEX_NO_ERROR)
 	  {
@@ -482,7 +484,6 @@ void CamFrame::AcqOneFrm()
 	  m_viewYPane->SetDataArray<short>((short*) &m_pSrY[0], m_nRows*m_nCols);
 	  m_viewXPane->SetDataArray<short>((short*) &m_pSrX[0], m_nRows*m_nCols);
 	  #ifdef JMU_USE_VTK
-		//_vtkWin->updateTOFcurrent(m_nRows, m_nCols, m_pSrZ, m_pSrY, m_pSrX, (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2],_vtkSub);
 		_camVtk->updateTOFcurrent(m_nRows, m_nCols, m_pSrZ, m_pSrY, m_pSrX, (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2]);
       #endif
 	  m_settingsPane->SetText(strR);
@@ -501,10 +502,12 @@ void CamFrame::AcqOneFrm()
   }
   if((m_sr != NULL) && (m_pSrBuf != NULL) && (m_pSrZ!=NULL) && (m_pSrY!=NULL) && (m_pSrX!=NULL) )
   {
+	  // if reading data live from camera ...
 	  wxMutexError errMutex= m_mutexSrBuf->Lock();
 	  if(errMutex == wxMUTEX_NO_ERROR)
 	  {
 	    res = SR_Acquire(m_sr, AM_COR_FIX_PTRN );
+		CoordTrf();
 	    errMutex = m_mutexSrBuf->Unlock();
 	  } //{errMutex == wxMUTEX_NO_ERROR)
 	  strR.sprintf(wxT("frm:%05u - pixRead %i - %ix%i  - %i"), m_nFrmRead, res, m_nRows, m_nCols, m_nSrBufSz);
@@ -513,6 +516,9 @@ void CamFrame::AcqOneFrm()
 	  m_viewZPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrZ[0], m_nRows*m_nCols);
 	  m_viewYPane->SetDataArray<short>((short*) &m_pSrY[0], m_nRows*m_nCols);
 	  m_viewXPane->SetDataArray<short>((short*) &m_pSrX[0], m_nRows*m_nCols);
+	  #ifdef JMU_USE_VTK
+		_camVtk->updateTOFcurrent(m_nRows, m_nCols, m_pSrZ, m_pSrY, m_pSrX, (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2]);
+      #endif
 	  m_settingsPane->SetText(strR);
 	  m_viewRangePane->SetTxtInfo(strR);
 	  m_viewAmpPane->SetTxtInfo(strR);
