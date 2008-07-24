@@ -66,9 +66,9 @@ void *ThreadReadData::Entry()
         if ( TestDestroy() )
             break;
 		//m_cFrm->AcqOneFrm();
-		wxCommandEvent event( wxEVT_JMUACQONEFRM, GetId() );
-		//m_cFrm->AddPendingEvent(event);
-		m_cFrm->ProcessEvent(event);
+		wxCommandEvent event( wxEVT_JMUACQONEFRM, IDC_AcqOne );
+		m_cFrm->AddPendingEvent(event);
+		//m_cFrm->ProcessEvent(event);
         wxThread::Sleep(500);
     }
 
@@ -496,10 +496,10 @@ void CamFrame::AcqOneFrm()
 	  m_viewYPane->SetDataArray<short>((short*) &m_pSrY[0], m_nRows*m_nCols);
 	  m_viewXPane->SetDataArray<short>((short*) &m_pSrX[0], m_nRows*m_nCols);
 	  #ifdef JMU_USE_VTK
-		if(m_camReadMode==CAM_RD_ONESHOT) // vtk does not support access from different threads
-		{
+		//if(m_camReadMode==CAM_RD_ONESHOT) // vtk does not support access from different threads
+		//{
 			_camVtk->updateTOFcurrent(m_nRows, m_nCols, m_pSrZ, m_pSrY, m_pSrX, (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2]);
-		}
+		//}
       #endif
 	  m_settingsPane->SetText(strR);
 	  m_viewRangePane->SetTxtInfo(strR);
@@ -532,7 +532,10 @@ void CamFrame::AcqOneFrm()
 	  m_viewYPane->SetDataArray<short>((short*) &m_pSrY[0], m_nRows*m_nCols);
 	  m_viewXPane->SetDataArray<short>((short*) &m_pSrX[0], m_nRows*m_nCols);
 	  #ifdef JMU_USE_VTK
-		_camVtk->updateTOFcurrent(m_nRows, m_nCols, m_pSrZ, m_pSrY, m_pSrX, (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2]);
+	    //if(m_camReadMode==CAM_RD_ONESHOT) // vtk does not support access from different threads
+		//{
+			_camVtk->updateTOFcurrent(m_nRows, m_nCols, m_pSrZ, m_pSrY, m_pSrX, (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2]);
+		//}
       #endif
 	  m_settingsPane->SetText(strR);
 	  m_viewRangePane->SetTxtInfo(strR);
