@@ -48,7 +48,12 @@ CViewSrVtk::CViewSrVtk(wxFrame* pWnd)
     renderer->AddActor(axesActor);
     renderer->SetBackground(0.2,0.2,0.4);		//!< HARDCODED BACKGROUND COLOR
     renWin->SetSize(800,600);					//!< HARDCODED RENDER WINDOW SIZE
+	renWin->SetPosition(300, 050);
 
+	renderer->GetActiveCamera()->SetParallelProjection(1);
+	renderer->GetActiveCamera()->SetParallelScale(2000);
+	renderer->GetActiveCamera()->SetPosition(0,0,-2000);
+	//renderer->GetActiveCamera()->SetViewPlaneNormal(0,0,-1);
 	//renderer->GetActiveCamera()->;
     // Finally we start the interactor so that event will be handled
     renWin->Render();
