@@ -48,6 +48,7 @@ private:
 	/* Buttons */
 	wxButton* m_buttonOpenDev; //!< Open camera
 	wxButton* m_buttonCloseDev; //!< Close camera
+	wxButton* m_buttonSetTrfMat; //!< Set camera trf Mat
 
 	/* Radio boxes */
 	wxRadioBox* m_radioboxFrq;	//!< camera frq

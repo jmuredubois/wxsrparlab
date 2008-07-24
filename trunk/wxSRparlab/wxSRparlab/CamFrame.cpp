@@ -132,6 +132,7 @@ BEGIN_EVENT_TABLE(CamFrame, wxFrame)
 	EVT_BUTTON(IDB_Acquire,  CamFrame::Acquire)
 	EVT_RADIOBOX(IDR_Freq, CamFrame::SetFreq)
 	EVT_RADIOBOX(IDR_ReadMode, CamFrame::SetReadMode)
+	EVT_BUTTON(IDB_SetTrfMat,  CamFrame::OnSetTrfMat)
 END_EVENT_TABLE()
 
 /**
@@ -644,8 +645,32 @@ void CamFrame::SetVtkWin(CViewSrVtk *vtkWin, int vtkSub)
 		_camVtk->SetDepthLUT(_vtkWin->GetDepthLUT());
 		_camVtk->SetGrayLUT(_vtkWin->GetGrayLUT());
 		_camVtk->SetPlainLUT(_vtkWin->GetRLUT(), _vtkWin->GetGLUT(), _vtkWin->GetBLUT(), _vtkWin->GetWLUT(), _vtkWin->GetKLUT());
-		char toto[] = "toto";
-		_camVtk->setTrfMat(toto);
 	}
 };
 #endif
+
+void CamFrame::OnSetTrfMat(wxCommandEvent& WXUNUSED(event))
+{
+#ifdef JMU_USE_VTK
+  //logPrintf("swissrangerTester: SR_Open device");
+  m_settingsPane->SetText(wxT("Modify camera trf matrix"));
+  wxString strR;
+
+  wxFileDialog* OpenDialogMat = new wxFileDialog(this, 
+	  wxT("Choose a coordinates transformation matrix file to open"),	// msg
+	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
+	  wxEmptyString,	// default file
+	  wxT("Coordinates transformation matrix files (*.xml)|*.xml|All files (*.*)|*.*"),	// file ext
+	  wxFD_OPEN|wxFD_CHANGE_DIR,
+	  wxDefaultPosition);
+ 
+  if((OpenDialogMat->ShowModal()==wxID_OK) )
+  {
+	  wxString strPathMat = OpenDialogMat->GetPath();
+	  _camVtk->setTrfMat(strPathMat.char_str());
+  } // (OpenDialogMat->ShowModal()==wxID_OK) )
+  delete(OpenDialogMat);
+  
+  m_settingsPane->SetText(wxT("Modified camera trf matrix"));
+#endif
+}

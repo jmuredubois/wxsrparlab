@@ -37,6 +37,7 @@ int CamPanelSettings::InitSettings()
 	    sizerButtons->Add(m_buttonOpenDev, 1, wxEXPAND);
 	    sizerButtons->Add(m_buttonCloseDev, 1, wxEXPAND);
 
+	m_buttonSetTrfMat = new wxButton(this, IDB_SetTrfMat, wxT("Cam. trf. matrix"));
 
 	wxString freqs[] = { wxT("19 MHz"), wxT("20 MHz"), wxT("21 MHz"),
         wxT("30 MHz") };
@@ -64,6 +65,7 @@ int CamPanelSettings::InitSettings()
 	sizerPanel->Add(m_radioboxReadMode, 0, wxEXPAND);
     sizerPanel->Add(m_radioboxFrq, 0, wxEXPAND);
     sizerPanel->Add(m_radioboxSrFilt, 0, wxEXPAND);
+	sizerPanel->Add(m_buttonSetTrfMat, 0, wxEXPAND);
 
 	sizerPanel->Add(m_statText, 1, wxEXPAND);
 
