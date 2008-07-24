@@ -69,7 +69,7 @@ void *ThreadReadData::Entry()
 		wxCommandEvent event( wxEVT_JMUACQONEFRM, IDC_AcqOne );
 		m_cFrm->AddPendingEvent(event);
 		//m_cFrm->ProcessEvent(event);
-        wxThread::Sleep(500);
+        wxThread::Sleep(90);
     }
 
     return NULL;
