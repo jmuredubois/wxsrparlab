@@ -45,6 +45,8 @@
 #include "wx/ffile.h"		//!< for files
 #include "wx/thread.h"		//!< for threads
 #include "wx/gbsizer.h"		//!< for grid bag sizer
+#include "wx/event.h"		//!< for command events
+#include "wx/app.h"			//!< for posting events
 
 #include <list>		//STL list
 #include <vector>		//STL list
