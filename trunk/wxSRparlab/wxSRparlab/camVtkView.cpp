@@ -113,7 +113,6 @@ int CamVtkView::setTrfMat(char* fn)
 {
 	int res = 0;
 
-	fn = "C:\\Documents and Settings\\murej\\My Documents\\svnSandbox\\trunk\\wxSRparlab\\wxSRparlab\\camTranMats\\TestTrfMat.xml";
 	try
 	{
 		ticpp::Document doc( fn );
@@ -141,6 +140,7 @@ int CamVtkView::setTrfMat(char* fn)
 	catch(...)
 	{
 		camTranMat->Identity(); // if a problem occured, set TrfMat to Identity
+		return -1;
 	}
 	camTranMat->Modified();
 	camTran->SetMatrix(camTranMat);
