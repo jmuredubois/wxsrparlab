@@ -60,6 +60,7 @@ public:
 	void SetFreq(wxCommandEvent& event);
 	void SetReadMode(wxCommandEvent& event);
 	void AcqOneFrm();
+	void AcqOneFrmEvt(wxCommandEvent& WXUNUSED(event));
 	void CoordTrf();
 	void OnSetTrfMat(wxCommandEvent& WXUNUSED(event));
 #ifdef JMU_USE_VTK
@@ -119,6 +120,7 @@ enum CamFrameEnum
 	IDR_Freq = 7,
 	IDR_ReadMode = 8,
 	IDB_SetTrfMat = 9,
+	IDC_AcqOne = 10, 
 	ID_ThisIsAStop = 255
 };
 

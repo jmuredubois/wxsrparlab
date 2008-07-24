@@ -16,6 +16,10 @@
 // GUI thread
 // ----------------------------------------------------------------------------
 
+DECLARE_EVENT_TYPE(wxEVT_JMUACQONEFRM, -1)
+
+DEFINE_EVENT_TYPE(wxEVT_JMUACQONEFRM)
+
 class ThreadReadData : public wxThread
 {
 public:
@@ -61,8 +65,11 @@ void *ThreadReadData::Entry()
         // check if we were asked to exit
         if ( TestDestroy() )
             break;
-		m_cFrm->AcqOneFrm();
-        wxThread::Sleep(100);
+		//m_cFrm->AcqOneFrm();
+		wxCommandEvent event( wxEVT_JMUACQONEFRM, GetId() );
+		//m_cFrm->AddPendingEvent(event);
+		m_cFrm->ProcessEvent(event);
+        wxThread::Sleep(500);
     }
 
     return NULL;
@@ -133,6 +140,7 @@ BEGIN_EVENT_TABLE(CamFrame, wxFrame)
 	EVT_RADIOBOX(IDR_Freq, CamFrame::SetFreq)
 	EVT_RADIOBOX(IDR_ReadMode, CamFrame::SetReadMode)
 	EVT_BUTTON(IDB_SetTrfMat,  CamFrame::OnSetTrfMat)
+	EVT_COMMAND(IDC_AcqOne, wxEVT_JMUACQONEFRM, CamFrame::AcqOneFrmEvt)
 END_EVENT_TABLE()
 
 /**
@@ -539,6 +547,12 @@ void CamFrame::AcqOneFrm()
   //if((m_viewRangePane->IsShownOnScreen())){ m_viewRangePane->SetNewImage();};
   //if((m_viewAmpPane->IsShownOnScreen())){ m_viewAmpPane->SetNewImage();};
 };
+
+
+void CamFrame::AcqOneFrmEvt(wxCommandEvent& WXUNUSED(event))
+{
+	AcqOneFrm();
+}
 
 //! TransFormCoordinates
 void CamFrame::CoordTrf()
