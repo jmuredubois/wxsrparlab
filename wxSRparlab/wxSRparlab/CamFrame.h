@@ -61,6 +61,7 @@ public:
 	void SetReadMode(wxCommandEvent& event);
 	void AcqOneFrm();
 	void CoordTrf();
+	void OnSetTrfMat(wxCommandEvent& WXUNUSED(event));
 #ifdef JMU_USE_VTK
 	void SetVtkWin(CViewSrVtk *vtkWin, int vtkSub);
 	CamVtkView* GetCamVtk(){return _camVtk;};
@@ -117,6 +118,7 @@ enum CamFrameEnum
 	IDB_Acquire = 6, 
 	IDR_Freq = 7,
 	IDR_ReadMode = 8,
+	IDB_SetTrfMat = 9,
 	ID_ThisIsAStop = 255
 };
 
