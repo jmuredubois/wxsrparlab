@@ -339,6 +339,7 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 		res = m_viewYPane->SetDataArray<short>((short*) &m_pSrY[0], m_nRows*m_nCols);
  
 	    m_settingsPane->SetText(strR);
+		SetStatusText( strR );
 	  } // (wxFparams->IsOpened())
   } // (OpenDialogPar->ShowModal()==wxID_OK) && (OpenDialogPha->ShowModal()==wxID_OK) && (OpenDialogAmp->ShowModal()==wxID_OK)
   delete(OpenDialogPar);
@@ -376,6 +377,7 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	  res = m_viewYPane->SetDataArray<short>((short*) &m_pSrY[0], m_nRows*m_nCols);
   }
   m_settingsPane->SetText(strR);
+  SetStatusText( strR );
 }
 
 //---------------------------------------------------
@@ -415,6 +417,7 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   m_nSerialSR = 0;
   m_settingsPane->EnableOpenSR();	// enable "Open" button
   m_settingsPane->SetText(wxT("Close successfull"));
+  SetStatusText( wxT("cam") );
 }
 //! Acquire 1 Frame
 void CamFrame::Acquire(wxCommandEvent& WXUNUSED(event))
@@ -484,7 +487,10 @@ void CamFrame::AcqOneFrm()
 	  m_viewYPane->SetDataArray<short>((short*) &m_pSrY[0], m_nRows*m_nCols);
 	  m_viewXPane->SetDataArray<short>((short*) &m_pSrX[0], m_nRows*m_nCols);
 	  #ifdef JMU_USE_VTK
-		_camVtk->updateTOFcurrent(m_nRows, m_nCols, m_pSrZ, m_pSrY, m_pSrX, (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2]);
+		if(m_camReadMode==CAM_RD_ONESHOT) // vtk does not support access from different threads
+		{
+			_camVtk->updateTOFcurrent(m_nRows, m_nCols, m_pSrZ, m_pSrY, m_pSrX, (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2]);
+		}
       #endif
 	  m_settingsPane->SetText(strR);
 	  m_viewRangePane->SetTxtInfo(strR);
