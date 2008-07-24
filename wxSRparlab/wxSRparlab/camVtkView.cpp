@@ -18,25 +18,6 @@ CamVtkView::CamVtkView(int vtkSub, vtkRenderWindow* ParRenWin, vtkLookupTable* L
 	_zBG = NULL;
 	camTranMat = vtkMatrix4x4::New();
 
-#ifndef VTKNOTRANSFORM
-	if(_vtkSub == 0)
-	{
-		#include "camTranMats/camTrfMat_20080707_cmpSteRansac_cam00.cpp"
-	}
-	if(_vtkSub == 1)
-	{
-		#include "camTranMats/camTrfMat_20080707_cmpSteRansac_cam01.cpp"
-	}
-	if(_vtkSub == 2)
-	{
-		#include "camTranMats/camTrfMat_20080707_cmpSteRansac_cam00.cpp"
-	}
-	if(_vtkSub == 3)
-	{
-		#include "camTranMats/camTrfMat_20080707_cmpSteRansac_cam01.cpp"
-	}
-#endif// VTKNOTRANSFORM
-
 	dataWriter = vtkStructuredGridWriter::New();
 	BGdataWriter = vtkStructuredGridWriter::New();
 
@@ -67,6 +48,11 @@ CamVtkView::CamVtkView(int vtkSub, vtkRenderWindow* ParRenWin, vtkLookupTable* L
 	grayLUT = LUT;
 	rLUT = LUT; gLUT = LUT; bLUT = LUT; wLUT = LUT; kLUT = LUT;
 
+#ifndef VTKNOTRANSFORM
+	char strTrfFile[512];
+	sprintf(strTrfFile, "camTranMats/camTrfMat_mostRecent_cam%02i.xml", _vtkSub);
+	setTrfMat(strTrfFile);
+#endif// VTKNOTRANSFORM
 
 	// add actors
 	renderer->AddActor(srCubeActor);

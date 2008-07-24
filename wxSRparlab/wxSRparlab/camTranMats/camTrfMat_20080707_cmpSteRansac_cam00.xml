@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- camTrfMat_20080707_cmpSteRansac_cam00 -->
 <TrfMat Version="1">
     <Row0 val0="+0000.886" val1="-000.1263" val2="+000.4462" val3="+00000000" />
 	<Row1 val0="+00000000" val1="+000.9622" val2="+000.2724" val3="+00000000" />
