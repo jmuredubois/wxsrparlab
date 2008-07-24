@@ -119,9 +119,18 @@ int CamVtkView::setTrfMat(char* fn)
 		ticpp::Document doc( fn );
 		doc.LoadFile();
 
-		double val0;
-		ticpp::Element* pRow = doc.FirstChildElement()->FirstChildElement("Row");
-		pRow->GetAttribute("val0", &val0);
+		char rowStr[64]; char attrStr[64]; double val=0.0;
+		for(int row = 0; row <4; row++)
+		{
+			sprintf(rowStr, "Row%i", row);
+			ticpp::Element* pRow = doc.FirstChildElement()->FirstChildElement(rowStr);
+			for(int col = 0; col <4 ; col++)
+			{
+				sprintf(attrStr, "val%i", col);
+				pRow->GetAttribute(attrStr, &val);
+				camTranMat->SetElement(row,col,val);
+			}
+		}
 
 	}
 	catch( ticpp::Exception& ex )
@@ -129,9 +138,15 @@ int CamVtkView::setTrfMat(char* fn)
 		std::cout << ex.what();
 		return -1;
 	}
+	catch(...)
+	{
+		camTranMat->Identity(); // if a problem occured, set TrfMat to Identity
+	}
 	camTranMat->Modified();
-	//res = freeSrCam();
-	//res += addSrCam();
+	camTran->SetMatrix(camTranMat);
+	camTran->Modified();
+	srCube->SetCenter( camTranMat->GetElement(0,3),  camTranMat->GetElement(1,3),  camTranMat->GetElement(2,3));
+	srLabelActor->SetPosition( camTranMat->GetElement(0,3),  camTranMat->GetElement(1,3),  camTranMat->GetElement(2,3));
 	return res;
 }
 
