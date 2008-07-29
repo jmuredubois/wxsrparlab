@@ -49,6 +49,7 @@ public:
 	void AcqAll(wxCommandEvent& event);	//!< send Acquire command to all cams
 	void SetVisVtk(wxCommandEvent& event); //!< react on event changed visibility
 	void SetColVtk(wxCommandEvent& event); //!< react on event changed color options
+	void PopCam(int vtkSub); //!< remove camFrame object from list if window is closed
 
     DECLARE_EVENT_TABLE()
 
