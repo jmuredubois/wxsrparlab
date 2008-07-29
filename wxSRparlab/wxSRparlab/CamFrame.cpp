@@ -69,7 +69,7 @@ void *ThreadReadData::Entry()
 		wxCommandEvent event( wxEVT_JMUACQONEFRM, IDC_AcqOne );
 		m_cFrm->AddPendingEvent(event);
 		//m_cFrm->ProcessEvent(event);
-        wxThread::Sleep(90);
+        wxThread::Sleep(500);
     }
 
     return NULL;
@@ -79,13 +79,14 @@ void *ThreadReadData::Entry()
  * Camera frame class constructor \n
  * Each instance must have a parent frame (usually CMainWnd) \n
  */
-CamFrame::CamFrame(wxFrame* parentFrm, const wxString& title, const wxPoint& pos, const wxSize& size)
+CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos, const wxSize& size)
 : wxFrame(parentFrm, -1, title, pos, size)
 {
 	//! - a status bar is created \n
     CreateStatusBar();
     SetStatusText( _T("cam") );
 
+	_pWin = parentFrm;
 	m_camNB = NULL;
 	m_sr = NULL;
 	m_pSrBuf = NULL; m_nRows = 0; m_nCols = 0; m_nSrBufSz = 0;
@@ -107,9 +108,9 @@ CamFrame::CamFrame(wxFrame* parentFrm, const wxString& title, const wxPoint& pos
 	m_mfrqInt = 2;
 #ifdef JMU_USE_VTK
 	_vtkWin=NULL;
-	_vtkSub = 0;
 	_camVtk = NULL;
 #endif
+	_vtkSub = 0;
 }
 
 /**
@@ -117,6 +118,7 @@ CamFrame::CamFrame(wxFrame* parentFrm, const wxString& title, const wxPoint& pos
  */
 CamFrame::~CamFrame()
 {
+	if(_pWin != NULL){	_pWin->PopCam(_vtkSub);};
 	int res = -1;
 	if(m_bReadContinuously){ if(m_pThreadReadData != NULL){ m_pThreadReadData->Delete(); } } ;
 #ifdef JMU_USE_VTK
@@ -651,20 +653,25 @@ void CamFrame::SetReadMode(wxCommandEvent&(event))
   m_settingsPane->SetText(strR);
 };
 
-#ifdef JMU_USE_VTK
+
 void CamFrame::SetVtkWin(CViewSrVtk *vtkWin, int vtkSub)
 {
-	_vtkWin = vtkWin;
 	if( (vtkSub > -1) && (vtkSub < NUMCAMS))
 	{
 		_vtkSub = vtkSub;
+	}
+	else{return;};
+#ifdef JMU_USE_VTK
+	_vtkWin = vtkWin;
+	if( (vtkSub > -1) && (vtkSub < NUMCAMS))
+	{
 		_camVtk = new CamVtkView(_vtkSub, _vtkWin->GetRenWin(), _vtkWin->GetDepthLUT());
 		_camVtk->SetDepthLUT(_vtkWin->GetDepthLUT());
 		_camVtk->SetGrayLUT(_vtkWin->GetGrayLUT());
 		_camVtk->SetPlainLUT(_vtkWin->GetRLUT(), _vtkWin->GetGLUT(), _vtkWin->GetBLUT(), _vtkWin->GetWLUT(), _vtkWin->GetKLUT());
 	}
-};
 #endif
+};
 
 void CamFrame::OnSetTrfMat(wxCommandEvent& WXUNUSED(event))
 {

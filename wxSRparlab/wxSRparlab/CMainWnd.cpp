@@ -422,3 +422,26 @@ void MainWnd::SetColVtk(wxCommandEvent& event)
 	_vtkWin->Render();
 #endif
 }
+
+/* remove CamFrame object from list if window is closed */
+void MainWnd::PopCam(int vtkSub)
+{
+#ifdef JMU_USE_VTK
+	int i = 0;
+	std::vector<wxRadioBox*>::iterator itCtrl;  // get iterator on the controls
+	std::vector<wxCheckBox*>::iterator itCtrl2;  // get iterator on the controls
+	std::vector<CamFrame*>::iterator itCam;  // get iterator on the camera frames
+	for ( itCtrl  =_colVtk.begin(), itCtrl2  =_visVtk.begin(), itCam  =m_camFrm.begin();
+		  itCtrl !=_colVtk.end()  , itCtrl2 !=_visVtk.end()  , itCam !=m_camFrm.end(); 
+		  itCtrl++, itCtrl2++, itCam++, i++ )
+	{
+		if( (*itCam)->GetVtkSub() == vtkSub)
+		{
+			m_camFrm.erase(itCam);
+			(*itCtrl )->Disable();
+			(*itCtrl2)->Disable();
+			break;
+		}
+	}
+#endif
+}

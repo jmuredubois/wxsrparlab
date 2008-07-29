@@ -25,6 +25,7 @@
 #include "wx/image.h" //!< for wxImages
 
 class ThreadReadData;
+class MainWnd;
 #ifdef JMU_USE_VTK
 class CViewSrVtk;
 class CamVtkView;
@@ -48,7 +49,7 @@ class CamFrame: public wxFrame //!< Camera frame class
 {
 public:
 	//! constructor
-    CamFrame( wxFrame* parentFrm, const wxString& title, const wxPoint& pos, const wxSize& size);
+    CamFrame( MainWnd* parentFrm, const wxString& title, const wxPoint& pos, const wxSize& size);
 	//! destructor
 	~CamFrame();
 	//! Close() method
@@ -67,8 +68,10 @@ public:
 	void SetVtkWin(CViewSrVtk *vtkWin, int vtkSub);
 	CamVtkView* GetCamVtk(){return _camVtk;};
 #endif
+	int GetVtkSub(){return _vtkSub;};
 
 private:
+	MainWnd	*_pWin; // parent main wnd
 	SRCAM	m_sr;	// pointer for SR camera
 	//! buffer where the SR camera will return the data
 	unsigned char       *m_pSrBuf;
@@ -100,9 +103,9 @@ private:
 	int	  m_mfrqInt;
 #ifdef JMU_USE_VTK
 	CViewSrVtk	*_vtkWin ; //!< pointer to vtk window
-	int _vtkSub;
 	CamVtkView *_camVtk; //!< point to vtk camera structure
 #endif
+	int _vtkSub;
 
 public:
     DECLARE_EVENT_TABLE()
