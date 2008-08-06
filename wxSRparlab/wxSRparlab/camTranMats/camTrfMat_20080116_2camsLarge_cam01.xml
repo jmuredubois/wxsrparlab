@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- camTrfMat_20080707_cmpSteRansac_cam00 -->
+<TrfMat Version="1">
+    <Row0 val0="+000.7312" val1="+000.1609" val2="+000.6629" val3="-001952.8" />
+	<Row1 val0="+000.3196" val1="+000.7778" val2="-000.5412" val3="+001400.6" />
+	<Row2 val0="-000.6027" val1="+000.6076" val2="+000.5173" val3="+001180.1" />
+	<Row3 val0="+00000000" val1="+00000000" val2="+00000000" val3="+00000001" />
+</TrfMat>
