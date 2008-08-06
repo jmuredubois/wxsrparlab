@@ -69,7 +69,7 @@ void *ThreadReadData::Entry()
 		wxCommandEvent event( wxEVT_JMUACQONEFRM, IDC_AcqOne );
 		m_cFrm->AddPendingEvent(event);
 		//m_cFrm->ProcessEvent(event);
-        wxThread::Sleep(500);
+        wxThread::Sleep(100);
     }
 
     return NULL;
@@ -653,7 +653,7 @@ void CamFrame::SetReadMode(wxCommandEvent&(event))
   m_settingsPane->SetText(strR);
 };
 
-
+#ifdef JMU_USE_VTK
 void CamFrame::SetVtkWin(CViewSrVtk *vtkWin, int vtkSub)
 {
 	if( (vtkSub > -1) && (vtkSub < NUMCAMS))
@@ -661,7 +661,7 @@ void CamFrame::SetVtkWin(CViewSrVtk *vtkWin, int vtkSub)
 		_vtkSub = vtkSub;
 	}
 	else{return;};
-#ifdef JMU_USE_VTK
+
 	_vtkWin = vtkWin;
 	if( (vtkSub > -1) && (vtkSub < NUMCAMS))
 	{
@@ -670,8 +670,8 @@ void CamFrame::SetVtkWin(CViewSrVtk *vtkWin, int vtkSub)
 		_camVtk->SetGrayLUT(_vtkWin->GetGrayLUT());
 		_camVtk->SetPlainLUT(_vtkWin->GetRLUT(), _vtkWin->GetGLUT(), _vtkWin->GetBLUT(), _vtkWin->GetWLUT(), _vtkWin->GetKLUT());
 	}
-#endif
 };
+#endif
 
 void CamFrame::OnSetTrfMat(wxCommandEvent& WXUNUSED(event))
 {
