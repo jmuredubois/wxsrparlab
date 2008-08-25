@@ -1,6 +1,10 @@
 package.name = "wxSRparlabVTKPREM"
 package.guid = "F0174772-C16D-4CED-8E0E-3B1348DB3631"
-package.kind = "winexe"
+if (OS == "windows") then
+	package.kind = "winexe"
+else
+	package.kind = "exe"
+end
 package.language = "c++"
 
 package.configs = {"DebugVTK", "ReleaseVTK"}
@@ -125,6 +129,21 @@ tinsert( package.libpaths,
   }
 )
 --END OF package includes for TICPP
+
+--package includes for FFTW
+tinsert(package.config["DebugVTK"].links,   { "libfftw3-3"})
+tinsert(package.config["ReleaseVTK"].links,   { "libfftw3-3"})
+tinsert(package.includepaths,
+  {
+    string.format('%s',os.getenv("JMU_FFTW3"))
+  }
+)
+tinsert( package.libpaths, 
+  {
+    string.format('%s',os.getenv("JMU_FFTW3"))
+  }
+)
+--END OF package includes for FFTW
 
 -- --http://wiki.wxwindows.org/WxMac_Issues
 if (OS == "macosx") then
