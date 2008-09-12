@@ -39,6 +39,13 @@ extern "C" {
 #define SR_API(RETURN) __attribute__ ((visibility("default"))) RETURN
 #endif
 
+#ifndef _WIN32
+typedef int            HWND;
+typedef unsigned short WORD;
+#endif
+typedef unsigned short WORD;
+//typedef int            HWND;
+
 #define _countof(array) (sizeof(array)/sizeof(array[0]))
 #include "srDummyDefines.h"
 
@@ -71,7 +78,7 @@ extern "C" {
 //!
 //!The parent is a HWND window handle.
 //! \return 0: SUCCESSFUL, -1: FAILED
-SR_API(int) SR_OpenDlg(SRCAM* srCam, int mode, HWND parent);
+SR_API(int) SR_OpenDlg(SRCAM* srCam, int mode);//, HWND parent);
 
 //!Opens the Swissranger USB device and returns a device ID.
 //!The serial number is only used, if more than one camera is connected to the computer.\n
@@ -115,7 +122,7 @@ SR_API(int) SR_Close(SRCAM srCam);
 //!Opens a dialog with various settings and information of the camera
 //!The parent is a HWND.
 //!The Window is Non Modal and will be destroyed, if it is closed or if the camera is closed.
-SR_API(int) SR_OpenSettingsDlg(SRCAM srCam, HWND parent);
+SR_API(int) SR_OpenSettingsDlg(SRCAM srCam);//, HWND parent);
 
 //!The mode selects the used filters. It is an ored value of the enumerator #AcquireMode.
 //!The recommended mode is described in #AcquireMode.\n
