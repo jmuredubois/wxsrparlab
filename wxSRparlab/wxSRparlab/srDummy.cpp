@@ -32,9 +32,9 @@
 //!
 //!The parent is a HWND window handle.
 //! \return 0: SUCCESSFUL, -1: FAILED
-SR_API(int) SR_OpenDlg(SRCAM* srCam, int mode, HWND parent)
+SR_API(int) SR_OpenDlg(SRCAM* srCam, int mode)//, HWND parent)
 {
-	return 0;
+	return -7;
 }
 
 //!Opens the Swissranger USB device and returns a device ID.
@@ -42,7 +42,7 @@ SR_API(int) SR_OpenDlg(SRCAM* srCam, int mode, HWND parent)
 //!Setting the serialNumber to 0 opens the first found camera
 SR_API(int) SR_OpenUSB(SRCAM* srCam, unsigned int serialNumber)
 {
-	return 0;
+	return -7;
 }
 
 //!Opens the Swissranger Ethernet device and returns a device ID.
@@ -50,14 +50,14 @@ SR_API(int) SR_OpenUSB(SRCAM* srCam, unsigned int serialNumber)
 //! \n\intDoc{function}
 SR_API(int) SR_OpenETH(SRCAM* srCam,  const char* addr)
 {
-	return 0;
+	return -7;
 }
 
 //!Opens the Swissranger Firewire device and returns a device ID.
 //! \n\intDoc{function}
 SR_API(int) SR_Open1394(SRCAM* srCam, int camID)
 {
-	return 0;
+	return -7;
 }
 
 //!Opens the Swissranger File and returns a virtual device ID.
@@ -65,7 +65,7 @@ SR_API(int) SR_Open1394(SRCAM* srCam, int camID)
 //!Any settings that affect the data sent from the camera will be ignored.
 SR_API(int) SR_OpenFile(SRCAM* srCam, const char* filename)
 {
-	return 0;
+	return -7;
 }
 
 //!SR_StreamToFile opens a file and streams received Data from the camera to that file.
@@ -76,7 +76,7 @@ SR_API(int) SR_OpenFile(SRCAM* srCam, const char* filename)
 //!- 2 : Close
 SR_API(int) SR_StreamToFile(SRCAM srCam, const char* filename, int mode)
 {
-	return 0;
+	return -7;
 }
 
 //! Closes the swissranger device, first releasing the claimed
@@ -91,29 +91,29 @@ SR_API(int) SR_StreamToFile(SRCAM srCam, const char* filename, int mode)
 //! -3 can't close device
 SR_API(int) SR_Close(SRCAM srCam)
 {
-	return 0;
+	return -7;
 }
 
 //!Opens a dialog with various settings and information of the camera
 //!The parent is a HWND.
 //!The Window is Non Modal and will be destroyed, if it is closed or if the camera is closed.
-SR_API(int) SR_OpenSettingsDlg(SRCAM srCam, HWND parent)
+SR_API(int) SR_OpenSettingsDlg(SRCAM srCam)//, HWND parent)
 {
-	return 0;
+	return -7;
 }
 
 //!The mode selects the used filters. It is an ored value of the enumerator #AcquireMode.
 //!The recommended mode is described in #AcquireMode.\n
 SR_API(int) SR_SetMode(SRCAM srCam, int mode)
 {
-	return 0;
+	return -7;
 }
 
 //!Returns the current mode setting. It is an ored value of the enumerator #AcquireMode.
 //!\sa SR_SetMode\n
 SR_API(int) SR_GetMode(SRCAM srCam)
 {
-	return 0;
+	return -7;
 }
 
 //!SR_Acquire() triggers image acquisition on the camera and transfers the data from the camera to the PC.
@@ -126,7 +126,7 @@ SR_API(int) SR_GetMode(SRCAM srCam)
 //!\sa SR_GetImageList()
 SR_API(int) SR_Acquire(SRCAM srCam)
 {
-	return 0;
+	return -7;
 }
 
 //!Transforms spherical coordinates to cartesian coordinates.
@@ -137,7 +137,7 @@ SR_API(int) SR_Acquire(SRCAM srCam)
 //!\sa SR_CoordTrfFlt()
 SR_API(int) SR_CoordTrfUint16(SRCAM srCam, short *x, short *y, unsigned short *z, int pitchX,int pitchY,int pitchZ)
 {
-	return 0;
+	return -7;
 }
 
 //!Transforms spherical coordinates to cartesian coordinates.
@@ -149,7 +149,7 @@ SR_API(int) SR_CoordTrfUint16(SRCAM srCam, short *x, short *y, unsigned short *z
 //!This allows the user to perform processing on the range data before the coordinate transformation is calculated.
 SR_API(int) SR_CoordTrfFlt(SRCAM srCam, float *x,float *y,float *z, int pitchX,int pitchY,int pitchZ)
 {
-	return 0;
+	return -7;
 }
 
 //!Transforms spherical coordinates to cartesian coordinates.
@@ -159,7 +159,7 @@ SR_API(int) SR_CoordTrfFlt(SRCAM srCam, float *x,float *y,float *z, int pitchX,i
 //!\sa SR_CoordTrfFlt()
 SR_API(int) SR_CoordTrfDbl(SRCAM srCam, double *x,double *y,double *z, int pitchX,int pitchY,int pitchZ)
 {
-	return 0;
+	return -7;
 }
 
 //!Full documentation of the mode is not provided to the customer.
@@ -169,13 +169,13 @@ SR_API(int) SR_CoordTrfDbl(SRCAM srCam, double *x,double *y,double *z, int pitch
 //!-if mode & 2 it also informs about version entries with no info tag
 SR_API(int) SR_CheckForNewDllVersion(int mode)
 {
-	return 0;
+	return -7;
 }
 
 //!returns the version of this libusbSR library.
 SR_API(int) SR_GetVersion(unsigned short version[4])
 {
-	return 0;
+	return -7;
 }
 
 //!SR_SetCallback() can set a user callback function of type \ref SR_FuncCB that is called on special events.
@@ -205,7 +205,7 @@ SR_API (SR_FuncCB*) SR_GetDefaultCallback();
 //!\endverbatim
 SR_API(int) SR_GetDeviceString(SRCAM srCam, char* buf, int buflen)
 {
-	return 0;
+	return -7;
 }
 
 //!sets the timeout in ms. This timeout is used at reading and writing on USB port.
@@ -239,7 +239,7 @@ SR_API(void*) SR_GetImage(SRCAM srCam, unsigned char idx)
 //!\sa  SR_GetRows(), SR_GetCols(), SR_GetImage()
 SR_API(int) SR_GetImageList(SRCAM srCam, ImgEntry** imgEntryArray)
 {
-	return 0;
+	return -7;
 }
 
 //!Sets the Integration time of the camera
@@ -255,7 +255,7 @@ SR_API(int) SR_GetImageList(SRCAM srCam, ImgEntry** imgEntryArray)
 //! \sa SR_GetIntegrationTime()
 SR_API(int) SR_SetIntegrationTime(SRCAM srCam, unsigned char intTime)
 {
-	return 0;
+	return -7;
 }
 
 //!Gets the Integration time of the camera
@@ -264,7 +264,7 @@ SR_API(int) SR_SetIntegrationTime(SRCAM srCam, unsigned char intTime)
 //! \sa SR_SetIntegrationTime()
 SR_API(unsigned char) SR_GetIntegrationTime(SRCAM srCam)
 {
-	return 0;
+	return -7;
 }
 
 //!Sets the Amplitude Threshold of the camera.
@@ -273,14 +273,14 @@ SR_API(unsigned char) SR_GetIntegrationTime(SRCAM srCam)
 //! \sa SR_GetAmplitudeThreshold()
 SR_API(int) SR_SetAmplitudeThreshold(SRCAM srCam, unsigned short val)
 {
-	return 0;
+	return -7;
 }
 
 //!Gets the Amplitude Threshold of the camera
 //! \sa SR_SetAmplitudeThreshold()
 SR_API(unsigned short) SR_GetAmplitudeThreshold(SRCAM srCam)
 {
-	return 0;
+	return -7;
 }
 
 //!Sets the modulation of the LEDs that will changes the measurement range.
@@ -294,14 +294,14 @@ SR_API(unsigned short) SR_GetAmplitudeThreshold(SRCAM srCam)
 //!\return this function returns a negative value if it fails.
 SR_API(int) SR_SetModulationFrequency(SRCAM srCam, ModulationFrq modFrq)
 {
-	return 0;
+	return -7;
 }
 
 //!Gets the modulation frequency of the LEDs. This determins the measurement range.
 //!\sa SR_SetModulationFrequency()
 SR_API(ModulationFrq) SR_GetModulationFrequency(SRCAM srCam)
 {
-	return 0;
+	return MF_LAST;
 }
 
 //!Sets the Distance Offset. This function should only be used on SR2 cameras.
@@ -309,7 +309,7 @@ SR_API(ModulationFrq) SR_GetModulationFrequency(SRCAM srCam)
 //!\sa SR_GetDistanceOffset()
 SR_API(int) SR_SetDistanceOffset(SRCAM srCam, unsigned short distOfs)
 {
-	return 0;
+	return -7;
 }
 
 //!Gets the Distance Offset.  This function should only be used on SR2 cameras.
@@ -317,7 +317,7 @@ SR_API(int) SR_SetDistanceOffset(SRCAM srCam, unsigned short distOfs)
 //!\sa SR_SetDistanceOffset()
 SR_API(unsigned short) SR_GetDistanceOffset(SRCAM srCam)
 {
-	return 0;
+	return -7;
 }
 
 //!Turns the Autoillumination on/off and set the desired parameters.
@@ -331,7 +331,7 @@ SR_API(unsigned short) SR_GetDistanceOffset(SRCAM srCam)
 SR_API(int) SR_SetAutoIllumination(SRCAM srCam, unsigned char minIntTime, unsigned char maxIntTime,
                                    unsigned char percentOverPos, unsigned char desiredPos)
 								   {
-	return 0;
+	return -7;
 }
 
 //!Sets a desired register value of the camera. The register values are given to the customer only for special usages.
@@ -347,20 +347,20 @@ SR_API(int) SR_SetAutoIllumination(SRCAM srCam, unsigned char minIntTime, unsign
 //!\warning <b>This must not be used without explicit instructions from Mesa-Imaging</b>
 SR_API(int) SR_SetReg(SRCAM srCam, unsigned char reg, unsigned char val)
 {
-	return 0;
+	return -7;
 }
 
 //!Returns a desired register value of the camera.
 //!\sa SR_SetReg()
 SR_API(unsigned char)  SR_GetReg(SRCAM srCam, unsigned char reg)
 {
-	return 0;
+	return -7;
 }
 
 //!Returns the serial number (if existing) of the camera
 SR_API(unsigned int) SR_ReadSerial(SRCAM srCam)
 {
-	return 0;
+	return -7;
 }
 //!@}
 
