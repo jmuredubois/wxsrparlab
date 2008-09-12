@@ -241,7 +241,7 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   if(m_sr == NULL)
   {
 	  res = -1;
-		res = SR_OpenUSB(& m_sr);
+		res = SR_OpenUSB(& m_sr, 0); // opens first found camera
 		//Returns the serial number (if existing) of the camera
   }
   strR.sprintf(wxT("cam open %u"), res); // ... change title text ...
@@ -364,20 +364,24 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 
   if(m_sr != NULL)
   {
-	  m_nSrBufSz = (int) SR_GetBufferSize(m_sr); 
+	  //m_nSrBufSz = (int) SR_GetBufferSize(m_sr); 
 	  m_nCols = (int) SR_GetCols(m_sr); 
 	  m_nRows = (int) SR_GetRows(m_sr); 
+	  m_nSrBufSz = m_nCols * m_nRows *sizeof(WORD)*2 ;  //2 images
 	  strR.sprintf(wxT("cam serial %u - %ix%i  - %i"), serial, m_nRows, m_nCols, m_nSrBufSz); // ... change text ...
 	  wxMutexError errMutex= m_mutexSrBuf->Lock();
 	  if(errMutex == wxMUTEX_NO_ERROR)
 	  {
 		m_pSrBuf = (unsigned char*) malloc(m_nSrBufSz);
 		memset(m_pSrBuf, 0x77, m_nSrBufSz);
-		m_pSrZ = (unsigned short*) malloc(m_nCols*m_nRows*2); memset((void*)m_pSrZ, 0x77, m_nCols*m_nRows*2);
-		m_pSrY = (short*) malloc(m_nCols*m_nRows*2); memset((void*)m_pSrY, 0x55, m_nCols*m_nRows*2);
-		m_pSrX = (short*) malloc(m_nCols*m_nRows*2); memset((void*)m_pSrX, 0x33, m_nCols*m_nRows*2);
-		res = SR_SetBuffer(m_sr, (void*) m_pSrBuf , m_nSrBufSz);
-		res = SR_Acquire(m_sr, AM_COR_FIX_PTRN );//|| AM_COR_LED_NON_LIN );
+		m_pSrZ = (unsigned short*) malloc(m_nCols*m_nRows*(sizeof(unsigned short))); memset((void*)m_pSrZ, 0x77, m_nCols*m_nRows*(sizeof(unsigned short)));
+		m_pSrY = (short*) malloc(m_nCols*m_nRows*(sizeof(short))); memset((void*)m_pSrY, 0x55, m_nCols*m_nRows*(sizeof(short)));
+		m_pSrX = (short*) malloc(m_nCols*m_nRows*(sizeof(short))); memset((void*)m_pSrX, 0x33, m_nCols*m_nRows*(sizeof(short)));
+		//res = SR_SetBuffer(m_sr, (void*) m_pSrBuf , m_nSrBufSz);
+		res = SR_SetMode(m_sr, AM_COR_FIX_PTRN ); //|| AM_COR_LED_NON_LIN );
+		res = SR_Acquire(m_sr);
+		memcpy( (void*) m_pSrBuf, SR_GetImage(m_sr,0), m_nRows*m_nCols*sizeof(unsigned short));
+		memcpy( (void*) (&m_pSrBuf[m_nRows*m_nCols]), SR_GetImage(m_sr,1), m_nRows*m_nCols*sizeof(unsigned short));
 	    errMutex = m_mutexSrBuf->Unlock();
 	  } //{errMutex == wxMUTEX_NO_ERROR)
 
@@ -523,7 +527,10 @@ void CamFrame::AcqOneFrm()
 	  wxMutexError errMutex= m_mutexSrBuf->Lock();
 	  if(errMutex == wxMUTEX_NO_ERROR)
 	  {
-	    res = SR_Acquire(m_sr, AM_COR_FIX_PTRN );
+	    res = SR_SetMode(m_sr, AM_COR_FIX_PTRN ); //|| AM_COR_LED_NON_LIN );
+		res = SR_Acquire(m_sr);
+		memcpy( (void*) m_pSrBuf, SR_GetImage(m_sr,0), m_nRows*m_nCols*sizeof(unsigned short));
+		memcpy( (void*) (&m_pSrBuf[m_nRows*m_nCols]), SR_GetImage(m_sr,1), m_nRows*m_nCols*sizeof(unsigned short));
 		CoordTrf();
 	    errMutex = m_mutexSrBuf->Unlock();
 	  } //{errMutex == wxMUTEX_NO_ERROR)
