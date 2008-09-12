@@ -8,7 +8,7 @@
 
 #pragma once
 
-//#define DUMMYSR //!< use this flag to disable SR fcts
+#define DUMMYSR //!< use this flag to disable SR fcts
 
 #ifndef DUMMYSR
     #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
