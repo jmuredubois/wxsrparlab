@@ -49,20 +49,8 @@ CamVtkView::CamVtkView(int vtkSub, vtkRenderWindow* ParRenWin, vtkLookupTable* L
 	rLUT = LUT; gLUT = LUT; bLUT = LUT; wLUT = LUT; kLUT = LUT;
 
 	#ifdef JMU_TGTFOLLOW
-		tgtLine = vtkLineSource::New();
-		tgtLine->SetPoint1(camTranMat->GetElement(0,3),camTranMat->GetElement(1,3),camTranMat->GetElement(2,3));
-		tgtLine->SetPoint2(camTranMat->GetElement(0,3),camTranMat->GetElement(1,3),camTranMat->GetElement(2,3));
-		tgtLineMapper = vtkPolyDataMapper::New();
-		tgtLineMapper->SetInputConnection(tgtLine->GetOutputPort());
-		tgtLineActor = vtkActor::New();
-		tgtLineActor->SetMapper(tgtLineMapper);
-		tgtLineActor->GetProperty()->SetColor(0.0,0.0,1.0);	//!< HARDCODED SR CAMERA COLOR
-		tgtLineActor->GetProperty()->SetLineWidth(5.0f);
-		if(_vtkSub==0){ tgtLineActor->GetProperty()->SetColor(0.0,0.0,1.0); }; // BLUE for 0-th cam
-		if(_vtkSub==1){ tgtLineActor->GetProperty()->SetColor(1.0,0.0,0.0); }; // RED  for 1-st add cam
-		if(_vtkSub==2){ tgtLineActor->GetProperty()->SetColor(0.0,1.0,0.0); }; // GREENfor 2-nd add cam
-		if(_vtkSub==3){ tgtLineActor->GetProperty()->SetColor(0.7,0.0,0.7); }; // PURPLfor 3-rd add cam
-		renderer->AddActor(tgtLineActor);
+		// add a target actor
+		addTgtAct();
 	#endif
 
 #ifndef VTKNOTRANSFORM
@@ -96,9 +84,8 @@ CamVtkView::~CamVtkView()
 	BGdataWriter->Delete();
 	dataWriter->Delete();
 	#ifdef JMU_TGTFOLLOW
-	  tgtLine->Delete();
-	  tgtLineMapper->Delete();
-	  tgtLineActor->Delete();
+	  // free tgt actor
+	  res+= freeTgtAct();
 	#endif
 	// free data actor
 	res+= freeBGDataAct();
@@ -1001,16 +988,90 @@ int CamVtkView::updateTarget()
 	}
 	return res;
 }
+#endif
+#ifdef JMU_TGTFOLLOW
 int CamVtkView::updateTarget(float *ptsF, int nCoord)
 {
 	int res = 0;
-	if ( (nCoord != 3) && (nCoord !=5)) {return -1;} ; // return if wrong number of coord is passed
+	if ( (nCoord != 3) && (nCoord !=15)) {return -1;} ; // return if wrong number of coord is passed
 	if((tgtLine != NULL) && (ptsF != NULL))
 	{
 		tgtLine->SetPoint2((double) ptsF[0],(double) ptsF[1],(double) ptsF[2]);
 		tgtLine->Modified();
 		//renWin->Render();
+		if(nCoord==15)
+		{
+			for(int k=0; k<4; k++)
+			{
+				tgtQuadPoints->SetPoint(k, ptsF[(3*(k+1))+0],(double) ptsF[(3*(k+1))+1],(double) ptsF[(3*(k+1))+2]);
+			}
+			tgtQuadPoints->Modified();
+		}
 	}
 	return res;
+}
+#endif
+#ifdef JMU_TGTFOLLOW
+int CamVtkView::addTgtAct()
+{
+	int res = 0;
+	tgtLine = vtkLineSource::New();
+	tgtLine->SetPoint1(camTranMat->GetElement(0,3),camTranMat->GetElement(1,3),camTranMat->GetElement(2,3));
+	tgtLine->SetPoint2(camTranMat->GetElement(0,3),camTranMat->GetElement(1,3),camTranMat->GetElement(2,3));
+	tgtLineMapper = vtkPolyDataMapper::New();
+	tgtLineMapper->SetInputConnection(tgtLine->GetOutputPort());
+	tgtLineActor = vtkActor::New();
+	tgtLineActor->SetMapper(tgtLineMapper);
+	tgtLineActor->GetProperty()->SetColor(0.0,0.0,1.0);	//!< HARDCODED SR CAMERA COLOR
+	tgtLineActor->GetProperty()->SetLineWidth(5.0f);
+	if(_vtkSub==0){ tgtLineActor->GetProperty()->SetColor(0.0,0.0,1.0); }; // BLUE for 0-th cam
+	if(_vtkSub==1){ tgtLineActor->GetProperty()->SetColor(1.0,0.0,0.0); }; // RED  for 1-st add cam
+	if(_vtkSub==2){ tgtLineActor->GetProperty()->SetColor(0.0,1.0,0.0); }; // GREENfor 2-nd add cam
+	if(_vtkSub==3){ tgtLineActor->GetProperty()->SetColor(0.7,0.0,0.7); }; // PURPLfor 3-rd add cam
+	renderer->AddActor(tgtLineActor);
+
+	tgtQuadPoints = vtkPoints::New();
+	tgtQuadPoints->SetNumberOfPoints(4);
+	tgtQuadPoints->InsertPoint(0, 0.0, 0.0,0.0);
+	tgtQuadPoints->InsertPoint(1, 1.0, 0.0,0.0);
+	tgtQuadPoints->InsertPoint(2, 1.0, 1.0,0.0);
+	tgtQuadPoints->InsertPoint(3, 0.0, 1.0,0.0);
+	tgtQuad = vtkQuad::New();
+	tgtQuad->GetPointIds()->SetNumberOfIds(4);
+	for(int k=0; k<4; k++)
+	{
+		tgtQuad->GetPointIds()->SetId(k, k);
+	}
+	tgtQuadGrid = vtkUnstructuredGrid::New();
+	tgtQuadGrid->Allocate(1,1);
+	tgtQuadGrid->InsertNextCell(tgtQuad->GetCellType(), tgtQuad->GetPointIds());
+	tgtQuadGrid->SetPoints(tgtQuadPoints);
+	tgtQuadMapper = vtkDataSetMapper::New();
+	tgtQuadMapper->SetInput(tgtQuadGrid);
+	tgtQuadActor = vtkActor::New();
+	tgtQuadActor->SetMapper(tgtQuadMapper);
+	tgtQuadActor->GetProperty()->SetOpacity(0.5); //transparency
+	if(_vtkSub==0){ tgtQuadActor->GetProperty()->SetColor(0.0,0.0,1.0); }; // BLUE for 0-th cam
+	if(_vtkSub==1){ tgtQuadActor->GetProperty()->SetColor(1.0,0.0,0.0); }; // RED  for 1-st add cam
+	if(_vtkSub==2){ tgtQuadActor->GetProperty()->SetColor(0.0,1.0,0.0); }; // GREENfor 2-nd add cam
+	if(_vtkSub==3){ tgtQuadActor->GetProperty()->SetColor(0.7,0.0,0.7); }; // PURPLfor 3-rd add cam
+	renderer->AddActor(tgtQuadActor);
+	
+	return res;
+}
+#endif
+#ifdef JMU_TGTFOLLOW
+int CamVtkView::freeTgtAct()
+{
+	int res = tgtLineActor->GetReferenceCount();
+	tgtLine->Delete();
+	tgtLineMapper->Delete();
+	tgtLineActor->Delete();
+
+	tgtQuadPoints->Delete();
+	tgtQuad->Delete();
+	tgtQuadMapper->Delete();
+	tgtQuadActor->Delete();
+	return res-1;
 }
 #endif
