@@ -55,7 +55,7 @@ int CamPanelSettings::InitSettings()
         wxT("Spatial filter"), wxDefaultPosition, wxDefaultSize,
         2, srFilter, 0, wxRA_SPECIFY_COLS);
 
-	wxString strReadMode[] = { wxT("Continuous"), wxT("1 frame")};
+	wxString strReadMode[] = { wxT("1 frame"), wxT("Continuous") };
 
     m_radioboxReadMode = new wxRadioBox(this, IDR_ReadMode, wxT("Read mode"),
         wxDefaultPosition, wxDefaultSize, 2, strReadMode, 2, wxRA_SPECIFY_COLS);
