@@ -526,7 +526,8 @@ void CamFrame::AcqOneFrm()
 			}
 			else
 			{
-				_camVtk->updateTarget(&(tgt[0]), 3);
+				//_camVtk->updateTarget(&(tgt[0]), 3); // to update only line
+				_camVtk->updateTarget(&(tgt[0]), 15); // to update line and quad
 			}
 		}
 	  #endif

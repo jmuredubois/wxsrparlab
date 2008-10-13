@@ -15,6 +15,7 @@
 #include "vtkLineSource.h"			// requires $(JMU_VTKSRCBASE)/Graphics
 #include "vtkPolyDataMapper.h"		// requires $(JMU_VTKSRCBASE)/Rendering
 #include "vtkRenderWindow.h"		// requires $(JMU_VTKSRCBASE)/Rendering
+#include "vtkDataSetMapper.h"		// requires $(JMU_VTKSRCBASE)/Rendering
 #include "vtkRenderWindowInteractor.h"	// requires $(JMU_VTKSRCBASE)/Rendering
 #include "vtkRenderer.h"		// requires $(JMU_VTKSRCBASE)/Rendering
 #include "vtkFloatArray.h"		// requires $(JMU_VTKSRCBASE)/Common
@@ -22,7 +23,9 @@
 
 #include "vtkStructuredGridGeometryFilter.h"	// requires $(JMU_VTKSRCBASE)/Graphics
 #include "vtkStructuredGrid.h"	// requires $(JMU_VTKSRCBASE)/Filtering
+#include "vtkUnstructuredGrid.h"	// requires $(JMU_VTKSRCBASE)/Filtering
 #include "vtkDataSetToStructuredGridFilter.h"	// requires $(JMU_VTKSRCBASE)/Filtering
+#include "vtkQuad.h"	// requires $(JMU_VTKSRCBASE)/Filtering
 #include "vtkXMLStructuredGridReader.h"	// requires $(JMU_VTKSRCBASE)/IO
 #include "vtkProperty.h"		// requires $(JMU_VTKSRCBASE)/Rendering
 #include "vtkOutlineFilter.h"	// requires $(JMU_VTKSRCBASE)/Graphics
@@ -112,6 +115,13 @@ private:
     vtkLineSource		*tgtLine; //! target line
 	vtkPolyDataMapper	*tgtLineMapper; //!
 	vtkActor			*tgtLineActor;
+	vtkPoints			*tgtQuadPoints;
+	vtkQuad				*tgtQuad;
+	vtkUnstructuredGrid	*tgtQuadGrid;
+	vtkDataSetMapper	*tgtQuadMapper;
+	vtkActor			*tgtQuadActor;
+	int addTgtAct();
+	int freeTgtAct();
   #endif
 
   vtkLookupTable	*depthLUT;	//!< LUT for depth data display
