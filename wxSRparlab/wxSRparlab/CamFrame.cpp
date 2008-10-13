@@ -511,11 +511,10 @@ void CamFrame::AcqOneFrm()
 	  #ifdef JMU_TGTFOLLOW  
 		if(m_pFile4TgtCoord != NULL) 
 		{
-			float frmCntFl, xTgt, yTgt, zTgt;
+			float frmCntFl;
+			float tgt[15];
 			res  =m_pFile4TgtCoord->Read(&frmCntFl, sizeof(float));
-			res  =m_pFile4TgtCoord->Read(&xTgt, sizeof(float));
-			res  =m_pFile4TgtCoord->Read(&yTgt, sizeof(float));
-			res  =m_pFile4TgtCoord->Read(&zTgt, sizeof(float));
+			res  =m_pFile4TgtCoord->Read(&tgt, 15*sizeof(float));
 			if( m_pFile4TgtCoord->Eof() )  
 			{
 			  res = m_pFile4TgtCoord->Seek(0, wxFromStart);
@@ -527,7 +526,7 @@ void CamFrame::AcqOneFrm()
 			}
 			else
 			{
-				_camVtk->updateTarget(xTgt, yTgt, zTgt);
+				_camVtk->updateTarget(&(tgt[0]), 3);
 			}
 		}
 	  #endif
