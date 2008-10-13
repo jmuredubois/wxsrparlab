@@ -1001,4 +1001,16 @@ int CamVtkView::updateTarget()
 	}
 	return res;
 }
+int CamVtkView::updateTarget(float *ptsF, int nCoord)
+{
+	int res = 0;
+	if ( (nCoord != 3) && (nCoord !=5)) {return -1;} ; // return if wrong number of coord is passed
+	if((tgtLine != NULL) && (ptsF != NULL))
+	{
+		tgtLine->SetPoint2((double) ptsF[0],(double) ptsF[1],(double) ptsF[2]);
+		tgtLine->Modified();
+		//renWin->Render();
+	}
+	return res;
+}
 #endif

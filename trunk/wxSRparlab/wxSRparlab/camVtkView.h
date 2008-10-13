@@ -68,6 +68,7 @@ public:
 	  int setTgtFile(char* fn);
 	  int updateTarget(float x, float y, float z);
 	  int updateTarget(); //overloaded operator to reset to camera center
+	  int updateTarget(float *ptsF, int nCoord);
 	#endif
 
 	//int updateTOFcurrent(SRCAM sr, SRPARLAB srPL, int vtkSub){};
