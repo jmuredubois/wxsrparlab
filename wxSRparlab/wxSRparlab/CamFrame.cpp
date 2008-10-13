@@ -110,9 +110,9 @@ CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos
 	_vtkWin=NULL;
 	_camVtk = NULL;
 #endif
-	//#ifdef JMU_TGTFOLLOW  
+	#ifdef JMU_TGTFOLLOW  
 		m_pFile4TgtCoord = NULL; 
-	//#endif
+	#endif
 	_vtkSub = 0;
 }
 
@@ -464,6 +464,7 @@ void CamFrame::Acquire(wxCommandEvent& WXUNUSED(event))
 		m_viewZPane->SetBtnTxtStop();			// ...
 		m_viewYPane->SetBtnTxtStop();			// ...
 		m_viewXPane->SetBtnTxtStop();			// ...
+		m_settingsPane->SetBtnTxtStop();		// ...
 		m_settingsPane->DisableRadioFilt();	// disable filter selection
 		m_settingsPane->DisableRadioFrq();	// disable frequency selection
 
@@ -481,6 +482,7 @@ void CamFrame::Acquire(wxCommandEvent& WXUNUSED(event))
 		m_viewZPane->SetBtnTxtAcqu();			// ...
 		m_viewYPane->SetBtnTxtAcqu();			// ...
 		m_viewXPane->SetBtnTxtAcqu();			// ...
+		m_settingsPane->SetBtnTxtAcqu();		// ...
 		m_settingsPane->EnableRadioFilt();	// enable filter selection
 		m_settingsPane->EnableRadioFrq();	// enable frequency selection
 
@@ -741,10 +743,10 @@ void CamFrame::OnSetTrfMat(wxCommandEvent& WXUNUSED(event))
 #endif
 }
 
-
+#ifdef JMU_TGTFOLLOW
 void CamFrame::OnTgtFile(wxCommandEvent& WXUNUSED(event))
 {
-  #ifdef JMU_TGTFOLLOW
+  //#ifdef JMU_TGTFOLLOW
 
   //logPrintf("swissrangerTester: SR_Open device");
   m_settingsPane->SetText(wxT("Modify camera target file"));
@@ -767,5 +769,6 @@ void CamFrame::OnTgtFile(wxCommandEvent& WXUNUSED(event))
   delete(OpenDialogTgt);
   
   m_settingsPane->SetText(wxT("Opened target file"));
-  #endif
+  //#endif
 }
+#endif
