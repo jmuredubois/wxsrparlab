@@ -48,6 +48,23 @@ CamVtkView::CamVtkView(int vtkSub, vtkRenderWindow* ParRenWin, vtkLookupTable* L
 	grayLUT = LUT;
 	rLUT = LUT; gLUT = LUT; bLUT = LUT; wLUT = LUT; kLUT = LUT;
 
+	#ifdef JMU_TGTFOLLOW
+		tgtLine = vtkLineSource::New();
+		tgtLine->SetPoint1(0.0,0.0,0.0);
+		tgtLine->SetPoint2(0.0,0.0,0.0);
+		tgtLineMapper = vtkPolyDataMapper::New();
+		tgtLineMapper->SetInputConnection(tgtLine->GetOutputPort());
+		tgtLineActor = vtkActor::New();
+		tgtLineActor->SetMapper(tgtLineMapper);
+		tgtLineActor->GetProperty()->SetColor(0.0,0.0,1.0);	//!< HARDCODED SR CAMERA COLOR
+		tgtLineActor->GetProperty()->SetLineWidth(5.0f);
+		if(_vtkSub==0){ tgtLineActor->GetProperty()->SetColor(0.0,0.0,1.0); }; // BLUE for 0-th cam
+		if(_vtkSub==1){ tgtLineActor->GetProperty()->SetColor(1.0,0.0,0.0); }; // RED  for 1-st add cam
+		if(_vtkSub==2){ tgtLineActor->GetProperty()->SetColor(0.0,1.0,0.0); }; // GREENfor 2-nd add cam
+		if(_vtkSub==3){ tgtLineActor->GetProperty()->SetColor(0.7,0.0,0.7); }; // PURPLfor 3-rd add cam
+		renderer->AddActor(tgtLineActor);
+	#endif
+
 #ifndef VTKNOTRANSFORM
 	char strTrfFile[512];
 	sprintf(strTrfFile, "camTranMats/camTrfMat_mostRecent_cam%02i.xml", _vtkSub);
@@ -78,6 +95,11 @@ CamVtkView::~CamVtkView()
 
 	BGdataWriter->Delete();
 	dataWriter->Delete();
+	#ifdef JMU_TGTFOLLOW
+	  tgtLine->Delete();
+	  tgtLineMapper->Delete();
+	  tgtLineActor->Delete();
+	#endif
 	// free data actor
 	res+= freeBGDataAct();
 	// free data actor
@@ -133,6 +155,12 @@ int CamVtkView::setTrfMat(char* fn)
 	camTran->Modified();
 	srCube->SetCenter( camTranMat->GetElement(0,3),  camTranMat->GetElement(1,3),  camTranMat->GetElement(2,3));
 	srLabelActor->SetPosition( camTranMat->GetElement(0,3),  camTranMat->GetElement(1,3),  camTranMat->GetElement(2,3));
+	#ifdef JMU_TGTFOLLOW
+		if( tgtLine != NULL)
+		{
+			tgtLine->SetPoint1(camTranMat->GetElement(0,3),camTranMat->GetElement(1,3),camTranMat->GetElement(2,3));
+		}
+	#endif
 	return res;
 }
 
@@ -852,12 +880,19 @@ void CamVtkView::hideDataAct(bool doHide)
 		dataActor->VisibilityOff();
 		srCubeActor->VisibilityOff();
 		srLabelActor->VisibilityOff();
+		#ifdef JMU_TGTFOLLOW 
+			tgtLineActor->VisibilityOff();
+		#endif
+
 	}
 	else
 	{ 
 		dataActor->VisibilityOn();
 		srCubeActor->VisibilityOn();
 		srLabelActor->VisibilityOn();
+		#ifdef JMU_TGTFOLLOW 
+			tgtLineActor->VisibilityOn(); 
+		#endif
 	}
 }
 
@@ -927,4 +962,29 @@ void CamVtkView::setDataMapperColorK()
 {
 	dataMapperAmp->SetLookupTable(kLUT);  // sets color
 	dataActor->SetMapper(dataMapperAmp);
+}
+
+
+int CamVtkView::setTgtFile(char* fn)
+{
+	int res = 0;
+	#ifdef JMU_TGTFOLLOW
+	#endif
+	return res;
+}
+
+/**
+ * Updates the TOF points
+ */
+int CamVtkView::updateTarget(float x, float y, float z)
+{
+	int res = 0;
+	#ifdef JMU_TGTFOLLOW
+	//if(!sr){return -1;};
+
+	tgtLine->SetPoint2((double) x,(double) y,(double) z);
+	tgtLine->Modified();
+	//renWin->Render();
+	#endif
+	return res;
 }

@@ -64,6 +64,9 @@ public:
 	void AcqOneFrmEvt(wxCommandEvent& WXUNUSED(event));
 	void CoordTrf();
 	void OnSetTrfMat(wxCommandEvent& WXUNUSED(event));
+	//#ifdef JMU_TGTFOLLOW 
+		void OnTgtFile(wxCommandEvent& WXUNUSED(event)); 
+	//#endif
 #ifdef JMU_USE_VTK
 	void SetVtkWin(CViewSrVtk *vtkWin, int vtkSub);
 	CamVtkView* GetCamVtk(){return _camVtk;};
@@ -105,6 +108,9 @@ private:
 	CViewSrVtk	*_vtkWin ; //!< pointer to vtk window
 	CamVtkView *_camVtk; //!< point to vtk camera structure
 #endif
+	//#ifdef JMU_TGTFOLLOW  
+		wxFFile*		m_pFile4TgtCoord; 
+	//#endif
 	int _vtkSub;
 
 public:
@@ -123,7 +129,8 @@ enum CamFrameEnum
 	IDR_Freq = 7,
 	IDR_ReadMode = 8,
 	IDB_SetTrfMat = 9,
-	IDC_AcqOne = 10, 
+	IDC_AcqOne = 10,
+	IDB_TgtFile = 11,
 	ID_ThisIsAStop = 255
 };
 
