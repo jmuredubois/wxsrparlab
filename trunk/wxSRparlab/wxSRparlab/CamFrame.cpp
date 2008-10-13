@@ -516,6 +516,11 @@ void CamFrame::AcqOneFrm()
 			res  =m_pFile4TgtCoord->Read(&xTgt, sizeof(float));
 			res  =m_pFile4TgtCoord->Read(&yTgt, sizeof(float));
 			res  =m_pFile4TgtCoord->Read(&zTgt, sizeof(float));
+			if( m_pFile4TgtCoord->Eof() )  
+			{
+			  res = m_pFile4TgtCoord->Seek(0, wxFromStart);
+			  _camVtk->updateTarget();
+			}
 			if( ((int) frmCntFl) != m_nFrmRead )
 			{
 				res = m_pFile4TgtCoord->Seek(0, wxFromStart);
@@ -523,11 +528,6 @@ void CamFrame::AcqOneFrm()
 			else
 			{
 				_camVtk->updateTarget(xTgt, yTgt, zTgt);
-			}
-			if( m_pFile4TgtCoord->Eof() )  
-			{
-			  res = m_pFile4TgtCoord->Seek(0, wxFromStart);
-			  _camVtk->updateTarget(0.0f, 0.0f, 0.0f);
 			}
 		}
 	  #endif

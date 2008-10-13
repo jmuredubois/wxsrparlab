@@ -50,8 +50,8 @@ CamVtkView::CamVtkView(int vtkSub, vtkRenderWindow* ParRenWin, vtkLookupTable* L
 
 	#ifdef JMU_TGTFOLLOW
 		tgtLine = vtkLineSource::New();
-		tgtLine->SetPoint1(0.0,0.0,0.0);
-		tgtLine->SetPoint2(0.0,0.0,0.0);
+		tgtLine->SetPoint1(camTranMat->GetElement(0,3),camTranMat->GetElement(1,3),camTranMat->GetElement(2,3));
+		tgtLine->SetPoint2(camTranMat->GetElement(0,3),camTranMat->GetElement(1,3),camTranMat->GetElement(2,3));
 		tgtLineMapper = vtkPolyDataMapper::New();
 		tgtLineMapper->SetInputConnection(tgtLine->GetOutputPort());
 		tgtLineActor = vtkActor::New();
@@ -159,6 +159,7 @@ int CamVtkView::setTrfMat(char* fn)
 		if( tgtLine != NULL)
 		{
 			tgtLine->SetPoint1(camTranMat->GetElement(0,3),camTranMat->GetElement(1,3),camTranMat->GetElement(2,3));
+			tgtLine->SetPoint2(camTranMat->GetElement(0,3),camTranMat->GetElement(1,3),camTranMat->GetElement(2,3));
 		}
 	#endif
 	return res;
@@ -981,13 +982,23 @@ int CamVtkView::setTgtFile(char* fn)
 int CamVtkView::updateTarget(float x, float y, float z)
 {
 	int res = 0;
-	//#ifdef JMU_TGTFOLLOW
-	//if(!sr){return -1;};
-
-	tgtLine->SetPoint2((double) x,(double) y,(double) z);
-	tgtLine->Modified();
-	//renWin->Render();
-	//#endif
+	if((tgtLine != NULL))
+	{
+		tgtLine->SetPoint2((double) x,(double) y,(double) z);
+		tgtLine->Modified();
+		//renWin->Render();
+	}
+	return res;
+}
+int CamVtkView::updateTarget()
+{
+	int res = 0;
+	if((tgtLine != NULL) && (camTranMat != NULL) )
+	{
+		tgtLine->SetPoint2(camTranMat->GetElement(0,3),camTranMat->GetElement(1,3),camTranMat->GetElement(2,3));
+		tgtLine->Modified();
+		//renWin->Render();
+	}
 	return res;
 }
 #endif

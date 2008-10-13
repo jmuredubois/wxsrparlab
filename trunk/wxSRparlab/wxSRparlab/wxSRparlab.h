@@ -77,8 +77,7 @@
 
 #define SAFE_FREE(p)       { if(p) { delete (p);     (p)=0; } }
 
-
-#define JMU_TGTFOLLOW
+//#define JMU_TGTFOLLOW // WATCH OUT: JMU_USE_VTK must be defined to use this //added to project options
 #ifdef JMU_USE_VTK
 	#include "wxSRvtkView.h"
 #endif

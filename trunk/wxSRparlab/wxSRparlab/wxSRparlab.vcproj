@@ -194,7 +194,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(JMU_MESA_LIBUSBSR)&quot;;&quot;$(WXWIN)/include/msvc&quot;;&quot;$(WXWIN)/include&quot;;&quot;$(JMU_VTKSRCBASE)/Graphics&quot;;&quot;$(JMU_VTKSRCBASE)/Rendering&quot;;&quot;$(JMU_VTKSRCBASE)/Common&quot;;&quot;$(JMU_VTKSRCBASE)/Filtering&quot;;&quot;$(JMU_VTKSRCBASE)/IO&quot;;&quot;$(JMU_VTKSRCBASE)/Hybrid&quot;;&quot;$(JMU_VTKBINBASE)&quot;;&quot;$(JMU_TICPP)&quot;;&quot;$(JMU_FFTW3)&quot;"
-				PreprocessorDefinitions="JMU_USE_VTK"
+				PreprocessorDefinitions="JMU_USE_VTK;JMU_TGTFOLLOW"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -273,7 +273,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="&quot;$(JMU_MESA_LIBUSBSR)&quot;;&quot;$(WXWIN)/include/msvc&quot;;&quot;$(WXWIN)/include&quot;;&quot;$(JMU_VTKSRCBASE)/Graphics&quot;;&quot;$(JMU_VTKSRCBASE)/Rendering&quot;;&quot;$(JMU_VTKSRCBASE)/Common&quot;;&quot;$(JMU_VTKSRCBASE)/Filtering&quot;;&quot;$(JMU_VTKSRCBASE)/IO&quot;;&quot;$(JMU_VTKSRCBASE)/Hybrid&quot;;&quot;$(JMU_VTKBINBASE)&quot;;&quot;$(JMU_TICPP)&quot;;&quot;$(JMU_FFTW3)&quot;"
-				PreprocessorDefinitions="NDEBUG;JMU_USE_VTK"
+				PreprocessorDefinitions="NDEBUG;JMU_USE_VTK;JMU_TGTFOLLOW"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="wxSRparlab.h"
