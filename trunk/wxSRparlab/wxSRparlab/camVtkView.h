@@ -64,10 +64,10 @@ public:
 	int getVtkSub();
 	int setTrfMat(char* fn);
 
-	//#ifdef JMU_TGTFOLLOW 
+	#ifdef JMU_TGTFOLLOW 
 	  int setTgtFile(char* fn);
 	  int updateTarget(float x, float y, float z);
-	//#endif
+	#endif
 
 	//int updateTOFcurrent(SRCAM sr, SRPARLAB srPL, int vtkSub){};
 	int updateTOFcurrent(int rows, int cols, unsigned short *z, short *y, short *x);

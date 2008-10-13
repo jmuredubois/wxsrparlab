@@ -38,6 +38,7 @@ int CamPanelSettings::InitSettings()
 	    sizerButtons->Add(m_buttonCloseDev, 1, wxEXPAND);
 
 	m_buttonSetTrfMat = new wxButton(this, IDB_SetTrfMat, wxT("Cam. trf. matrix"));
+	m_buttonAcq = new wxButton(this, IDB_Acquire, wxT("Acquire"));
 
 	#ifdef JMU_TGTFOLLOW 
 		m_buttonTgtFile = new wxButton(this, IDB_TgtFile, wxT("Target file")); 
@@ -65,6 +66,7 @@ int CamPanelSettings::InitSettings()
 	/* sizer stuff  ...*/
     wxBoxSizer *sizerPanel = new wxBoxSizer(wxVERTICAL);
 
+	sizerPanel->Add(m_buttonAcq, 0, wxEXPAND);
 	sizerPanel->Add(sizerButtons, 0, wxEXPAND);
 	sizerPanel->Add(m_radioboxReadMode, 0, wxEXPAND);
     sizerPanel->Add(m_radioboxFrq, 0, wxEXPAND);
@@ -142,4 +144,20 @@ void CamPanelSettings::DisableRadioReadMode()
 void CamPanelSettings::EnableRadioReadMode()
 {
 	m_radioboxReadMode->Enable();
+};
+
+/* Changing interface buttons text */
+void CamPanelSettings::SetBtnTxtStop()
+{
+	if(!m_buttonAcq){return;};
+	m_buttonAcq->SetLabel(wxT("Stop"));
+	return;
+};
+
+/* Changing interface buttons text */
+void CamPanelSettings::SetBtnTxtAcqu()
+{
+	if(!m_buttonAcq){return;};
+	m_buttonAcq->SetLabel(wxT("Acquire"));
+	return;
 };

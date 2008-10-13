@@ -42,6 +42,9 @@ public:
 	void CamPanelSettings::DisableRadioReadMode(); //!< Disables the read mode radio panel
 	void CamPanelSettings::EnableRadioReadMode();  //!< Enables the read mode radio panel
 
+	void CamPanelSettings::SetBtnTxtStop();	//!< sets button text to 'Stop'
+	void CamPanelSettings::SetBtnTxtAcqu();	//!< sets button text to 'Acquire'
+
 
 private:
 
@@ -49,6 +52,7 @@ private:
 	wxButton* m_buttonOpenDev; //!< Open camera
 	wxButton* m_buttonCloseDev; //!< Close camera
 	wxButton* m_buttonSetTrfMat; //!< Set camera trf Mat
+	wxButton* m_buttonAcq; //!< Acquire button
 	#ifdef JMU_TGTFOLLOW  
 	  wxButton* m_buttonTgtFile; 
 	#endif

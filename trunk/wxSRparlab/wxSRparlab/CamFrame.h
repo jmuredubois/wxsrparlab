@@ -64,9 +64,9 @@ public:
 	void AcqOneFrmEvt(wxCommandEvent& WXUNUSED(event));
 	void CoordTrf();
 	void OnSetTrfMat(wxCommandEvent& WXUNUSED(event));
-	//#ifdef JMU_TGTFOLLOW 
+	#ifdef JMU_TGTFOLLOW 
 		void OnTgtFile(wxCommandEvent& WXUNUSED(event)); 
-	//#endif
+	#endif
 #ifdef JMU_USE_VTK
 	void SetVtkWin(CViewSrVtk *vtkWin, int vtkSub);
 	CamVtkView* GetCamVtk(){return _camVtk;};
@@ -108,9 +108,9 @@ private:
 	CViewSrVtk	*_vtkWin ; //!< pointer to vtk window
 	CamVtkView *_camVtk; //!< point to vtk camera structure
 #endif
-	//#ifdef JMU_TGTFOLLOW  
+	#ifdef JMU_TGTFOLLOW  
 		wxFFile*		m_pFile4TgtCoord; 
-	//#endif
+	#endif
 	int _vtkSub;
 
 public:

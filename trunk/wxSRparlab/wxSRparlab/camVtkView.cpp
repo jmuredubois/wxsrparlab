@@ -964,27 +964,30 @@ void CamVtkView::setDataMapperColorK()
 	dataActor->SetMapper(dataMapperAmp);
 }
 
-
+#ifdef JMU_TGTFOLLOW
 int CamVtkView::setTgtFile(char* fn)
 {
 	int res = 0;
-	#ifdef JMU_TGTFOLLOW
-	#endif
+	//#ifdef JMU_TGTFOLLOW
+	//#endif
 	return res;
 }
+#endif
 
 /**
- * Updates the TOF points
+ * Updates the tracking end point
  */
+#ifdef JMU_TGTFOLLOW
 int CamVtkView::updateTarget(float x, float y, float z)
 {
 	int res = 0;
-	#ifdef JMU_TGTFOLLOW
+	//#ifdef JMU_TGTFOLLOW
 	//if(!sr){return -1;};
 
 	tgtLine->SetPoint2((double) x,(double) y,(double) z);
 	tgtLine->Modified();
 	//renWin->Render();
-	#endif
+	//#endif
 	return res;
 }
+#endif
