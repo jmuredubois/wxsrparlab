@@ -73,10 +73,12 @@
 #define TIXML_USE_TICPP
 #include "ticpp.h" //Open source XML parser
 
-#define NUMCAMS 5	//!< number of SR cams
+#define NUMCAMS 2	//!< number of SR cams
 
 #define SAFE_FREE(p)       { if(p) { delete (p);     (p)=0; } }
 
+
+#define JMU_TGTFOLLOW
 #ifdef JMU_USE_VTK
 	#include "wxSRvtkView.h"
 #endif

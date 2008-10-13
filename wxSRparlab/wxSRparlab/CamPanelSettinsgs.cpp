@@ -39,6 +39,10 @@ int CamPanelSettings::InitSettings()
 
 	m_buttonSetTrfMat = new wxButton(this, IDB_SetTrfMat, wxT("Cam. trf. matrix"));
 
+	#ifdef JMU_TGTFOLLOW 
+		m_buttonTgtFile = new wxButton(this, IDB_TgtFile, wxT("Target file")); 
+	#endif
+
 	wxString freqs[] = { wxT("19 MHz"), wxT("20 MHz"), wxT("21 MHz"),
         wxT("30 MHz") };
 
@@ -66,6 +70,9 @@ int CamPanelSettings::InitSettings()
     sizerPanel->Add(m_radioboxFrq, 0, wxEXPAND);
     sizerPanel->Add(m_radioboxSrFilt, 0, wxEXPAND);
 	sizerPanel->Add(m_buttonSetTrfMat, 0, wxEXPAND);
+	#ifdef JMU_TGTFOLLOW  
+		sizerPanel->Add(m_buttonTgtFile, 0, wxEXPAND); 
+	#endif
 
 	sizerPanel->Add(m_statText, 1, wxEXPAND);
 

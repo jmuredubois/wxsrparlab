@@ -12,6 +12,7 @@
 // to stop complaints about vtkConfigure.h, include $(JMU_VTKBINBASE)
 // first include the required header files for the vtk classes we are using
 #include "vtkCubeSource.h"			// requires $(JMU_VTKSRCBASE)/Graphics
+#include "vtkLineSource.h"			// requires $(JMU_VTKSRCBASE)/Graphics
 #include "vtkPolyDataMapper.h"		// requires $(JMU_VTKSRCBASE)/Rendering
 #include "vtkRenderWindow.h"		// requires $(JMU_VTKSRCBASE)/Rendering
 #include "vtkRenderWindowInteractor.h"	// requires $(JMU_VTKSRCBASE)/Rendering
@@ -63,6 +64,11 @@ public:
 	int getVtkSub();
 	int setTrfMat(char* fn);
 
+	//#ifdef JMU_TGTFOLLOW 
+	  int setTgtFile(char* fn);
+	  int updateTarget(float x, float y, float z);
+	//#endif
+
 	//int updateTOFcurrent(SRCAM sr, SRPARLAB srPL, int vtkSub){};
 	int updateTOFcurrent(int rows, int cols, unsigned short *z, short *y, short *x);
 	int updateTOFcurrent(int rows, int cols, unsigned short *z, short *y, short *x, unsigned short* amp);
@@ -100,6 +106,11 @@ private:
   vtkFollower				*srLabelActor;		//!< actor for TOF camera label (text)
   int		addSrCam(); //!< adds the sr cam actor to the current view
   int		freeSrCam(); //!< adds the sr cam actor to the current view
+  #ifdef JMU_TGTFOLLOW 
+    vtkLineSource		*tgtLine; //! target line
+	vtkPolyDataMapper	*tgtLineMapper; //!
+	vtkActor			*tgtLineActor;
+  #endif
 
   vtkLookupTable	*depthLUT;	//!< LUT for depth data display
   vtkLookupTable	*grayLUT;	//!< LUT for depth data display

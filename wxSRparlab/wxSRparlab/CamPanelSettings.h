@@ -49,6 +49,9 @@ private:
 	wxButton* m_buttonOpenDev; //!< Open camera
 	wxButton* m_buttonCloseDev; //!< Close camera
 	wxButton* m_buttonSetTrfMat; //!< Set camera trf Mat
+	#ifdef JMU_TGTFOLLOW  
+	  wxButton* m_buttonTgtFile; 
+	#endif
 
 	/* Radio boxes */
 	wxRadioBox* m_radioboxFrq;	//!< camera frq

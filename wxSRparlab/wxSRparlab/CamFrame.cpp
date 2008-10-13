@@ -110,6 +110,9 @@ CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos
 	_vtkWin=NULL;
 	_camVtk = NULL;
 #endif
+	//#ifdef JMU_TGTFOLLOW  
+		m_pFile4TgtCoord = NULL; 
+	//#endif
 	_vtkSub = 0;
 }
 
@@ -132,6 +135,9 @@ CamFrame::~CamFrame()
 	if(m_pSrX   != NULL) { free((void*) m_pSrX  ); m_pSrX   = NULL; };
 	if(m_pFile4ReadPha != NULL) { delete(m_pFile4ReadPha); m_pFile4ReadPha = NULL; };
 	if(m_pFile4ReadAmp != NULL) { delete(m_pFile4ReadAmp); m_pFile4ReadAmp = NULL; };
+	#ifdef JMU_TGTFOLLOW  
+		if(m_pFile4TgtCoord != NULL) { delete(m_pFile4TgtCoord); m_pFile4TgtCoord = NULL; }; 
+	#endif
 }
 
 BEGIN_EVENT_TABLE(CamFrame, wxFrame)
@@ -142,6 +148,9 @@ BEGIN_EVENT_TABLE(CamFrame, wxFrame)
 	EVT_RADIOBOX(IDR_Freq, CamFrame::SetFreq)
 	EVT_RADIOBOX(IDR_ReadMode, CamFrame::SetReadMode)
 	EVT_BUTTON(IDB_SetTrfMat,  CamFrame::OnSetTrfMat)
+	#ifdef JMU_TGTFOLLOW 
+		EVT_BUTTON(IDB_TgtFile,  CamFrame::OnTgtFile) 
+	#endif
 	EVT_COMMAND(IDC_AcqOne, wxEVT_JMUACQONEFRM, CamFrame::AcqOneFrmEvt)
 END_EVENT_TABLE()
 
@@ -425,6 +434,9 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   if(m_pSrZ   != NULL) { free((void*) m_pSrZ  ); m_pSrZ   = NULL; };
   if(m_pSrY   != NULL) { free((void*) m_pSrY  ); m_pSrY   = NULL; };
   if(m_pSrX   != NULL) { free((void*) m_pSrX  ); m_pSrX   = NULL; };
+  #ifdef JMU_TGTFOLLOW  
+	if(m_pFile4TgtCoord != NULL) { delete(m_pFile4TgtCoord); m_pFile4TgtCoord = NULL; }; 
+  #endif
   m_nSrBufSz = 0; 
   m_nCols = 0; 
   m_nRows = 0;
@@ -494,6 +506,29 @@ void CamFrame::AcqOneFrm()
 		CoordTrf();
 		errMutex = m_mutexSrBuf->Unlock();
 	  } //{errMutex == wxMUTEX_NO_ERROR)
+	  #ifdef JMU_TGTFOLLOW  
+		if(m_pFile4TgtCoord != NULL) 
+		{
+			float frmCntFl, xTgt, yTgt, zTgt;
+			res  =m_pFile4TgtCoord->Read(&frmCntFl, sizeof(float));
+			res  =m_pFile4TgtCoord->Read(&xTgt, sizeof(float));
+			res  =m_pFile4TgtCoord->Read(&yTgt, sizeof(float));
+			res  =m_pFile4TgtCoord->Read(&zTgt, sizeof(float));
+			if( ((int) frmCntFl) != m_nFrmRead )
+			{
+				res = m_pFile4TgtCoord->Seek(0, wxFromStart);
+			}
+			else
+			{
+				_camVtk->updateTarget(xTgt, yTgt, zTgt);
+			}
+			if( m_pFile4TgtCoord->Eof() )  
+			{
+			  res = m_pFile4TgtCoord->Seek(0, wxFromStart);
+			  _camVtk->updateTarget(0.0f, 0.0f, 0.0f);
+			}
+		}
+	  #endif
 	  
 	  strR.sprintf(wxT("frm:%05u - pixFileRead %i - %ix%i  - %i"), m_nFrmRead, res, m_nRows, m_nCols, m_nSrBufSz);
 	  m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[0], m_nRows*m_nCols);
@@ -704,4 +739,33 @@ void CamFrame::OnSetTrfMat(wxCommandEvent& WXUNUSED(event))
   
   m_settingsPane->SetText(wxT("Modified camera trf matrix"));
 #endif
+}
+
+
+void CamFrame::OnTgtFile(wxCommandEvent& WXUNUSED(event))
+{
+  #ifdef JMU_TGTFOLLOW
+
+  //logPrintf("swissrangerTester: SR_Open device");
+  m_settingsPane->SetText(wxT("Modify camera target file"));
+  wxString strR;
+
+  wxFileDialog* OpenDialogTgt = new wxFileDialog(this, 
+	  wxT("Choose a target coordinates file to open"),	// msg
+	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
+	  wxEmptyString,	// default file
+	  wxT("Target coordinates files (*.dat)|*.dat|All files (*.*)|*.*"),	// file ext
+	  wxFD_OPEN|wxFD_CHANGE_DIR,
+	  wxDefaultPosition);
+ 
+  if((OpenDialogTgt->ShowModal()==wxID_OK) )
+  {
+	  wxString strPathTgt = OpenDialogTgt->GetPath();
+	  m_pFile4TgtCoord = new wxFFile(strPathTgt, wxT("rb"));
+	  //_camVtk->setTgtFile(strPathTgt.char_str());
+  } // (OpenDialogMat->ShowModal()==wxID_OK) )
+  delete(OpenDialogTgt);
+  
+  m_settingsPane->SetText(wxT("Opened target file"));
+  #endif
 }
