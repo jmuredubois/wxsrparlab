@@ -1001,10 +1001,14 @@ int CamVtkView::updateTarget(float *ptsF, int nCoord)
 		//renWin->Render();
 		if(nCoord==15)
 		{
-			for(int k=0; k<4; k++)
+			/*for(int k=0; k<4; k++)
 			{
 				tgtQuadPoints->SetPoint(k, ptsF[(3*(k+1))+0],(double) ptsF[(3*(k+1))+1],(double) ptsF[(3*(k+1))+2]);
-			}
+			}*/
+			tgtQuadPoints->SetPoint(0, ptsF[ 3],(double) ptsF[ 4],(double) ptsF[ 5]);
+			tgtQuadPoints->SetPoint(3, ptsF[ 6],(double) ptsF[ 7],(double) ptsF[ 8]);
+			tgtQuadPoints->SetPoint(2, ptsF[ 9],(double) ptsF[10],(double) ptsF[11]);
+			tgtQuadPoints->SetPoint(1, ptsF[12],(double) ptsF[13],(double) ptsF[14]);
 			tgtQuadPoints->Modified();
 		}
 	}
