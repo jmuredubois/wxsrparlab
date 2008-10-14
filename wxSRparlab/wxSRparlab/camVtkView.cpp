@@ -870,6 +870,7 @@ void CamVtkView::hideDataAct(bool doHide)
 		srLabelActor->VisibilityOff();
 		#ifdef JMU_TGTFOLLOW 
 			tgtLineActor->VisibilityOff();
+			tgtTriActor->VisibilityOff();
 		#endif
 
 	}
@@ -880,6 +881,7 @@ void CamVtkView::hideDataAct(bool doHide)
 		srLabelActor->VisibilityOn();
 		#ifdef JMU_TGTFOLLOW 
 			tgtLineActor->VisibilityOn(); 
+			tgtTriActor->VisibilityOn();
 		#endif
 	}
 }
@@ -1001,15 +1003,13 @@ int CamVtkView::updateTarget(float *ptsF, int nCoord)
 		//renWin->Render();
 		if(nCoord==15)
 		{
-			/*for(int k=0; k<4; k++)
-			{
-				tgtQuadPoints->SetPoint(k, ptsF[(3*(k+1))+0],(double) ptsF[(3*(k+1))+1],(double) ptsF[(3*(k+1))+2]);
-			}*/
-			tgtQuadPoints->SetPoint(0, ptsF[ 3],(double) ptsF[ 4],(double) ptsF[ 5]);
-			tgtQuadPoints->SetPoint(3, ptsF[ 6],(double) ptsF[ 7],(double) ptsF[ 8]);
-			tgtQuadPoints->SetPoint(2, ptsF[ 9],(double) ptsF[10],(double) ptsF[11]);
-			tgtQuadPoints->SetPoint(1, ptsF[12],(double) ptsF[13],(double) ptsF[14]);
-			tgtQuadPoints->Modified();
+			tgtTriPoints->SetPoint(0, (double) ptsF[ 0],(double) ptsF[ 1],(double) ptsF[ 2]);
+			tgtTriPoints->SetPoint(1, (double) ptsF[ 3],(double) ptsF[ 4],(double) ptsF[ 5]);
+			tgtTriPoints->SetPoint(2, (double) ptsF[ 6],(double) ptsF[ 7],(double) ptsF[ 8]);
+			tgtTriPoints->SetPoint(3, (double) ptsF[ 9],(double) ptsF[10],(double) ptsF[11]);
+			tgtTriPoints->SetPoint(4, (double) ptsF[12],(double) ptsF[13],(double) ptsF[14]);		
+			tgtTriPoints->Modified();
+			tgtTriTCoords->Modified();
 		}
 	}
 	return res;
@@ -1034,32 +1034,56 @@ int CamVtkView::addTgtAct()
 	if(_vtkSub==3){ tgtLineActor->GetProperty()->SetColor(0.7,0.0,0.7); }; // PURPLfor 3-rd add cam
 	renderer->AddActor(tgtLineActor);
 
-	tgtQuadPoints = vtkPoints::New();
-	tgtQuadPoints->SetNumberOfPoints(4);
-	tgtQuadPoints->InsertPoint(0, 0.0, 0.0,0.0);
-	tgtQuadPoints->InsertPoint(1, 1.0, 0.0,0.0);
-	tgtQuadPoints->InsertPoint(2, 1.0, 1.0,0.0);
-	tgtQuadPoints->InsertPoint(3, 0.0, 1.0,0.0);
-	tgtQuad = vtkQuad::New();
-	tgtQuad->GetPointIds()->SetNumberOfIds(4);
+	tgtTriPoints = vtkPoints::New();
+	tgtTriPoints->SetNumberOfPoints(5);
+	tgtTriPoints->InsertPoint(0, 0.0, 0.0,0.0);
+	tgtTriPoints->InsertPoint(1,-1.0, 1.0,0.0);
+	tgtTriPoints->InsertPoint(2, 1.0, 1.0,0.0);
+	tgtTriPoints->InsertPoint(3, 1.0,-1.0,0.0);
+	tgtTriPoints->InsertPoint(4,-2.0,-1.0,0.0);
+	tgtTriTCoords = vtkFloatArray::New();
+	tgtTriTCoords->SetNumberOfComponents(3);
+	tgtTriTCoords->SetNumberOfTuples(5);
+	tgtTriTCoords->InsertTuple3(0, 1, 1, 1); 
+	tgtTriTCoords->InsertTuple3(1, 2, 2, 2);
+	tgtTriTCoords->InsertTuple3(2, 3, 3, 3);
+	tgtTriTCoords->InsertTuple3(3, 4, 4, 4);
+	tgtTriTCoords->InsertTuple3(4, 5, 5, 5);
+	tgtTri = new vtkTriangle*[4];
+	if( (tgtTri == NULL)){ return -2;};
 	for(int k=0; k<4; k++)
 	{
-		tgtQuad->GetPointIds()->SetId(k, k);
+		tgtTri[k] = vtkTriangle::New();
+		tgtTri[k]->GetPointIds()->SetNumberOfIds(3);
+		tgtTri[k]->GetPointIds()->SetId(0,0);
 	}
-	tgtQuadGrid = vtkUnstructuredGrid::New();
-	tgtQuadGrid->Allocate(1,1);
-	tgtQuadGrid->InsertNextCell(tgtQuad->GetCellType(), tgtQuad->GetPointIds());
-	tgtQuadGrid->SetPoints(tgtQuadPoints);
-	tgtQuadMapper = vtkDataSetMapper::New();
-	tgtQuadMapper->SetInput(tgtQuadGrid);
-	tgtQuadActor = vtkActor::New();
-	tgtQuadActor->SetMapper(tgtQuadMapper);
-	tgtQuadActor->GetProperty()->SetOpacity(0.5); //transparency
-	if(_vtkSub==0){ tgtQuadActor->GetProperty()->SetColor(0.0,0.0,1.0); }; // BLUE for 0-th cam
-	if(_vtkSub==1){ tgtQuadActor->GetProperty()->SetColor(1.0,0.0,0.0); }; // RED  for 1-st add cam
-	if(_vtkSub==2){ tgtQuadActor->GetProperty()->SetColor(0.0,1.0,0.0); }; // GREENfor 2-nd add cam
-	if(_vtkSub==3){ tgtQuadActor->GetProperty()->SetColor(0.7,0.0,0.7); }; // PURPLfor 3-rd add cam
-	renderer->AddActor(tgtQuadActor);
+		tgtTri[0]->GetPointIds()->SetId(1, 1);
+		tgtTri[0]->GetPointIds()->SetId(2, 2);
+		tgtTri[1]->GetPointIds()->SetId(1, 2);
+		tgtTri[1]->GetPointIds()->SetId(2, 3);
+		tgtTri[2]->GetPointIds()->SetId(1, 3);
+		tgtTri[2]->GetPointIds()->SetId(2, 4);
+		tgtTri[3]->GetPointIds()->SetId(1, 4);
+		tgtTri[3]->GetPointIds()->SetId(2, 1);
+
+	tgtTriGrid = vtkUnstructuredGrid::New();
+	tgtTriGrid->Allocate(4,4);
+	for(int k=0; k<4; k++)
+	{
+		tgtTriGrid->InsertNextCell(tgtTri[k]->GetCellType(), tgtTri[k]->GetPointIds());
+	}
+	tgtTriGrid->SetPoints(tgtTriPoints);
+	tgtTriGrid->GetPointData()->SetTCoords(tgtTriTCoords);
+	tgtTriMapper = vtkDataSetMapper::New();
+	tgtTriMapper->SetInput(tgtTriGrid);
+	tgtTriActor = vtkActor::New();
+	tgtTriActor->SetMapper(tgtTriMapper);
+	tgtTriActor->GetProperty()->SetOpacity(0.5); //transparency
+	if(_vtkSub==0){ tgtTriActor->GetProperty()->SetColor(0.0,0.0,1.0); }; // BLUE for 0-th cam
+	if(_vtkSub==1){ tgtTriActor->GetProperty()->SetColor(1.0,0.0,0.0); }; // RED  for 1-st add cam
+	if(_vtkSub==2){ tgtTriActor->GetProperty()->SetColor(0.0,1.0,0.0); }; // GREENfor 2-nd add cam
+	if(_vtkSub==3){ tgtTriActor->GetProperty()->SetColor(0.7,0.0,0.7); }; // PURPLfor 3-rd add cam
+	renderer->AddActor(tgtTriActor);
 	
 	return res;
 }
@@ -1072,10 +1096,19 @@ int CamVtkView::freeTgtAct()
 	tgtLineMapper->Delete();
 	tgtLineActor->Delete();
 
-	tgtQuadPoints->Delete();
-	tgtQuad->Delete();
-	tgtQuadMapper->Delete();
-	tgtQuadActor->Delete();
+	
+	tgtTriPoints->Delete();	
+	tgtTriTCoords->Delete();
+	if(tgtTri != NULL)
+	{
+		for(int k=0; k<4; k++)
+		{
+			tgtTri[k]->Delete();	
+		}
+		delete(tgtTri); tgtTri=NULL;
+	}
+	tgtTriMapper->Delete();
+	tgtTriActor->Delete();
 	return res-1;
 }
 #endif
