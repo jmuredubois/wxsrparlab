@@ -26,6 +26,7 @@
 #include "vtkUnstructuredGrid.h"	// requires $(JMU_VTKSRCBASE)/Filtering
 #include "vtkDataSetToStructuredGridFilter.h"	// requires $(JMU_VTKSRCBASE)/Filtering
 #include "vtkQuad.h"	// requires $(JMU_VTKSRCBASE)/Filtering
+#include "vtkTriangle.h"	// requires $(JMU_VTKSRCBASE)/Filtering
 #include "vtkXMLStructuredGridReader.h"	// requires $(JMU_VTKSRCBASE)/IO
 #include "vtkProperty.h"		// requires $(JMU_VTKSRCBASE)/Rendering
 #include "vtkOutlineFilter.h"	// requires $(JMU_VTKSRCBASE)/Graphics
@@ -115,11 +116,12 @@ private:
     vtkLineSource		*tgtLine; //! target line
 	vtkPolyDataMapper	*tgtLineMapper; //!
 	vtkActor			*tgtLineActor;
-	vtkPoints			*tgtQuadPoints;
-	vtkQuad				*tgtQuad;
-	vtkUnstructuredGrid	*tgtQuadGrid;
-	vtkDataSetMapper	*tgtQuadMapper;
-	vtkActor			*tgtQuadActor;
+	vtkPoints			*tgtTriPoints;
+	vtkFloatArray		*tgtTriTCoords;
+	vtkTriangle			**tgtTri;
+	vtkUnstructuredGrid	*tgtTriGrid;
+	vtkDataSetMapper	*tgtTriMapper;
+	vtkActor			*tgtTriActor;
 	int addTgtAct();
 	int freeTgtAct();
   #endif
