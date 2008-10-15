@@ -864,23 +864,23 @@ int CamVtkView::freeBGDataAct()
 void CamVtkView::hideDataAct(bool doHide)
 {
 	if(doHide)
-	{ 
+	{
 		dataActor->VisibilityOff();
 		srCubeActor->VisibilityOff();
 		srLabelActor->VisibilityOff();
-		#ifdef JMU_TGTFOLLOW 
+		#ifdef JMU_TGTFOLLOW
 			tgtLineActor->VisibilityOff();
 			tgtTriActor->VisibilityOff();
 		#endif
 
 	}
 	else
-	{ 
+	{
 		dataActor->VisibilityOn();
 		srCubeActor->VisibilityOn();
 		srLabelActor->VisibilityOn();
-		#ifdef JMU_TGTFOLLOW 
-			tgtLineActor->VisibilityOn(); 
+		#ifdef JMU_TGTFOLLOW
+			tgtLineActor->VisibilityOn();
 			tgtTriActor->VisibilityOn();
 		#endif
 	}
@@ -975,6 +975,12 @@ int CamVtkView::updateTarget(float x, float y, float z)
 	{
 		tgtLine->SetPoint2((double) x,(double) y,(double) z);
 		tgtLine->Modified();
+		tgtTriPoints->SetPoint(0, 0.0, 0.0,0.0);
+        tgtTriPoints->SetPoint(1,-1.0, 1.0,0.0);
+        tgtTriPoints->SetPoint(2, 1.0, 1.0,0.0);
+        tgtTriPoints->SetPoint(3, 1.0,-1.0,0.0);
+        tgtTriPoints->SetPoint(4,-2.0,-1.0,0.0);
+        tgtTriPoints->Modified();
 		//renWin->Render();
 	}
 	return res;
@@ -1007,7 +1013,7 @@ int CamVtkView::updateTarget(float *ptsF, int nCoord)
 			tgtTriPoints->SetPoint(1, (double) ptsF[ 3],(double) ptsF[ 4],(double) ptsF[ 5]);
 			tgtTriPoints->SetPoint(2, (double) ptsF[ 6],(double) ptsF[ 7],(double) ptsF[ 8]);
 			tgtTriPoints->SetPoint(3, (double) ptsF[ 9],(double) ptsF[10],(double) ptsF[11]);
-			tgtTriPoints->SetPoint(4, (double) ptsF[12],(double) ptsF[13],(double) ptsF[14]);		
+			tgtTriPoints->SetPoint(4, (double) ptsF[12],(double) ptsF[13],(double) ptsF[14]);
 			tgtTriPoints->Modified();
 			tgtTriTCoords->Modified();
 		}
@@ -1044,7 +1050,7 @@ int CamVtkView::addTgtAct()
 	tgtTriTCoords = vtkFloatArray::New();
 	tgtTriTCoords->SetNumberOfComponents(3);
 	tgtTriTCoords->SetNumberOfTuples(5);
-	tgtTriTCoords->InsertTuple3(0, 1, 1, 1); 
+	tgtTriTCoords->InsertTuple3(0, 1, 1, 1);
 	tgtTriTCoords->InsertTuple3(1, 2, 2, 2);
 	tgtTriTCoords->InsertTuple3(2, 3, 3, 3);
 	tgtTriTCoords->InsertTuple3(3, 4, 4, 4);
@@ -1084,7 +1090,7 @@ int CamVtkView::addTgtAct()
 	if(_vtkSub==2){ tgtTriActor->GetProperty()->SetColor(0.0,1.0,0.0); }; // GREENfor 2-nd add cam
 	if(_vtkSub==3){ tgtTriActor->GetProperty()->SetColor(0.7,0.0,0.7); }; // PURPLfor 3-rd add cam
 	renderer->AddActor(tgtTriActor);
-	
+
 	return res;
 }
 #endif
@@ -1096,14 +1102,14 @@ int CamVtkView::freeTgtAct()
 	tgtLineMapper->Delete();
 	tgtLineActor->Delete();
 
-	
-	tgtTriPoints->Delete();	
+
+	tgtTriPoints->Delete();
 	tgtTriTCoords->Delete();
 	if(tgtTri != NULL)
 	{
 		for(int k=0; k<4; k++)
 		{
-			tgtTri[k]->Delete();	
+			tgtTri[k]->Delete();
 		}
 		delete(tgtTri); tgtTri=NULL;
 	}
