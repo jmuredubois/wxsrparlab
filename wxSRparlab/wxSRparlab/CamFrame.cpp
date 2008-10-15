@@ -37,7 +37,7 @@ private:
     CamFrame *m_cFrm;
 };
 
-ThreadReadData::ThreadReadData(CamFrame *cFrm) 
+ThreadReadData::ThreadReadData(CamFrame *cFrm)
 : wxThread(wxTHREAD_DETACHED)//: wxThread(wxTHREAD_JOINABLE)
 {
     m_cFrm = cFrm;
@@ -48,12 +48,12 @@ ThreadReadData::ThreadReadData(CamFrame *cFrm)
  */
 ThreadReadData::~ThreadReadData()
 {
-	
+
 }
 
 void ThreadReadData::OnExit()
 {
- 
+
 }
 
 void *ThreadReadData::Entry()
@@ -70,6 +70,9 @@ void *ThreadReadData::Entry()
 		m_cFrm->AddPendingEvent(event);
 		//m_cFrm->ProcessEvent(event);
         wxThread::Sleep(100);
+        #ifdef __WXMAC__
+            wxThread::Sleep(100); // macBook graphics card is slow
+        #endif
     }
 
     return NULL;
@@ -99,7 +102,7 @@ CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos
 	m_nSerialSR = 0;
 	m_pThreadReadData = NULL;
 	m_camReadMode = CAM_RD_ONESHOT;
-	m_bReadContinuously = false; 
+	m_bReadContinuously = false;
 	m_srFrq = MF_20MHz;
 	m_maxMM[0]= 5000.0f; m_maxMM[1]= 7142.8571f;m_maxMM[2]= 7500.0f;m_maxMM[3]= 7894.7368f;
 	//! @todo:  HARDCODED values for m_maxMM -> check with libusbSR driver settings
@@ -110,8 +113,8 @@ CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos
 	_vtkWin=NULL;
 	_camVtk = NULL;
 #endif
-	#ifdef JMU_TGTFOLLOW  
-		m_pFile4TgtCoord = NULL; 
+	#ifdef JMU_TGTFOLLOW
+		m_pFile4TgtCoord = NULL;
 	#endif
 	_vtkSub = 0;
 }
@@ -135,8 +138,8 @@ CamFrame::~CamFrame()
 	if(m_pSrX   != NULL) { free((void*) m_pSrX  ); m_pSrX   = NULL; };
 	if(m_pFile4ReadPha != NULL) { delete(m_pFile4ReadPha); m_pFile4ReadPha = NULL; };
 	if(m_pFile4ReadAmp != NULL) { delete(m_pFile4ReadAmp); m_pFile4ReadAmp = NULL; };
-	#ifdef JMU_TGTFOLLOW  
-		if(m_pFile4TgtCoord != NULL) { delete(m_pFile4TgtCoord); m_pFile4TgtCoord = NULL; }; 
+	#ifdef JMU_TGTFOLLOW
+		if(m_pFile4TgtCoord != NULL) { delete(m_pFile4TgtCoord); m_pFile4TgtCoord = NULL; };
 	#endif
 }
 
@@ -148,8 +151,8 @@ BEGIN_EVENT_TABLE(CamFrame, wxFrame)
 	EVT_RADIOBOX(IDR_Freq, CamFrame::SetFreq)
 	EVT_RADIOBOX(IDR_ReadMode, CamFrame::SetReadMode)
 	EVT_BUTTON(IDB_SetTrfMat,  CamFrame::OnSetTrfMat)
-	#ifdef JMU_TGTFOLLOW 
-		EVT_BUTTON(IDB_TgtFile,  CamFrame::OnTgtFile) 
+	#ifdef JMU_TGTFOLLOW
+		EVT_BUTTON(IDB_TgtFile,  CamFrame::OnTgtFile)
 	#endif
 	EVT_COMMAND(IDC_AcqOne, wxEVT_JMUACQONEFRM, CamFrame::AcqOneFrmEvt)
 END_EVENT_TABLE()
@@ -256,26 +259,26 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   strR.sprintf(wxT("cam open %u"), res); // ... change title text ...
   if(m_sr != NULL)
   {
-	  serial =  SR_ReadSerial(m_sr); 
+	  serial =  SR_ReadSerial(m_sr);
 	  strR.sprintf(wxT("cam serial %u"), serial); // ... change title text ...
 	  m_nSerialSR = serial;
   }
 
-  wxFileDialog* OpenDialogPar = new wxFileDialog(this, 
+  wxFileDialog* OpenDialogPar = new wxFileDialog(this,
 	  wxT("Choose a SR parameters file to open"),	// msg
 	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
 	  wxEmptyString,	// default file
 	  wxT("SR parameters files (*.sr2)|*.sr2|All files (*.*)|*.*"),	// file ext
 	  wxFD_OPEN|wxFD_CHANGE_DIR,
 	  wxDefaultPosition);
-  wxFileDialog* OpenDialogPha = new wxFileDialog(this, 
+  wxFileDialog* OpenDialogPha = new wxFileDialog(this,
 	  wxT("Choose a SR PHASE file to open"),	// msg
 	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
 	  wxEmptyString,	// default file
 	  wxT("SR phase files (*.16b)|*.16b|All files (*.*)|*.*"),	// file ext
 	  wxFD_OPEN|wxFD_CHANGE_DIR,
 	  wxDefaultPosition);
-  wxFileDialog* OpenDialogAmp = new wxFileDialog(this, 
+  wxFileDialog* OpenDialogAmp = new wxFileDialog(this,
 	  wxT("Choose a SR AMPLITUDE file to open"),	// msg
 	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
 	  wxEmptyString,	// default file
@@ -295,9 +298,9 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 		float tmpFlt = 0;
 		if(sizeof(int)!=4)
 		{
-			res-=64; 
-			m_nCols = (int) 176; 
-			m_nRows = (int) 144; 
+			res-=64;
+			m_nCols = (int) 176;
+			m_nRows = (int) 144;
 			m_nSrBufSz = (int) (m_nCols*m_nRows*2*2); // *2 amp,pha *2:short
 		}
 		else // (sizeof(int)!=4)
@@ -340,7 +343,7 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	    {
 		  res -=4;
 	    }
- 
+
 	    strR.sprintf(wxT("cam serial %u posing as %u \n - %ix%i  - %i"), serial, m_nSerialSR, m_nRows, m_nCols, m_nSrBufSz); // ... change text ...
 		wxMutexError errMutex= m_mutexSrBuf->Lock();
 		if(errMutex == wxMUTEX_NO_ERROR)
@@ -357,7 +360,7 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 		res = m_viewZPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrZ[0], m_nRows*m_nCols);
 		res = m_viewXPane->SetDataArray<short>((short*) &m_pSrX[0], m_nRows*m_nCols);
 		res = m_viewYPane->SetDataArray<short>((short*) &m_pSrY[0], m_nRows*m_nCols);
- 
+
 	    m_settingsPane->SetText(strR);
 		SetStatusText( strR );
 	  } // (wxFparams->IsOpened())
@@ -369,13 +372,13 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   {
 	  return;
   }
-  
+
 
   if(m_sr != NULL)
   {
-	  //m_nSrBufSz = (int) SR_GetBufferSize(m_sr); 
-	  m_nCols = (int) SR_GetCols(m_sr); 
-	  m_nRows = (int) SR_GetRows(m_sr); 
+	  //m_nSrBufSz = (int) SR_GetBufferSize(m_sr);
+	  m_nCols = (int) SR_GetCols(m_sr);
+	  m_nRows = (int) SR_GetRows(m_sr);
 	  m_nSrBufSz = m_nCols * m_nRows *sizeof(WORD)*2 ;  //2 images
 	  strR.sprintf(wxT("cam serial %u - %ix%i  - %i"), serial, m_nRows, m_nCols, m_nSrBufSz); // ... change text ...
 	  wxMutexError errMutex= m_mutexSrBuf->Lock();
@@ -425,7 +428,7 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   if(m_sr != NULL)
   {
 		res = SR_Close(m_sr);
-		m_sr = NULL; 
+		m_sr = NULL;
   }
   if(m_pFile4ReadPha != NULL) { delete(m_pFile4ReadPha); m_pFile4ReadPha = NULL; };
   if(m_pFile4ReadAmp != NULL) { delete(m_pFile4ReadAmp); m_pFile4ReadAmp = NULL; };
@@ -434,11 +437,11 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   if(m_pSrZ   != NULL) { free((void*) m_pSrZ  ); m_pSrZ   = NULL; };
   if(m_pSrY   != NULL) { free((void*) m_pSrY  ); m_pSrY   = NULL; };
   if(m_pSrX   != NULL) { free((void*) m_pSrX  ); m_pSrX   = NULL; };
-  #ifdef JMU_TGTFOLLOW  
-	if(m_pFile4TgtCoord != NULL) { delete(m_pFile4TgtCoord); m_pFile4TgtCoord = NULL; }; 
+  #ifdef JMU_TGTFOLLOW
+	if(m_pFile4TgtCoord != NULL) { delete(m_pFile4TgtCoord); m_pFile4TgtCoord = NULL; };
   #endif
-  m_nSrBufSz = 0; 
-  m_nCols = 0; 
+  m_nSrBufSz = 0;
+  m_nCols = 0;
   m_nRows = 0;
   m_nFrmRead = 0;
   m_nSerialSR = 0;
@@ -508,14 +511,14 @@ void CamFrame::AcqOneFrm()
 		CoordTrf();
 		errMutex = m_mutexSrBuf->Unlock();
 	  } //{errMutex == wxMUTEX_NO_ERROR)
-	  #ifdef JMU_TGTFOLLOW  
-		if(m_pFile4TgtCoord != NULL) 
+	  #ifdef JMU_TGTFOLLOW
+		if(m_pFile4TgtCoord != NULL)
 		{
 			float frmCntFl;
 			float tgt[15];
 			res  =m_pFile4TgtCoord->Read(&frmCntFl, sizeof(float));
 			res  =m_pFile4TgtCoord->Read(&tgt, 15*sizeof(float));
-			if( m_pFile4TgtCoord->Eof() )  
+			if( m_pFile4TgtCoord->Eof() )
 			{
 			  res = m_pFile4TgtCoord->Seek(0, wxFromStart);
 			  _camVtk->updateTarget();
@@ -531,7 +534,7 @@ void CamFrame::AcqOneFrm()
 			}
 		}
 	  #endif
-	  
+
 	  strR.sprintf(wxT("frm:%05u - pixFileRead %i - %ix%i  - %i"), m_nFrmRead, res, m_nRows, m_nCols, m_nSrBufSz);
 	  m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[0], m_nRows*m_nCols);
 	  m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2], m_nRows*m_nCols);
@@ -619,18 +622,18 @@ void CamFrame::CoordTrf()
 			  xc = -(c -m_fCenterX) * m_fPixSzX;
 			  yc = -(r -m_fCenterY) * m_fPixSzY;
 
-			  z = (sqrt( 
-				   ( 
-				     ( 
-					   ((float) pSrBuf[r*m_nCols+c]) / 65535.0f * m_maxMM[m_srFrq] 
+			  z = (sqrt(
+				   (
+				     (
+					   ((float) pSrBuf[r*m_nCols+c]) / 65535.0f * m_maxMM[m_srFrq]
 					 )
-					*( 
-					   ((float) pSrBuf[r*m_nCols+c]) / 65535.0f * m_maxMM[m_srFrq] 
+					*(
+					   ((float) pSrBuf[r*m_nCols+c]) / 65535.0f * m_maxMM[m_srFrq]
 					 )
 					 * ((m_fFocal * m_fFocal) / ((m_fFocal * m_fFocal) + xc*xc + yc*yc)))));
 
-			  x =(( xc * z) / m_fFocal); 
-			  y =(( yc * z) / m_fFocal); 
+			  x =(( xc * z) / m_fFocal);
+			  y =(( yc * z) / m_fFocal);
 
 			  m_pSrZ[r*m_nCols+c] = (unsigned short) z ;
 			  m_pSrY[r*m_nCols+c] = (short) y ;
@@ -646,7 +649,7 @@ void CamFrame::SetFreq(wxCommandEvent&(event))
   int res = 0;
   wxString strR;
   //ModulationFrq srFrq = MF_20MHz ;
-  
+
   wxString strF = event.GetString();
   if( ( strF.Find(wxT("MHz")) != wxNOT_FOUND) )
   {
@@ -724,21 +727,21 @@ void CamFrame::OnSetTrfMat(wxCommandEvent& WXUNUSED(event))
   m_settingsPane->SetText(wxT("Modify camera trf matrix"));
   wxString strR;
 
-  wxFileDialog* OpenDialogMat = new wxFileDialog(this, 
+  wxFileDialog* OpenDialogMat = new wxFileDialog(this,
 	  wxT("Choose a coordinates transformation matrix file to open"),	// msg
 	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
 	  wxEmptyString,	// default file
 	  wxT("Coordinates transformation matrix files (*.xml)|*.xml|All files (*.*)|*.*"),	// file ext
 	  wxFD_OPEN|wxFD_CHANGE_DIR,
 	  wxDefaultPosition);
- 
+
   if((OpenDialogMat->ShowModal()==wxID_OK) )
   {
 	  wxString strPathMat = OpenDialogMat->GetPath();
 	  _camVtk->setTrfMat(strPathMat.char_str());
   } // (OpenDialogMat->ShowModal()==wxID_OK) )
   delete(OpenDialogMat);
-  
+
   m_settingsPane->SetText(wxT("Modified camera trf matrix"));
 #endif
 }
@@ -752,14 +755,14 @@ void CamFrame::OnTgtFile(wxCommandEvent& WXUNUSED(event))
   m_settingsPane->SetText(wxT("Modify camera target file"));
   wxString strR;
 
-  wxFileDialog* OpenDialogTgt = new wxFileDialog(this, 
+  wxFileDialog* OpenDialogTgt = new wxFileDialog(this,
 	  wxT("Choose a target coordinates file to open"),	// msg
 	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
 	  wxEmptyString,	// default file
 	  wxT("Target coordinates files (*.dat)|*.dat|All files (*.*)|*.*"),	// file ext
 	  wxFD_OPEN|wxFD_CHANGE_DIR,
 	  wxDefaultPosition);
- 
+
   if((OpenDialogTgt->ShowModal()==wxID_OK) )
   {
 	  wxString strPathTgt = OpenDialogTgt->GetPath();
@@ -767,7 +770,7 @@ void CamFrame::OnTgtFile(wxCommandEvent& WXUNUSED(event))
 	  //_camVtk->setTgtFile(strPathTgt.char_str());
   } // (OpenDialogMat->ShowModal()==wxID_OK) )
   delete(OpenDialogTgt);
-  
+
   m_settingsPane->SetText(wxT("Opened target file"));
   //#endif
 }
