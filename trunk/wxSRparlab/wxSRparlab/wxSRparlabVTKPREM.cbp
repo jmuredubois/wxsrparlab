@@ -6,198 +6,211 @@
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
-			<Target title="Debug">
-				<Option output="../../../../../../../builds/Debug/bin/wxSRparlabVTKPREM.exe" prefix_auto="0" extension_auto="0" />
-				<Option object_output="obj/Debug" />
-				<Option type="0" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-g" />
-					<Add directory="C:\wxWidgets-2.8.7/include" />
-				</Compiler>
-				<Linker>
-					<Add directory="../../../../../../../builds/Debug/bin" />
-					<Add directory="C:\wxWidgets-2.8.7/lib/vc_dll" />
-					<Add directory="C:\wxWidgets-2.8.7/lib/vc_lib" />
-					<Add library="comctl32" />
-					<Add library="rpcrt4" />
-					<Add library="winmm" />
-					<Add library="advapi32" />
-					<Add library="wsock32" />
-				</Linker>
-			</Target>
-			<Target title="Release">
-				<Option output="../../../../../../../builds/Release/bin/wxSRparlabVTKPREM.exe" prefix_auto="0" extension_auto="0" />
-				<Option object_output="obj/Release" />
-				<Option type="0" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-O" />
-					<Add directory="C:\wxWidgets-2.8.7/include" />
-				</Compiler>
-				<Linker>
-					<Add option="-s" />
-					<Add directory="../../../../../../../builds/Release/bin" />
-					<Add directory="C:\wxWidgets-2.8.7/lib/vc_dll" />
-					<Add directory="C:\wxWidgets-2.8.7/lib/vc_lib" />
-					<Add library="comctl32" />
-					<Add library="rpcrt4" />
-					<Add library="winmm" />
-					<Add library="advapi32" />
-					<Add library="wsock32" />
-				</Linker>
-			</Target>
 			<Target title="DebugVTK">
-				<Option output="C:/builds/Debug/bin/wxSRparlabVTKPREM.exe" prefix_auto="0" extension_auto="0" />
-				<Option object_output="C:\builds/Debug/obj" />
+				<Option output="builds/Debug/bin/wxSRparlabVTKPREM" prefix_auto="0" extension_auto="0" />
+				<Option object_output="/builds/Debug/obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
-					<Add directory="C:\wxWidgets-2.8.7/include" />
+					<Add option="-DJMU_USE_VTK" />
+					<Add option="-DJMU_TGTFOLLOW" />
+					<Add option="`wx-config --cxxflags` -W -Wall -ansi" />
+					<Add directory="/usr/local/lib/wx/include/mac-ansi-release-2.8/wx" />
+					<Add directory="/software/wxMac-2.8.7/include" />
+					<Add directory="/builds/VTK504" />
+					<Add directory="/software/VTK/Graphics" />
+					<Add directory="/software/VTK/Rendering" />
+					<Add directory="/software/VTK/Common" />
+					<Add directory="/software/VTK/Filtering" />
+					<Add directory="/software/VTK/IO" />
+					<Add directory="/software/VTK/Hybrid" />
+					<Add directory="/software/ticpp" />
+					<Add directory="/opt/local/var/macports/software/fftw-3/3.1.2_5/opt/local/include" />
 				</Compiler>
 				<Linker>
-					<Add directory="C:\builds/Debug/bin" />
+					<Add option="`wx-config --libs`" />
+					<Add directory="/builds/Debug/bin" />
 					<Add directory=".." />
-					<Add directory="C:\wxWidgets-2.8.7/lib/vc_dll" />
-					<Add directory="C:\wxWidgets-2.8.7/lib/vc_lib" />
-					<Add library="comctl32" />
-					<Add library="rpcrt4" />
-					<Add library="winmm" />
-					<Add library="advapi32" />
-					<Add library="wsock32" />
-					<Add library="wxmsw28d_core" />
-					<Add library="wxbase28d" />
+					<Add directory="/usr/local/lib" />
+					<Add directory="/software/wxMac-2.8.7/build-release" />
+					<Add directory="/builds/VTK504/bin" />
+					<Add directory="/builds/VTK504/bin/release" />
+					<Add directory="/software/ticpp/lib" />
+					<Add directory="/opt/local/var/macports/software/fftw-3/3.1.2_5/opt/local/lib" />
+					<Add library="vtkGraphics" />
+					<Add library="vtkRendering" />
+					<Add library="vtkCommon" />
+					<Add library="vtkFiltering" />
+					<Add library="vtkIO" />
+					<Add library="vtkHybrid" />
+					<Add library="ticppd" />
+					<Add library="libfftw3" />
 				</Linker>
+				<ExtraCommands>
+					<Add after="rm -f -r -v /builds/Debug/bin/wxSRparlabVTKPREM.app" />
+					<Add after="mkdir /builds/Debug/bin/wxSRparlabVTKPREM.app" />
+					<Add after="mkdir /builds/Debug/bin/wxSRparlabVTKPREM.app/Contents" />
+					<Add after="mkdir /builds/Debug/bin/wxSRparlabVTKPREM.app/Contents/MacOS" />
+					<Add after="mkdir /builds/Debug/bin/wxSRparlabVTKPREM.app/Contents/Resources" />
+					<Add after="mkdir /builds/Debug/bin/wxSRparlabVTKPREM.app/Contents/Resources/English.lproj" />
+					<Add after="cp /builds/Debug/bin/wxSRparlabVTKPREM /builds/Debug/bin/wxSRparlabVTKPREM.app/Contents/MacOS/wxSRparlabVTKPREM" />
+					<Add after="cp wxSRparlabVTKPREM.icns /builds/Debug/bin/wxSRparlabVTKPREM.app/Contents/Resources/wxSRparlabVTKPREM.icns" />
+					<Add after="cp Info.plist /builds/Debug/bin/wxSRparlabVTKPREM.app/Contents/Info.plist" />
+				</ExtraCommands>
 			</Target>
 			<Target title="ReleaseVTK">
-				<Option output="C:/builds/Release/bin/wxSRparlabVTKPREM.exe" prefix_auto="0" extension_auto="0" />
-				<Option object_output="C:\builds/Release/obj" />
+				<Option output="builds/Release/bin/wxSRparlabVTKPREM" prefix_auto="0" extension_auto="0" />
+				<Option object_output="/builds/Release/obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
 					<Add option="-O3" />
-					<Add option="-DNDEBUG" />
-					<Add directory="C:\wxWidgets-2.8.7/include" />
+					<Add option="-DJMU_USE_VTK" />
+					<Add option="-DJMU_TGTFOLLOW" />
+					<Add option="`wx-config --cxxflags` -W -Wall -ansi" />
+					<Add directory="/usr/local/lib/wx/include/mac-ansi-release-2.8/wx" />
+					<Add directory="/software/wxMac-2.8.7/include" />
+					<Add directory="/builds/VTK504" />
+					<Add directory="/software/VTK/Graphics" />
+					<Add directory="/software/VTK/Rendering" />
+					<Add directory="/software/VTK/Common" />
+					<Add directory="/software/VTK/Filtering" />
+					<Add directory="/software/VTK/IO" />
+					<Add directory="/software/VTK/Hybrid" />
+					<Add directory="/software/ticpp" />
+					<Add directory="/opt/local/var/macports/software/fftw-3/3.1.2_5/opt/local/include" />
 				</Compiler>
 				<Linker>
-					<Add directory="C:\builds/Release/bin" />
+					<Add option="`wx-config --libs`" />
+					<Add directory="/builds/Release/bin" />
 					<Add directory=".." />
-					<Add directory="C:\wxWidgets-2.8.7/lib/vc_dll" />
-					<Add directory="C:\wxWidgets-2.8.7/lib/vc_lib" />
-					<Add library="comctl32" />
-					<Add library="rpcrt4" />
-					<Add library="winmm" />
-					<Add library="advapi32" />
-					<Add library="wsock32" />
-					<Add library="wxmsw28_core" />
-					<Add library="wxbase28" />
+					<Add directory="/usr/local/lib" />
+					<Add directory="/software/wxMac-2.8.7/build-release" />
+					<Add directory="/builds/VTK504/bin" />
+					<Add directory="/builds/VTK504/bin/release" />
+					<Add directory="/software/ticpp/lib" />
+					<Add directory="/opt/local/var/macports/software/fftw-3/3.1.2_5/opt/local/lib" />
+					<Add library="vtkGraphics" />
+					<Add library="vtkRendering" />
+					<Add library="vtkCommon" />
+					<Add library="vtkFiltering" />
+					<Add library="vtkIO" />
+					<Add library="vtkHybrid" />
+					<Add library="ticpp" />
+					<Add library="libfftw3" />
 				</Linker>
+				<ExtraCommands>
+					<Add after="rm -f -r -v /builds/Release/bin/wxSRparlabVTKPREM.app" />
+					<Add after="mkdir /builds/Release/bin/wxSRparlabVTKPREM.app" />
+					<Add after="mkdir /builds/Release/bin/wxSRparlabVTKPREM.app/Contents" />
+					<Add after="mkdir /builds/Release/bin/wxSRparlabVTKPREM.app/Contents/MacOS" />
+					<Add after="mkdir /builds/Release/bin/wxSRparlabVTKPREM.app/Contents/Resources" />
+					<Add after="mkdir /builds/Release/bin/wxSRparlabVTKPREM.app/Contents/Resources/English.lproj" />
+					<Add after="cp /builds/Release/bin/wxSRparlabVTKPREM /builds/Release/bin/wxSRparlabVTKPREM.app/Contents/MacOS/wxSRparlabVTKPREM" />
+					<Add after="cp wxSRparlabVTKPREM.icns /builds/Debug/bin/wxSRparlabVTKPREM.app/Contents/Resources/wxSRparlabVTKPREM.icns" />
+					<Add after="cp Info.plist /builds/Release/bin/wxSRparlabVTKPREM.app/Contents/Info.plist" />
+				</ExtraCommands>
 			</Target>
 		</Build>
 		<Unit filename="CamFrame.h">
 			<Option compilerVar="CPP" />
-			<Option target="Debug" />
-			<Option target="Release" />
 			<Option target="DebugVTK" />
 			<Option target="ReleaseVTK" />
 		</Unit>
 		<Unit filename="CamPanelSettings.h">
 			<Option compilerVar="CPP" />
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="DebugVTK" />
+			<Option target="ReleaseVTK" />
+		</Unit>
+		<Unit filename="CamScattering.h">
+			<Option compilerVar="CPP" />
 			<Option target="DebugVTK" />
 			<Option target="ReleaseVTK" />
 		</Unit>
 		<Unit filename="CamViewData.h">
 			<Option compilerVar="CPP" />
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="DebugVTK" />
+			<Option target="ReleaseVTK" />
+		</Unit>
+		<Unit filename="camVtkView.h">
+			<Option compilerVar="CPP" />
 			<Option target="DebugVTK" />
 			<Option target="ReleaseVTK" />
 		</Unit>
 		<Unit filename="CMainWnd.h">
 			<Option compilerVar="CPP" />
-			<Option target="Debug" />
-			<Option target="Release" />
 			<Option target="DebugVTK" />
 			<Option target="ReleaseVTK" />
 		</Unit>
 		<Unit filename="srDummy.h">
 			<Option compilerVar="CPP" />
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="DebugVTK" />
+			<Option target="ReleaseVTK" />
+		</Unit>
+		<Unit filename="srDummyDefines.h">
+			<Option compilerVar="CPP" />
 			<Option target="DebugVTK" />
 			<Option target="ReleaseVTK" />
 		</Unit>
 		<Unit filename="wxSrApp.h">
 			<Option compilerVar="CPP" />
-			<Option target="Debug" />
-			<Option target="Release" />
 			<Option target="DebugVTK" />
 			<Option target="ReleaseVTK" />
 		</Unit>
 		<Unit filename="wxSRparlab.h">
 			<Option compilerVar="CPP" />
-			<Option target="Debug" />
-			<Option target="Release" />
 			<Option target="DebugVTK" />
 			<Option target="ReleaseVTK" />
 		</Unit>
 		<Unit filename="wxSRvtkView.h">
 			<Option compilerVar="CPP" />
-			<Option target="Debug" />
-			<Option target="Release" />
 			<Option target="DebugVTK" />
 			<Option target="ReleaseVTK" />
 		</Unit>
 		<Unit filename="CamFrame.cpp">
 			<Option compilerVar="CPP" />
-			<Option target="Debug" />
-			<Option target="Release" />
 			<Option target="DebugVTK" />
 			<Option target="ReleaseVTK" />
 		</Unit>
 		<Unit filename="CamPanelSettinsgs.cpp">
 			<Option compilerVar="CPP" />
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="DebugVTK" />
+			<Option target="ReleaseVTK" />
+		</Unit>
+		<Unit filename="CamScattering.cpp">
+			<Option compilerVar="CPP" />
 			<Option target="DebugVTK" />
 			<Option target="ReleaseVTK" />
 		</Unit>
 		<Unit filename="CamViewData.cpp">
 			<Option compilerVar="CPP" />
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="DebugVTK" />
+			<Option target="ReleaseVTK" />
+		</Unit>
+		<Unit filename="camVtkView.cpp">
+			<Option compilerVar="CPP" />
 			<Option target="DebugVTK" />
 			<Option target="ReleaseVTK" />
 		</Unit>
 		<Unit filename="CMainWnd.cpp">
 			<Option compilerVar="CPP" />
-			<Option target="Debug" />
-			<Option target="Release" />
 			<Option target="DebugVTK" />
 			<Option target="ReleaseVTK" />
 		</Unit>
 		<Unit filename="srDummy.cpp">
 			<Option compilerVar="CPP" />
-			<Option target="Debug" />
-			<Option target="Release" />
 			<Option target="DebugVTK" />
 			<Option target="ReleaseVTK" />
 		</Unit>
 		<Unit filename="wxSrApp.cpp">
 			<Option compilerVar="CPP" />
-			<Option target="Debug" />
-			<Option target="Release" />
 			<Option target="DebugVTK" />
 			<Option target="ReleaseVTK" />
 		</Unit>
 		<Unit filename="wxSRvtkView.cpp">
 			<Option compilerVar="CPP" />
-			<Option target="Debug" />
-			<Option target="Release" />
 			<Option target="DebugVTK" />
 			<Option target="ReleaseVTK" />
 		</Unit>
