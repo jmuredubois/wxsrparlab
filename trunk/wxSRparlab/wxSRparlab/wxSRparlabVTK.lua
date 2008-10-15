@@ -53,15 +53,15 @@ end
 if (OS == "macosx") then
   tinsert(package.includepaths,
     {
-      string.format('%s', "/usr/local/lib/wx/include/mac-ansi-release-2.8/wx"),
-      string.format('%s%s',os.getenv("WXWIN"), "/include")
+      string.format('%s', "/usr/local/lib/wx/include/mac-ansi-release-2.8")
+      --string.format('%s%s',os.getenv("WXWIN"), "/include")
     }
   )
   if (target =="cb-gcc") then
 	tinsert( package.libpaths, 
       {
-      	string.format('%s', "/usr/local/lib"),
-        string.format('%s%s',os.getenv("WXWIN"), "/build-release")
+      	string.format('%s', "/usr/local/lib")
+        --string.format('%s%s',os.getenv("WXWIN"), "/build-release")
       }
 	)
   end
@@ -82,8 +82,10 @@ if (OS == "linux") then
   tinsert(package.linkoptions,  "`wx-config --libs`")
 end
 if (OS == "macosx") then
-  tinsert(package.buildoptions, "`wx-config --cxxflags` -W -Wall -ansi")
-  tinsert(package.linkoptions,  "`wx-config --libs`")
+  tinsert(package.buildoptions, "`wx-config --cxxflags --unicode=no` -W -Wall -ansi")
+  tinsert(package.linkoptions,  "`wx-config --libs --unicode=no`")
+  tinsert(package.buildoptions, "-I/usr/local/lib/wx/include/mac-ansi-release-2.8 -I/usr/local/include/wx-2.8 -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXMAC__");
+  tinsert(package.linkoptions,  "-L/usr/local/lib   -framework IOKit -framework Carbon -framework Cocoa -framework System -framework QuickTime  -lwx_mac_richtext-2.8 -lwx_mac_aui-2.8 -lwx_mac_xrc-2.8 -lwx_mac_qa-2.8 -lwx_mac_html-2.8 -lwx_mac_adv-2.8 -lwx_mac_core-2.8 -lwx_base_carbon_xml-2.8 -lwx_base_carbon_net-2.8 -lwx_base_carbon-2.8")
 end
 
 if (OS == "windows") then
@@ -184,6 +186,7 @@ if (OS == "macosx") then
 tinsert(
   package.config["DebugVTK"].postbuildcommands, 
   {
+  	"pwd",
   	string.format('%s%s%s%s%s',"rm -f -r -v ",os.getenv("JMU_BUILDS"), "/Debug/bin/",package.name, ".app"),
   	string.format('%s%s%s%s%s',"mkdir ",os.getenv("JMU_BUILDS"), "/Debug/bin/",package.name, ".app"),
   	string.format('%s%s%s%s%s',"mkdir ",os.getenv("JMU_BUILDS"), "/Debug/bin/",package.name, ".app/Contents"),
@@ -198,6 +201,7 @@ tinsert(
 tinsert(
   package.config["ReleaseVTK"].postbuildcommands, 
   {
+  	"pwd",
   	string.format('%s%s%s%s%s',"rm -f -r -v ",os.getenv("JMU_BUILDS"), "/Release/bin/",package.name, ".app"),
   	string.format('%s%s%s%s%s',"mkdir ",os.getenv("JMU_BUILDS"), "/Release/bin/",package.name, ".app"),
   	string.format('%s%s%s%s%s',"mkdir ",os.getenv("JMU_BUILDS"), "/Release/bin/",package.name, ".app/Contents"),
@@ -205,7 +209,7 @@ tinsert(
   	string.format('%s%s%s%s%s',"mkdir ",os.getenv("JMU_BUILDS"), "/Release/bin/",package.name, ".app/Contents/Resources"),
   	string.format('%s%s%s%s%s',"mkdir ",os.getenv("JMU_BUILDS"), "/Release/bin/",package.name, ".app/Contents/Resources/English.lproj"),
   	string.format('%s%s%s%s%s%s%s%s%s%s',"cp ",os.getenv("JMU_BUILDS"), "/Release/bin/",package.name," ",os.getenv("JMU_BUILDS"), "/Release/bin/", package.name, ".app/Contents/MacOS/", package.name),
-  	string.format('%s%s%s%s%s%s%s%s%s',"cp ",package.name,".icns ",os.getenv("JMU_BUILDS"), "/Debug/bin/", package.name, ".app/Contents/Resources/", package.name,".icns"),
+  	string.format('%s%s%s%s%s%s%s%s%s',"cp ",package.name,".icns ",os.getenv("JMU_BUILDS"), "/Release/bin/", package.name, ".app/Contents/Resources/", package.name,".icns"),
   	string.format('%s%s%s%s%s',"cp Info.plist ",os.getenv("JMU_BUILDS"), "/Release/bin/", package.name, ".app/Contents/Info.plist")
   }
   )
