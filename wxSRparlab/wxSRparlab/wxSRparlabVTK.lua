@@ -1,16 +1,12 @@
 package.name = "wxSRparlabVTKPREM"
 package.guid = "F0174772-C16D-4CED-8E0E-3B1348DB3631"
-if (OS == "windows") then
-	package.kind = "winexe"
-else
-	package.kind = "exe"
-end
+package.kind = "winexe"
 package.language = "c++"
 
 package.configs = {"DebugVTK", "ReleaseVTK"}
 
 package.targetprefix = ""
---package.config["DebugVTK"].target = string.format('%s%s%s',os.getenv("JMU_BUILDS"), "/Debug/bin",package.name)
+--package.config["DebugVTK"].target = string.format('/%s%s%s',os.getenv("JMU_BUILDS"), "/Debug/bin",package.name)
 --package.config["ReleaseVTK"].target = string.format('%s%s%s',os.getenv("JMU_BUILDS"), "/Release/bin",package.name)
 
 package.config["DebugVTK"].bindir = string.format('%s%s',os.getenv("JMU_BUILDS"), "/Debug/bin")
@@ -49,7 +45,23 @@ if (OS == "windows") then
 	tinsert( package.libpaths, 
       {
         string.format('%s%s',os.getenv("WXWIN"), "/lib/vc_dll"),
-        string.format('%s%s',os.getenv("WXWIN"), "/lib/vc_lib"),
+        string.format('%s%s',os.getenv("WXWIN"), "/lib/vc_lib")
+      }
+	)
+  end
+end
+if (OS == "macosx") then
+  tinsert(package.includepaths,
+    {
+      string.format('%s', "/usr/local/lib/wx/include/mac-ansi-release-2.8/wx"),
+      string.format('%s%s',os.getenv("WXWIN"), "/include")
+    }
+  )
+  if (target =="cb-gcc") then
+	tinsert( package.libpaths, 
+      {
+      	string.format('%s', "/usr/local/lib"),
+        string.format('%s%s',os.getenv("WXWIN"), "/build-release")
       }
 	)
   end
@@ -113,6 +125,7 @@ tinsert(package.links,
   }
 )
 tinsert(package.defines, { "JMU_USE_VTK" } )
+tinsert(package.defines, { "JMU_TGTFOLLOW" } )
 --END OF package includes for VTK
 
 --package includes for TICPP
@@ -131,26 +144,45 @@ tinsert( package.libpaths,
 --END OF package includes for TICPP
 
 --package includes for FFTW
-tinsert(package.config["DebugVTK"].links,   { "libfftw3-3"})
-tinsert(package.config["ReleaseVTK"].links,   { "libfftw3-3"})
-tinsert(package.includepaths,
+if (OS == "windows") then
+  tinsert(package.config["DebugVTK"].links,   { "libfftw3-3"})
+  tinsert(package.config["ReleaseVTK"].links,   { "libfftw3-3"})
+  tinsert(package.includepaths,
   {
     string.format('%s',os.getenv("JMU_FFTW3"))
   }
-)
-tinsert( package.libpaths, 
+  )
+  tinsert( package.libpaths, 
   {
     string.format('%s',os.getenv("JMU_FFTW3"))
   }
-)
+  )
+end
+if (OS == "macosx") then
+  tinsert(package.config["DebugVTK"].links,   { "libfftw3"})
+  tinsert(package.config["ReleaseVTK"].links,   { "libfftw3"})
+  tinsert(package.includepaths,
+  {
+    string.format('%s%s',os.getenv("JMU_FFTW3"), "/include")
+  }
+  )
+  tinsert( package.libpaths, 
+  {
+    string.format('%s%s',os.getenv("JMU_FFTW3"), "/lib")
+  }
+  )
+end
+
+
 --END OF package includes for FFTW
 
 -- --http://wiki.wxwindows.org/WxMac_Issues
+--[
 if (OS == "macosx") then
 --  	string.format('%s%s',"cd ",string.format('%s%s',os.getenv("JMU_BUILDS"), "/Debug/bin")
 --),
 tinsert(
-  package.postbuildcommands, 
+  package.config["DebugVTK"].postbuildcommands, 
   {
   	string.format('%s%s%s%s%s',"rm -f -r -v ",os.getenv("JMU_BUILDS"), "/Debug/bin/",package.name, ".app"),
   	string.format('%s%s%s%s%s',"mkdir ",os.getenv("JMU_BUILDS"), "/Debug/bin/",package.name, ".app"),
@@ -163,4 +195,20 @@ tinsert(
   	string.format('%s%s%s%s%s',"cp Info.plist ",os.getenv("JMU_BUILDS"), "/Debug/bin/", package.name, ".app/Contents/Info.plist")
   }
   )
+tinsert(
+  package.config["ReleaseVTK"].postbuildcommands, 
+  {
+  	string.format('%s%s%s%s%s',"rm -f -r -v ",os.getenv("JMU_BUILDS"), "/Release/bin/",package.name, ".app"),
+  	string.format('%s%s%s%s%s',"mkdir ",os.getenv("JMU_BUILDS"), "/Release/bin/",package.name, ".app"),
+  	string.format('%s%s%s%s%s',"mkdir ",os.getenv("JMU_BUILDS"), "/Release/bin/",package.name, ".app/Contents"),
+  	string.format('%s%s%s%s%s',"mkdir ",os.getenv("JMU_BUILDS"), "/Release/bin/",package.name, ".app/Contents/MacOS"),
+  	string.format('%s%s%s%s%s',"mkdir ",os.getenv("JMU_BUILDS"), "/Release/bin/",package.name, ".app/Contents/Resources"),
+  	string.format('%s%s%s%s%s',"mkdir ",os.getenv("JMU_BUILDS"), "/Release/bin/",package.name, ".app/Contents/Resources/English.lproj"),
+  	string.format('%s%s%s%s%s%s%s%s%s%s',"cp ",os.getenv("JMU_BUILDS"), "/Release/bin/",package.name," ",os.getenv("JMU_BUILDS"), "/Release/bin/", package.name, ".app/Contents/MacOS/", package.name),
+  	string.format('%s%s%s%s%s%s%s%s%s',"cp ",package.name,".icns ",os.getenv("JMU_BUILDS"), "/Debug/bin/", package.name, ".app/Contents/Resources/", package.name,".icns"),
+  	string.format('%s%s%s%s%s',"cp Info.plist ",os.getenv("JMU_BUILDS"), "/Release/bin/", package.name, ".app/Contents/Info.plist")
+  }
+  )
+
 end
+---]]
