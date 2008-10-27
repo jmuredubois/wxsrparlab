@@ -46,7 +46,6 @@
 					<Add library="libwx_mac_xrc-2.8" />
 					<Add library="libwx_mac_qa-2.8" />
 					<Add library="libwx_mac_html-2.8" />
-					<Add library="libwx_mac_html-2.8" />
 					<Add library="libwx_mac_adv-2.8" />
 					<Add library="libwx_mac_core-2.8" />
 					<Add library="libwx_base_carbon_xml-2.8" />
@@ -143,6 +142,8 @@
 		</Build>
 		<Unit filename="CMainWnd.cpp" />
 		<Unit filename="CMainWnd.h" />
+		<Unit filename="CamFlagNaN.cpp" />
+		<Unit filename="CamFlagNaN.h" />
 		<Unit filename="CamFrame.cpp" />
 		<Unit filename="CamFrame.h" />
 		<Unit filename="CamPanelSettings.h" />
@@ -153,6 +154,11 @@
 		<Unit filename="CamViewData.h" />
 		<Unit filename="camVtkView.cpp" />
 		<Unit filename="camVtkView.h" />
+		<Unit filename="imgPadder.cpp" />
+		<Unit filename="imgPadder.h" />
+		<Unit filename="myConvolveHfloat.cpp" />
+		<Unit filename="myConvolveHfloat.h" />
+		<Unit filename="srBuf.h" />
 		<Unit filename="srDummy.cpp" />
 		<Unit filename="srDummy.h" />
 		<Unit filename="srDummyDefines.h" />

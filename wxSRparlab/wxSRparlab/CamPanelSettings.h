@@ -44,6 +44,7 @@ public:
 
 	void CamPanelSettings::SetBtnTxtStop();	//!< sets button text to 'Stop'
 	void CamPanelSettings::SetBtnTxtAcqu();	//!< sets button text to 'Acquire'
+	bool IsScatChecked(){return m_ckBoxScatComp->IsChecked();}; //
 
 
 private:
@@ -56,6 +57,7 @@ private:
 	#ifdef JMU_TGTFOLLOW  
 	  wxButton* m_buttonTgtFile; 
 	#endif
+	wxButton* m_buttonScatParams;
 
 	/* Radio boxes */
 	wxRadioBox* m_radioboxFrq;	//!< camera frq
@@ -65,6 +67,8 @@ private:
 	/* Check boxes */
 	wxCheckBox* m_ckBoxFixPtrn;
 	wxCheckBox* m_ckBoxLedNonLin;
+	
+	wxCheckBox* m_ckBoxScatComp;
 	
 	/* TextControls */
 	wxTextCtrl* m_TxtDelayStat;

@@ -51,7 +51,19 @@ int CamPanelSettings::InitSettings()
         wxDefaultPosition, wxDefaultSize, 4, freqs, 0, wxRA_SPECIFY_COLS);
 
     wxString srFilter[] = { wxT("None"), wxT("Median") };
+    
+	// Scat comp controls //
+    m_ckBoxScatComp = new wxCheckBox( this, IDC_ScatComp, wxT("Scattering compensation"),
+        wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
+        
+    m_buttonScatParams = new wxButton(this, IDB_SetScatParams, wxT("Set scat. comp. params"));
 
+	wxBoxSizer *sizerScat = new wxBoxSizer(wxHORIZONTAL);
+		sizerScat->Add(m_ckBoxScatComp, 0, wxEXPAND);
+		sizerScat->Add(m_buttonScatParams, 1, wxEXPAND);
+
+
+	// Frequency controls
     m_radioboxSrFilt = new wxRadioBox(this, wxID_ANY,
         wxT("Spatial filter"), wxDefaultPosition, wxDefaultSize,
         2, srFilter, 0, wxRA_SPECIFY_COLS);
@@ -70,6 +82,7 @@ int CamPanelSettings::InitSettings()
 	sizerPanel->Add(sizerButtons, 0, wxEXPAND);
 	sizerPanel->Add(m_radioboxReadMode, 0, wxEXPAND);
     sizerPanel->Add(m_radioboxFrq, 0, wxEXPAND);
+    sizerPanel->Add(sizerScat, 0, wxEXPAND);
     sizerPanel->Add(m_radioboxSrFilt, 0, wxEXPAND);
 	sizerPanel->Add(m_buttonSetTrfMat, 0, wxEXPAND);
 	#ifdef JMU_TGTFOLLOW  
