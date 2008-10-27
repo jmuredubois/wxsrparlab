@@ -55,9 +55,9 @@ public:
 	//! destructor
 	~CamScattering();
 	//! Compensate scattering method
-	int Compensate(SRBUF scatBuf);
+	int Compensate(SRBUF scatBuf, NANBUF nanBuf);
 	//! Add abiltity to set target once and for all
-	int SetCompensationTarget(SRBUF scatBuf);
+	int SetCompensationTarget(SRBUF scatBuf, NANBUF nanBuf);
 	//! Compensate on previously defined target
 	int CompensateAgain();
 	double*   GetPsfD();		//!< Returns the PSF image (double)

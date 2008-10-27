@@ -41,7 +41,7 @@ CamScattering::~CamScattering()
 }
 
 //! Add abiltity to set target once and for all
-int CamScattering::SetCompensationTarget(SRBUF scatBuf)
+int CamScattering::SetCompensationTarget(SRBUF scatBuf, NANBUF nanBuf)
 {
 	int res = 0;
     if( (scatBuf.amp==NULL) || (scatBuf.pha==NULL) || (scatBuf.nCols<1) || (scatBuf.nRows<1) || (scatBuf.nCols*scatBuf.nCols*sizeof(unsigned short) != scatBuf.bufferSizeInBytes) ){return -1;};
@@ -1960,3 +1960,10 @@ int CamScattering::LoadScatSettings(const char* fn)
   return res;
 }
 
+//! Compensate scattering method
+int CamScattering::Compensate(SRBUF scatBuf, NANBUF nanBuf)
+{
+	int res = 0;
+	res += CalcScatCorrPadDft(scatBuf, nanBuf);
+	return res;
+}
