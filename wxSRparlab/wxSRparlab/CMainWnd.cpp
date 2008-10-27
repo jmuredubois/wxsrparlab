@@ -214,6 +214,7 @@ void MainWnd::AddChildren()
 		_sizerCamVisCol->Add(colBox, wxGBPosition(i,1));
 		//sizerCamVisCol->SetItemSpan(colBox, wxGBSpan(1,7));
 		_colVtk.push_back(colBox);
+		camFrm->SendSizeEvent();
 	} // ENDOF for loop on _numCams
 	//this->SendSizeEvent();
 }
