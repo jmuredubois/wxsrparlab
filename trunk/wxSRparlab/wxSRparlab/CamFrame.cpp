@@ -373,6 +373,8 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   delete(OpenDialogAmp);
   if((m_pFile4ReadPha  != NULL) && (m_pFile4ReadAmp  != NULL) && (m_pFile4ReadPha->IsOpened()) && (m_pFile4ReadAmp->IsOpened()))
   {
+	  m_scat = new CamScattering(this);
+	  m_NaN = new CamFlagNaN(this);
 	  return;
   }
 
@@ -522,6 +524,12 @@ void CamFrame::AcqOneFrm()
 		    scatBuf.nCols = m_nCols;
 		    scatBuf.nRows = m_nRows;
 		    scatBuf.bufferSizeInBytes = m_nCols*m_nRows*2*sizeof(unsigned short);
+			NANBUF scatNaN;
+			scatNaN.nCols = m_nCols;
+			scatNaN.nRows = m_nRows;
+			scatNaN.bufferSizeInBytes = m_nCols * m_nRows * sizeof(bool);
+			scatNaN.nanBool = m_NaN->FlagNaN(scatBuf);
+			m_scat->Compensate(scatBuf, scatNaN);
 		}
 		CoordTrf();
 		errMutex = m_mutexSrBuf->Unlock();
