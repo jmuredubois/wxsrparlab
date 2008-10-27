@@ -1952,6 +1952,42 @@ int CamScattering::LoadScatSettings(const char* fn)
 //  ITR_CHILD_END(itr);
 //  res += InitKernels();
 
+	try
+	{
+		ticpp::Document doc( fn );
+		doc.LoadFile();
+		_kernelList.erase(_kernelList.begin(),_kernelList.end());
+
+		ticpp::Element* pKrn = doc.FirstChildElement("PersPass")->FirstChildElement("ScatComp")->FirstChildElement("kernel");
+		while(pKrn != NULL)
+		{
+			int numCoeffsH=0;
+			float sigmaH=0;
+			int numCoeffsV=0;
+			float sigmaV=0;
+			float weight=0.f;
+			
+			pKrn->GetAttribute("numCoeffsV", &numCoeffsV);
+			pKrn->GetAttribute("sigmaV", &sigmaV);
+			pKrn->GetAttribute("numCoeffsH", &numCoeffsH);
+			pKrn->GetAttribute("sigmaH", &sigmaH);
+			pKrn->GetAttribute("weight", &weight);
+			_kernelList.push_back(SCkernel(SCkernel::KT_GAUSSIAN, numCoeffsH, sigmaH, numCoeffsV, sigmaV, weight));
+			pKrn = pKrn->NextSiblingElement("kernel", false);
+		}
+
+	}
+	catch( ticpp::Exception& ex )
+	{
+		std::cout << ex.what();
+		return -1;
+	}
+	catch(...)
+	{
+		_kernelList.push_back(SCkernel(SCkernel::KT_GAUSSIAN, 20, 3, 30, 2, 1.0)); // dummy values
+		return -1;
+	}
+
 #ifndef LARGE_PSF
   res += InitScatPsfFromKernel();// initialize the scattering PSF from its the kernel description
 #else // LARGE_PSF
