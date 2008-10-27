@@ -1987,6 +1987,7 @@ int CamScattering::LoadScatSettings(const char* fn)
 		_kernelList.push_back(SCkernel(SCkernel::KT_GAUSSIAN, 20, 3, 30, 2, 1.0)); // dummy values
 		return -1;
 	}
+	res += InitKernels();
 
 #ifndef LARGE_PSF
   res += InitScatPsfFromKernel();// initialize the scattering PSF from its the kernel description
