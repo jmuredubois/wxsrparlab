@@ -143,6 +143,8 @@ CamFrame::~CamFrame()
 	#ifdef JMU_TGTFOLLOW
 		if(m_pFile4TgtCoord != NULL) { delete(m_pFile4TgtCoord); m_pFile4TgtCoord = NULL; };
 	#endif
+	if(m_NaN != NULL) {delete(m_NaN); m_NaN = NULL; };
+	if(m_scat != NULL) {delete(m_scat); m_scat = NULL; };
 }
 
 BEGIN_EVENT_TABLE(CamFrame, wxFrame)
@@ -448,11 +450,13 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   #ifdef JMU_TGTFOLLOW
 	if(m_pFile4TgtCoord != NULL) { delete(m_pFile4TgtCoord); m_pFile4TgtCoord = NULL; };
   #endif
-  m_nSrBufSz = 0;
-  m_nCols = 0;
-  m_nRows = 0;
+  m_nSrBufSz = 176*144*2*sizeof(unsigned short);
+  m_nCols = 176;
+  m_nRows = 144;
   m_nFrmRead = 0;
   m_nSerialSR = 0;
+  if(m_NaN != NULL) {delete(m_NaN); m_NaN = NULL; };
+  if(m_scat != NULL) {delete(m_scat); m_scat = NULL; };
   m_settingsPane->EnableOpenSR();	// enable "Open" button
   m_settingsPane->SetText(wxT("Close successfull"));
   SetStatusText( wxT("cam") );
