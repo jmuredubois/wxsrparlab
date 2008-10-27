@@ -15,6 +15,9 @@
 #ifdef JMU_USE_VTK
 #include "CamVtkView.h" //!< camera vtk view header file
 #endif
+#include "srBuf.h"
+#include "CamScattering.h"
+#include "CamFlagNaN.h"
 
 
 
@@ -30,6 +33,9 @@ class MainWnd;
 class CViewSrVtk;
 class CamVtkView;
 #endif
+
+class CamScattering;
+class CamFlagNaN;
 
 //! enum used by the CamViewData class
 enum CamReadModeEnum
@@ -72,6 +78,10 @@ public:
 	CamVtkView* GetCamVtk(){return _camVtk;};
 #endif
 	int GetVtkSub(){return _vtkSub;};
+	int GetNumCols(){return m_nCols;};
+	int GetNumRows(){return m_nRows;};
+	SRCAM GetSRcam(){return m_sr;};
+	void OnSetScatParams(wxCommandEvent& WXUNUSED(event));
 
 private:
 	MainWnd	*_pWin; // parent main wnd
@@ -112,6 +122,8 @@ private:
 		wxFFile*		m_pFile4TgtCoord; 
 	#endif
 	int _vtkSub;
+	CamScattering* m_scat;
+	CamFlagNaN* m_NaN;
 
 public:
     DECLARE_EVENT_TABLE()
@@ -131,6 +143,8 @@ enum CamFrameEnum
 	IDB_SetTrfMat = 9,
 	IDC_AcqOne = 10,
 	IDB_TgtFile = 11,
+	IDC_ScatComp = 12,
+	IDB_SetScatParams = 13,
 	ID_ThisIsAStop = 255
 };
 

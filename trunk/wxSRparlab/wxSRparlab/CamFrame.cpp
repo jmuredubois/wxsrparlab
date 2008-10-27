@@ -117,6 +117,8 @@ CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos
 		m_pFile4TgtCoord = NULL;
 	#endif
 	_vtkSub = 0;
+	m_scat = NULL;
+	m_NaN = NULL;
 }
 
 /**
@@ -155,6 +157,7 @@ BEGIN_EVENT_TABLE(CamFrame, wxFrame)
 		EVT_BUTTON(IDB_TgtFile,  CamFrame::OnTgtFile)
 	#endif
 	EVT_COMMAND(IDC_AcqOne, wxEVT_JMUACQONEFRM, CamFrame::AcqOneFrmEvt)
+	EVT_BUTTON(IDB_SetScatParams, CamFrame::OnSetScatParams)
 END_EVENT_TABLE()
 
 /**
@@ -405,6 +408,9 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   }
   m_settingsPane->SetText(strR);
   SetStatusText( strR );
+  
+  m_scat = new CamScattering(this);
+  m_NaN = new CamFlagNaN(this);
 }
 
 //---------------------------------------------------
@@ -505,9 +511,18 @@ void CamFrame::AcqOneFrm()
 	  wxMutexError errMutex= m_mutexSrBuf->Lock();
 	  if(errMutex == wxMUTEX_NO_ERROR)
 	  {
-		res = m_pFile4ReadPha->Read(m_pSrBuf, (int)m_nCols*(int)m_nRows*2);
-		res = m_pFile4ReadAmp->Read(&m_pSrBuf[(int)m_nCols*(int)m_nRows*2], (int)m_nCols*(int)m_nRows*2);
+		res = m_pFile4ReadPha->Read(m_pSrBuf, (int)m_nCols*(int)m_nRows*sizeof(unsigned short));
+		res = m_pFile4ReadAmp->Read(&m_pSrBuf[(int)m_nCols*(int)m_nRows*sizeof(unsigned short)], (int)m_nCols*(int)m_nRows*sizeof(unsigned short));
 		m_nFrmRead +=1;
+		if(m_settingsPane->IsScatChecked())
+		{
+		    SRBUF scatBuf;
+		    scatBuf.pha = (unsigned short*) m_pSrBuf;
+		    scatBuf.amp = (unsigned short*) (&m_pSrBuf[m_nRows*m_nCols*sizeof(unsigned short)]);
+		    scatBuf.nCols = m_nCols;
+		    scatBuf.nRows = m_nRows;
+		    scatBuf.bufferSizeInBytes = m_nCols*m_nRows*2*sizeof(unsigned short);
+		}
 		CoordTrf();
 		errMutex = m_mutexSrBuf->Unlock();
 	  } //{errMutex == wxMUTEX_NO_ERROR)
@@ -570,7 +585,16 @@ void CamFrame::AcqOneFrm()
 	    res = SR_SetMode(m_sr, AM_COR_FIX_PTRN ); //|| AM_COR_LED_NON_LIN );
 		res = SR_Acquire(m_sr);
 		memcpy( (void*) m_pSrBuf, SR_GetImage(m_sr,0), m_nRows*m_nCols*sizeof(unsigned short));
-		memcpy( (void*) (&m_pSrBuf[m_nRows*m_nCols]), SR_GetImage(m_sr,1), m_nRows*m_nCols*sizeof(unsigned short));
+		memcpy( (void*) (&m_pSrBuf[m_nRows*m_nCols*sizeof(unsigned short)]), SR_GetImage(m_sr,1), m_nRows*m_nCols*sizeof(unsigned short));
+		if(m_settingsPane->IsScatChecked())
+		{
+		    SRBUF scatBuf;
+		    scatBuf.pha = (unsigned short*) m_pSrBuf;
+		    scatBuf.amp = (unsigned short*) (&m_pSrBuf[m_nRows*m_nCols*sizeof(unsigned short)]);
+		    scatBuf.nCols = m_nCols;
+		    scatBuf.nRows = m_nRows;
+		    scatBuf.bufferSizeInBytes = m_nCols*m_nRows*2*sizeof(unsigned short);
+		}
 		CoordTrf();
 	    errMutex = m_mutexSrBuf->Unlock();
 	  } //{errMutex == wxMUTEX_NO_ERROR)
@@ -775,3 +799,30 @@ void CamFrame::OnTgtFile(wxCommandEvent& WXUNUSED(event))
   //#endif
 }
 #endif
+
+void CamFrame::OnSetScatParams(wxCommandEvent& WXUNUSED(event))
+{
+  //#ifdef JMU_TGTFOLLOW
+
+  //logPrintf("swissrangerTester: SR_Open device");
+  m_settingsPane->SetText(wxT("Modify scattering compensation parameters"));
+  wxString strR;
+
+  wxFileDialog* OpenDialogScat = new wxFileDialog(this,
+	  wxT("Choose a scattering compensation parameters file to open"),	// msg
+	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
+	  wxEmptyString,	// default file
+	  wxT("Scattering compensation parameter files (*.xml)|*.xml|All files (*.*)|*.*"),	// file ext
+	  wxFD_OPEN|wxFD_CHANGE_DIR,
+	  wxDefaultPosition);
+
+  if((OpenDialogScat->ShowModal()==wxID_OK) )
+  {
+	  wxString strPathScat = OpenDialogScat->GetPath();
+	  m_scat->LoadScatSettings( strPathScat.char_str() );
+  } // (OpenDialogMat->ShowModal()==wxID_OK) )
+  delete(OpenDialogScat);
+
+  m_settingsPane->SetText(wxT("Opened target file"));
+  //#endif
+}

@@ -29,7 +29,7 @@
  *  - config specific: "$(WXWIN)/include/vc_lib/msvc/" should
  *    be added to the include path for "setup.h"
  */
-#include "wx/wxprec.h"
+//#include "wx/wxprec.h"
 #ifndef  WX_PRECOMP
   #include "wx/wx.h"
 #endif //precompiled headers
@@ -81,3 +81,9 @@
 #ifdef JMU_USE_VTK
 	#include "wxSRvtkView.h"
 #endif
+
+#define USE_FFTW	// using FFTW dft transform for scattering compensation calculations
+#define PAD_FFTW	// image padding for FFTW processing
+#define PAD_ZEROS	// pad fft image with zeros -> THIS SHOULD BE THE DEFAULT
+
+#include "srBuf.h"
