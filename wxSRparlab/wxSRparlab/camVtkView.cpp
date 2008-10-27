@@ -992,7 +992,13 @@ int CamVtkView::updateTarget()
 	{
 		tgtLine->SetPoint2(camTranMat->GetElement(0,3),camTranMat->GetElement(1,3),camTranMat->GetElement(2,3));
 		tgtLine->Modified();
-		//renWin->Render();
+
+		tgtTriPoints->InsertPoint(0, 0.0, 0.0,0.0);
+		tgtTriPoints->InsertPoint(1,-1.0, 1.0,0.0);
+		tgtTriPoints->InsertPoint(2, 1.0, 1.0,0.0);
+		tgtTriPoints->InsertPoint(3, 1.0,-1.0,0.0);
+		tgtTriPoints->InsertPoint(4,-2.0,-1.0,0.0);
+		tgtTriPoints->Modified();
 	}
 	return res;
 }
@@ -1015,7 +1021,6 @@ int CamVtkView::updateTarget(float *ptsF, int nCoord)
 			tgtTriPoints->SetPoint(3, (double) ptsF[ 9],(double) ptsF[10],(double) ptsF[11]);
 			tgtTriPoints->SetPoint(4, (double) ptsF[12],(double) ptsF[13],(double) ptsF[14]);
 			tgtTriPoints->Modified();
-			tgtTriTCoords->Modified();
 		}
 	}
 	return res;
