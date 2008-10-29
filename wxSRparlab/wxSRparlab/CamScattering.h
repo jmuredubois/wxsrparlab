@@ -146,7 +146,7 @@ private:
   int CalcScatDoLargeConv(); //!< Launch the LARGE convolution operation
   int CalcConv2LargePsf();  //!< put convolution result into LARGE psf buffer
   int CalcConv2Psf();       //!< put convolution result into psf buffer
-  int CalcSrBuf2Complex(SRBUF scatBuf, NANBUF nanBuf);	//!< put SR data into complex buffer			    USING DFT
+  int CalcSrBuf2Complex(SRBUF scatBuf);	//!< put SR data into complex buffer			    USING DFT
   int CalcComplex2SrBuf(SRBUF scatBuf, NANBUF nanBuf);	//!< put complex data into SR buffer			    USING DFT
   int CalcSrBuf2RepComplex(SRBUF scatBuf, int repW, int repH);	//!< put replicated SR data into complex buffer USING DFT
   int CalcRepComplex2SrBuf(SRBUF scatBuf, NANBUF nanBuf, int repW, int repH);	//!< put replicates complex data into SR buffer USING DFT
@@ -159,6 +159,6 @@ private:
   int CalcScatSimulPadDft(SRBUF scatBuf, NANBUF nanBuf);	//!< scattering SIMULATION calculation         USING PADDED DFT
   int CalcBufReallocDft();		//!< reallocates psf buffers if needed 		   USING PADDED DFT
   int UpdateScatPsf4PadDft();	//!< update scattering psf model			   USING PADDED DFT
-  int CalcSrBuf2ComplexPad(SRBUF scatBuf, NANBUF nanBuf);	//!< put SR data into complex buffer		   USING PADDED DFT
+  int CalcSrBuf2ComplexPad(SRBUF scatBuf);	//!< put SR data into complex buffer		   USING PADDED DFT
   int CalcComplexPad2SrBuf(SRBUF scatBuf, NANBUF nanBuf);	//!< put complex data into SR buffer		   USING PADDED DFT
 };
