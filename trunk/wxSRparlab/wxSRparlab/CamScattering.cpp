@@ -498,7 +498,7 @@ int CamScattering::CalcSrBuf2RepComplex(SRBUF scatBuf, int repW, int repH)
 	DFT image size. \n
 */
 //! Puts complex data into SR buffer
-int CamScattering::CalcRepComplex2SrBuf(SRBUF scatBuf, int repW, int repH)
+int CamScattering::CalcRepComplex2SrBuf(SRBUF scatBuf, NANBUF nanBuf, int repW, int repH)
 {
 	int res = 0;
 #ifdef USE_FFTW
@@ -525,7 +525,7 @@ int CamScattering::CalcRepComplex2SrBuf(SRBUF scatBuf, int repW, int repH)
 											// phase 65535 (7.50m)
 	for(i=0;i<num;i++)	// for each pixel
     {
-		if(_imgNaN[i])	// if NIL, set NIL amplitude and phase
+		if(nanBuf.nanBool[i])	// if NIL, set NIL amplitude and phase
 		{
 		  pha[i] = phaNaN;	// set NIL amplitude
 		  amp[i] = ampNaN;	// set NIL phase
@@ -1458,7 +1458,7 @@ int CamScattering::CalcFreeBufs()
 		if (_kernIplV[k]!=NULL) iplDeleteConvKernelFP( _kernIplV[k]);
 #else
 		DeallocateMyKernel1D(_myKernsH[k]);DeallocateMyKernel1D(_myKernsV[k]);
-		SAFE_FREE(_myKernsH[k]);
+		SAFE_FREE(_myKernsH[k]); SAFE_FREE(_myKernsV[k]);
 #endif
 	}
 	// This loop deletes intermediary images for scat calculation
@@ -1497,7 +1497,7 @@ int CamScattering::CalcScatCorr(SRBUF scatBuf, NANBUF nanBuf)
 	_scatCTimer.StartTimer();
 #endif
 
-	res += CalcSrBuf2Conv(scatBuf, nanBuf);	// put SR data into convolution buffers
+	res += CalcSrBuf2Conv(scatBuf);	// put SR data into convolution buffers
 
 	res += CalcScatDoConv();	// Do the convolution operation
 
@@ -1538,7 +1538,7 @@ int CamScattering::CalcScatSimul(SRBUF scatBuf, NANBUF nanBuf)
 	_scatCTimer.StartTimer();
 #endif
 
-	res += CalcSrBuf2Conv(scatBuf, nanBuf);	// put SR data into convolution buffers
+	res += CalcSrBuf2Conv(scatBuf);	// put SR data into convolution buffers
 
 	res += CalcScatDoConv();	// Do the convolution operation
 
@@ -1711,7 +1711,7 @@ int CamScattering::CalcScatDoSub()
   \sa CalcScatCorr()
 */
 //! Bufffer conversions.
-int CamScattering::CalcSrBuf2Conv(SRBUF scatBuf, NANBUF nanBuf)
+int CamScattering::CalcSrBuf2Conv(SRBUF scatBuf)
 {
 	int res = 0;
 
@@ -1956,8 +1956,12 @@ int CamScattering::LoadScatSettings(const char* fn)
 	{
 		ticpp::Document doc( fn );
 		doc.LoadFile();
-		_kernelList.erase(_kernelList.begin(),_kernelList.end());
+		res += CalcFreeBufs();
+		res += CalcFreeBufsDft();
+		res += CalcFreeBufsPadDft();
 
+		_kernelList.erase(_kernelList.begin(),_kernelList.end());
+		//_numScatGauss = 0;
 		ticpp::Element* pKrn = doc.FirstChildElement("PersPass")->FirstChildElement("ScatComp")->FirstChildElement("kernel");
 		while(pKrn != NULL)
 		{
@@ -1973,6 +1977,7 @@ int CamScattering::LoadScatSettings(const char* fn)
 			pKrn->GetAttribute("sigmaH", &sigmaH);
 			pKrn->GetAttribute("weight", &weight);
 			_kernelList.push_back(SCkernel(SCkernel::KT_GAUSSIAN, numCoeffsH, sigmaH, numCoeffsV, sigmaV, weight));
+			//_numScatGauss +=1 ;
 			pKrn = pKrn->NextSiblingElement("kernel", false);
 		}
 
@@ -1980,13 +1985,24 @@ int CamScattering::LoadScatSettings(const char* fn)
 	catch( ticpp::Exception& ex )
 	{
 		std::cout << ex.what();
+		res += CalcBufAlloc();
+		res += CalcBufAllocDft();
+		res += CalcBufAllocPadDft();
 		return -1;
 	}
 	catch(...)
 	{
 		_kernelList.push_back(SCkernel(SCkernel::KT_GAUSSIAN, 20, 3, 30, 2, 1.0)); // dummy values
+		_numScatGauss = 1;
+		res += CalcBufAlloc();
+		res += CalcBufAllocDft();
+		res += CalcBufAllocPadDft();
 		return -1;
 	}
+	res += CalcBufAlloc();
+	res += CalcBufAllocDft();
+	res += CalcBufAllocPadDft();
+
 	res += InitKernels();
 
 #ifndef LARGE_PSF

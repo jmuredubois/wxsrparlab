@@ -7,6 +7,12 @@
  */
 
 #pragma once
+
+#define USE_FFTW	// using FFTW dft transform for scattering compensation calculations
+#define PAD_FFTW	// image padding for FFTW processing
+#define PAD_ZEROS	// pad fft image with zeros -> THIS SHOULD BE THE DEFAULT
+#define LARGE_PSF // enable processing with PSF larger than SR image size ; SHOULD BE SET
+
 #include "wxSRparlab.h" //!< top-level header file
 #include "wxSrApp.h"	//!< application header file
 #include "CamFrame.h"	//!< main camera header file
@@ -124,7 +130,7 @@ private:
   int CalcScatCorr(SRBUF scatBuf, NANBUF nanBuf);	//!< scattering compensation calculation
   int CalcScatDoConv(); //!< Launch the convolution operation
   int CalcScatDoSub();	//!< Do the subtraction needed in scat compensation
-  int CalcSrBuf2Conv(SRBUF scatBuf, NANBUF nanBuf); //!< convert SR buffer 2 convolution buffer
+  int CalcSrBuf2Conv(SRBUF scatBuf); //!< convert SR buffer 2 convolution buffer
   int CalcConv2SrBuf(SRBUF scatBuf, NANBUF nanBuf); //!< convert convolution buffer to SR buffer
   int CalcScatSimul(SRBUF scatBuf, NANBUF nanBuf);	//!< scattering SIMULATION calculation
   int CalcScatDoAdd();	//!< Do the addition needed in scat SIMULATION
@@ -143,7 +149,7 @@ private:
   int CalcSrBuf2Complex(SRBUF scatBuf, NANBUF nanBuf);	//!< put SR data into complex buffer			    USING DFT
   int CalcComplex2SrBuf(SRBUF scatBuf, NANBUF nanBuf);	//!< put complex data into SR buffer			    USING DFT
   int CalcSrBuf2RepComplex(SRBUF scatBuf, int repW, int repH);	//!< put replicated SR data into complex buffer USING DFT
-  int CalcRepComplex2SrBuf(SRBUF scatBuf, int repW, int repH);	//!< put replicates complex data into SR buffer USING DFT
+  int CalcRepComplex2SrBuf(SRBUF scatBuf, NANBUF nanBuf, int repW, int repH);	//!< put replicates complex data into SR buffer USING DFT
   
   int CalcBufAllocPadDft();	//!< allocate scattering correction image buffers  USING PADDED DFT
   int CalcBufAllocPadDft(double padFact);	//!< allocate scattering correction image buffers  USING PADDED DFT

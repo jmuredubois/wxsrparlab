@@ -82,8 +82,4 @@
 	#include "wxSRvtkView.h"
 #endif
 
-#define USE_FFTW	// using FFTW dft transform for scattering compensation calculations
-#define PAD_FFTW	// image padding for FFTW processing
-#define PAD_ZEROS	// pad fft image with zeros -> THIS SHOULD BE THE DEFAULT
-
 #include "srBuf.h"
