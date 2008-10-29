@@ -37,7 +37,7 @@ bool SrApp::OnInit()
 	_mainWnd = NULL;
 
 	//! - creates a new main window \n
-    _mainWnd = new MainWnd( _T("wxSRparlab"), wxPoint(050,050), wxSize(300,150) );
+    _mainWnd = new MainWnd( _T("wxSRparlab"), wxPoint(05,05), wxSize(300,150) );
 	if(_mainWnd != NULL){
 		_mainWnd->Init();
 		_mainWnd->Show(TRUE); // show the main window
@@ -47,16 +47,17 @@ bool SrApp::OnInit()
 	} // ENDOF if(_mainWnd != NULL)
 
 	_mainWnd->AddChildren();
-	_mainWnd->Layout();
-	_mainWnd->Fit();
-	_mainWnd->Refresh();
-	_mainWnd->Update();
-	_mainWnd->Show(TRUE);
     SetTopWindow(_mainWnd); //! - declares main wnd as top wnd \n
 	// success: wxApp::OnRun() will be called which will enter the main message
     // loop and the application will run. If we returned false here, the
     // application would exit immediately.
 	_mainWnd->SendSizeEvent();
+	_mainWnd->Layout();
+	int wdt, hgt;
+	_mainWnd->GetSize(&wdt, &hgt);
+	_mainWnd->SetSize(wdt+1, hgt+1);
+	_mainWnd->Refresh();
+	_mainWnd->Raise();
     return TRUE;
 } 
 
