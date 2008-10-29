@@ -12,13 +12,15 @@
 #include "CamFrame.h"	//!< main camera header file
 #include "srBuf.h"
 
-
+#ifndef NANBUFHEADER
+#define NANBUFHEADER
 typedef struct nanVar {
     bool* nanBool;
     int nCols;
     int nRows;
     int bufferSizeInBytes;
 } NANBUF;
+#endif
 
 class CamFrame;
 

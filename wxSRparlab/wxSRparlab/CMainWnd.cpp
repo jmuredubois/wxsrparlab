@@ -85,6 +85,8 @@ MainWnd::~MainWnd()
 #ifdef JMU_USE_VTK
 	if(_vtkWin){ delete(_vtkWin); _vtkWin =NULL; };
 #endif
+	_visVtk.clear();
+	_colVtk.clear();
 }
 
 /**
@@ -203,6 +205,7 @@ void MainWnd::AddChildren()
 		m_camFrm.push_back(camFrm);
 		pos += incr; //... increment position.
 
+#ifdef JMU_USE_VTK
 		//labT.sprintf(wxT("Cam %i"), i); // ... change checkbox text ...
 		wxCheckBox *chkBox = new wxCheckBox(_bgPanel, IDC_visVtk, labT);	
 		chkBox->SetValue(true);
@@ -215,6 +218,7 @@ void MainWnd::AddChildren()
 		//sizerCamVisCol->SetItemSpan(colBox, wxGBSpan(1,7));
 		_colVtk.push_back(colBox);
 		camFrm->SendSizeEvent();
+#endif
 	} // ENDOF for loop on _numCams
 	//this->SendSizeEvent();
 }
