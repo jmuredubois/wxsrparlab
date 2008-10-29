@@ -194,7 +194,7 @@ int CamFrame::CreateAndSetNotebook(const wxString& title)
 	{
 		m_camNB->Close(TRUE);
 	}
-	m_camNB = new wxAuiNotebook(this, -1, wxPoint(-1,-1), wxSize(-1,-1), wxAUI_NB_TOP | wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_CLOSE_ON_ALL_TABS );
+	m_camNB = new wxAuiNotebook(this, -1, wxPoint(-1,-1), wxSize(-1,-1), wxAUI_NB_TOP | wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS );
 
 	// %%%%%%% Settings window
 	m_settingsPane = new CamPanelSettings(m_camNB,wxT("Settings"), wxPoint(-1,-1), wxSize(-1,-1)); /* NBparadigm */
@@ -218,13 +218,13 @@ int CamFrame::CreateAndSetNotebook(const wxString& title)
 	// %%%%%% Y panel
 	m_viewYPane = new CamViewData(m_camNB,wxT("Y [mm]"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
 	m_viewYPane->InitViewData();
-	m_viewYPane->SetDispMin(-1000.0);
-	m_viewYPane->SetDispMax(1000.0);
+	m_viewYPane->SetDispMin(-1500.0);
+	m_viewYPane->SetDispMax(1500.0);
 	// %%%%%% Z panel
 	m_viewXPane = new CamViewData(m_camNB,wxT("X [mm]"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
 	m_viewXPane->InitViewData();
-	m_viewXPane->SetDispMin(-1000.0);
-	m_viewXPane->SetDispMax(1000.0);
+	m_viewXPane->SetDispMin(-1500.0);
+	m_viewXPane->SetDispMax(1500.0);
 
 	/* NBparadigm */
 	m_camNB->AddPage(m_settingsPane, wxT("Settings"), TRUE);//, -1);
