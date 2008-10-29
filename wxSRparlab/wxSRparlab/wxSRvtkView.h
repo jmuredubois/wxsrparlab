@@ -57,6 +57,7 @@ class CamVtkView; // a class to represent ONE camera of the scene
 class CViewSrVtk{
 public:
 	CViewSrVtk(wxFrame* pWnd);
+	CViewSrVtk(wxFrame* pWnd, int x, int y, int w, int h);
 	~CViewSrVtk();
 
 	//int updateTOFcurrent(SRCAM sr, SRPARLAB srPL, int vtkSub){};

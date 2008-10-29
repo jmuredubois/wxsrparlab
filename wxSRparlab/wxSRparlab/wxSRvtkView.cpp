@@ -2,12 +2,20 @@
 #include "wxSRvtkView.h"
 #include "camVtkView.h"
 
-
 /**
  * Constructor for CViewSrVtk
  *
  */
 CViewSrVtk::CViewSrVtk(wxFrame* pWnd)
+{
+	int x=300, y=50, w=800, h=600;
+	CViewSrVtk(pWnd, x, y, w, h);
+};
+/**
+ * Constructor for CViewSrVtk
+ *
+ */
+CViewSrVtk::CViewSrVtk(wxFrame* pWnd, int x, int y, int w, int h)
 {
 
 	// instantiate class fields
@@ -47,8 +55,8 @@ CViewSrVtk::CViewSrVtk(wxFrame* pWnd)
 	//BGdataActor->Register(renderer);
     renderer->AddActor(axesActor);
     renderer->SetBackground(0.2,0.2,0.4);		//!< HARDCODED BACKGROUND COLOR
-    renWin->SetSize(800,600);					//!< HARDCODED RENDER WINDOW SIZE
-	renWin->SetPosition(300, 050);
+    renWin->SetSize(w,h);					//!< HARDCODED RENDER WINDOW SIZE
+	renWin->SetPosition(x, y);
 
 	//renderer->GetActiveCamera()->SetParallelProjection(1);
 	//renderer->GetActiveCamera()->SetParallelScale(2000);

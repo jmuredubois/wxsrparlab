@@ -185,14 +185,14 @@ void MainWnd::Init()
 void MainWnd::AddChildren()
 {
     // temp variables to avoid creating new camFrames on top of each other
-	wxPoint pos = wxPoint(50,150);	// initial position
+	wxPoint pos = wxPoint(5,450);	// initial position
 	wxPoint incr = wxPoint(220,00);	// increment in position
 	wxSize	sz = wxSize(220,400);	// size for camFrame
 	wxString lab;					// title string for camFrame
 	wxString labT;					// title string for camFrame
 
 #ifdef JMU_USE_VTK
-	_vtkWin = new CViewSrVtk(NULL);
+	_vtkWin = new CViewSrVtk(NULL, 440,5,1024,768);
 #endif
 
 	wxString colors[] = { wxT("Z"), wxT("Amp."), wxT("R"),
@@ -228,7 +228,6 @@ void MainWnd::AddChildren()
 #endif
 	} // ENDOF for loop on _numCams
 	this->Layout();
-	//this->SendSizeEvent();
 }
 
 /* Setting display min value*/
