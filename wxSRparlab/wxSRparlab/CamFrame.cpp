@@ -517,8 +517,8 @@ void CamFrame::AcqOneFrm()
 	  wxMutexError errMutex= m_mutexSrBuf->Lock();
 	  if(errMutex == wxMUTEX_NO_ERROR)
 	  {
-		res = m_pFile4ReadPha->Read(m_pSrBuf, (int)m_nCols*(int)m_nRows*sizeof(unsigned short));
-		res = m_pFile4ReadAmp->Read(&m_pSrBuf[(int)m_nCols*(int)m_nRows*sizeof(unsigned short)], (int)m_nCols*(int)m_nRows*sizeof(unsigned short));
+		res = (int) m_pFile4ReadPha->Read(m_pSrBuf, (int)m_nCols*(int)m_nRows*sizeof(unsigned short));
+		res = (int) m_pFile4ReadAmp->Read(&m_pSrBuf[(int)m_nCols*(int)m_nRows*sizeof(unsigned short)], (int)m_nCols*(int)m_nRows*sizeof(unsigned short));
 		m_nFrmRead +=1;
 		if(m_settingsPane->IsScatChecked())
 		{
@@ -543,8 +543,8 @@ void CamFrame::AcqOneFrm()
 		{
 			float frmCntFl;
 			float tgt[15];
-			res  =m_pFile4TgtCoord->Read(&frmCntFl, sizeof(float));
-			res  =m_pFile4TgtCoord->Read(&tgt, 15*sizeof(float));
+			res  =(int) m_pFile4TgtCoord->Read(&frmCntFl, sizeof(float));
+			res  =(int) m_pFile4TgtCoord->Read(&tgt, 15*sizeof(float));
 			if( m_pFile4TgtCoord->Eof() )
 			{
 			  res = m_pFile4TgtCoord->Seek(0, wxFromStart);

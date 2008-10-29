@@ -60,6 +60,8 @@ CamVtkView::CamVtkView(int vtkSub, vtkRenderWindow* ParRenWin, vtkLookupTable* L
 #endif// VTKNOTRANSFORM
 
 	// add actors
+	renderer->GetActiveCamera()->SetPosition(0,0,-5000);
+
 	renderer->AddActor(srCubeActor);
 	renderer->AddActor(dataActor);
 	renderer->AddActor(BGdataActor);
