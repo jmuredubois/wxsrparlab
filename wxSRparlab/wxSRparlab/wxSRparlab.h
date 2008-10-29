@@ -37,6 +37,7 @@
 #include "wx/mdi.h"			//!< used for MDI interface
 #include "wx/panel.h"		//!< for panels (used in tabbed interface)
 #include "wx/notebook.h"	//!< for notebook (tabbed interface)
+#include "wx/aui/auibook.h" //!< AUI notebook (DEBUG)
 #include "wx/datetime.h"	//!< for date/time
 #include "wx/stattext.h"	//!< for static text
 #include "wx/textctrl.h"	//!< for text control
