@@ -57,6 +57,7 @@ int CamPanelSettings::InitSettings()
         wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
         
     m_buttonScatParams = new wxButton(this, IDB_SetScatParams, wxT("Set scat. comp. params"));
+	this->DisableScatParams(); // button is disabled until cam is opened
 
 	wxBoxSizer *sizerScat = new wxBoxSizer(wxHORIZONTAL);
 		sizerScat->Add(m_ckBoxScatComp, 0, wxEXPAND);
@@ -173,4 +174,15 @@ void CamPanelSettings::SetBtnTxtAcqu()
 	if(!m_buttonAcq){return;};
 	m_buttonAcq->SetLabel(wxT("Acquire"));
 	return;
+};
+
+//! Disables the "Scat Comp Params" button
+void CamPanelSettings::DisableScatParams()
+{
+	m_buttonScatParams->Disable();
+};
+//! Enables the "Scat Comp Params" button
+void CamPanelSettings::EnableScatParams()
+{
+	m_buttonScatParams->Enable();
 };
