@@ -82,6 +82,7 @@ public:
 	int GetNumRows(){return m_nRows;};
 	SRCAM GetSRcam(){return m_sr;};
 	void OnSetScatParams(wxCommandEvent& WXUNUSED(event));
+	bool IsScatChecked(){ return m_settingsPane->IsScatChecked(); };
 
 private:
 	MainWnd	*_pWin; // parent main wnd

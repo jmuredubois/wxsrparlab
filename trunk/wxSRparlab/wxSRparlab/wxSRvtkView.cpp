@@ -647,3 +647,16 @@ int CViewSrVtk::Render()
 	renWin->Render();
 	return res;
 }
+
+void CViewSrVtk::setParallelProj(bool para)
+{
+	if(para)
+	{
+		renderer->GetActiveCamera()->ParallelProjectionOn();
+	}
+	else
+	{
+		renderer->GetActiveCamera()->ParallelProjectionOff();
+	}
+	return;
+}

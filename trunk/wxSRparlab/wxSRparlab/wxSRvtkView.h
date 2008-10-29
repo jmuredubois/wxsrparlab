@@ -87,6 +87,7 @@ public:
 	vtkLookupTable* GetKLUT(){return kLUT;};
 	vtkRenderWindow* GetRenWin(){return renWin;};
 	int Render();
+	void setParallelProj(bool para);
 
 private:
 	static const int _vtkSubMax = NUMCAMS ; // VTKSUBMAX undeclared identifier bug 20080114

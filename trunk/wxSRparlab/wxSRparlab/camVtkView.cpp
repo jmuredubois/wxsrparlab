@@ -74,6 +74,7 @@ CamVtkView::CamVtkView(int vtkSub, vtkRenderWindow* ParRenWin, vtkLookupTable* L
  */
 CamVtkView::~CamVtkView()
 {
+	hideDataAct(true);
 	camTran->Delete();
 	camTranMat->Delete();
 	camTranFilter->Delete();
