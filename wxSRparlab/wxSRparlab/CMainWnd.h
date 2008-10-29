@@ -50,6 +50,7 @@ public:
 	void SetVisVtk(wxCommandEvent& event); //!< react on event changed visibility
 	void SetColVtk(wxCommandEvent& event); //!< react on event changed color options
 	void PopCam(int vtkSub); //!< remove camFrame object from list if window is closed
+	void OnParaProj(wxCommandEvent& event); //! Set projection to parallel or perpective
 
     DECLARE_EVENT_TABLE()
 
@@ -72,6 +73,7 @@ private:
 	std::vector<wxCheckBox*> _visVtk;		//!< list of visibility checkboxes
 	std::vector<wxRadioBox*> _colVtk;		//!< list of vtk color options
 	wxGridBagSizer *_sizerCamVisCol;
+	wxCheckBox* _ckParaProj; //! Parallel projection button
 };
 
 //! enum used by main wnd
@@ -85,5 +87,6 @@ enum MainWndEnum
 	IDT_ampMax,
 	IDB_AcqAll,
 	IDC_visVtk,
-	IDC_colVtk
+	IDC_colVtk,
+	IDC_ParaProj
 };

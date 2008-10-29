@@ -74,7 +74,10 @@ void *ThreadReadData::Entry()
             wxThread::Sleep(100); // macBook graphics card is slow
         #endif
 		#ifdef LARGE_PSF
-            wxThread::Sleep(200); // scattering compensatino is expensive
+			if(m_cFrm->IsScatChecked())
+			{
+				wxThread::Sleep(200); // scattering compensatino is expensive
+			}
         #endif
     }
 

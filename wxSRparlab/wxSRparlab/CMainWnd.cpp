@@ -22,6 +22,7 @@ BEGIN_EVENT_TABLE(MainWnd, wxFrame)
 	EVT_BUTTON(IDB_AcqAll, MainWnd::AcqAll)
 	EVT_CHECKBOX(IDC_visVtk, MainWnd::SetVisVtk)
 	EVT_RADIOBOX(IDC_colVtk, MainWnd::SetColVtk)
+	EVT_CHECKBOX(IDC_ParaProj, MainWnd::OnParaProj)
 END_EVENT_TABLE()
 
 IMPLEMENT_APP(SrApp)
@@ -77,6 +78,7 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
 	SetStatusText(strW);
 
 	_buttAcqAll = NULL;
+	_ckParaProj = NULL;
 }
 
 
@@ -152,7 +154,9 @@ void MainWnd::Init()
 		
 
 	_buttAcqAll = new wxButton(_bgPanel, IDB_AcqAll, wxT("Acq. All") );
-
+#ifdef JMU_USE_VTK
+	_ckParaProj = new wxCheckBox(_bgPanel, IDC_ParaProj, wxT("Parallel projection"));
+#endif
 	wxFlexGridSizer *sizerAcqScales = new wxFlexGridSizer(1,2,0,0);
 		sizerAcqScales->Add(_buttAcqAll, flagsExpand);
 		sizerAcqScales->Add( sizerZAmpScales, flagsExpand);
@@ -162,6 +166,9 @@ void MainWnd::Init()
 	wxGridBagSizer *sizerPanel = new wxGridBagSizer();
 		sizerPanel->Add(_sizerCamVisCol, wxGBPosition(0,0), wxGBSpan(8,4));
 		sizerPanel->Add(sizerAcqScales, wxGBPosition(8,0), wxGBSpan(2,4));
+#ifdef JMU_USE_VTK
+		sizerPanel->Add(_ckParaProj, wxGBPosition(10,0), wxGBSpan(1,4));
+#endif
 
 	wxBoxSizer *sizerFrame = new wxBoxSizer(wxVERTICAL); // create sizer for frame
 		sizerFrame->Add(_bgPanel, flagsExpand);
@@ -220,6 +227,7 @@ void MainWnd::AddChildren()
 		camFrm->SendSizeEvent();
 #endif
 	} // ENDOF for loop on _numCams
+	this->Layout();
 	//this->SendSizeEvent();
 }
 
@@ -448,5 +456,15 @@ void MainWnd::PopCam(int vtkSub)
 			break;
 		}
 	}
+#endif
+}
+
+/* acting on "Para proj" checkBox*/
+void MainWnd::OnParaProj(wxCommandEvent& event)
+{
+#ifdef JMU_USE_VTK
+	if(_ckParaProj == NULL) return;
+	_vtkWin->setParallelProj( _ckParaProj->IsChecked() );
+	_vtkWin->Render();
 #endif
 }
