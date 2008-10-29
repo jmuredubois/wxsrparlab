@@ -164,7 +164,7 @@ int CamScattering::CalcScatCorrDft(SRBUF scatBuf, NANBUF nanBuf)
 	// 1- : convert phase and amplitude data
 	// into real and imaginary parts, in double format, and
 	// into an _cxBuf buffer.
-	res += CalcSrBuf2Complex(scatBuf, nanBuf);
+	res += CalcSrBuf2Complex(scatBuf);
 
 	// ...
 	//  2- perform in-place forward dft on _cxBuf
@@ -310,7 +310,7 @@ int CamScattering::UpdateScatPsf4Dft()
 	into the DFT complex buffer. \n
 */
 //! Puts SR data into complex buffer
-int CamScattering::CalcSrBuf2Complex(SRBUF scatBuf, NANBUF nanBuf)
+int CamScattering::CalcSrBuf2Complex(SRBUF scatBuf)
 {
 	int res = 0;
 #ifdef USE_FFTW
@@ -682,7 +682,7 @@ int CamScattering::CalcScatCorrPadDft(SRBUF scatBuf, NANBUF nanBuf)
 	// 1- : convert phase and amplitude data
 	// into real and imaginary parts, in double format, and
 	// into an _cxBuf buffer.
-	res += CalcSrBuf2ComplexPad(scatBuf, nanBuf);
+	res += CalcSrBuf2ComplexPad(scatBuf);
 
 	// ...
 	//  2- perform in-place forward dft on _cxBuf
@@ -745,7 +745,7 @@ int CamScattering::CalcScatSimulPadDft(SRBUF scatBuf , NANBUF nanBuf)
 	// 1- : convert phase and amplitude data
 	// into real and imaginary parts, in double format, and
 	// into an _cxBuf buffer.
-	res += CalcSrBuf2ComplexPad(scatBuf, nanBuf);
+	res += CalcSrBuf2ComplexPad(scatBuf);
 
 	// ...
 	//  2- perform in-place forward dft on _cxBuf
@@ -849,12 +849,12 @@ int CamScattering::UpdateScatPsf4PadDft()
 	into the DFT complex buffer. \n
 */
 //! Puts SR data into complex buffer
-int CamScattering::CalcSrBuf2ComplexPad(SRBUF scatBuf, NANBUF nanBuf)
+int CamScattering::CalcSrBuf2ComplexPad(SRBUF scatBuf)
 {
 	int res = 0;
 #ifdef USE_FFTW
 #ifdef PAD_FFTW
-	res += CalcSrBuf2Complex(scatBuf, nanBuf); // put image into _cxBuf
+	res += CalcSrBuf2Complex(scatBuf); // put image into _cxBuf
 	// create the padded filter
 	_padder->imgPad(reinterpret_cast<fftw_complex*>(_cxBuf),_imgSz.cx*_imgSz.cy*sizeof(fftw_complex), _imgSz, reinterpret_cast<fftw_complex*>(_cxPadBuf), _imgPadSz.cx*_imgPadSz.cy*sizeof(fftw_complex), _imgPadSz);
 #endif // PAD_FFTW
@@ -1187,6 +1187,8 @@ int CamScattering::InitKernels()
 	{
 		w = 0;
 		memcpy( (void*) &_w[j], (void*) &w, sizeof(float) );
+		DeallocateMyKernel1D(_myKernsH[j]);DeallocateMyKernel1D(_myKernsV[j]);
+		SAFE_FREE(_myKernsH[j]); SAFE_FREE(_myKernsV[j]);
 	}
   }
   _numScatGauss = k ;
@@ -1315,11 +1317,12 @@ int CamScattering::CalcBufReallocDft()
 	// initialize DFT buffers a new with updated width and height
 	res += CalcFreeBufsDft();
 	res += CalcBufAllocDft(wdt, hgt);
-	if((wdt>_imgPadSz.cx) || (hgt>_imgPadSz.cy) )
-	{
+	//if((wdt>_imgPadSz.cx) || (hgt>_imgPadSz.cy) )
+	//{
 		res += CalcFreeBufsPadDft();
-		res += CalcBufAllocPadDft(wdt+20, hgt+20);
-	}
+		//res += CalcBufAllocPadDft(wdt+20, hgt+20);
+		res += CalcBufAllocPadDft();
+	//}
 
 	return res;
 }
@@ -1451,7 +1454,7 @@ int CamScattering::CalcFreeBufs()
 	int res = 0;
 	int k=0;
 	// This loop deletes convolution kernels.
-	for(k=0;k<_numScatGauss;k++)
+	for(k=0;k<8;k++)
 	{
 #ifdef IPLENG
 		if (_kernIplH[k]!=NULL) iplDeleteConvKernelFP( _kernIplH[k]);
@@ -1890,78 +1893,13 @@ int CamScattering::CalcUnitImpulse2Conv()
 int CamScattering::LoadScatSettings(const char* fn)
 {
 	int res = 0;
-//  //Reads XML file containing scattering kernels and other configuration informations
-//  pug::xml_parser xml; //XML Parser
-//  if(!xml.parse_file(fn,pug::parse_default))
-//  {
-//    LibSRparlab_Msg(0x200, _T("LoadScatSettings: can not parse:\n'%s'!"),fn);
-//    return -1;
-//  }
-//  pug::xml_node xmlDoc = xml.document();
-//  pug::xml_node itr= xmlDoc;
-//
-//  xml_outline outline;
-//	xmlDoc.traverse(outline); //Output the resulting tree using our outline filter.
-//
-//  _kernelList.erase(_kernelList.begin(),_kernelList.end());
-//  pug::xml_attribute_struct* attr;
-//  XMLTag::Tag tag;
-//  ITR_CHILD_BEGIN(itr,tag);
-//  if(tag==XMLTag::TG_PersPass)
-//  {
-//    ITR_CHILD_BEGIN(itr,tag);
-//    switch(tag)
-//    {
-//    case XMLTag::TG_ScatComp:
-//      {
-//        ITR_CHILD_BEGIN(itr,tag);
-//        int numCoeffsH=0;
-//		float sigmaH=0;
-//		int numCoeffsV=0;
-//		float sigmaV=0;
-//        float weight=0.f;
-//        if((attr = itr.mapto_attribute_ptr(XML(numCoeffsH))) && attr->value)
-//          numCoeffsH=atoi(attr->value);
-//        else break;
-//		if((attr = itr.mapto_attribute_ptr(XML(sigmaH))) && attr->value)
-//          sigmaH=(float)atof(attr->value);
-//        else break;
-//		if((attr = itr.mapto_attribute_ptr(XML(numCoeffsV))) && attr->value)
-//          numCoeffsV=atoi(attr->value);
-//        else break;
-//		if((attr = itr.mapto_attribute_ptr(XML(sigmaV))) && attr->value)
-//          sigmaV=(float)atof(attr->value);
-//        else break;
-//        if((attr = itr.mapto_attribute_ptr(XML(weight))) && attr->value)
-//          weight=(float)atof(attr->value);
-//        else break;
-//        switch(tag)
-//        {
-//        case XMLTag::TG_kernel:
-//          _kernelList.push_back(SCkernel(SCkernel::KT_GAUSSIAN, numCoeffsH, sigmaH, numCoeffsV, sigmaV, weight));
-//          break;
-//        }
-//        ITR_CHILD_END(itr);
-//        break;
-//      }
-//    default:
-//      break;
-//    }
-//    ITR_CHILD_END(itr);
-//  }
-//  ITR_CHILD_END(itr);
-//  res += InitKernels();
-
 	try
 	{
 		ticpp::Document doc( fn );
 		doc.LoadFile();
-		res += CalcFreeBufs();
-		res += CalcFreeBufsDft();
-		res += CalcFreeBufsPadDft();
 
 		_kernelList.erase(_kernelList.begin(),_kernelList.end());
-		//_numScatGauss = 0;
+	
 		ticpp::Element* pKrn = doc.FirstChildElement("PersPass")->FirstChildElement("ScatComp")->FirstChildElement("kernel");
 		while(pKrn != NULL)
 		{
@@ -1977,7 +1915,6 @@ int CamScattering::LoadScatSettings(const char* fn)
 			pKrn->GetAttribute("sigmaH", &sigmaH);
 			pKrn->GetAttribute("weight", &weight);
 			_kernelList.push_back(SCkernel(SCkernel::KT_GAUSSIAN, numCoeffsH, sigmaH, numCoeffsV, sigmaV, weight));
-			//_numScatGauss +=1 ;
 			pKrn = pKrn->NextSiblingElement("kernel", false);
 		}
 
@@ -1985,24 +1922,14 @@ int CamScattering::LoadScatSettings(const char* fn)
 	catch( ticpp::Exception& ex )
 	{
 		std::cout << ex.what();
-		res += CalcBufAlloc();
-		res += CalcBufAllocDft();
-		res += CalcBufAllocPadDft();
 		return -1;
 	}
 	catch(...)
 	{
 		_kernelList.push_back(SCkernel(SCkernel::KT_GAUSSIAN, 20, 3, 30, 2, 1.0)); // dummy values
 		_numScatGauss = 1;
-		res += CalcBufAlloc();
-		res += CalcBufAllocDft();
-		res += CalcBufAllocPadDft();
 		return -1;
 	}
-	res += CalcBufAlloc();
-	res += CalcBufAllocDft();
-	res += CalcBufAllocPadDft();
-
 	res += InitKernels();
 
 #ifndef LARGE_PSF
