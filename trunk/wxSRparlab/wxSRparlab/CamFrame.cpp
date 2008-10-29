@@ -253,6 +253,7 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   m_settingsPane->EnableRadioFilt();	// ensable filter selection
   m_settingsPane->EnableRadioFrq();		// enable frequency selection
   m_settingsPane->EnableCloseSR();	// enable "Close" button
+  m_settingsPane->EnableScatParams(); // enable "Scat comp params" button
   wxString strR;
   unsigned int serial = 0;
   if(m_sr == NULL)
@@ -435,6 +436,7 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   m_settingsPane->DisableCloseSR();		// disable "Close" button
   m_settingsPane->DisableRadioFilt();	// disable filter selection
   m_settingsPane->DisableRadioFrq();	// disable frequency selection
+  m_settingsPane->DisableScatParams();  // disable "Scat Comp Params" button
   if(m_sr != NULL)
   {
 		res = SR_Close(m_sr);

@@ -46,6 +46,9 @@ public:
 	void CamPanelSettings::SetBtnTxtAcqu();	//!< sets button text to 'Acquire'
 	bool IsScatChecked(){return m_ckBoxScatComp->IsChecked();}; //
 
+	void CamPanelSettings::DisableScatParams(); //!< Disables the "Scat Comp Params" button
+	void CamPanelSettings::EnableScatParams();  //!< Enables the "Scat Comp Params" button
+
 
 private:
 
