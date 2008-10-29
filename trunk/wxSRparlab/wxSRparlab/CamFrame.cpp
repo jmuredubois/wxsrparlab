@@ -194,7 +194,7 @@ int CamFrame::CreateAndSetNotebook(const wxString& title)
 	{
 		m_camNB->Close(TRUE);
 	}
-	m_camNB = new wxNotebook(this, -1, wxPoint(-1,-1), wxSize(-1,-1), wxNB_TOP, title);
+	m_camNB = new wxAuiNotebook(this, -1, wxPoint(-1,-1), wxSize(-1,-1), wxAUI_NB_TOP | wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_CLOSE_ON_ALL_TABS );
 
 	// %%%%%%% Settings window
 	m_settingsPane = new CamPanelSettings(m_camNB,wxT("Settings"), wxPoint(-1,-1), wxSize(-1,-1)); /* NBparadigm */
@@ -227,12 +227,12 @@ int CamFrame::CreateAndSetNotebook(const wxString& title)
 	m_viewXPane->SetDispMax(1000.0);
 
 	/* NBparadigm */
-	m_camNB->AddPage(m_settingsPane, wxT("Settings"), TRUE, -1);
-	m_camNB->AddPage(m_viewRangePane, wxT("Range"), FALSE, -1);
-	m_camNB->AddPage(m_viewAmpPane, wxT("Amplitude"), FALSE, -1);
-	m_camNB->AddPage(m_viewZPane, wxT("Z [mm]"), FALSE, -1);
-	m_camNB->AddPage(m_viewYPane, wxT("Y [mm]"), FALSE, -1);
-	m_camNB->AddPage(m_viewXPane, wxT("X [mm]"), FALSE, -1);
+	m_camNB->AddPage(m_settingsPane, wxT("Settings"), TRUE);//, -1);
+	m_camNB->AddPage(m_viewRangePane, wxT("Range"), FALSE);//, -1);
+	m_camNB->AddPage(m_viewAmpPane, wxT("Amplitude"), FALSE);//, -1);
+	m_camNB->AddPage(m_viewZPane, wxT("Z [mm]"), FALSE);//, -1);
+	m_camNB->AddPage(m_viewYPane, wxT("Y [mm]"), FALSE);//, -1);
+	m_camNB->AddPage(m_viewXPane, wxT("X [mm]"), FALSE);//, -1);
 	/* EO NBparadigm */
 
 	return res;

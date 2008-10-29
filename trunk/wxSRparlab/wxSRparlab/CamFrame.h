@@ -96,7 +96,7 @@ private:
 	int m_nSrBufSz ;
 	int m_nRows;
 	int m_nCols;
-	wxNotebook* m_camNB; //!< a notebook interface
+	wxAuiNotebook* m_camNB; //!< a notebook interface
 	wxFFile*		m_pFile4ReadPha; // PHASE file for read operation
 	wxFFile*		m_pFile4ReadAmp; // AMPLITUDE file for read operation
 	ThreadReadData*		m_pThreadReadData; // THREAD for reading data
