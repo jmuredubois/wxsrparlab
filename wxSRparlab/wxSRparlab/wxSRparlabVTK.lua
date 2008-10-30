@@ -22,16 +22,7 @@ package.excludes = {
   "lutDef.h",
   "definesSR.h",
   "libusbSR.h",
-  "camTranMats.cpp",
-  "CamScattering.h",
-  "CamScattering.cpp",
-  "CamFlagNaN.h",
-  "CamFlagNaN.cpp",
-  "srBuf.h",
-  "imgPadder.h",
-  "imgPadder.cpp",
-  "myConvolveHfloat.h",
-  "myConvolveHfloat.cpp"
+  "camTranMats.cpp"
 }
 --]]
 
@@ -154,22 +145,11 @@ tinsert( package.libpaths,
 )
 --END OF package includes for TICPP
 
---package includes for FFTW
-if (OS == "windows") then
-  tinsert(package.config["DebugVTK"].links,   { "libfftw3-3"})
-  tinsert(package.config["ReleaseVTK"].links,   { "libfftw3-3"})
-  tinsert(package.includepaths,
-  {
-    string.format('%s',os.getenv("JMU_FFTW3"))
-  }
-  )
-  tinsert( package.libpaths, 
-  {
-    string.format('%s',os.getenv("JMU_FFTW3"))
-  }
-  )
+--package includes for libSRPLscat (uses FFTW)
+---if (OS == "windows") then
   --tinsert(package.config["DebugVTK"].links,   { "libSRPLscat"})
   --tinsert(package.config["ReleaseVTK"].links,   { "libSRPLscat"})
+  tinsert(package.links,   { "libSRPLscat"})
   tinsert(package.includepaths,
   {
 	string.format('%s%s',os.getenv("JMU_SVNSANDBOX_TRUNK"), "/libSRPLscat")
@@ -184,24 +164,8 @@ if (OS == "windows") then
     string.format('%s%s',os.getenv("JMU_BUILDS"), "/Release/lib")
   }
   )
-end
-if (OS == "macosx") then
-  tinsert(package.config["DebugVTK"].links,   { "libfftw3"})
-  tinsert(package.config["ReleaseVTK"].links,   { "libfftw3"})
-  tinsert(package.includepaths,
-  {
-    string.format('%s%s',os.getenv("JMU_FFTW3"), "/include")
-  }
-  )
-  tinsert( package.libpaths, 
-  {
-    string.format('%s%s',os.getenv("JMU_FFTW3"), "/lib")
-  }
-  )
-end
-
-
---END OF package includes for FFTW
+---end
+--END OF package includes for libSRPLscat (uses FFTW)
 
 -- --http://wiki.wxwindows.org/WxMac_Issues
 --[
