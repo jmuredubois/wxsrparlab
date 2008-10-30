@@ -18,6 +18,7 @@
 #include "srBuf.h"
 #include "CamScattering.h"
 #include "CamFlagNaN.h"
+#pragma comment( lib, "libSRPLscat" )
 
 
 
@@ -123,8 +124,8 @@ private:
 		wxFFile*		m_pFile4TgtCoord; 
 	#endif
 	int _vtkSub;
-	CamScattering* m_scat;
-	CamFlagNaN* m_NaN;
+	SRPLSCAT m_scat;
+	SRPLNAN  m_NaN;
 
 public:
     DECLARE_EVENT_TABLE()

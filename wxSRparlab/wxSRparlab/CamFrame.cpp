@@ -12,6 +12,11 @@
 #include "CamFrame.h"	//!< camera frame header file
 #include "CamPanelSettings.h" //!< camera settings panel header file
 
+#include "srBuf.h"
+#include "CamScattering.h"
+#include "CamFlagNaN.h"
+#pragma comment( lib, "libSRPLscat" )
+
 // ----------------------------------------------------------------------------
 // GUI thread
 // ----------------------------------------------------------------------------
@@ -149,8 +154,8 @@ CamFrame::~CamFrame()
 	#ifdef JMU_TGTFOLLOW
 		if(m_pFile4TgtCoord != NULL) { delete(m_pFile4TgtCoord); m_pFile4TgtCoord = NULL; };
 	#endif
-	if(m_NaN != NULL) {delete(m_NaN); m_NaN = NULL; };
-	if(m_scat != NULL) {delete(m_scat); m_scat = NULL; };
+	if(m_NaN != NULL) { PLNN_Close(m_NaN); /*delete(m_scat);*/ m_NaN = NULL; };
+	if(m_scat != NULL) {PLSC_Close(m_scat); /*delete(m_scat);*/ m_scat = NULL; };
 }
 
 BEGIN_EVENT_TABLE(CamFrame, wxFrame)
@@ -382,8 +387,11 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   delete(OpenDialogAmp);
   if((m_pFile4ReadPha  != NULL) && (m_pFile4ReadAmp  != NULL) && (m_pFile4ReadPha->IsOpened()) && (m_pFile4ReadAmp->IsOpened()))
   {
-	  m_scat = new CamScattering(this);
-	  m_NaN = new CamFlagNaN(this);
+	  SRBUF newbuf; newbuf.amp = NULL; newbuf.pha = NULL; 
+	  newbuf.nCols = m_nCols; newbuf.nRows = m_nRows; 
+	  newbuf.bufferSizeInBytes = m_nRows * m_nCols * 2 * sizeof(unsigned short);
+	  PLSC_Open(&m_scat, newbuf);
+	  PLNN_Open(&m_NaN, newbuf);
 	  return;
   }
 
@@ -419,9 +427,12 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   }
   m_settingsPane->SetText(strR);
   SetStatusText( strR );
-  
-  m_scat = new CamScattering(this);
-  m_NaN = new CamFlagNaN(this);
+
+  SRBUF newbuf; newbuf.amp = NULL; newbuf.pha = NULL; 
+  newbuf.nCols = m_nCols; newbuf.nRows = m_nRows; 
+  newbuf.bufferSizeInBytes = m_nRows * m_nCols * 2 * sizeof(unsigned short);
+  PLSC_Open(&m_scat, newbuf);
+  PLNN_Open(&m_NaN, newbuf);
 }
 
 //---------------------------------------------------
@@ -463,8 +474,8 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   m_nRows = 144;
   m_nFrmRead = 0;
   m_nSerialSR = 0;
-  if(m_NaN != NULL) {delete(m_NaN); m_NaN = NULL; };
-  if(m_scat != NULL) {delete(m_scat); m_scat = NULL; };
+  if(m_NaN != NULL) {PLNN_Close(m_NaN);  /*delete(m_NaN);*/ m_NaN = NULL; };
+  if(m_scat != NULL) {PLSC_Close(m_scat); /*delete(m_scat);*/ m_scat = NULL; };
   m_settingsPane->EnableOpenSR();	// enable "Open" button
   m_settingsPane->SetText(wxT("Close successfull"));
   SetStatusText( wxT("cam") );
@@ -540,8 +551,8 @@ void CamFrame::AcqOneFrm()
 			scatNaN.nCols = m_nCols;
 			scatNaN.nRows = m_nRows;
 			scatNaN.bufferSizeInBytes = m_nCols * m_nRows * sizeof(bool);
-			scatNaN.nanBool = m_NaN->FlagNaN(scatBuf);
-			m_scat->Compensate(scatBuf, scatNaN);
+			scatNaN.nanBool = PLNN_FlagNaN(m_NaN, scatBuf);
+			PLSC_Compensate(m_scat, scatBuf, scatNaN);
 		}
 		CoordTrf();
 		errMutex = m_mutexSrBuf->Unlock();
@@ -839,7 +850,7 @@ void CamFrame::OnSetScatParams(wxCommandEvent& WXUNUSED(event))
   if((OpenDialogScat->ShowModal()==wxID_OK) )
   {
 	  wxString strPathScat = OpenDialogScat->GetPath();
-	  m_scat->LoadScatSettings( strPathScat.char_str() );
+	  PLSC_LoadScatSettings( m_scat, strPathScat.char_str() );
   } // (OpenDialogMat->ShowModal()==wxID_OK) )
   delete(OpenDialogScat);
 
