@@ -23,6 +23,15 @@ package.excludes = {
   "definesSR.h",
   "libusbSR.h",
   "camTranMats.cpp",
+  "CamScattering.h",
+  "CamScattering.cpp",
+  "CamFlagNaN.h",
+  "CamFlagNaN.cpp",
+  "srBuf.h",
+  "imgPadder.h",
+  "imgPadder.cpp",
+  "myConvolveHfloat.h",
+  "myConvolveHfloat.cpp"
 }
 --]]
 
@@ -157,6 +166,22 @@ if (OS == "windows") then
   tinsert( package.libpaths, 
   {
     string.format('%s',os.getenv("JMU_FFTW3"))
+  }
+  )
+  --tinsert(package.config["DebugVTK"].links,   { "libSRPLscat"})
+  --tinsert(package.config["ReleaseVTK"].links,   { "libSRPLscat"})
+  tinsert(package.includepaths,
+  {
+	string.format('%s%s',os.getenv("JMU_SVNSANDBOX_TRUNK"), "/libSRPLscat")
+  }
+  )
+  tinsert( package.config["DebugVTK"].libpaths, 
+  {
+    string.format('%s%s',os.getenv("JMU_BUILDS"), "/Debug/lib")
+  }
+  tinsert( package.config["ReleaseVTK"].libpaths, 
+  {
+    string.format('%s%s',os.getenv("JMU_BUILDS"), "/Release/lib")
   }
   )
 end
