@@ -44,8 +44,8 @@ if (OS == "windows") then
 	)
 	tinsert( package.libpaths, 
       {
-        string.format('%s%s',os.getenv("WXWIN"), "/lib/vc_dll"),
-        string.format('%s%s',os.getenv("WXWIN"), "/lib/vc_lib")
+        string.format('%s%s',os.getenv("WXWIN"), "/lib/vc_lib")--,
+		--string.format('%s%s',os.getenv("WXWIN"), "/lib/vc_dll") --causes LINK ERRORS on PARLAB
       }
 	)
   end
@@ -159,6 +159,7 @@ tinsert( package.libpaths,
   {
     string.format('%s%s',os.getenv("JMU_BUILDS"), "/Debug/lib")
   }
+  )
   tinsert( package.config["ReleaseVTK"].libpaths, 
   {
     string.format('%s%s',os.getenv("JMU_BUILDS"), "/Release/lib")
