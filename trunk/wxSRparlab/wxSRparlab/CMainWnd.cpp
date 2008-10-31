@@ -192,7 +192,7 @@ void MainWnd::AddChildren()
 	wxString labT;					// title string for camFrame
 
 #ifdef JMU_USE_VTK
-	_vtkWin = new CViewSrVtk(NULL, 440,5,1024,768);
+	_vtkWin = new CViewSrVtk(NULL, 440,50,1024,768);
 #endif
 
 	wxString colors[] = { wxT("Z"), wxT("Amp."), wxT("R"),
