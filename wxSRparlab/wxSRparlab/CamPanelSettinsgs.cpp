@@ -63,6 +63,15 @@ int CamPanelSettings::InitSettings()
 		sizerScat->Add(m_ckBoxScatComp, 0, wxEXPAND);
 		sizerScat->Add(m_buttonScatParams, 1, wxEXPAND);
 
+	// Learn background controls //
+    m_ckBoxLrnBg = new wxCheckBox( this, IDC_LrnBg, wxT("Learn background"),
+        wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
+	m_buttonClearBg = new wxButton(this, IDB_ClearBg, wxT("Clear BG."));
+
+	wxBoxSizer *sizerLrnBg = new wxBoxSizer(wxHORIZONTAL);
+		sizerLrnBg->Add(m_ckBoxLrnBg, 0, wxEXPAND);
+		sizerLrnBg->Add(m_buttonClearBg, 1, wxEXPAND);
+
 
 	// Frequency controls
     m_radioboxSrFilt = new wxRadioBox(this, wxID_ANY,
@@ -83,6 +92,7 @@ int CamPanelSettings::InitSettings()
 	sizerPanel->Add(sizerButtons, 0, wxEXPAND);
 	sizerPanel->Add(m_radioboxReadMode, 0, wxEXPAND);
     sizerPanel->Add(m_radioboxFrq, 0, wxEXPAND);
+	sizerPanel->Add(sizerLrnBg, 0, wxEXPAND);
     sizerPanel->Add(sizerScat, 0, wxEXPAND);
     sizerPanel->Add(m_radioboxSrFilt, 0, wxEXPAND);
 	sizerPanel->Add(m_buttonSetTrfMat, 0, wxEXPAND);
