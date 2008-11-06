@@ -197,19 +197,6 @@ int CamViewData::AllocWxBitmap() //! Allocate wxBitmap buffer
 int CamViewData::InitViewData()
 {
 	int res = 0;
-
-	m_buttonCloseView = new wxButton(this, IDB_CloseViewData, wxT("Close"));
-	m_buttonAcquire = new wxButton(this, IDB_Acquire, wxT("Acquire"));
-	m_buttonStopView = new wxButton(this, IDB_FreezeViewData, wxT("Freeze"));
-	m_buttonStopView->SetFocus();
-	  wxBoxSizer *sizerButtons = new wxBoxSizer(wxHORIZONTAL);
-		sizerButtons->Add(m_buttonAcquire, 1, wxEXPAND);
-	    sizerButtons->Add(m_buttonCloseView, 1, wxEXPAND);
-	    sizerButtons->Add(m_buttonStopView, 1, wxEXPAND);
-
-	//Connect(IDB_CloseViewData, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CamViewData::CloseView));
-
-
 	wxString types[] = { wxT("Range"), wxT("Amp"), wxT("z"),
         wxT("xy") };
 
@@ -237,7 +224,6 @@ int CamViewData::InitViewData()
 	/* sizer stuff  ...*/
     wxBoxSizer *sizerPanel = new wxBoxSizer(wxVERTICAL);
 
-	sizerPanel->Add(sizerButtons, 0, wxEXPAND);
     sizerPanel->Add(m_radioboxDtype, 0, wxEXPAND);
 	sizerPanel->Add(sizerDrawText, 4, wxEXPAND);
 
@@ -407,23 +393,6 @@ int CamViewData::SetBitmap()
 	} //{errMutex == wxMUTEX_NO_ERROR)
 
 	return res;
-};
-
-
-/* Changing interface buttons text */
-void CamViewData::SetBtnTxtStop()
-{
-	if(!m_buttonAcquire){return;};
-	m_buttonAcquire->SetLabel(wxT("Stop"));
-	return;
-};
-
-/* Changing interface buttons text */
-void CamViewData::SetBtnTxtAcqu()
-{
-	if(!m_buttonAcquire){return;};
-	m_buttonAcquire->SetLabel(wxT("Acquire"));
-	return;
 };
 
 /* Changing info text */

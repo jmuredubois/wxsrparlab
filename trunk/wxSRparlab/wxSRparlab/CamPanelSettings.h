@@ -48,6 +48,7 @@ public:
 
 	void CamPanelSettings::DisableScatParams(); //!< Disables the "Scat Comp Params" button
 	void CamPanelSettings::EnableScatParams();  //!< Enables the "Scat Comp Params" button
+	bool IsLrnBgChecked(){return m_ckBoxLrnBg->IsChecked();}; //
 
 
 private:
@@ -61,6 +62,7 @@ private:
 	  wxButton* m_buttonTgtFile; 
 	#endif
 	wxButton* m_buttonScatParams;
+	wxButton* m_buttonClearBg;
 
 	/* Radio boxes */
 	wxRadioBox* m_radioboxFrq;	//!< camera frq
@@ -72,6 +74,7 @@ private:
 	wxCheckBox* m_ckBoxLedNonLin;
 	
 	wxCheckBox* m_ckBoxScatComp;
+	wxCheckBox* m_ckBoxLrnBg;
 	
 	/* TextControls */
 	wxTextCtrl* m_TxtDelayStat;

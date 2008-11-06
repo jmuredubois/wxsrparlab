@@ -19,6 +19,8 @@
 #include "CamScattering.h"
 #include "CamFlagNaN.h"
 #pragma comment( lib, "libSRPLscat" )
+#include "libSRPLavg.h"
+#pragma comment( lib, "libSRPLavg" )
 
 
 
@@ -84,6 +86,8 @@ public:
 	SRCAM GetSRcam(){return m_sr;};
 	void OnSetScatParams(wxCommandEvent& WXUNUSED(event));
 	bool IsScatChecked(){ return m_settingsPane->IsScatChecked(); };
+	void OnClearBg(wxCommandEvent& WXUNUSED(event));
+	bool IsLrnBgChecked(){ return m_settingsPane->IsLrnBgChecked(); };
 
 private:
 	MainWnd	*_pWin; // parent main wnd
@@ -105,8 +109,11 @@ private:
 	CamViewData* m_viewRangePane;		//! panel for RANGE data display
 	CamViewData* m_viewAmpPane;			//! panel for AMPLITUDE data display
 	CamViewData* m_viewZPane;			//! panel for Z data display
+#ifdef DISPXYBUFFERS
 	CamViewData* m_viewYPane;			//! panel for Y data display
 	CamViewData* m_viewXPane;			//! panel for X data display
+#endif //DISPXYBUFFERS
+	CamViewData* m_viewBGRangePane;		//! panel for BACKGROUND RANGE data display
 	int m_nFrmRead;		//! number of frames read
 	unsigned int m_nSerialSR;		//! SR serial
 	CamReadModeEnum  m_camReadMode;		//! read  mode
@@ -126,6 +133,7 @@ private:
 	int _vtkSub;
 	SRPLSCAT m_scat;
 	SRPLNAN  m_NaN;
+	SRPLAVG	 m_bgAvg;
 
 public:
     DECLARE_EVENT_TABLE()
@@ -147,6 +155,8 @@ enum CamFrameEnum
 	IDB_TgtFile = 11,
 	IDC_ScatComp = 12,
 	IDB_SetScatParams = 13,
+	IDC_LrnBg = 14,
+	IDB_ClearBg = 15,
 	ID_ThisIsAStop = 255
 };
 

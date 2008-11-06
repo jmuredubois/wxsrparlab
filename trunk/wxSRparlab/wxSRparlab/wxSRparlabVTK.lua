@@ -146,9 +146,6 @@ tinsert( package.libpaths,
 --END OF package includes for TICPP
 
 --package includes for libSRPLscat (uses FFTW)
----if (OS == "windows") then
-  --tinsert(package.config["DebugVTK"].links,   { "libSRPLscat"})
-  --tinsert(package.config["ReleaseVTK"].links,   { "libSRPLscat"})
   tinsert(package.links,   { "libSRPLscat"})
   tinsert(package.includepaths,
   {
@@ -165,8 +162,25 @@ tinsert( package.libpaths,
     string.format('%s%s',os.getenv("JMU_BUILDS"), "/Release/lib")
   }
   )
----end
---END OF package includes for libSRPLscat (uses FFTW)
+--END OF package includes for libSRPLavg
+--package includes for libSRPLscat (uses FFTW)
+  tinsert(package.links,   { "libSRPLavg"})
+  tinsert(package.includepaths,
+  {
+	string.format('%s%s',os.getenv("JMU_SVNSANDBOX_TRUNK"), "/libSRPLavg")
+  }
+  )
+  tinsert( package.config["DebugVTK"].libpaths, 
+  {
+    string.format('%s%s',os.getenv("JMU_BUILDS"), "/Debug/lib")
+  }
+  )
+  tinsert( package.config["ReleaseVTK"].libpaths, 
+  {
+    string.format('%s%s',os.getenv("JMU_BUILDS"), "/Release/lib")
+  }
+  )
+--END OF package includes for libSRPLavg
 
 -- --http://wiki.wxwindows.org/WxMac_Issues
 --[

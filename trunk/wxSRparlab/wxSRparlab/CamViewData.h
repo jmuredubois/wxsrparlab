@@ -46,8 +46,6 @@ public:
 	void StopView(wxCommandEvent& WXUNUSED(event));  //!< Disables the display
 
 	/* Changing interface buttons text */
-	void SetBtnTxtStop();
-	void SetBtnTxtAcqu();
 
 	void SetTxtInfo(wxString text);
 
@@ -127,12 +125,7 @@ public:
 	int SetBitmap();
 private:
 
-	/* Buttons */
-	wxButton* m_buttonCloseView; //!< Close view
-	wxButton* m_buttonAcquire; //!< Acquire image camera
-	wxButton* m_buttonStopView;  //!< Freeze display
-
-	/* Buttons */
+	/* RadioBoxes */
 	wxRadioBox* m_radioboxDtype;	//!< SR data type
 
 	/* Text zones */
