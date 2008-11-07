@@ -60,14 +60,6 @@ public:
 	CViewSrVtk(wxFrame* pWnd, int x, int y, int w, int h);
 	~CViewSrVtk();
 
-	//int updateTOFcurrent(SRCAM sr, SRPARLAB srPL, int vtkSub){};
-	//int updateTOFcurrent(int rows, int cols, unsigned short *z, short *y, short *x, int vtkSub);
-	int updateTOFcurrent(int rows, int cols, unsigned short *z, short *y, short *x, unsigned short* amp, int vtkSub);
-	//int updateTOFcurrent(SRCAM sr, SRPARLAB srPL, int vtkSub, char* fname){};
-
-	//int updateTOFbg(SRCAM sr, SRPARLAB srPL, int vtkSub);
-	//int updateTOFbg(SRCAM sr, SRPARLAB srPL, int vtkSub, char*fname);
-
 	int changeDepthRange(float minVal, float maxVal);
 	int changeAmpRange(float minAmp, float maxAmp);
 	int hideDataAct(int vtkSub, bool doHide);
