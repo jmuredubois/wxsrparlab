@@ -72,6 +72,8 @@ private:
 	wxButton* _buttAcqAll; //!< Acquire image camera
 	std::vector<wxCheckBox*> _visVtk;		//!< list of visibility checkboxes
 	std::vector<wxRadioBox*> _colVtk;		//!< list of vtk color options
+	std::vector<wxCheckBox*> _visBGVtk;		//!< list of BACKGROUND visibility checkboxes
+	std::vector<wxRadioBox*> _colBGVtk;		//!< list of BACKGROUND vtk color options
 	wxGridBagSizer *_sizerCamVisCol;
 	wxCheckBox* _ckParaProj; //! Parallel projection button
 };

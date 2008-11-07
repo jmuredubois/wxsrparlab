@@ -12,11 +12,6 @@
 #include "CamFrame.h"	//!< camera frame header file
 #include "CamPanelSettings.h" //!< camera settings panel header file
 
-#include "srBuf.h"
-#include "libSRPLscat.h"
-#include "libSRPLflagNaN.h"
-#pragma comment( lib, "libSRPLscat" )
-
 // ----------------------------------------------------------------------------
 // GUI thread
 // ----------------------------------------------------------------------------
@@ -104,7 +99,6 @@ CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos
 	m_camNB = NULL;
 	m_sr = NULL;
 	m_pSrBuf = NULL; m_nRows = 0; m_nCols = 0; m_nSrBufSz = 0;
-	m_pSrZ = NULL; m_pSrX = NULL; m_pSrY = NULL;
 	m_mutexSrBuf = new wxMutex(wxMUTEX_DEFAULT);
 
 	m_pFile4ReadPha = NULL;//new wxFFile();
@@ -117,12 +111,15 @@ CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos
 	m_srFrq = MF_20MHz;
 	m_maxMM[0]= 5000.0f; m_maxMM[1]= 7142.8571f;m_maxMM[2]= 7500.0f;m_maxMM[3]= 7894.7368f;
 	//! @todo:  HARDCODED values for m_maxMM -> check with libusbSR driver settings
-	m_fFocal = 8.0f; m_fPixSzX = 0.04f; m_fPixSzY = 0.04f; m_fCenterX = 88.0f; m_fCenterY = 72.0f;
-	m_maxMMr = 7500.0f;
+	//m_fFocal = 8.0f; m_fPixSzX = 0.04f; m_fPixSzY = 0.04f; m_fCenterX = 88.0f; m_fCenterY = 72.0f;
+	//m_maxMMr = 7500.0f;
+	m_ctrParam.f = 8.0f; m_ctrParam.pixDX = 0.04f; m_ctrParam.pixDY = 0.04f; m_ctrParam.cX = 88.0f; m_ctrParam.cY = 72.0f;
+	m_ctrParam.maxMM = 7500.0f;
 	m_mfrqInt = 2;
 #ifdef JMU_USE_VTK
 	_vtkWin=NULL;
 	_camVtk = NULL;
+	_camBGVtk = NULL;
 #endif
 	#ifdef JMU_TGTFOLLOW
 		m_pFile4TgtCoord = NULL;
@@ -131,6 +128,8 @@ CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos
 	m_scat = NULL;
 	m_NaN = NULL;
 	m_bgAvg = NULL;
+	m_CTrf = NULL;
+	m_CTrfBG = NULL;
 }
 
 /**
@@ -143,13 +142,11 @@ CamFrame::~CamFrame()
 	if(m_bReadContinuously){ if(m_pThreadReadData != NULL){ m_pThreadReadData->Delete(); } } ;
 #ifdef JMU_USE_VTK
 	if(_camVtk != NULL) { delete(_camVtk); _camVtk = NULL; } ;
+	if(_camBGVtk != NULL) { delete(_camBGVtk); _camVtk = NULL; } ;
 #endif
 	if(m_sr		  != NULL) { res = SR_Close(m_sr);	m_sr = NULL; };
 	if(m_mutexSrBuf != NULL) { delete(m_mutexSrBuf); m_mutexSrBuf = NULL;};
 	if(m_pSrBuf   != NULL) { free((void*) m_pSrBuf  ); m_pSrBuf   = NULL; };
-	if(m_pSrZ   != NULL) { free((void*) m_pSrZ  ); m_pSrZ   = NULL; };
-	if(m_pSrY   != NULL) { free((void*) m_pSrY  ); m_pSrY   = NULL; };
-	if(m_pSrX   != NULL) { free((void*) m_pSrX  ); m_pSrX   = NULL; };
 	if(m_pFile4ReadPha != NULL) { delete(m_pFile4ReadPha); m_pFile4ReadPha = NULL; };
 	if(m_pFile4ReadAmp != NULL) { delete(m_pFile4ReadAmp); m_pFile4ReadAmp = NULL; };
 	#ifdef JMU_TGTFOLLOW
@@ -158,6 +155,8 @@ CamFrame::~CamFrame()
 	if(m_NaN != NULL) { PLNN_Close(m_NaN); m_NaN = NULL; };
 	if(m_scat != NULL) {PLSC_Close(m_scat); m_scat = NULL; };
 	if(m_bgAvg != NULL) {PLAVG_Close(m_bgAvg); m_bgAvg = NULL; };
+	if(m_CTrf != NULL) {PLCTR_Close(m_CTrf); m_CTrf = NULL; };
+	if(m_CTrfBG != NULL) {PLCTR_Close(m_CTrfBG); m_CTrfBG = NULL; };
 }
 
 BEGIN_EVENT_TABLE(CamFrame, wxFrame)
@@ -361,17 +360,17 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 					float pixSzY = 0.04f; //mm
 					float centerX = 95.1f ; float centerY = 56.3f ; // pixels*/
 		  readBytes = wxFparams->Read(&tmpFlt, sizeof(float));
-		  if(readBytes==sizeof(float)) { m_fFocal = tmpFlt;};
+		  if(readBytes==sizeof(float)) { m_ctrParam.f = tmpFlt;};
 		  readBytes = wxFparams->Read(&tmpFlt, sizeof(float));
-		  if(readBytes==sizeof(float)) { m_fPixSzX = tmpFlt;};
+		  if(readBytes==sizeof(float)) { m_ctrParam.pixDX = tmpFlt;};
 		  readBytes = wxFparams->Read(&tmpFlt, sizeof(float));
-		  if(readBytes==sizeof(float)) { m_fPixSzY = tmpFlt;};
+		  if(readBytes==sizeof(float)) { m_ctrParam.pixDY = tmpFlt;};
 		  readBytes = wxFparams->Read(&tmpFlt, sizeof(float));
-		  if(readBytes==sizeof(float)) { m_fCenterX = tmpFlt;};
+		  if(readBytes==sizeof(float)) { m_ctrParam.cX = tmpFlt;};
 		  readBytes = wxFparams->Read(&tmpFlt, sizeof(float));
-		  if(readBytes==sizeof(float)) { m_fCenterY = tmpFlt;};
+		  if(readBytes==sizeof(float)) { m_ctrParam.cY = tmpFlt;};
 		  readBytes = wxFparams->Read(&tmpFlt, sizeof(float));
-		  if(readBytes==sizeof(float)) { m_maxMMr = tmpFlt;};
+		  if(readBytes==sizeof(float)) { m_ctrParam.maxMM = tmpFlt;};
 		} // (sizeof(int)!=4)
 		delete(wxFparams);
 	    m_pFile4ReadPha = new wxFFile(strPathPha, wxT("rb"));
@@ -387,18 +386,15 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 		{
 			m_pSrBuf = (unsigned char*) malloc(m_nSrBufSz);
 			memset(m_pSrBuf, 0x77, m_nSrBufSz);
-			m_pSrZ = (unsigned short*) malloc(m_nCols*m_nRows*2); memset((void*)m_pSrZ, 0x77, m_nCols*m_nRows*2);
-			m_pSrY = (short*) malloc(m_nCols*m_nRows*2); memset((void*)m_pSrY, 0x55, m_nCols*m_nRows*2);
-			m_pSrX = (short*) malloc(m_nCols*m_nRows*2); memset((void*)m_pSrX, 0x33, m_nCols*m_nRows*2);
 			errMutex = m_mutexSrBuf->Unlock();
 		} //{errMutex == wxMUTEX_NO_ERROR)
 	    res = m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[0], m_nRows*m_nCols);
 	    res = m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2], m_nRows*m_nCols);
-		res = m_viewZPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrZ[0], m_nRows*m_nCols);
-		#ifdef DISPXYBUFFERS
-		  res = m_viewXPane->SetDataArray<short>((short*) &m_pSrX[0], m_nRows*m_nCols);
-		  res = m_viewYPane->SetDataArray<short>((short*) &m_pSrY[0], m_nRows*m_nCols);
-		#endif //DISPXYBUFFERS
+		//res = m_viewZPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrZ[0], m_nRows*m_nCols);
+		//#ifdef DISPXYBUFFERS
+		//  res = m_viewXPane->SetDataArray<short>((short*) &m_pSrX[0], m_nRows*m_nCols);
+		//  res = m_viewYPane->SetDataArray<short>((short*) &m_pSrY[0], m_nRows*m_nCols);
+		//#endif //DISPXYBUFFERS
 		  //res = m_viewBGRangePane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[0], m_nRows*m_nCols);
 
 	    m_settingsPane->SetText(strR);
@@ -415,7 +411,9 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	  newbuf.bufferSizeInBytes = m_nRows * m_nCols * 2 * sizeof(unsigned short);
 	  PLSC_Open(&m_scat, newbuf);
 	  PLNN_Open(&m_NaN, newbuf);
-	  PLAVG_Open (&m_bgAvg, newbuf);
+	  PLAVG_Open(&m_bgAvg, newbuf);
+	  PLCTR_Open(&m_CTrf, newbuf);
+	  PLCTR_Open(&m_CTrfBG, newbuf);
 	  return;
   }
 
@@ -432,10 +430,6 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	  {
 		m_pSrBuf = (unsigned char*) malloc(m_nSrBufSz);
 		memset(m_pSrBuf, 0x77, m_nSrBufSz);
-		m_pSrZ = (unsigned short*) malloc(m_nCols*m_nRows*(sizeof(unsigned short))); memset((void*)m_pSrZ, 0x77, m_nCols*m_nRows*(sizeof(unsigned short)));
-		m_pSrY = (short*) malloc(m_nCols*m_nRows*(sizeof(short))); memset((void*)m_pSrY, 0x55, m_nCols*m_nRows*(sizeof(short)));
-		m_pSrX = (short*) malloc(m_nCols*m_nRows*(sizeof(short))); memset((void*)m_pSrX, 0x33, m_nCols*m_nRows*(sizeof(short)));
-		//res = SR_SetBuffer(m_sr, (void*) m_pSrBuf , m_nSrBufSz);
 		res = SR_SetMode(m_sr, AM_COR_FIX_PTRN ); //|| AM_COR_LED_NON_LIN );
 		res = SR_Acquire(m_sr);
 		memcpy( (void*) m_pSrBuf, SR_GetImage(m_sr,0), m_nRows*m_nCols*sizeof(unsigned short));
@@ -445,11 +439,11 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 
 	  res = m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 0), m_nRows*m_nCols);
 	  res = m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 1), m_nRows*m_nCols);
-	  res = m_viewZPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrZ[0], m_nRows*m_nCols);
-	  #ifdef DISPXYBUFFERS
-	    res = m_viewXPane->SetDataArray<short>((short*) &m_pSrX[0], m_nRows*m_nCols);
-	    res = m_viewYPane->SetDataArray<short>((short*) &m_pSrY[0], m_nRows*m_nCols);
-	  #endif //DISPXYBUFFERS
+	  //res = m_viewZPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrZ[0], m_nRows*m_nCols);
+	  //#ifdef DISPXYBUFFERS
+	  //  res = m_viewXPane->SetDataArray<short>((short*) &m_pSrX[0], m_nRows*m_nCols);
+	  //  res = m_viewYPane->SetDataArray<short>((short*) &m_pSrY[0], m_nRows*m_nCols);
+	  //#endif //DISPXYBUFFERS
 	  //res = m_viewBGRangePane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 0), m_nRows*m_nCols);
   }
   m_settingsPane->SetText(strR);
@@ -461,6 +455,8 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   PLSC_Open(&m_scat, newbuf);
   PLNN_Open(&m_NaN, newbuf);
   PLAVG_Open (&m_bgAvg, newbuf);
+  PLCTR_Open(&m_CTrf, newbuf);
+  PLCTR_Open(&m_CTrfBG, newbuf);
 }
 
 //---------------------------------------------------
@@ -491,9 +487,6 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   if(m_pFile4ReadAmp != NULL) { delete(m_pFile4ReadAmp); m_pFile4ReadAmp = NULL; };
   if(m_mutexSrBuf != NULL) { delete(m_mutexSrBuf); m_mutexSrBuf = NULL;};
   if(m_pSrBuf   != NULL) { free((void*) m_pSrBuf  ); m_pSrBuf   = NULL; };
-  if(m_pSrZ   != NULL) { free((void*) m_pSrZ  ); m_pSrZ   = NULL; };
-  if(m_pSrY   != NULL) { free((void*) m_pSrY  ); m_pSrY   = NULL; };
-  if(m_pSrX   != NULL) { free((void*) m_pSrX  ); m_pSrX   = NULL; };
   #ifdef JMU_TGTFOLLOW
 	if(m_pFile4TgtCoord != NULL) { delete(m_pFile4TgtCoord); m_pFile4TgtCoord = NULL; };
   #endif
@@ -505,6 +498,8 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   if(m_NaN != NULL)   {PLNN_Close(m_NaN);    m_NaN = NULL; };
   if(m_scat != NULL)  {PLSC_Close(m_scat);   m_scat = NULL; };
   if(m_bgAvg != NULL) {PLAVG_Close(m_bgAvg); m_bgAvg = NULL; };
+  if(m_CTrf != NULL) {PLCTR_Close(m_CTrf); m_CTrf = NULL; };
+  if(m_CTrfBG != NULL) {PLCTR_Close(m_CTrfBG); m_CTrfBG = NULL; };
   m_settingsPane->EnableOpenSR();	// enable "Open" button
   m_settingsPane->SetText(wxT("Close successfull"));
   SetStatusText( wxT("cam") );
@@ -549,7 +544,7 @@ void CamFrame::AcqOneFrm()
 {
   int res = 0;
   wxString strR;
-  if((m_sr == NULL) && (m_pSrBuf != NULL) && (m_pSrZ!=NULL) && (m_pSrY!=NULL) && (m_pSrX!=NULL)&&(m_pFile4ReadPha  != NULL) && (m_pFile4ReadAmp  != NULL) && (m_pFile4ReadPha->IsOpened()) && (m_pFile4ReadAmp->IsOpened()))
+  if((m_sr == NULL) && (m_pSrBuf != NULL) && (m_CTrf!=NULL)&&(m_pFile4ReadPha  != NULL) && (m_pFile4ReadAmp  != NULL) && (m_pFile4ReadPha->IsOpened()) && (m_pFile4ReadAmp->IsOpened()))
   {
 	  // if reading from file ...
 	  wxMutexError errMutex= m_mutexSrBuf->Lock();
@@ -558,32 +553,26 @@ void CamFrame::AcqOneFrm()
 		res = (int) m_pFile4ReadPha->Read(m_pSrBuf, (int)m_nCols*(int)m_nRows*sizeof(unsigned short));
 		res = (int) m_pFile4ReadAmp->Read(&m_pSrBuf[(int)m_nCols*(int)m_nRows*sizeof(unsigned short)], (int)m_nCols*(int)m_nRows*sizeof(unsigned short));
 		m_nFrmRead +=1;
-		if(m_settingsPane->IsScatChecked())
-		{
-		    SRBUF scatBuf;
-		    scatBuf.pha = (unsigned short*) m_pSrBuf;
-		    scatBuf.amp = (unsigned short*) (&m_pSrBuf[m_nRows*m_nCols*sizeof(unsigned short)]);
-		    scatBuf.nCols = m_nCols;
-		    scatBuf.nRows = m_nRows;
-		    scatBuf.bufferSizeInBytes = m_nCols*m_nRows*2*sizeof(unsigned short);
+		    SRBUF srBuf;
+		    srBuf.pha = (unsigned short*) m_pSrBuf;
+		    srBuf.amp = (unsigned short*) (&m_pSrBuf[m_nRows*m_nCols*sizeof(unsigned short)]);
+		    srBuf.nCols = m_nCols;
+		    srBuf.nRows = m_nRows;
+		    srBuf.bufferSizeInBytes = m_nCols*m_nRows*2*sizeof(unsigned short);
 			NANBUF scatNaN;
 			scatNaN.nCols = m_nCols;
 			scatNaN.nRows = m_nRows;
 			scatNaN.bufferSizeInBytes = m_nCols * m_nRows * sizeof(bool);
-			scatNaN.nanBool = PLNN_FlagNaN(m_NaN, scatBuf);
-			PLSC_Compensate(m_scat, scatBuf, scatNaN);
+			scatNaN.nanBool = PLNN_FlagNaN(m_NaN, srBuf);
+		if(m_settingsPane->IsScatChecked())
+		{
+			PLSC_Compensate(m_scat, srBuf, scatNaN);
 		}
 		if(m_settingsPane->IsLrnBgChecked())
 		{
-		    SRBUF scatBuf;
-		    scatBuf.pha = (unsigned short*) m_pSrBuf;
-		    scatBuf.amp = (unsigned short*) (&m_pSrBuf[m_nRows*m_nCols*sizeof(unsigned short)]);
-		    scatBuf.nCols = m_nCols;
-		    scatBuf.nRows = m_nRows;
-		    scatBuf.bufferSizeInBytes = m_nCols*m_nRows*2*sizeof(unsigned short);
-			PLAVG_LearnBackground(m_bgAvg, scatBuf);
+			PLAVG_LearnBackground(m_bgAvg, srBuf);
 		}
-		CoordTrf();
+		PLCTR_CoordTrf(m_CTrf, srBuf, m_ctrParam);
 		errMutex = m_mutexSrBuf->Unlock();
 	  } //{errMutex == wxMUTEX_NO_ERROR)
 	  #ifdef JMU_TGTFOLLOW
@@ -596,7 +585,7 @@ void CamFrame::AcqOneFrm()
 			if( m_pFile4TgtCoord->Eof() )
 			{
 			  res = m_pFile4TgtCoord->Seek(0, wxFromStart);
-			  _camVtk->updateTarget();
+			  _camVtk->updateTarget();  //to reset target
 			}
 			if( ((int) frmCntFl) != m_nFrmRead )
 			{
@@ -613,16 +602,21 @@ void CamFrame::AcqOneFrm()
 	  strR.sprintf(wxT("frm:%05u - pixFileRead %i - %ix%i  - %i"), m_nFrmRead, res, m_nRows, m_nCols, m_nSrBufSz);
 	  m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[0], m_nRows*m_nCols);
 	  m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2], m_nRows*m_nCols);
-	  m_viewZPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrZ[0], m_nRows*m_nCols);
+	  m_viewZPane->SetDataArray<unsigned short>(PLCTR_GetZ(m_CTrf), m_nRows*m_nCols);
 	  #ifdef DISPXYBUFFERS
-	    m_viewYPane->SetDataArray<short>((short*) &m_pSrY[0], m_nRows*m_nCols);
-	    m_viewXPane->SetDataArray<short>((short*) &m_pSrX[0], m_nRows*m_nCols);
+	    m_viewYPane->SetDataArray<short>(PLCTR_GetY(m_CTrf), m_nRows*m_nCols);
+	    m_viewXPane->SetDataArray<short>(PLCTR_GetX(m_CTrf), m_nRows*m_nCols);
 	  #endif //DISPXYBUFFERS
 	  m_viewBGRangePane->SetDataArray<unsigned short>((unsigned short*) (PLAVG_GetAvgBuf(m_bgAvg)).pha, m_nRows*m_nCols);
 	  m_viewBGAmpPane->SetDataArray<unsigned short>((unsigned short*) (PLAVG_GetAvgBuf(m_bgAvg)).amp, m_nRows*m_nCols);
 	  #ifdef JMU_USE_VTK
 		//if(m_camReadMode==CAM_RD_ONESHOT) // vtk does not support access from different threads
-			_camVtk->updateTOF(m_nRows, m_nCols, m_pSrZ, m_pSrY, m_pSrX, (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2]);
+			_camVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrf), PLCTR_GetY(m_CTrf), PLCTR_GetX(m_CTrf), (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2]);
+		if(m_settingsPane->IsLrnBgChecked())
+		{
+			PLCTR_CoordTrf(m_CTrfBG, PLAVG_GetAvgBuf(m_bgAvg), m_ctrParam);
+			_camBGVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLAVG_GetAvgBuf(m_bgAvg).amp);
+		}
       #endif
 	  m_settingsPane->SetText(strR);
 	  m_viewRangePane->SetTxtInfo(strR);
@@ -643,7 +637,7 @@ void CamFrame::AcqOneFrm()
 		  m_nFrmRead = 0;	// reset frame count
 	  }
   }
-  if((m_sr != NULL) && (m_pSrBuf != NULL) && (m_pSrZ!=NULL) && (m_pSrY!=NULL) && (m_pSrX!=NULL) )
+  if((m_sr != NULL) && (m_pSrBuf != NULL) && (m_CTrf!=NULL) )
   {
 	  // if reading data live from camera ...
 	  wxMutexError errMutex= m_mutexSrBuf->Lock();
@@ -653,47 +647,46 @@ void CamFrame::AcqOneFrm()
 		res = SR_Acquire(m_sr);
 		memcpy( (void*) m_pSrBuf, SR_GetImage(m_sr,0), m_nRows*m_nCols*sizeof(unsigned short));
 		memcpy( (void*) (&m_pSrBuf[m_nRows*m_nCols*sizeof(unsigned short)]), SR_GetImage(m_sr,1), m_nRows*m_nCols*sizeof(unsigned short));
-		if(m_settingsPane->IsScatChecked())
-		{
-		    SRBUF scatBuf;
-		    scatBuf.pha = (unsigned short*) m_pSrBuf;
-		    scatBuf.amp = (unsigned short*) (&m_pSrBuf[m_nRows*m_nCols*sizeof(unsigned short)]);
-		    scatBuf.nCols = m_nCols;
-		    scatBuf.nRows = m_nRows;
-		    scatBuf.bufferSizeInBytes = m_nCols*m_nRows*2*sizeof(unsigned short);
+			SRBUF srBuf;
+		    srBuf.pha = (unsigned short*) m_pSrBuf;
+		    srBuf.amp = (unsigned short*) (&m_pSrBuf[m_nRows*m_nCols*sizeof(unsigned short)]);
+		    srBuf.nCols = m_nCols;
+		    srBuf.nRows = m_nRows;
+		    srBuf.bufferSizeInBytes = m_nCols*m_nRows*2*sizeof(unsigned short);
 			NANBUF scatNaN;
 			scatNaN.nCols = m_nCols;
 			scatNaN.nRows = m_nRows;
 			scatNaN.bufferSizeInBytes = m_nCols * m_nRows * sizeof(bool);
-			scatNaN.nanBool = PLNN_FlagNaN(m_NaN, scatBuf);
-			PLSC_Compensate(m_scat, scatBuf, scatNaN);
+			scatNaN.nanBool = PLNN_FlagNaN(m_NaN, srBuf);
+		if(m_settingsPane->IsScatChecked())
+		{
+			PLSC_Compensate(m_scat, srBuf, scatNaN);
 		}
 		if(m_settingsPane->IsLrnBgChecked())
 		{
-		    SRBUF scatBuf;
-		    scatBuf.pha = (unsigned short*) m_pSrBuf;
-		    scatBuf.amp = (unsigned short*) (&m_pSrBuf[m_nRows*m_nCols*sizeof(unsigned short)]);
-		    scatBuf.nCols = m_nCols;
-		    scatBuf.nRows = m_nRows;
-		    scatBuf.bufferSizeInBytes = m_nCols*m_nRows*2*sizeof(unsigned short);
-			PLAVG_LearnBackground(m_bgAvg, scatBuf);
+			PLAVG_LearnBackground(m_bgAvg, srBuf);
 		}
-		CoordTrf();
+		PLCTR_CoordTrf(m_CTrf, srBuf, m_ctrParam);
 	    errMutex = m_mutexSrBuf->Unlock();
 	  } //{errMutex == wxMUTEX_NO_ERROR)
 	  strR.sprintf(wxT("frm:%05u - pixRead %i - %ix%i  - %i"), m_nFrmRead, res, m_nRows, m_nCols, m_nSrBufSz);
 	  m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 0), m_nRows*m_nCols);
 	  m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 1), m_nRows*m_nCols);
-	  m_viewZPane->SetDataArray<unsigned short>((unsigned short*) &m_pSrZ[0], m_nRows*m_nCols);
+	  m_viewZPane->SetDataArray<unsigned short>(PLCTR_GetZ(m_CTrf), m_nRows*m_nCols);
 	  #ifdef DISPXYBUFFERS
-	    m_viewYPane->SetDataArray<short>((short*) &m_pSrY[0], m_nRows*m_nCols);
-	    m_viewXPane->SetDataArray<short>((short*) &m_pSrX[0], m_nRows*m_nCols);
+	    m_viewYPane->SetDataArray<short>(PLCTR_GetY(m_CTrf), m_nRows*m_nCols);
+	    m_viewXPane->SetDataArray<short>(PLCTR_GetX(m_CTrf), m_nRows*m_nCols);
 	  #endif //DISPXYBUFFERS
 	  m_viewBGRangePane->SetDataArray<unsigned short>((unsigned short*) (PLAVG_GetAvgBuf(m_bgAvg)).pha, m_nRows*m_nCols);
 	  m_viewBGAmpPane->SetDataArray<unsigned short>((unsigned short*) (PLAVG_GetAvgBuf(m_bgAvg)).amp, m_nRows*m_nCols);
 	  #ifdef JMU_USE_VTK
 		 // vtk does not support access from different threads
-			_camVtk->updateTOF(m_nRows, m_nCols, m_pSrZ, m_pSrY, m_pSrX, (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2]);
+			_camVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrf), PLCTR_GetY(m_CTrf), PLCTR_GetX(m_CTrf), (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2]);
+		if(m_settingsPane->IsLrnBgChecked())
+		{
+			PLCTR_CoordTrf(m_CTrfBG, PLAVG_GetAvgBuf(m_bgAvg), m_ctrParam);
+			_camBGVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLAVG_GetAvgBuf(m_bgAvg).amp);
+		}
       #endif
 	  m_settingsPane->SetText(strR);
 	  m_viewRangePane->SetTxtInfo(strR);
@@ -717,43 +710,6 @@ void CamFrame::AcqOneFrmEvt(wxCommandEvent& WXUNUSED(event))
 {
 	AcqOneFrm();
 }
-
-//! TransFormCoordinates
-void CamFrame::CoordTrf()
-{
-  int res = 0;
-  wxString strR;
-  if((m_pSrBuf != NULL) && (m_pSrZ!=NULL) && (m_pSrY!=NULL) && (m_pSrX!=NULL) )
-  {
-	  float xc = 0; float yc= 0; float x, y, z;
-	  unsigned short *pSrBuf = (unsigned short*) m_pSrBuf;
-	  for(int r = 0; r< m_nRows; r++)
-	  {
-		  for(int c = 0; c< m_nCols; c++)
-		  {
-			  xc = -(c -m_fCenterX) * m_fPixSzX;
-			  yc = -(r -m_fCenterY) * m_fPixSzY;
-
-			  z = (sqrt(
-				   (
-				     (
-					   ((float) pSrBuf[r*m_nCols+c]) / 65535.0f * m_maxMM[m_srFrq]
-					 )
-					*(
-					   ((float) pSrBuf[r*m_nCols+c]) / 65535.0f * m_maxMM[m_srFrq]
-					 )
-					 * ((m_fFocal * m_fFocal) / ((m_fFocal * m_fFocal) + xc*xc + yc*yc)))));
-
-			  x =(( xc * z) / m_fFocal);
-			  y =(( yc * z) / m_fFocal);
-
-			  m_pSrZ[r*m_nCols+c] = (unsigned short) z ;
-			  m_pSrY[r*m_nCols+c] = (short) y ;
-			  m_pSrX[r*m_nCols+c] = (short) x ;
-		  }
-	  }
-  }
-};
 
 //! Interface fct to set the modulation frequency
 void CamFrame::SetFreq(wxCommandEvent&(event))
@@ -828,6 +784,11 @@ void CamFrame::SetVtkWin(CViewSrVtk *vtkWin, int vtkSub)
 		_camVtk->SetDepthLUT(_vtkWin->GetDepthLUT());
 		_camVtk->SetGrayLUT(_vtkWin->GetGrayLUT());
 		_camVtk->SetPlainLUT(_vtkWin->GetRLUT(), _vtkWin->GetGLUT(), _vtkWin->GetBLUT(), _vtkWin->GetWLUT(), _vtkWin->GetKLUT());
+		_camBGVtk = new CamVtkView(_vtkSub, _vtkWin->GetRenWin(), _vtkWin->GetDepthLUT());
+		_camBGVtk->SetDepthLUT(_vtkWin->GetDepthLUT());
+		_camBGVtk->SetGrayLUT(_vtkWin->GetGrayLUT());
+		_camBGVtk->SetPlainLUT(_vtkWin->GetRLUT(), _vtkWin->GetGLUT(), _vtkWin->GetBLUT(), _vtkWin->GetWLUT(), _vtkWin->GetKLUT());
+		_camBGVtk->setDataRepBG();
 	}
 };
 #endif
@@ -851,6 +812,7 @@ void CamFrame::OnSetTrfMat(wxCommandEvent& WXUNUSED(event))
   {
 	  wxString strPathMat = OpenDialogMat->GetPath();
 	  _camVtk->setTrfMat(strPathMat.char_str());
+	  _camBGVtk->setTrfMat(strPathMat.char_str());
   } // (OpenDialogMat->ShowModal()==wxID_OK) )
   delete(OpenDialogMat);
 

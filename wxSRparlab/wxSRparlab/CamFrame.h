@@ -21,6 +21,8 @@
 #pragma comment( lib, "libSRPLscat" )
 #include "libSRPLavg.h"
 #pragma comment( lib, "libSRPLavg" )
+#include "libSRPLcoordTrf.h"
+#pragma comment( lib, "libSRPLcoordTrf" )
 
 
 
@@ -71,7 +73,6 @@ public:
 	void SetReadMode(wxCommandEvent& event);
 	void AcqOneFrm();
 	void AcqOneFrmEvt(wxCommandEvent& WXUNUSED(event));
-	void CoordTrf();
 	void OnSetTrfMat(wxCommandEvent& WXUNUSED(event));
 	#ifdef JMU_TGTFOLLOW 
 		void OnTgtFile(wxCommandEvent& WXUNUSED(event)); 
@@ -79,6 +80,7 @@ public:
 #ifdef JMU_USE_VTK
 	void SetVtkWin(CViewSrVtk *vtkWin, int vtkSub);
 	CamVtkView* GetCamVtk(){return _camVtk;};
+	CamVtkView* GetCamBGVtk(){return _camBGVtk;};
 #endif
 	int GetVtkSub(){return _vtkSub;};
 	int GetNumCols(){return m_nCols;};
@@ -94,9 +96,6 @@ private:
 	SRCAM	m_sr;	// pointer for SR camera
 	//! buffer where the SR camera will return the data
 	unsigned char       *m_pSrBuf;
-	unsigned short      *m_pSrZ;
-	short      *m_pSrX;
-	short      *m_pSrY;
 	wxMutex* m_mutexSrBuf;
 	int m_nSrBufSz ;
 	int m_nRows;
@@ -121,12 +120,13 @@ private:
 	bool m_bReadContinuously;	//! flag for continuous read
 	ModulationFrq m_srFrq;		//! SR frequency
 	float m_maxMM[4];			//! table for maximum depth value according to frequency
-	float m_fFocal; float m_fPixSzX; float m_fPixSzY; float m_fCenterX; float m_fCenterY;
-	float m_maxMMr;
+	//float m_fFocal; float m_fPixSzX; float m_fPixSzY; float m_fCenterX; float m_fCenterY;
+	//float m_maxMMr;
 	int	  m_mfrqInt;
 #ifdef JMU_USE_VTK
 	CViewSrVtk	*_vtkWin ; //!< pointer to vtk window
 	CamVtkView *_camVtk; //!< point to vtk camera structure
+	CamVtkView *_camBGVtk; //!< point to background vtk camera structure
 #endif
 	#ifdef JMU_TGTFOLLOW  
 		wxFFile*		m_pFile4TgtCoord; 
@@ -135,6 +135,9 @@ private:
 	SRPLSCAT m_scat;
 	SRPLNAN  m_NaN;
 	SRPLAVG	 m_bgAvg;
+	SRPLCTR	 m_CTrf;
+	SRPLCTR	 m_CTrfBG;
+	SRCTR m_ctrParam;
 
 public:
     DECLARE_EVENT_TABLE()

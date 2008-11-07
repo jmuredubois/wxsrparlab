@@ -89,6 +89,8 @@ MainWnd::~MainWnd()
 #endif
 	_visVtk.clear();
 	_colVtk.clear();
+	_visBGVtk.clear();
+	_colBGVtk.clear();
 }
 
 /**
@@ -189,7 +191,8 @@ void MainWnd::AddChildren()
 	wxPoint incr = wxPoint(220,00);	// increment in position
 	wxSize	sz = wxSize(220,400);	// size for camFrame
 	wxString lab;					// title string for camFrame
-	wxString labT;					// title string for camFrame
+	wxString labT;					// string for cam nickname
+	wxString labBGT;					// string for cam BGnickname
 
 #ifdef JMU_USE_VTK
 	_vtkWin = new CViewSrVtk(NULL, 440,50,1024,768);
@@ -201,7 +204,8 @@ void MainWnd::AddChildren()
 	//! - for the max number of cameras ...
 	for(int i = 0; i<_numCams; i++){
 		lab.sprintf(wxT("Camera %i"), i); // ... change title text ...
-		labT.sprintf(wxT("Cam %i"), i); // ... change title text ...
+		labT.sprintf(wxT("Cam %i"), i); // ... change cam nickname ...
+		labBGT.sprintf(wxT("BGcam %i"), i); // ... change cam BG nickname ...
 		//! ... create and show new camFrame ... \n
 		CamFrame *camFrm = new CamFrame( this, lab, pos, sz );
 		camFrm->Show(TRUE);
@@ -221,9 +225,19 @@ void MainWnd::AddChildren()
 
 		wxRadioBox *colBox = new wxRadioBox(_bgPanel, IDC_colVtk, wxT("Color"), 
 			wxDefaultPosition, wxDefaultSize, 7, colors, 0, wxRA_SPECIFY_COLS );
-		_sizerCamVisCol->Add(colBox, wxGBPosition(i,1));
-		//sizerCamVisCol->SetItemSpan(colBox, wxGBSpan(1,7));
+		_sizerCamVisCol->Add(colBox, wxGBPosition(i,2));
 		_colVtk.push_back(colBox);
+
+		wxCheckBox *chkBGBox = new wxCheckBox(_bgPanel, IDC_visVtk, labBGT);	
+		chkBGBox->SetValue(true);
+		_sizerCamVisCol->Add(chkBGBox, wxGBPosition(i,1));
+		_visBGVtk.push_back(chkBGBox);	// add visibility checkbox to container
+		wxRadioBox *colBGBox = new wxRadioBox(_bgPanel, IDC_colVtk, wxT("BG Color"), 
+			wxDefaultPosition, wxDefaultSize, 7, colors, 0, wxRA_SPECIFY_COLS );
+		_sizerCamVisCol->Add(colBGBox, wxGBPosition(i,3));
+		_colBGVtk.push_back(colBGBox);
+
+
 		camFrm->SendSizeEvent();
 #endif
 	} // ENDOF for loop on _numCams
@@ -390,6 +404,13 @@ void MainWnd::SetVisVtk(wxCommandEvent& event)
 		if(!_vtkWin){return;};
 		(*itCam)->GetCamVtk()->hideDataAct( !((*itCtrl)->IsChecked()) );
 	}
+	for ( itCtrl  =_visBGVtk.begin(), itCam  =m_camFrm.begin();
+		  itCtrl !=_visBGVtk.end()  , itCam !=m_camFrm.end(); 
+		  itCtrl++, itCam++, i++ )
+	{
+		if(!_vtkWin){return;};
+		(*itCam)->GetCamBGVtk()->hideDataAct( !((*itCtrl)->IsChecked()) );
+	}
 	_vtkWin->Render();
 #endif
 }
@@ -431,6 +452,36 @@ void MainWnd::SetColVtk(wxCommandEvent& event)
 			/*/(*itCam)->GetCamVtk()->setDataActColorRGB(r,g,b);/**/
 		}
 	}
+	for ( itCtrl  =_colBGVtk.begin(), itCam  =m_camFrm.begin();
+		  itCtrl !=_colBGVtk.end()  , itCam !=m_camFrm.end(); 
+		  itCtrl++, itCam++, i++ )
+	{
+		if(!_vtkWin){return;};
+		/* wxString colors[] = { wxT("Z"), wxT("Amp."), wxT("R"),
+        wxT("G"), wxT("B"), wxT("W"), wxT("K") };*/
+		wxString strCol = (*itCtrl)->GetStringSelection();
+		double r, g, b; r=0.0; g=0.0; b=0.0;
+		if(  strCol.IsSameAs(wxT("Z"))  )
+		{
+			(*itCam)->GetCamBGVtk()->setDataMapperColorDepth();
+			SetZMin(_zMin); // trick to update data Mapper
+		}
+		if(  strCol.IsSameAs(wxT("Amp."))  )
+		{
+			(*itCam)->GetCamBGVtk()->setDataMapperColorGray();
+			SetAmpMin(_ampMin); // trick to update data Mapper
+		}
+		if(  strCol.IsSameAs(wxT("R")) || strCol.IsSameAs(wxT("G")) || strCol.IsSameAs(wxT("B"))
+			 || strCol.IsSameAs(wxT("W")) || strCol.IsSameAs(wxT("K")))
+		{
+			if(  strCol.IsSameAs(wxT("R"))  ) { (*itCam)->GetCamBGVtk()->setDataMapperColorR();/*/r=1.0; g=0.0; b=0.0;/**/} ;
+			if(  strCol.IsSameAs(wxT("G"))  ) { (*itCam)->GetCamBGVtk()->setDataMapperColorG();/*/r=0.0; g=1.0; b=0.0;/**/} ;
+			if(  strCol.IsSameAs(wxT("B"))  ) { (*itCam)->GetCamBGVtk()->setDataMapperColorB();/*/r=0.0; g=0.0; b=1.0;/**/} ;
+			if(  strCol.IsSameAs(wxT("W"))  ) { (*itCam)->GetCamBGVtk()->setDataMapperColorW();/*/r=1.0; g=1.0; b=1.0;/**/} ;
+			if(  strCol.IsSameAs(wxT("K"))  ) { (*itCam)->GetCamBGVtk()->setDataMapperColorK();/*/r=0.0; g=0.0; b=0.0;/**/} ;
+			/*/(*itCam)->GetCamVtk()->setDataActColorRGB(r,g,b);/**/
+		}
+	}
 	_vtkWin->Render();
 #endif
 }
@@ -442,16 +493,20 @@ void MainWnd::PopCam(int vtkSub)
 	int i = 0;
 	std::vector<wxRadioBox*>::iterator itCtrl;  // get iterator on the controls
 	std::vector<wxCheckBox*>::iterator itCtrl2;  // get iterator on the controls
+	std::vector<wxRadioBox*>::iterator itCtrl3;  // get iterator on the controls
+	std::vector<wxCheckBox*>::iterator itCtrl4;  // get iterator on the controls
 	std::vector<CamFrame*>::iterator itCam;  // get iterator on the camera frames
-	for ( itCtrl  =_colVtk.begin(), itCtrl2  =_visVtk.begin(), itCam  =m_camFrm.begin();
-		  itCtrl !=_colVtk.end()  , itCtrl2 !=_visVtk.end()  , itCam !=m_camFrm.end(); 
-		  itCtrl++, itCtrl2++, itCam++, i++ )
+	for ( itCtrl  =_colVtk.begin(), itCtrl2  =_visVtk.begin(), itCtrl3  =_colBGVtk.begin(), itCtrl4  =_visBGVtk.begin(), itCam  =m_camFrm.begin();
+		  itCtrl !=_colVtk.end()  , itCtrl2 !=_visVtk.end()  , itCtrl3 !=_colBGVtk.end()  , itCtrl4 !=_visBGVtk.end()  , itCam !=m_camFrm.end(); 
+		  itCtrl++, itCtrl2++, itCtrl3++, itCtrl4++, itCam++, i++ )
 	{
 		if( (*itCam)->GetVtkSub() == vtkSub)
 		{
 			m_camFrm.erase(itCam);
 			(*itCtrl )->Disable();
 			(*itCtrl2)->Disable();
+			(*itCtrl3)->Disable();
+			(*itCtrl4)->Disable();
 			break;
 		}
 	}
