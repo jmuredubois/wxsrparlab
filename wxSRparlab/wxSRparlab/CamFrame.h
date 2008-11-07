@@ -114,6 +114,7 @@ private:
 	CamViewData* m_viewXPane;			//! panel for X data display
 #endif //DISPXYBUFFERS
 	CamViewData* m_viewBGRangePane;		//! panel for BACKGROUND RANGE data display
+	CamViewData* m_viewBGAmpPane;		//! panel for BACKGROUND RANGE data display
 	int m_nFrmRead;		//! number of frames read
 	unsigned int m_nSerialSR;		//! SR serial
 	CamReadModeEnum  m_camReadMode;		//! read  mode

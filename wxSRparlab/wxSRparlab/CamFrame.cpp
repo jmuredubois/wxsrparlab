@@ -239,8 +239,13 @@ int CamFrame::CreateAndSetNotebook(const wxString& title)
 	// %%%%% BACKGROUND RANGE panel
 	m_viewBGRangePane = new CamViewData(m_camNB, wxT("BG pha"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
 	m_viewBGRangePane->InitViewData();
-	m_viewBGRangePane->SetDispMin(0.0);
-	m_viewBGRangePane->SetDispMax(45000.0); 
+	m_viewBGRangePane->SetDispMin(45000.0);
+	m_viewBGRangePane->SetDispMax(0.0); 
+	// %%%%% BACKGROUND AMPLITUDE panel
+	m_viewBGAmpPane = new CamViewData(m_camNB, wxT("BG amp"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
+	m_viewBGAmpPane->InitViewData();
+	m_viewBGAmpPane->SetDispMin(0.0);
+	m_viewBGAmpPane->SetDispMax(1000.0);
 
 	/* NBparadigm */
 	m_camNB->AddPage(m_settingsPane, wxT("Settings"), TRUE);//, -1);
@@ -251,7 +256,8 @@ int CamFrame::CreateAndSetNotebook(const wxString& title)
 	m_camNB->AddPage(m_viewYPane, wxT("Y [mm]"), FALSE);//, -1);
 	m_camNB->AddPage(m_viewXPane, wxT("X [mm]"), FALSE);//, -1);
 #endif //DISPXYBUFFERS
-	m_camNB->AddPage(m_viewBGRangePane, wxT("Range"), FALSE);//, -1);
+	m_camNB->AddPage(m_viewBGRangePane, wxT("BG pha"), FALSE);//, -1);
+	m_camNB->AddPage(m_viewBGAmpPane, wxT("BG amp"), FALSE);//, -1);
 	/* EO NBparadigm */
 
 	return res;
@@ -393,7 +399,7 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 		  res = m_viewXPane->SetDataArray<short>((short*) &m_pSrX[0], m_nRows*m_nCols);
 		  res = m_viewYPane->SetDataArray<short>((short*) &m_pSrY[0], m_nRows*m_nCols);
 		#endif //DISPXYBUFFERS
-		  res = m_viewBGRangePane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[0], m_nRows*m_nCols);
+		  //res = m_viewBGRangePane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[0], m_nRows*m_nCols);
 
 	    m_settingsPane->SetText(strR);
 		SetStatusText( strR );
@@ -444,7 +450,7 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	    res = m_viewXPane->SetDataArray<short>((short*) &m_pSrX[0], m_nRows*m_nCols);
 	    res = m_viewYPane->SetDataArray<short>((short*) &m_pSrY[0], m_nRows*m_nCols);
 	  #endif //DISPXYBUFFERS
-	  res = m_viewBGRangePane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 0), m_nRows*m_nCols);
+	  //res = m_viewBGRangePane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 0), m_nRows*m_nCols);
   }
   m_settingsPane->SetText(strR);
   SetStatusText( strR );
@@ -613,6 +619,7 @@ void CamFrame::AcqOneFrm()
 	    m_viewXPane->SetDataArray<short>((short*) &m_pSrX[0], m_nRows*m_nCols);
 	  #endif //DISPXYBUFFERS
 	  m_viewBGRangePane->SetDataArray<unsigned short>((unsigned short*) (PLAVG_GetAvgBuf(m_bgAvg)).pha, m_nRows*m_nCols);
+	  m_viewBGAmpPane->SetDataArray<unsigned short>((unsigned short*) (PLAVG_GetAvgBuf(m_bgAvg)).amp, m_nRows*m_nCols);
 	  #ifdef JMU_USE_VTK
 		//if(m_camReadMode==CAM_RD_ONESHOT) // vtk does not support access from different threads
 		//{
@@ -627,7 +634,9 @@ void CamFrame::AcqOneFrm()
 	    m_viewYPane->SetTxtInfo(strR);
 	    m_viewXPane->SetTxtInfo(strR);
 	  #endif //DISPXYBUFFERS
-	  m_viewBGRangePane->SetTxtInfo(strR);
+	  wxString strBG; strBG.sprintf(wxT("Average count: %05i"), PLAVG_GetAvgCnt(m_bgAvg));
+	  m_viewBGRangePane->SetTxtInfo(strBG);
+	  m_viewBGAmpPane->SetTxtInfo(strBG);
 
 	  if( (m_pFile4ReadPha->Eof()) || (m_pFile4ReadAmp->Eof()) )
 	  {
@@ -683,6 +692,7 @@ void CamFrame::AcqOneFrm()
 	    m_viewXPane->SetDataArray<short>((short*) &m_pSrX[0], m_nRows*m_nCols);
 	  #endif //DISPXYBUFFERS
 	  m_viewBGRangePane->SetDataArray<unsigned short>((unsigned short*) (PLAVG_GetAvgBuf(m_bgAvg)).pha, m_nRows*m_nCols);
+	  m_viewBGAmpPane->SetDataArray<unsigned short>((unsigned short*) (PLAVG_GetAvgBuf(m_bgAvg)).amp, m_nRows*m_nCols);
 	  #ifdef JMU_USE_VTK
 	    //if(m_camReadMode==CAM_RD_ONESHOT) // vtk does not support access from different threads
 		//{
@@ -697,7 +707,9 @@ void CamFrame::AcqOneFrm()
 	    m_viewYPane->SetTxtInfo(strR);
 	    m_viewXPane->SetTxtInfo(strR);
 	  #endif //DISPXYBUFFERS
-	  m_viewBGRangePane->SetTxtInfo(strR);
+	  wxString strBG; strBG.sprintf(wxT("Average count: %05i"), PLAVG_GetAvgCnt(m_bgAvg));
+	  m_viewBGRangePane->SetTxtInfo(strBG);
+	  m_viewBGAmpPane->SetTxtInfo(strBG);
 	  m_nFrmRead +=1;
   }
   //if((m_viewRangePane->IsShownOnScreen())){ m_viewRangePane->SetNewImage();};
