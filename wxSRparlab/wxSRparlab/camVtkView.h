@@ -75,8 +75,6 @@ public:
 	  int updateTarget(float *ptsF, int nCoord);
 	#endif
 
-	//int updateTOFcurrent(SRCAM sr, SRPARLAB srPL, int vtkSub){};
-	int updateTOFcurrent(int rows, int cols, unsigned short *z, short *y, short *x);
 	int updateTOFcurrent(int rows, int cols, unsigned short *z, short *y, short *x, unsigned short* amp);
 	//int updateTOFcurrent(SRCAM sr, SRPARLAB srPL, int vtkSub, char* fname){};
 
@@ -176,6 +174,7 @@ private:
   // Create a float array which represents the points.
   vtkFloatArray* BGpcoords;
   vtkFloatArray* BGdData;
+  vtkFloatArray* BGaData; //amplitude
 
   vtkTransform			*camTran;			//!< transformation between camera coordinates
   vtkMatrix4x4			*camTranMat;		//!< 4D transformation matrix
