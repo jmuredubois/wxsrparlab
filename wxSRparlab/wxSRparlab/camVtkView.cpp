@@ -13,20 +13,14 @@ CamVtkView::CamVtkView(int vtkSub, vtkRenderWindow* ParRenWin, vtkLookupTable* L
 	_y = NULL;
 	_z = NULL;
 
-	_xBG = NULL;
-	_yBG = NULL;
-	_zBG = NULL;
 	camTranMat = vtkMatrix4x4::New();
 
 	dataWriter = vtkStructuredGridWriter::New();
-	BGdataWriter = vtkStructuredGridWriter::New();
 
 	camTran = vtkTransform::New();
 	camTran->SetMatrix(camTranMat);
 	camTranFilter = vtkTransformFilter::New();
 	camTranFilter->SetTransform(camTran);
-	BGcamTranFilter = vtkTransformFilter::New();
-	BGcamTranFilter->SetTransform(camTran);
 
 	// instantiate class fields
 	// setup the parent window
@@ -41,8 +35,6 @@ CamVtkView::CamVtkView(int vtkSub, vtkRenderWindow* ParRenWin, vtkLookupTable* L
 
 	// add a data actor
 	addDataAct();
-	// add a BG data actor
-	addBGDataAct();
 	// create a depth LUT
 	depthLUT = LUT;
 	grayLUT = LUT;
@@ -64,7 +56,6 @@ CamVtkView::CamVtkView(int vtkSub, vtkRenderWindow* ParRenWin, vtkLookupTable* L
 
 	renderer->AddActor(srCubeActor);
 	renderer->AddActor(dataActor);
-	renderer->AddActor(BGdataActor);
 	renderer->AddActor(srLabelActor);
 };
 
@@ -78,20 +69,16 @@ CamVtkView::~CamVtkView()
 	camTran->Delete();
 	camTranMat->Delete();
 	camTranFilter->Delete();
-	BGcamTranFilter->Delete();
 
 	int res = 0;
 	// free camera shape
 	res+= freeSrCam();
 
-	BGdataWriter->Delete();
 	dataWriter->Delete();
 	#ifdef JMU_TGTFOLLOW
 	  // free tgt actor
 	  res+= freeTgtAct();
 	#endif
-	// free data actor
-	res+= freeBGDataAct();
 	// free data actor
 	res+= freeDataAct();
 };
@@ -216,8 +203,6 @@ int CamVtkView::changeDepthRange(float minVal, float maxVal)
 	int res = 0;
 	dataMapperZ->SetScalarRange((double) minVal, (double) maxVal);
 	dataMapperZ->Modified();
-	BGdataMapperZ->SetScalarRange((double) minVal, (double) maxVal);
-	BGdataMapperZ->Modified();
 	return res;
 }
 
@@ -361,7 +346,7 @@ int CamVtkView::addDataAct()
 /**
  * Updates the TOF points
  */
-int CamVtkView::updateTOFcurrent(int rows, int cols, unsigned short *z, short *y, short *x, unsigned short* amp)
+int CamVtkView::updateTOF(int rows, int cols, unsigned short *z, short *y, short *x, unsigned short* amp)
 {
 	int res = 0;
 	//if(!sr){return -1;};
@@ -437,20 +422,19 @@ int CamVtkView::updateTOFcurrent(int rows, int cols, unsigned short *z, short *y
 	return res;
 }
 
-///**
-// * Updates the TOF points
-// */
-//int CViewSrVtk::updateTOFcurrent(SRCAM sr, SRPARLAB srPL, int vtkSub, char* fname)
-//{
-//	int res = 0;
-//	if(!fname){return -1;};
-//	res += updateTOFcurrent(sr, srPL, vtkSub);
-//	if(res!=0){return -2;};
-//	dataWriter[vtkSub]->SetFileName(fname);
-//	res+=dataWriter[vtkSub]->Write();
-//
-//	return res;
-//}
+/**
+ * Updates the TOF points
+ */
+int CamVtkView::updateTOF(int rows, int cols, unsigned short *z, short *y, short *x, unsigned short* amp, char* fname)
+{
+	int res = 0;
+	if(!fname){return -1;};
+	res += updateTOF(rows, cols, z, y, x, amp);
+	if(res!=0){return -2;};
+	dataWriter->SetFileName(fname);
+	res+=dataWriter->Write();
+	return res;
+}
 /**
  * Frees the scalar bar
  */
@@ -511,278 +495,6 @@ int CamVtkView::freeXYZ()
 	SAFE_FREE(_y);
 	SAFE_FREE(_z);
 	return res;
-}
-
-/**
- * alloc BG buffers for xyz values
- */
-int CamVtkView::allocXYZbg(int rows, int cols)
-{
-	int res = 0;
-	if((_xBG) || (_yBG) || (_zBG) ){ freeXYZbg();};
-
-	int num=rows*cols;
-	_xBG = (short*) malloc(num*sizeof(short)); memset( (void*) _xBG, 0x00, rows*cols*sizeof(short));
-	_yBG = (short*) malloc(num*sizeof(short)); memset( (void*) _yBG, 0x00, rows*cols*sizeof(short));
-	_zBG = (unsigned short*)  malloc(num*sizeof(unsigned short)); memset( (void*) _zBG, 0x00, rows*cols*sizeof(unsigned short));
-
-	return res;
-}
-
-/**
- * free buffers for xyz values
- */
-int CamVtkView::freeXYZbg()
-{
-	int res = 0;
-	SAFE_FREE(_xBG);
-	SAFE_FREE(_yBG);
-	SAFE_FREE(_zBG);
-	return res;
-}
-/**
- * Updates the TOF background points
- */
-int CamVtkView::addBGDataAct()
-{
-	int res = 0;
-
-	int rows = 144; // HARDCODED BAD BAD BAD
-	int cols = 176;
-
-	if((!_xBG) || (!_yBG) || (!_zBG) ){ allocXYZbg(rows, cols); };
-
-	int num = rows * cols;
-
-	BGdataPoints = vtkPoints::New();
-	// Create a float array which represents the points.
-    BGpcoords = vtkFloatArray::New();
-	BGdData = vtkFloatArray::New();
-	// Note that by default, an array has 1 component.
-    // We have to change it to 3 for points
-    BGpcoords->SetNumberOfComponents(3);
-	BGdData->SetNumberOfComponents(1);
-	// We ask pcoords to allocate room for at least 25344 tuples
-	// and set the number of tuples to 4.
-	BGpcoords->SetNumberOfTuples(num);
-	BGdData->SetNumberOfTuples(num);
-
-	// Assign each tuple
-	float x,y,z;
-	float xMin, xMax, yMin, yMax;
-	xMin = -3000.0f; xMax = 3000.0f;	// some bogus init value
-	yMin = -2000.0f; yMax = 2000.0f;	// some bogus init value
-	z = 250.0f;							// some bogus init value
-	float pt[3];
-	int row = 0; int col = 0;
-	int i = 0; int iv1 = 0; int iv2 = 0; int iv3 = 0;
-	for (row = 0 ; row <rows; row++)
-    {
-		y =  (  ((float)row )/144.0f * (yMax-yMin) + yMin);	//bogus value Y init
-		for (col = 0; col<cols; col++)
-		{
-			x =  (  ((float)col )/176.0f * (xMax-xMin) + xMin);	// bogus value X init
-			pt[2] = z;
-			pt[1] = y;
-			pt[0] = x;
-			//pt[2] = (float) ((_zBG)[i]);
-			//pt[1] = (float) ((_yBG)[i]);
-			//pt[0] = (float) ((_xBG)[i]);
-			BGpcoords->SetTuple((iv1+iv2), pt);
-			BGdData->SetValue((iv1+iv2),(float)((_zBG)[i]));
-			i++; // le i++ doit être ici, il faut commencer à zéro !!!
-			iv2+=rows;
-			iv3++;
-			if(iv3>=cols)
-			{
-				iv2 = 0;
-				iv3 = 0;
-				iv1 += 1;
-			}
-		}
-    }
-
-	BGdataPoints->SetData(BGpcoords);
-
-	BGdata = vtkStructuredGrid::New();
-	vtkPointData *BGptdata = BGdata->GetPointData();
-	BGdata->SetPoints(BGdataPoints);
-	BGdata->SetWholeExtent(0,rows-1,0,cols-1,0,0);
-	BGptdata->SetScalars(BGdData);
-	BGdata->ComputeBounds();
-	int dim[3];
-	BGdata->GetDimensions(dim);
-	BGdata->SetDimensions(rows,cols,1);
-
-	BGcamTranFilter->SetInput(BGdata);	// 20080118 transf
-
-	BGpdata = vtkStructuredGridGeometryFilter::New();
-	// 20080118 transf	pBGpdata->SetInput(BGdata);
-	BGpdata->SetInput(BGcamTranFilter->GetOutputDataObject(0)); // 20080118 transf
-    BGdataMapperZ = vtkPolyDataMapper::New();
-
-	BGdataMapperZ->SetInputConnection(BGpdata->GetOutputPort());
-	//BGdataMapperZ->ScalarVisibilityOff();
-
-    BGdataActor = vtkActor::New();
-    BGdataActor->SetMapper(BGdataMapperZ);
-    BGdataActor->GetProperty()->SetOpacity(.2);
-	//BGdataActor->VisibilityOff();
-	BGdataActor->GetProperty()->SetRepresentationToSurface();
-	BGdataActor->GetProperty()->SetDiffuse(0.0);
-	BGdataActor->GetProperty()->SetSpecular(0.0);
-	BGdataActor->GetProperty()->SetAmbient(1.0);
-
-	if(_vtkSub==0){ BGdataActor->GetProperty()->SetColor(0.0,0.0,1.0); }; // BLUE for 0-th cam
-	if(_vtkSub==1){ BGdataActor->GetProperty()->SetColor(1.0,0.0,0.0); }; // RED  for 1-st add cam
-	if(_vtkSub==2){ BGdataActor->GetProperty()->SetColor(0.0,1.0,0.0); }; // GREENfor 2-nd add cam
-	if(_vtkSub==3){ BGdataActor->GetProperty()->SetColor(0.7,0.0,0.7); }; // PURPLfor 3-rd add cam
-
-	//BGdataWriter->SetInput(BGdata); // write StructuredGrid data
-	BGdataWriter->SetInput(BGcamTranFilter->GetOutputDataObject(0)); // 20080118 transf
-
-#ifdef _DEBUG
-	BGdataWriter->SetFileTypeToASCII();
-#else
-	BGdataWriter->SetFileTypeToBinary();
-#endif
-
-	renWin->Render();
-	BGdataActor->VisibilityOff();
-	return res;
-}
-
-/**
- * Updates the TOF background points
- */
-//int CViewSrVtk::updateTOFbg(SRCAM sr, SRPARLAB srPL)
-//{
-//	int res = 0;
-//	if(!sr){return -1;};
-//
-//	if((!_xBG) || (!_yBG) || (!_zBG) ){
-//		allocXYZbg(sr, vtkSub); };
-//	if(!(srPL)) return -1;
-//
-//	int bgCnt =PL_GetBGcnt(srPL);
-//	if(bgCnt==0) {return res;};
-//
-//	//freeBGDataAct();
-//
-//	int rows=(int)SR_GetRows(sr);
-//	int cols=(int)SR_GetCols(sr);
-//	int num=(int)SR_GetRows(sr)*(int)SR_GetCols(sr);
-//
-//	WORD* pha = (WORD*)SR_GetImage(sr,0);
-//	WORD* amp = (WORD*)SR_GetImage(sr,1);
-//
-//	WORD* phaBg = PL_GetBGImage(srPL, 0);
-//	WORD* ampBg = PL_GetBGImage(srPL, 1);
-//	WORD* zBG = PL_GetZbgImage(srPL);
-//
-//	SR_SetBuffer(sr, (LPVOID) phaBg, SR_GetBufferSize(sr)); //touchy
-//	SR_CoordTrfUint16(sr, _xBG,_yBG,0, sizeof(short),sizeof(short), sizeof(WORD));
-//	///SR_CoordTrfUint16(sr, xBG,yBG,zBG2, sizeof(short),sizeof(short), sizeof(WORD));
-//	SR_SetBuffer(sr, (LPVOID) pha, SR_GetBufferSize(sr)); //touchy
-//
-//	// WATCH OUT, THE BG DATA MUST BE IN SR BUFFER WHEN THIS FCT IS CALLED !!!
-//	//SR_CoordTrfUint16(sr, _xBG,_yBG,_zBG, sizeof(short),sizeof(short), sizeof(WORD));
-//
-//
-//	// We ask pcoords to allocate room for at least 25344 tuples
-//	// and set the number of tuples to 4.
-//	if(num!=25344)
-//	{
-//	BGpcoords->SetNumberOfTuples(num);
-//	BGdData->SetNumberOfTuples(num);
-//	}
-//
-//	// Assign each tuple
-//	float pt[3];
-//	int row = 0; int col = 0;
-//	int i = 0; int iv1 = 0; int iv2 = 0; int iv3 = 0;
-//	for (row = 0 ; row <rows; row++)
-//    {
-//		for (col = 0; col<cols; col++)
-//		{
-//			pt[2] = (float)zBG[i];
-//			pt[1] = (float)((_yBG)[i]);
-//			pt[0] = (float)((_xBG)[i]);
-//			BGpcoords->SetTuple((iv1+iv2), pt);
-//			BGdData->SetValue((iv1+iv2),(float)zBG[i]);
-//			i++; // le i++ doit être ici, il faut commencer à zéro !!!
-//			iv2+=rows;
-//			iv3++;
-//			if(iv3>=cols)
-//			{
-//				iv2 = 0;
-//				iv3 = 0;
-//				iv1 += 1;
-//			}
-//		}
-//    }
-//	BGdataActor->VisibilityOn();
-//	BGdataPoints->Modified();
-//
-//	i = 0;iv1 = 0; iv2 = 0; iv3 = 0;
-//	for (row = 0 ; row <rows; row++)
-//    {
-//		for (col = 0; col<cols; col++)
-//		{
-//			vtkPolyData* totoPoly = BGpdata->GetOutput();
-//			vtkPoints* totoPoints = totoPoly->GetPoints();
-//			if(!totoPoints) {
-//				return -3; // WHY WHY WHY IS A NULLPOINTER RETURNED ?
-//			};
-//			double* totoDouble = totoPoints->GetPoint(iv1+iv2);
-//			BGdData->SetValue((iv1+iv2),(float)(BGpdata->GetOutput()->GetPoints()->GetPoint(iv1+iv2)[2]));		// make sure that depth data is the transformed value; :-( unable to avoid loop yet :-(
-//			i++; // le i++ doit être ici, il faut commencer à zéro !!!
-//			iv2+=rows;
-//			iv3++;
-//			if(iv3>=cols)
-//			{
-//				iv2 = 0;
-//				iv3 = 0;
-//				iv1 += 1;
-//			}
-//		}
-//    }
-//
-//	BGdataActor->VisibilityOn();
-//	renWin->Render();
-//	return res;
-//}
-
-
-/**
- * Updates the TOF background points
- */
-//int CViewSrVtk::updateTOFbg(SRCAM sr, SRPARLAB srPL, int vtkSub, char* fname)
-//{
-//	int res = 0;
-//	if(!fname){return -1;};
-//	res += updateTOFbg(sr, srPL, vtkSub);
-//	if(res!=0){return -2;};
-//	BGdataWriter->SetFileName(fname);
-//	res+=BGdataWriter->Write();
-//
-//	return res;
-//}
-
-/**
- * Frees the background data actor
- */
-int CamVtkView::freeBGDataAct()
-{
-	int res = BGdataActor->GetReferenceCount();
-	BGdataPoints->Delete();
-	BGpcoords->Delete();
-	freeXYZbg();
-	BGdata->Delete();
-	BGpdata->Delete();
-	BGdataMapperZ->Delete();
-	BGdataActor->Delete();
-	return res-1;
 }
 
 /**

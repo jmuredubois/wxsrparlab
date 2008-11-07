@@ -75,11 +75,8 @@ public:
 	  int updateTarget(float *ptsF, int nCoord);
 	#endif
 
-	int updateTOFcurrent(int rows, int cols, unsigned short *z, short *y, short *x, unsigned short* amp);
-	//int updateTOFcurrent(SRCAM sr, SRPARLAB srPL, int vtkSub, char* fname){};
-
-	//int updateTOFbg(SRCAM sr, SRPARLAB srPL, int vtkSub);
-	//int updateTOFbg(SRCAM sr, SRPARLAB srPL, int vtkSub, char*fname);
+	int updateTOF(int rows, int cols, unsigned short *z, short *y, short *x, unsigned short* amp);
+	int updateTOF(int rows, int cols, unsigned short *z, short *y, short *x, unsigned short* amp, char* fname);
 
 	int changeDepthRange(float minVal, float maxVal);
 	int changeAmpRange(float minAmp, float maxAmp);
@@ -152,29 +149,8 @@ private:
   short		*_y;
   unsigned short *_z;
 
-  short		*_xBG;
-  short		*_yBG;
-  unsigned short *_zBG;
-
   int allocXYZ(int rows, int cols);
   int freeXYZ();
-
-
-  int allocXYZbg(int rows, int cols);
-  int freeXYZbg();
-  int addBGDataAct();
-  int freeBGDataAct();
-
-  vtkStructuredGrid					*BGdata;			//!< read TOF depth data
-  vtkPoints							*BGdataPoints;    //!< points vtk objects to store SR dara
-  vtkStructuredGridGeometryFilter	*BGpdata;			//!< geometry filter to obtain PolyData
-  vtkPolyDataMapper					*BGdataMapperZ;	//!< mapper for TOF data
-  vtkActor							*BGdataActor;		//!< actor for TOF data
-
-  // Create a float array which represents the points.
-  vtkFloatArray* BGpcoords;
-  vtkFloatArray* BGdData;
-  vtkFloatArray* BGaData; //amplitude
 
   vtkTransform			*camTran;			//!< transformation between camera coordinates
   vtkMatrix4x4			*camTranMat;		//!< 4D transformation matrix
