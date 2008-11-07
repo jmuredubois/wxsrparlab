@@ -16,8 +16,8 @@
 #include "CamVtkView.h" //!< camera vtk view header file
 #endif
 #include "srBuf.h"
-#include "CamScattering.h"
-#include "CamFlagNaN.h"
+#include "libSRPLscat.h"
+#include "libSRPLflagNaN.h"
 #pragma comment( lib, "libSRPLscat" )
 #include "libSRPLavg.h"
 #pragma comment( lib, "libSRPLavg" )

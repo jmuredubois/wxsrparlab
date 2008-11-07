@@ -13,8 +13,8 @@
 #include "CamPanelSettings.h" //!< camera settings panel header file
 
 #include "srBuf.h"
-#include "CamScattering.h"
-#include "CamFlagNaN.h"
+#include "libSRPLscat.h"
+#include "libSRPLflagNaN.h"
 #pragma comment( lib, "libSRPLscat" )
 
 // ----------------------------------------------------------------------------
