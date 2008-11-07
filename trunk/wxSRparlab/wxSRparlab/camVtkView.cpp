@@ -762,3 +762,13 @@ int CamVtkView::freeTgtAct()
 	return res-1;
 }
 #endif
+
+
+/**
+ * Sets a data actor color
+ */
+void CamVtkView::setDataRepBG()
+{
+	dataActor->GetProperty()->SetRepresentationToSurface();
+	dataActor->GetProperty()->SetOpacity(0.2);
+}

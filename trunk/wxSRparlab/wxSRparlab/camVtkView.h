@@ -92,6 +92,7 @@ public:
 	void setDataMapperColorB();
 	void setDataMapperColorW();
 	void setDataMapperColorK();
+	void setDataRepBG();
 
 private:
 	static const int _vtkSubMax = NUMCAMS ; // VTKSUBMAX undeclared identifier bug 20080114
