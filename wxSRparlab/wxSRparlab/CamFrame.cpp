@@ -61,6 +61,7 @@ void *ThreadReadData::Entry()
 {
     wxString text;
 
+	long acqTime = 1000L;
     for ( ; ; )
     {
         // check if we were asked to exit
@@ -68,9 +69,11 @@ void *ThreadReadData::Entry()
             break;
 		//m_cFrm->AcqOneFrm();
 		wxCommandEvent event( wxEVT_JMUACQONEFRM, IDC_AcqOne );
+		acqTime = m_cFrm->GetAcqTime();
 		m_cFrm->AddPendingEvent(event);
 		//m_cFrm->ProcessEvent(event);
-        wxThread::Sleep(100);
+		if(acqTime <66){acqTime = 66;};
+        wxThread::Sleep(acqTime);
         #ifdef __WXMAC__
             wxThread::Sleep(100); // macBook graphics card is slow
         #endif
@@ -103,7 +106,7 @@ CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos
 	m_camNB = NULL;
 	m_sr = NULL;
 	m_pSrBuf = NULL; m_nRows = 0; m_nCols = 0; m_nSrBufSz = 0;
-	m_mutexSrBuf = new wxMutex(wxMUTEX_DEFAULT);
+	m_mutexSrBuf = NULL;
 
 	m_pFile4ReadPha = NULL;//new wxFFile();
 	m_pFile4ReadAmp = NULL;//new wxFFile();
@@ -133,6 +136,8 @@ CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos
 	m_bgAvg = NULL;
 	m_CTrf = NULL;
 	m_CTrfBG = NULL;
+	_acqTime = 1000L;
+	m_pAcqSWatch = NULL;
 }
 
 /**
@@ -160,6 +165,7 @@ CamFrame::~CamFrame()
 	if(m_bgAvg != NULL) {PLAVG_Close(m_bgAvg); m_bgAvg = NULL; };
 	if(m_CTrf != NULL) {PLCTR_Close(m_CTrf); m_CTrf = NULL; };
 	if(m_CTrfBG != NULL) {PLCTR_Close(m_CTrfBG); m_CTrfBG = NULL; };
+	if(m_pAcqSWatch != NULL) { delete(m_pAcqSWatch); m_pAcqSWatch = NULL;};
 }
 
 BEGIN_EVENT_TABLE(CamFrame, wxFrame)
@@ -281,6 +287,7 @@ int CamFrame::CreateAndSetNotebook(const wxString& title)
 void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 {
   unsigned int res = 0;
+  m_mutexSrBuf = new wxMutex(wxMUTEX_DEFAULT);
   //logPrintf("swissrangerTester: SR_Open device");
   m_settingsPane->SetText(wxT("Open attempt"));
   m_settingsPane->DisableOpenSR();		// disable "Open" button
@@ -303,6 +310,8 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	  strR.sprintf(wxT("cam serial %u"), serial); // ... change title text ...
 	  m_nSerialSR = serial;
   }
+  m_pAcqSWatch = new wxStopWatch();
+  m_pAcqSWatch->Pause();
 
   wxFileDialog* OpenDialogPar = new wxFileDialog(this,
 	  wxT("Choose a SR parameters file to open"),	// msg
@@ -504,6 +513,7 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   if(m_bgAvg != NULL) {PLAVG_Close(m_bgAvg); m_bgAvg = NULL; };
   if(m_CTrf != NULL) {PLCTR_Close(m_CTrf); m_CTrf = NULL; };
   if(m_CTrfBG != NULL) {PLCTR_Close(m_CTrfBG); m_CTrfBG = NULL; };
+  if(m_pAcqSWatch != NULL) { delete(m_pAcqSWatch); m_pAcqSWatch = NULL;};
   m_settingsPane->EnableOpenSR();	// enable "Open" button
   m_settingsPane->SetText(wxT("Close successfull"));
   SetStatusText( wxT("cam") );
@@ -548,6 +558,7 @@ void CamFrame::AcqOneFrm()
 {
   int res = 0;
   wxString strR;
+  m_pAcqSWatch->Start(0L);
   if((m_sr == NULL) && (m_pSrBuf != NULL) && (m_CTrf!=NULL)&&(m_pFile4ReadPha  != NULL) && (m_pFile4ReadAmp  != NULL) && (m_pFile4ReadPha->IsOpened()) && (m_pFile4ReadAmp->IsOpened()))
   {
 	  // if reading from file ...
@@ -715,6 +726,8 @@ void CamFrame::AcqOneFrm()
   }
   //if((m_viewRangePane->IsShownOnScreen())){ m_viewRangePane->SetNewImage();};
   //if((m_viewAmpPane->IsShownOnScreen())){ m_viewAmpPane->SetNewImage();};
+  _acqTime = m_pAcqSWatch->Time();
+  m_pAcqSWatch->Pause();
 };
 
 

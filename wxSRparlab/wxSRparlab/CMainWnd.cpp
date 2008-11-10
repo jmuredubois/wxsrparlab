@@ -55,6 +55,7 @@ void *ThreadReadDataSync::Entry()
 {
     wxString text;
 	int i = 0; //debug
+	long acqTime = 1000L;
 	std::vector<CamFrame*>::iterator it;  // get iterator on the camera frames
 
     for ( ; ; )
@@ -62,12 +63,15 @@ void *ThreadReadDataSync::Entry()
 		// check if we were asked to exit
         if ( TestDestroy() )
             break;
+		acqTime = 10L;
 		for ( it=(m_Wnd->GetCamFrms())->begin() ; it != (m_Wnd->GetCamFrms())->end(); it++, i++)
 		{
 			wxCommandEvent event( wxEVT_JMUACQONEFRM, IDC_AcqOne );
+			acqTime += (*it)->GetAcqTime();
 			(*it)->AddPendingEvent(event);
 		}
-        wxThread::Sleep(200);
+		if(acqTime <66){acqTime = 66;};
+        wxThread::Sleep(acqTime);
         #ifdef __WXMAC__
             wxThread::Sleep(100); // macBook graphics card is slow
         #endif
@@ -643,7 +647,7 @@ void MainWnd::OnRendTimer(wxTimerEvent& event) //! Render timer event action
 		_rendTgt = (int)(1.2*_rendCapms); // allow more rendering time
 		_renderTimer.Start(_rendTgt);
 	}
-	if( (rendDiff < 0) && (-rendDiff > 0.2*_rendCapms) && ((int)(0.9*_rendCapms) > 250) ) // if rendering is faster than target
+	if( (rendDiff < 0) && (-rendDiff > 0.2*_rendCapms) && ((int)(0.9*_rendCapms) > 66) ) // if rendering is faster than target
 	{
 		_rendTgt = (int)(0.9*_rendCapms); // shorten allowed rendering time
 		_renderTimer.Start(_rendTgt);
