@@ -273,7 +273,7 @@ void MainWnd::SetZVtk()
 			(*itCam)->GetCamVtk()->changeDepthRange((float) _zMin, (float) _zMax);
 			(*itCam)->GetCamBGVtk()->changeDepthRange((float) _zMin, (float) _zMax);
 		}
-		_vtkWin->Render();
+		_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 	}
 #endif
 }
@@ -341,7 +341,7 @@ void MainWnd::SetAmpVtk()
 			(*itCam)->GetCamVtk()->changeAmpRange((float) _ampMin, (float) _ampMax);
 			(*itCam)->GetCamBGVtk()->changeAmpRange((float) _ampMin, (float) _ampMax);
 		}
-		_vtkWin->Render();
+		_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 	}
 #endif
 }
@@ -413,7 +413,7 @@ void MainWnd::SetVisVtk(wxCommandEvent& event)
 		if(!_vtkWin){return;};
 		(*itCam)->GetCamBGVtk()->hideDataAct( !((*itCtrl)->IsChecked()) );
 	}
-	_vtkWin->Render();
+	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 #endif
 }
 
@@ -484,7 +484,7 @@ void MainWnd::SetColVtk(wxCommandEvent& event)
 			/*/(*itCam)->GetCamVtk()->setDataActColorRGB(r,g,b);/**/
 		}
 	}
-	_vtkWin->Render();
+	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 #endif
 }
 
@@ -521,6 +521,6 @@ void MainWnd::OnParaProj(wxCommandEvent& event)
 #ifdef JMU_USE_VTK
 	if(_ckParaProj == NULL) return;
 	_vtkWin->setParallelProj( _ckParaProj->IsChecked() );
-	_vtkWin->Render();
+	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 #endif
 }

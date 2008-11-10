@@ -617,6 +617,7 @@ void CamFrame::AcqOneFrm()
 			PLCTR_CoordTrf(m_CTrfBG, PLAVG_GetAvgBuf(m_bgAvg), m_ctrParam);
 			_camBGVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLAVG_GetAvgBuf(m_bgAvg).amp);
 		}
+		_vtkWin->Render(); // avoid rendering twice for BG and FG ; PROBLEM rendering is done once for each camera, should be done only once :-(
       #endif
 	  m_settingsPane->SetText(strR);
 	  m_viewRangePane->SetTxtInfo(strR);
@@ -873,7 +874,7 @@ void CamFrame::OnSetScatParams(wxCommandEvent& WXUNUSED(event))
   } // (OpenDialogMat->ShowModal()==wxID_OK) )
   delete(OpenDialogScat);
 
-  m_settingsPane->SetText(wxT("Opened target file"));
+  m_settingsPane->SetText(wxT("Opened scat. params file"));
   //#endif
 }
 
