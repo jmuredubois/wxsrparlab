@@ -23,6 +23,7 @@ BEGIN_EVENT_TABLE(MainWnd, wxFrame)
 	EVT_CHECKBOX(IDC_visVtk, MainWnd::SetVisVtk)
 	EVT_RADIOBOX(IDC_colVtk, MainWnd::SetColVtk)
 	EVT_CHECKBOX(IDC_ParaProj, MainWnd::OnParaProj)
+	EVT_TIMER(IDE_RendTimer, MainWnd::OnRendTimer)
 END_EVENT_TABLE()
 
 IMPLEMENT_APP(SrApp)
@@ -35,7 +36,7 @@ IMPLEMENT_APP(SrApp)
  *
  */
 MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
-: wxFrame((wxFrame *)NULL, -1, title, pos, size)
+: wxFrame((wxFrame *)NULL, -1, title, pos, size),_renderTimer(this, IDE_RendTimer)
 {
 	_numCams = NUMCAMS;
 	_vtkWin = NULL;
@@ -177,6 +178,10 @@ void MainWnd::Init()
 
 	_bgPanel->SetSizerAndFit(sizerPanel); // fit sizer to bg panel
 	this->SetSizerAndFit(sizerFrame);
+
+	_rendTgt = 200; // target rendering time
+	_rendCapms = 2.0*double(_rendTgt);
+	_renderTimer.Start(_rendTgt); //rendering every ... ms
 }
 
 /**
@@ -522,5 +527,25 @@ void MainWnd::OnParaProj(wxCommandEvent& event)
 	if(_ckParaProj == NULL) return;
 	_vtkWin->setParallelProj( _ckParaProj->IsChecked() );
 	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
+#endif
+}
+
+void MainWnd::OnRendTimer(wxTimerEvent& event) //! Render timer event action
+{
+#ifdef JMU_USE_VTK
+	if(_vtkWin == NULL) return;
+	_vtkWin->Render();//JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
+	_rendCapms = 0.8*_rendCapms + (_vtkWin->timeRender()*1000);
+	double rendDiff = _rendCapms - (double)_rendTgt;
+	if( rendDiff > 0) // if rendering is slower than target
+	{
+		_rendTgt = (int)(1.2*_rendCapms); // allow more rendering time
+		_renderTimer.Start(_rendTgt);
+	}
+	if( (rendDiff < 0) && (-rendDiff > 0.2*_rendCapms) && ((int)(0.9*_rendCapms) > 100) ) // if rendering is faster than target
+	{
+		_rendTgt = (int)(0.9*_rendCapms); // shorten allowed rendering time
+		_renderTimer.Start(_rendTgt);
+	}
 #endif
 }

@@ -81,6 +81,7 @@ public:
 	void SetVtkWin(CViewSrVtk *vtkWin, int vtkSub);
 	CamVtkView* GetCamVtk(){return _camVtk;};
 	CamVtkView* GetCamBGVtk(){return _camBGVtk;};
+	void RenderEvt(wxCommandEvent& WXUNUSED(event));
 #endif
 	int GetVtkSub(){return _vtkSub;};
 	int GetNumCols(){return m_nCols;};
@@ -161,6 +162,7 @@ enum CamFrameEnum
 	IDB_SetScatParams = 13,
 	IDC_LrnBg = 14,
 	IDB_ClearBg = 15,
+	IDC_Render = 16,
 	ID_ThisIsAStop = 255
 };
 

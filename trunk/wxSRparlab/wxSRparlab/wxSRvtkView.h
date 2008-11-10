@@ -80,6 +80,7 @@ public:
 	vtkLookupTable* GetKLUT(){return kLUT;};
 	vtkRenderWindow* GetRenWin(){return renWin;};
 	int Render();
+	double timeRender();
 	void setParallelProj(bool para);
 
 private:

@@ -507,6 +507,13 @@ int CViewSrVtk::Render()
 	renWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 	return res;
 }
+/**
+ * Renders
+ */
+double CViewSrVtk::timeRender()
+{
+	return renderer->GetLastRenderTimeInSeconds();
+}
 
 void CViewSrVtk::setParallelProj(bool para)
 {
