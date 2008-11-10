@@ -908,5 +908,8 @@ void CamFrame::OnClearBg(wxCommandEvent& WXUNUSED(event))
 		    srBuf.nRows = m_nRows;
 		    srBuf.bufferSizeInBytes = m_nCols*m_nRows*2*sizeof(unsigned short);
   PLAVG_LearnBackgroundInitReset( m_bgAvg, srBuf);
+//#ifdef JMU_USE_VTK // not really a good fix
+//  _camBGVtk->hideDataAct(true);
+//#endif
   m_settingsPane->SetText(wxT("Cleared background"));
 }

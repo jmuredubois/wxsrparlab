@@ -768,6 +768,31 @@ int CamVtkView::freeTgtAct()
  */
 void CamVtkView::setDataRepBG()
 {
+	setDataRepSurface();
+	setDataOpacity(0.3);
+}
+
+/**
+ * Sets data actor to surface
+ */
+void CamVtkView::setDataRepSurface()
+{
 	dataActor->GetProperty()->SetRepresentationToSurface();
-	dataActor->GetProperty()->SetOpacity(0.2);
+}
+
+/**
+ * Sets data actor to points
+ */
+void CamVtkView::setDataRepPoints()
+{
+	dataActor->GetProperty()->SetRepresentationToPoints();
+}
+
+/**
+ * Sets a data actor opacity
+ */
+void CamVtkView::setDataOpacity(double alpha)
+{
+	if( (alpha<0.0) || (alpha > 1.0)){return;};
+	dataActor->GetProperty()->SetOpacity(alpha);
 }
