@@ -122,7 +122,6 @@ private:
 	ModulationFrq m_srFrq;		//! SR frequency
 	float m_maxMM[4];			//! table for maximum depth value according to frequency
 	//float m_fFocal; float m_fPixSzX; float m_fPixSzY; float m_fCenterX; float m_fCenterY;
-	//float m_maxMMr;
 	int	  m_mfrqInt;
 #ifdef JMU_USE_VTK
 	CViewSrVtk	*_vtkWin ; //!< pointer to vtk window

@@ -116,7 +116,6 @@ CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos
 	m_maxMM[0]= 5000.0f; m_maxMM[1]= 7142.8571f;m_maxMM[2]= 7500.0f;m_maxMM[3]= 7894.7368f;
 	//! @todo:  HARDCODED values for m_maxMM -> check with libusbSR driver settings
 	//m_fFocal = 8.0f; m_fPixSzX = 0.04f; m_fPixSzY = 0.04f; m_fCenterX = 88.0f; m_fCenterY = 72.0f;
-	//m_maxMMr = 7500.0f;
 	m_ctrParam.f = 8.0f; m_ctrParam.pixDX = 0.04f; m_ctrParam.pixDY = 0.04f; m_ctrParam.cX = 88.0f; m_ctrParam.cY = 72.0f;
 	m_ctrParam.maxMM = 7500.0f;
 	m_mfrqInt = 2;
@@ -742,18 +741,22 @@ void CamFrame::SetFreq(wxCommandEvent&(event))
 	  if( ( strF.Find(wxT("19")) != wxNOT_FOUND) )
 	  {
 		  m_srFrq = MF_19MHz;
+		  m_ctrParam.maxMM = 7894.7368f;
 	  }
 	  if( ( strF.Find(wxT("20")) != wxNOT_FOUND) )
 	  {
 		  m_srFrq = MF_20MHz;
+		  m_ctrParam.maxMM = 7500.0;
 	  }
 	  if( ( strF.Find(wxT("21")) != wxNOT_FOUND) )
 	  {
 		  m_srFrq = MF_21MHz;
+		  m_ctrParam.maxMM = 7142.8571f;
 	  }
 	  if( ( strF.Find(wxT("30")) != wxNOT_FOUND) )
 	  {
 		  m_srFrq = MF_30MHz;
+		  m_ctrParam.maxMM = 5000.0;
 	  }
   }
   strR.sprintf(wxT("Mod Frq dummy = %i "), m_srFrq);
