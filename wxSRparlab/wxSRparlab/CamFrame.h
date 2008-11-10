@@ -91,6 +91,7 @@ public:
 	bool IsScatChecked(){ return m_settingsPane->IsScatChecked(); };
 	void OnClearBg(wxCommandEvent& WXUNUSED(event));
 	bool IsLrnBgChecked(){ return m_settingsPane->IsLrnBgChecked(); };
+	bool IsAcqContinuous(){ return (m_camReadMode==CAM_RD_CONTINU); };
 
 private:
 	MainWnd	*_pWin; // parent main wnd
