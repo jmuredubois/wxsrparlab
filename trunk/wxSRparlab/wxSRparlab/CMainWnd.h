@@ -10,6 +10,7 @@
 #include "wxSRparlab.h" //!< top-level header file
 #include "wxSrApp.h"	//!< this class header file
 
+class ThreadReadDataSync; // synchronized read data
 class CamFrame;		// camera frame
 class CViewSrVtk;	// vtk window
 
@@ -52,6 +53,8 @@ public:
 	void PopCam(int vtkSub); //!< remove camFrame object from list if window is closed
 	void OnParaProj(wxCommandEvent& event); //! Set projection to parallel or perpective
 	void OnRendTimer(wxTimerEvent& event); //! Render timer event action
+	std::vector<CamFrame*>* GetCamFrms(){return &m_camFrm;}; //! Get cam frames list
+
 
     DECLARE_EVENT_TABLE()
 
@@ -80,6 +83,7 @@ private:
 	wxTimer	_renderTimer; //! timer for rendering events
 	int _rendTgt; //! target rendering time in ms
 	double _rendCapms; //!rendering capacity in ms
+	ThreadReadDataSync*		m_pThreadReadDataSync; // THREAD for reading data
 };
 
 //! enum used by main wnd

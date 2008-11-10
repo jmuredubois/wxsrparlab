@@ -49,6 +49,7 @@
 #include "wx/event.h"		//!< for command events
 #include "wx/app.h"			//!< for posting events
 #include "wx/timer.h"		//!< for timer interface (used in rendering for example);
+#include "wx/stopwatch.h"	//!< for stopwatch interface;
 
 #include <list>		//STL list
 #include <vector>		//STL list

@@ -11,6 +11,81 @@
 #include "wxSrApp.h"	//!< application header file
 #include "CamFrame.h"	//!< camera frame header file
 
+class ThreadReadDataSync : public wxThread
+{
+public:
+    ThreadReadDataSync(MainWnd *cWnd);
+	~ThreadReadDataSync();
+
+    // thread execution starts here
+    virtual void *Entry();
+
+    // called when the thread exits - whether it terminates normally or is
+    // stopped with Delete() (but not when it is Kill()ed!)
+    virtual void OnExit();
+
+private:
+    MainWnd *m_Wnd;
+};
+
+ThreadReadDataSync::ThreadReadDataSync(MainWnd *cWnd)
+: wxThread(wxTHREAD_DETACHED)//: wxThread(wxTHREAD_JOINABLE)
+{
+    m_Wnd = cWnd;
+};
+
+/**
+ * Camera frame class destructor \n
+ */
+ThreadReadDataSync::~ThreadReadDataSync()
+{
+
+}
+
+void ThreadReadDataSync::OnExit()
+{
+
+}
+
+
+DECLARE_EVENT_TYPE(wxEVT_JMUACQONEFRM, -1)
+DECLARE_EVENT_TYPE(wxEVT_JMURENDER, -1)
+
+void *ThreadReadDataSync::Entry()
+{
+    wxString text;
+	int i = 0; //debug
+	std::vector<CamFrame*>::iterator it;  // get iterator on the camera frames
+
+    for ( ; ; )
+    {
+		// check if we were asked to exit
+        if ( TestDestroy() )
+            break;
+		for ( it=(m_Wnd->GetCamFrms())->begin() ; it != (m_Wnd->GetCamFrms())->end(); it++, i++)
+		{
+			wxCommandEvent event( wxEVT_JMUACQONEFRM, IDC_AcqOne );
+			(*it)->AddPendingEvent(event);
+		}
+        wxThread::Sleep(200);
+        #ifdef __WXMAC__
+            wxThread::Sleep(100); // macBook graphics card is slow
+        #endif
+		#ifdef LARGE_PSF
+			if(m_cFrm->IsScatChecked())
+			{
+				wxThread::Sleep(200); // scattering compensatino is expensive
+			}
+			 #ifdef __WXMAC__
+				wxThread::Sleep(100); // macBook graphics card is slow
+			#endif
+        #endif
+    }
+
+    return NULL;
+}
+
+
 
 BEGIN_EVENT_TABLE(MainWnd, wxFrame)
     EVT_MENU(ID_Quit, MainWnd::OnQuit)
@@ -80,11 +155,13 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
 
 	_buttAcqAll = NULL;
 	_ckParaProj = NULL;
+	m_pThreadReadDataSync = NULL;
 }
 
 
 MainWnd::~MainWnd()
 {
+	if(m_pThreadReadDataSync != NULL){ m_pThreadReadDataSync->Delete(); }
 #ifdef JMU_USE_VTK
 	if(_vtkWin){ delete(_vtkWin); _vtkWin =NULL; };
 #endif
@@ -156,7 +233,7 @@ void MainWnd::Init()
 		sizerZAmpScales->Add( sizerAmpScale, flagsExpand);
 		
 
-	_buttAcqAll = new wxButton(_bgPanel, IDB_AcqAll, wxT("Acq. All") );
+	_buttAcqAll = new wxButton(_bgPanel, IDB_AcqAll, wxT("Acq. all") );
 #ifdef JMU_USE_VTK
 	_ckParaProj = new wxCheckBox(_bgPanel, IDC_ParaProj, wxT("Parallel projection"));
 #endif
@@ -390,9 +467,33 @@ void MainWnd::AcqAll(wxCommandEvent& event)
 {
 	int i = 0; //debug
 	std::vector<CamFrame*>::iterator it;  // get iterator on the camera frames
+	bool contin = true;
 	for ( it=m_camFrm.begin() ; it != m_camFrm.end(); it++, i++)
 	{
-		(*it)->Acquire(event);
+		//(*it)->Acquire(event);
+		contin = contin && (*it)->IsAcqContinuous();
+	}
+	if(contin)
+	{
+		if (m_pThreadReadDataSync == NULL)
+		{
+			m_pThreadReadDataSync = new ThreadReadDataSync(this);	// create reading thread...
+			m_pThreadReadDataSync->Create();
+			m_pThreadReadDataSync->Run();						// ... and run it.
+		}
+		else if ((m_pThreadReadDataSync != NULL) && (m_pThreadReadDataSync->IsRunning()))
+		{
+			m_pThreadReadDataSync->Delete();
+			m_pThreadReadDataSync = NULL;
+		}
+	}
+	else
+	{
+		for ( it=m_camFrm.begin() ; it != m_camFrm.end(); it++, i++)
+		{
+			wxCommandEvent event( wxEVT_JMUACQONEFRM, IDC_AcqOne );
+			(*it)->ProcessEvent(event);
+		}
 	}
 
 }
@@ -542,7 +643,7 @@ void MainWnd::OnRendTimer(wxTimerEvent& event) //! Render timer event action
 		_rendTgt = (int)(1.2*_rendCapms); // allow more rendering time
 		_renderTimer.Start(_rendTgt);
 	}
-	if( (rendDiff < 0) && (-rendDiff > 0.2*_rendCapms) && ((int)(0.9*_rendCapms) > 100) ) // if rendering is faster than target
+	if( (rendDiff < 0) && (-rendDiff > 0.2*_rendCapms) && ((int)(0.9*_rendCapms) > 250) ) // if rendering is faster than target
 	{
 		_rendTgt = (int)(0.9*_rendCapms); // shorten allowed rendering time
 		_renderTimer.Start(_rendTgt);
