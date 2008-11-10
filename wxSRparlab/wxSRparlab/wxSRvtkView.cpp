@@ -59,9 +59,8 @@ CViewSrVtk::CViewSrVtk(wxFrame* pWnd, int x, int y, int w, int h)
 	renWin->SetPosition(x, y);
 
 	//renderer->GetActiveCamera()->SetParallelProjection(1);
-	//renderer->GetActiveCamera()->SetParallelScale(2000);
+	renderer->GetActiveCamera()->SetParallelScale(2000);
 	//renderer->GetActiveCamera()->SetPosition(0,0,-5000);
-	//renderer->GetActiveCamera()->SetViewPlaneNormal(0,0,-1);
 	//renderer->GetActiveCamera()->;
     // Finally we start the interactor so that event will be handled
     renWin->Render();
@@ -246,7 +245,7 @@ int CViewSrVtk::changeDepthRange(float minVal, float maxVal)
 {
 	int res = _vtkSubMax;
 	int i = 0;
-	renWin->Render();
+	//renWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 	return res-i;
 }
 
@@ -257,7 +256,7 @@ int CViewSrVtk::changeAmpRange(float minAmp, float maxAmp)
 {
 	int res = _vtkSubMax;
 	int i = 0;
-	renWin->Render();
+	//renWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 	return res-i;
 }
 
@@ -505,7 +504,7 @@ int CViewSrVtk::setDataMapperColorK(int vtkSub)
 int CViewSrVtk::Render()
 {
 	int res = 0;
-	renWin->Render();
+	renWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 	return res;
 }
 

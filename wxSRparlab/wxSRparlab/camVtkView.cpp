@@ -418,7 +418,7 @@ int CamVtkView::updateTOF(int rows, int cols, unsigned short *z, short *y, short
     }
 
 	data->Modified();
-	renWin->Render();
+	//renWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 	return res;
 }
 
@@ -620,7 +620,7 @@ int CamVtkView::updateTarget(float x, float y, float z)
         tgtTriPoints->SetPoint(3, 1.0,-1.0,0.0);
         tgtTriPoints->SetPoint(4,-2.0,-1.0,0.0);
         tgtTriPoints->Modified();
-		//renWin->Render();
+		//renWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 	}
 	return res;
 }
@@ -651,7 +651,6 @@ int CamVtkView::updateTarget(float *ptsF, int nCoord)
 	{
 		tgtLine->SetPoint2((double) ptsF[0],(double) ptsF[1],(double) ptsF[2]);
 		tgtLine->Modified();
-		//renWin->Render();
 		if(nCoord==15)
 		{
 			tgtTriPoints->SetPoint(0, (double) ptsF[ 0],(double) ptsF[ 1],(double) ptsF[ 2]);
