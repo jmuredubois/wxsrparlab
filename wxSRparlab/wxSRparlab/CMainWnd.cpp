@@ -271,6 +271,7 @@ void MainWnd::SetZVtk()
 		      itCam++)
 		{
 			(*itCam)->GetCamVtk()->changeDepthRange((float) _zMin, (float) _zMax);
+			(*itCam)->GetCamBGVtk()->changeDepthRange((float) _zMin, (float) _zMax);
 		}
 		_vtkWin->Render();
 	}
@@ -338,6 +339,7 @@ void MainWnd::SetAmpVtk()
 		      itCam++)
 		{
 			(*itCam)->GetCamVtk()->changeAmpRange((float) _ampMin, (float) _ampMax);
+			(*itCam)->GetCamBGVtk()->changeAmpRange((float) _ampMin, (float) _ampMax);
 		}
 		_vtkWin->Render();
 	}
