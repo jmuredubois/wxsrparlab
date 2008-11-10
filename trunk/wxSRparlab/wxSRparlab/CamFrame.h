@@ -92,6 +92,7 @@ public:
 	void OnClearBg(wxCommandEvent& WXUNUSED(event));
 	bool IsLrnBgChecked(){ return m_settingsPane->IsLrnBgChecked(); };
 	bool IsAcqContinuous(){ return (m_camReadMode==CAM_RD_CONTINU); };
+	long GetAcqTime(){ return _acqTime;};
 
 private:
 	MainWnd	*_pWin; // parent main wnd
@@ -139,6 +140,8 @@ private:
 	SRPLCTR	 m_CTrf;
 	SRPLCTR	 m_CTrfBG;
 	SRCTR m_ctrParam;
+	long _acqTime;
+	wxStopWatch* m_pAcqSWatch;
 
 public:
     DECLARE_EVENT_TABLE()
