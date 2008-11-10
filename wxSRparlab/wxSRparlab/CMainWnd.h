@@ -51,6 +51,7 @@ public:
 	void SetColVtk(wxCommandEvent& event); //!< react on event changed color options
 	void PopCam(int vtkSub); //!< remove camFrame object from list if window is closed
 	void OnParaProj(wxCommandEvent& event); //! Set projection to parallel or perpective
+	void OnRendTimer(wxTimerEvent& event); //! Render timer event action
 
     DECLARE_EVENT_TABLE()
 
@@ -76,6 +77,9 @@ private:
 	std::vector<wxRadioBox*> _colBGVtk;		//!< list of BACKGROUND vtk color options
 	wxGridBagSizer *_sizerCamVisCol;
 	wxCheckBox* _ckParaProj; //! Parallel projection button
+	wxTimer	_renderTimer; //! timer for rendering events
+	int _rendTgt; //! target rendering time in ms
+	double _rendCapms; //!rendering capacity in ms
 };
 
 //! enum used by main wnd
@@ -90,5 +94,6 @@ enum MainWndEnum
 	IDB_AcqAll,
 	IDC_visVtk,
 	IDC_colVtk,
+	IDE_RendTimer,
 	IDC_ParaProj
 };

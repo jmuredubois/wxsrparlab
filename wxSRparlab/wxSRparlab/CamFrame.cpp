@@ -17,8 +17,9 @@
 // ----------------------------------------------------------------------------
 
 DECLARE_EVENT_TYPE(wxEVT_JMUACQONEFRM, -1)
-
 DEFINE_EVENT_TYPE(wxEVT_JMUACQONEFRM)
+DECLARE_EVENT_TYPE(wxEVT_JMURENDER, -1)
+DEFINE_EVENT_TYPE(wxEVT_JMURENDER)
 
 class ThreadReadData : public wxThread
 {
@@ -78,6 +79,9 @@ void *ThreadReadData::Entry()
 			{
 				wxThread::Sleep(200); // scattering compensatino is expensive
 			}
+			 #ifdef __WXMAC__
+				wxThread::Sleep(100); // macBook graphics card is slow
+			#endif
         #endif
     }
 
@@ -171,6 +175,7 @@ BEGIN_EVENT_TABLE(CamFrame, wxFrame)
 		EVT_BUTTON(IDB_TgtFile,  CamFrame::OnTgtFile)
 	#endif
 	EVT_COMMAND(IDC_AcqOne, wxEVT_JMUACQONEFRM, CamFrame::AcqOneFrmEvt)
+	EVT_COMMAND(IDC_Render, wxEVT_JMURENDER, CamFrame::RenderEvt)
 	EVT_BUTTON(IDB_SetScatParams, CamFrame::OnSetScatParams)
 	EVT_BUTTON(IDB_ClearBg, CamFrame::OnClearBg)
 END_EVENT_TABLE()
@@ -617,7 +622,10 @@ void CamFrame::AcqOneFrm()
 			PLCTR_CoordTrf(m_CTrfBG, PLAVG_GetAvgBuf(m_bgAvg), m_ctrParam);
 			_camBGVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLAVG_GetAvgBuf(m_bgAvg).amp);
 		}
-		_vtkWin->Render(); // avoid rendering twice for BG and FG ; PROBLEM rendering is done once for each camera, should be done only once :-(
+		if(!m_bReadContinuously)
+		{
+			_vtkWin->Render(); // avoid rendering twice for BG and FG ; PROBLEM rendering is done once for each camera, should be done only once :-(
+		}
       #endif
 	  m_settingsPane->SetText(strR);
 	  m_viewRangePane->SetTxtInfo(strR);
@@ -688,6 +696,10 @@ void CamFrame::AcqOneFrm()
 			PLCTR_CoordTrf(m_CTrfBG, PLAVG_GetAvgBuf(m_bgAvg), m_ctrParam);
 			_camBGVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLAVG_GetAvgBuf(m_bgAvg).amp);
 		}
+		if(!m_bReadContinuously)
+		{
+			_vtkWin->Render(); // avoid rendering twice for BG and FG ; PROBLEM rendering is done once for each camera, should be done only once :-(
+		}
       #endif
 	  m_settingsPane->SetText(strR);
 	  m_viewRangePane->SetTxtInfo(strR);
@@ -710,6 +722,11 @@ void CamFrame::AcqOneFrm()
 void CamFrame::AcqOneFrmEvt(wxCommandEvent& WXUNUSED(event))
 {
 	AcqOneFrm();
+}
+
+void CamFrame::RenderEvt(wxCommandEvent& WXUNUSED(event))
+{
+	_vtkWin->Render();  // avoid rendering twice for BG and FG ; PROBLEM rendering is done once for each camera, should be done only once :-(
 }
 
 //! Interface fct to set the modulation frequency
