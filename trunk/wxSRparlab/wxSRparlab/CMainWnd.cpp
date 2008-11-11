@@ -57,6 +57,7 @@ void *ThreadReadDataSync::Entry()
 	int i = 0; //debug
 	long acqTime = 1000L;
 	std::vector<CamFrame*>::iterator it;  // get iterator on the camera frames
+	float fps = 1.0; wxString strFps;
 
     for ( ; ; )
     {
@@ -71,6 +72,9 @@ void *ThreadReadDataSync::Entry()
 			(*it)->AddPendingEvent(event);
 		}
 		if(acqTime <66){acqTime = 66;};
+		fps = 1000.0f/(float)acqTime;
+		strFps.Printf(wxT("Data update: %04.1f fps"), fps);
+		m_Wnd->GetVtkWin()->setReadFpsTxt(strFps.char_str());
         wxThread::Sleep(acqTime);
         #ifdef __WXMAC__
             wxThread::Sleep(100); // macBook graphics card is slow
@@ -639,6 +643,10 @@ void MainWnd::OnRendTimer(wxTimerEvent& event) //! Render timer event action
 {
 #ifdef JMU_USE_VTK
 	if(_vtkWin == NULL) return;
+	float fps = 1.0; wxString strFps;
+	fps = 1000.0f/(float)_rendTgt;
+	strFps.Printf(wxT("Rendering: %04.1f fps"), fps);
+	_vtkWin->setFpsTxt(strFps.char_str());
 	_vtkWin->Render();//JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 	_rendCapms = 0.8*_rendCapms + (_vtkWin->timeRender()*1000);
 	double rendDiff = _rendCapms - (double)_rendTgt;

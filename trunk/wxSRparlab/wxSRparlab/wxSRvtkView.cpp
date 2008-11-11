@@ -54,10 +54,14 @@ CViewSrVtk::CViewSrVtk(wxFrame* pWnd, int x, int y, int w, int h)
 	renderer->AddActor(ampSca);
 	//BGdataActor->Register(renderer);
     renderer->AddActor(axesActor);
+	renderer->AddActor(fpsTxtActor);
+	renderer->AddActor(fpsReadTxtActor);
     renderer->SetBackground(0.2,0.2,0.4);		//!< HARDCODED BACKGROUND COLOR
     renWin->SetSize(w,h);					//!< HARDCODED RENDER WINDOW SIZE
 	renWin->SetPosition(x, y);
 
+	fpsReadTxtActor->SetDisplayPosition(3,3);
+	fpsTxtActor->SetDisplayPosition(w-100,3);
 	//renderer->GetActiveCamera()->SetParallelProjection(1);
 	renderer->GetActiveCamera()->SetParallelScale(2000);
 	//renderer->GetActiveCamera()->SetPosition(0,0,-5000);
@@ -150,6 +154,8 @@ int CViewSrVtk::addSrAxes()
     axesMapper->SetInputConnection(axes->GetOutputPort());
     axesActor = vtkActor::New();
     axesActor->SetMapper(axesMapper);
+	fpsTxtActor = vtkTextActor::New();
+	fpsReadTxtActor = vtkTextActor::New();
 	return axesActor->GetReferenceCount();
 }
 
@@ -162,6 +168,8 @@ int CViewSrVtk::freeSrAxes()
 	axes->Delete();
 	axesMapper->Delete();
 	axesActor->Delete();
+	fpsTxtActor->Delete();
+	fpsReadTxtActor->Delete();
 	return res-1;
 }
 
@@ -526,4 +534,18 @@ void CViewSrVtk::setParallelProj(bool para)
 		renderer->GetActiveCamera()->ParallelProjectionOff();
 	}
 	return;
+}
+
+int CViewSrVtk::setFpsTxt(char* txt)
+{
+	int res = 0;
+	fpsTxtActor->SetInput(txt);
+	return res;
+}
+
+int CViewSrVtk::setReadFpsTxt(char* txt)
+{
+	int res = 0;
+	fpsReadTxtActor->SetInput(txt);
+	return res;
 }
