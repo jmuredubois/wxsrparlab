@@ -54,6 +54,7 @@ public:
 	void OnParaProj(wxCommandEvent& event); //! Set projection to parallel or perpective
 	void OnRendTimer(wxTimerEvent& event); //! Render timer event action
 	std::vector<CamFrame*>* GetCamFrms(){return &m_camFrm;}; //! Get cam frames list
+	CViewSrVtk* GetVtkWin(){return _vtkWin;} ; //!< pointer to vtk window
 
 
     DECLARE_EVENT_TABLE()

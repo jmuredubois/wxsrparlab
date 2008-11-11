@@ -42,6 +42,7 @@
 #include "vtkTransformFilter.h"	// requires $(JMU_VTKSRCBASE)/Graphics
 #include "vtkMatrix4x4.h"		// requires $(JMU_VTKSRCBASE)/Graphics
 #include "vtkStructuredGridWriter.h"	// requires $(JMU_VTKSRCBASE)/Graphics
+#include "vtkTextActor.h"		// requires $(JMU_VTKSRCBASE)/Rendering
 
 //#include "libusbSR.h"
 //#include "libSRparlab.h" // for SRCAM
@@ -82,6 +83,8 @@ public:
 	int Render();
 	double timeRender();
 	void setParallelProj(bool para);
+	int setFpsTxt(char* txt);
+	int setReadFpsTxt(char* txt);
 
 private:
 	static const int _vtkSubMax = NUMCAMS ; // VTKSUBMAX undeclared identifier bug 20080114
@@ -102,6 +105,8 @@ private:
   vtkActor			*axesActor;		//!< actor for axes
   int		addSrAxes(); //!< adds the sr cam actor to the current view
   int		freeSrAxes(); //!< adds the sr cam actor to the current view
+  vtkTextActor		*fpsTxtActor;	//!< actor for fps display
+  vtkTextActor		*fpsReadTxtActor;	//!< actor for fps display
 
   vtkLookupTable	*depthLUT;	//!< LUT for depth data display
   int addDepthLUT();
