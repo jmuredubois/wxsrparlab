@@ -74,7 +74,9 @@ void *ThreadReadDataSync::Entry()
 		if(acqTime <66){acqTime = 66;};
 		fps = 1000.0f/(float)acqTime;
 		strFps.Printf(wxT("Data update: %04.1f fps"), fps);
-		m_Wnd->GetVtkWin()->setReadFpsTxt(strFps.char_str());
+		#ifdef JMU_USE_VTK
+			m_Wnd->GetVtkWin()->setReadFpsTxt(strFps.char_str());
+		#endif
         wxThread::Sleep(acqTime);
         #ifdef __WXMAC__
             wxThread::Sleep(100); // macBook graphics card is slow

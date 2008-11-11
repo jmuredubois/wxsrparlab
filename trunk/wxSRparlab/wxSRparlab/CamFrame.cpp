@@ -180,7 +180,9 @@ BEGIN_EVENT_TABLE(CamFrame, wxFrame)
 		EVT_BUTTON(IDB_TgtFile,  CamFrame::OnTgtFile)
 	#endif
 	EVT_COMMAND(IDC_AcqOne, wxEVT_JMUACQONEFRM, CamFrame::AcqOneFrmEvt)
+	#ifdef JMU_USE_VTK
 	EVT_COMMAND(IDC_Render, wxEVT_JMURENDER, CamFrame::RenderEvt)
+	#endif
 	EVT_BUTTON(IDB_SetScatParams, CamFrame::OnSetScatParams)
 	EVT_BUTTON(IDB_ClearBg, CamFrame::OnClearBg)
 END_EVENT_TABLE()
@@ -735,11 +737,12 @@ void CamFrame::AcqOneFrmEvt(wxCommandEvent& WXUNUSED(event))
 {
 	AcqOneFrm();
 }
-
+#ifdef JMU_USE_VTK
 void CamFrame::RenderEvt(wxCommandEvent& WXUNUSED(event))
 {
 	_vtkWin->Render();  // avoid rendering twice for BG and FG ; PROBLEM rendering is done once for each camera, should be done only once :-(
 }
+#endif
 
 //! Interface fct to set the modulation frequency
 void CamFrame::SetFreq(wxCommandEvent&(event))
