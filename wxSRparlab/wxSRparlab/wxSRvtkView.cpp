@@ -61,7 +61,7 @@ CViewSrVtk::CViewSrVtk(wxFrame* pWnd, int x, int y, int w, int h)
 	renWin->SetPosition(x, y);
 
 	fpsReadTxtActor->SetDisplayPosition(3,3);
-	fpsTxtActor->SetDisplayPosition(w-100,3);
+	fpsTxtActor->SetDisplayPosition(w-125,3);
 	//renderer->GetActiveCamera()->SetParallelProjection(1);
 	renderer->GetActiveCamera()->SetParallelScale(2000);
 	//renderer->GetActiveCamera()->SetPosition(0,0,-5000);
