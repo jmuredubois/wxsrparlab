@@ -77,6 +77,7 @@ void *ThreadReadDataSync::Entry()
 		#ifdef JMU_USE_VTK
 			m_Wnd->GetVtkWin()->setReadFpsTxt(strFps.char_str());
 		#endif
+		m_Wnd->SetStatusText(strFps);
         wxThread::Sleep(acqTime);
         #ifdef __WXMAC__
             wxThread::Sleep(100); // macBook graphics card is slow
@@ -159,7 +160,6 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
 	_vtkWin = NULL;
 
 	wxString date1 = now.Format();
-    //SetStatusText( _T("Welcome to wxSRparlab!") );
 	wxString strW = date1 + strM + strU + strP;
 	SetStatusText(strW);
 
