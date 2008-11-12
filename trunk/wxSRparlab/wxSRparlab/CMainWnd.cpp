@@ -77,6 +77,7 @@ void *ThreadReadDataSync::Entry()
 		#ifdef JMU_USE_VTK
 			m_Wnd->GetVtkWin()->setReadFpsTxt(strFps.char_str());
 		#endif
+		m_Wnd->Refresh();
 		m_Wnd->SetStatusText(strFps);
         wxThread::Sleep(acqTime);
 		#ifdef LARGE_PSF
