@@ -74,17 +74,11 @@ void *ThreadReadData::Entry()
 		//m_cFrm->ProcessEvent(event);
 		if(acqTime <66){acqTime = 66;};
         wxThread::Sleep(acqTime);
-        #ifdef __WXMAC__
-            wxThread::Sleep(100); // macBook graphics card is slow
-        #endif
 		#ifdef LARGE_PSF
 			if(m_cFrm->IsScatChecked())
 			{
 				wxThread::Sleep(200); // scattering compensatino is expensive
 			}
-			 #ifdef __WXMAC__
-				wxThread::Sleep(100); // macBook graphics card is slow
-			#endif
         #endif
     }
 
