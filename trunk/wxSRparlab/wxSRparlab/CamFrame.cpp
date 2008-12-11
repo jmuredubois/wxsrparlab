@@ -555,15 +555,36 @@ void CamFrame::AcqOneFrm()
   int res = 0;
   wxString strR;
   m_pAcqSWatch->Start(0L);
-  if((m_sr == NULL) && (m_pSrBuf != NULL) && (m_CTrf!=NULL)&&(m_pFile4ReadPha  != NULL) && (m_pFile4ReadAmp  != NULL) && (m_pFile4ReadPha->IsOpened()) && (m_pFile4ReadAmp->IsOpened()))
+  // if buffers are defined
+  if( (m_pSrBuf != NULL) && (m_CTrf!=NULL) )
   {
-	  // if reading from file ...
 	  wxMutexError errMutex= m_mutexSrBuf->Lock();
 	  if(errMutex == wxMUTEX_NO_ERROR)
 	  {
-		res = (int) m_pFile4ReadPha->Read(m_pSrBuf, (int)m_nCols*(int)m_nRows*sizeof(unsigned short));
-		res = (int) m_pFile4ReadAmp->Read(&m_pSrBuf[(int)m_nCols*(int)m_nRows*sizeof(unsigned short)], (int)m_nCols*(int)m_nRows*sizeof(unsigned short));
-		m_nFrmRead +=1;
+		  // if reading from file ...
+		  if((m_sr == NULL) &&(m_pFile4ReadPha  != NULL) && (m_pFile4ReadAmp  != NULL) && (m_pFile4ReadPha->IsOpened()) && (m_pFile4ReadAmp->IsOpened()))
+		  {
+			res = (int) m_pFile4ReadPha->Read(m_pSrBuf, (int)m_nCols*(int)m_nRows*sizeof(unsigned short));
+			res = (int) m_pFile4ReadAmp->Read(&m_pSrBuf[(int)m_nCols*(int)m_nRows*sizeof(unsigned short)], (int)m_nCols*(int)m_nRows*sizeof(unsigned short));
+			m_nFrmRead +=1;
+			if( (m_pFile4ReadPha->Eof()) || (m_pFile4ReadAmp->Eof()) )
+			{
+				m_pFile4ReadPha->Seek(0); // rewind phase
+				m_pFile4ReadAmp->Seek(0); // rewind phase
+				m_nFrmRead = 0;	// reset frame count
+			}
+		  }
+		  else
+		  {
+			  if((m_sr != NULL) && (m_pSrBuf != NULL) && (m_CTrf!=NULL) )
+			  {
+				res = SR_SetMode(m_sr, AM_COR_FIX_PTRN ); //|| AM_COR_LED_NON_LIN );
+				res = SR_Acquire(m_sr);
+				memcpy( (void*) m_pSrBuf, SR_GetImage(m_sr,0), m_nRows*m_nCols*sizeof(unsigned short));
+				memcpy( (void*) (&m_pSrBuf[m_nRows*m_nCols*sizeof(unsigned short)]), SR_GetImage(m_sr,1), m_nRows*m_nCols*sizeof(unsigned short));
+				m_nFrmRead +=1;
+			  }
+		  }
 		    SRBUF srBuf;
 		    srBuf.pha = (unsigned short*) m_pSrBuf;
 		    srBuf.amp = (unsigned short*) (&m_pSrBuf[m_nRows*m_nCols*sizeof(unsigned short)]);
@@ -645,80 +666,6 @@ void CamFrame::AcqOneFrm()
 	  m_viewBGRangePane->SetTxtInfo(strBG);
 	  m_viewBGAmpPane->SetTxtInfo(strBG);
 
-	  if( (m_pFile4ReadPha->Eof()) || (m_pFile4ReadAmp->Eof()) )
-	  {
-		  m_pFile4ReadPha->Seek(0); // rewind phase
-		  m_pFile4ReadAmp->Seek(0); // rewind phase
-		  m_nFrmRead = 0;	// reset frame count
-	  }
-  }
-  if((m_sr != NULL) && (m_pSrBuf != NULL) && (m_CTrf!=NULL) )
-  {
-	  // if reading data live from camera ...
-	  wxMutexError errMutex= m_mutexSrBuf->Lock();
-	  if(errMutex == wxMUTEX_NO_ERROR)
-	  {
-	    res = SR_SetMode(m_sr, AM_COR_FIX_PTRN ); //|| AM_COR_LED_NON_LIN );
-		res = SR_Acquire(m_sr);
-		memcpy( (void*) m_pSrBuf, SR_GetImage(m_sr,0), m_nRows*m_nCols*sizeof(unsigned short));
-		memcpy( (void*) (&m_pSrBuf[m_nRows*m_nCols*sizeof(unsigned short)]), SR_GetImage(m_sr,1), m_nRows*m_nCols*sizeof(unsigned short));
-			SRBUF srBuf;
-		    srBuf.pha = (unsigned short*) m_pSrBuf;
-		    srBuf.amp = (unsigned short*) (&m_pSrBuf[m_nRows*m_nCols*sizeof(unsigned short)]);
-		    srBuf.nCols = m_nCols;
-		    srBuf.nRows = m_nRows;
-		    srBuf.bufferSizeInBytes = m_nCols*m_nRows*2*sizeof(unsigned short);
-			NANBUF scatNaN;
-			scatNaN.nCols = m_nCols;
-			scatNaN.nRows = m_nRows;
-			scatNaN.bufferSizeInBytes = m_nCols * m_nRows * sizeof(bool);
-			scatNaN.nanBool = PLNN_FlagNaN(m_NaN, srBuf);
-		if(m_settingsPane->IsScatChecked())
-		{
-			PLSC_Compensate(m_scat, srBuf, scatNaN);
-		}
-		if(m_settingsPane->IsLrnBgChecked())
-		{
-			PLAVG_LearnBackground(m_bgAvg, srBuf);
-		}
-		PLCTR_CoordTrf(m_CTrf, srBuf, m_ctrParam);
-	    errMutex = m_mutexSrBuf->Unlock();
-	  } //{errMutex == wxMUTEX_NO_ERROR)
-	  strR.sprintf(wxT("frm:%05u - pixRead %i - %ix%i  - %i"), m_nFrmRead, res, m_nRows, m_nCols, m_nSrBufSz);
-	  m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 0), m_nRows*m_nCols);
-	  m_viewAmpPane->SetDataArray<unsigned short>((unsigned short*) SR_GetImage(m_sr, 1), m_nRows*m_nCols);
-	  m_viewZPane->SetDataArray<unsigned short>(PLCTR_GetZ(m_CTrf), m_nRows*m_nCols);
-	  #ifdef DISPXYBUFFERS
-	    m_viewYPane->SetDataArray<short>(PLCTR_GetY(m_CTrf), m_nRows*m_nCols);
-	    m_viewXPane->SetDataArray<short>(PLCTR_GetX(m_CTrf), m_nRows*m_nCols);
-	  #endif //DISPXYBUFFERS
-	  m_viewBGRangePane->SetDataArray<unsigned short>((unsigned short*) (PLAVG_GetAvgBuf(m_bgAvg)).pha, m_nRows*m_nCols);
-	  m_viewBGAmpPane->SetDataArray<unsigned short>((unsigned short*) (PLAVG_GetAvgBuf(m_bgAvg)).amp, m_nRows*m_nCols);
-	  #ifdef JMU_USE_VTK
-		 // vtk does not support access from different threads
-			_camVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrf), PLCTR_GetY(m_CTrf), PLCTR_GetX(m_CTrf), (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2]);
-		if(m_settingsPane->IsLrnBgChecked())
-		{
-			PLCTR_CoordTrf(m_CTrfBG, PLAVG_GetAvgBuf(m_bgAvg), m_ctrParam);
-			_camBGVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLAVG_GetAvgBuf(m_bgAvg).amp);
-		}
-		if(!m_bReadContinuously)
-		{
-			_vtkWin->Render(); // avoid rendering twice for BG and FG ; PROBLEM rendering is done once for each camera, should be done only once :-(
-		}
-      #endif
-	  m_settingsPane->SetText(strR);
-	  m_viewRangePane->SetTxtInfo(strR);
-	  m_viewAmpPane->SetTxtInfo(strR);
-	  m_viewZPane->SetTxtInfo(strR);
-	  #ifdef DISPXYBUFFERS
-	    m_viewYPane->SetTxtInfo(strR);
-	    m_viewXPane->SetTxtInfo(strR);
-	  #endif //DISPXYBUFFERS
-	  wxString strBG; strBG.sprintf(wxT("Average count: %05i"), PLAVG_GetAvgCnt(m_bgAvg));
-	  m_viewBGRangePane->SetTxtInfo(strBG);
-	  m_viewBGAmpPane->SetTxtInfo(strBG);
-	  m_nFrmRead +=1;
   }
   //if((m_viewRangePane->IsShownOnScreen())){ m_viewRangePane->SetNewImage();};
   //if((m_viewAmpPane->IsShownOnScreen())){ m_viewAmpPane->SetNewImage();};
