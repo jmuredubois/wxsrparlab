@@ -72,6 +72,17 @@ int CamPanelSettings::InitSettings()
 		sizerLrnBg->Add(m_ckBoxLrnBg, 0, wxEXPAND);
 		sizerLrnBg->Add(m_buttonClearBg, 1, wxEXPAND);
 
+	// Learn foreground controls //
+    m_ckBoxLrnFg = new wxCheckBox( this, IDC_LrnFg, wxT("Learn foreground"),
+        wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
+	m_buttonClearFg = new wxButton(this, IDB_ClearBg, wxT("Clear FG."));
+	m_ckBoxFgHidesData = new wxCheckBox( this, IDC_FgHidesData, wxT("Foreground replaces data"),
+        wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
+
+	wxBoxSizer *sizerLrnFg = new wxBoxSizer(wxHORIZONTAL);
+		sizerLrnFg->Add(m_ckBoxLrnFg, 0, wxEXPAND);
+		sizerLrnFg->Add(m_buttonClearFg, 1, wxEXPAND);
+
 
 	// Frequency controls
     m_radioboxSrFilt = new wxRadioBox(this, wxID_ANY,
@@ -104,6 +115,8 @@ int CamPanelSettings::InitSettings()
 		sizerPanel->Add(m_buttonTgtFile, 0, wxEXPAND); 
 	#endif
 	sizerPanel->Add(m_ckBoxRecord, 0, wxEXPAND);
+	sizerPanel->Add(sizerLrnFg, 0, wxEXPAND);
+	sizerPanel->Add(m_ckBoxFgHidesData, 0, wxEXPAND);
 	sizerPanel->Add(m_statText, 1, wxEXPAND);
 
 

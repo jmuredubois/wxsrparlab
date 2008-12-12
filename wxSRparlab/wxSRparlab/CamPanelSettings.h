@@ -50,6 +50,8 @@ public:
 	void CamPanelSettings::DisableScatParams(); //!< Disables the "Scat Comp Params" button
 	void CamPanelSettings::EnableScatParams();  //!< Enables the "Scat Comp Params" button
 	bool IsLrnBgChecked(){return m_ckBoxLrnBg->IsChecked();}; //
+	bool IsLrnFgChecked(){return m_ckBoxLrnFg->IsChecked();}; //
+	bool IsFgHidesDataChecked(){return m_ckBoxFgHidesData->IsChecked();}; //
 
 
 private:
@@ -63,7 +65,8 @@ private:
 	  wxButton* m_buttonTgtFile; 
 	#endif
 	wxButton* m_buttonScatParams;
-	wxButton* m_buttonClearBg;
+	wxButton* m_buttonClearBg; // 'clear background' button
+	wxButton* m_buttonClearFg; // 'clear foreground' button
 
 	/* Radio boxes */
 	wxRadioBox* m_radioboxFrq;	//!< camera frq
@@ -71,12 +74,14 @@ private:
 	wxRadioBox* m_radioboxReadMode; //!< Read mode
 	
 	/* Check boxes */
-	wxCheckBox* m_ckBoxFixPtrn;
-	wxCheckBox* m_ckBoxLedNonLin;
+	wxCheckBox* m_ckBoxFixPtrn;  // check box for fix pattern noise filter -> NOT USED
+	wxCheckBox* m_ckBoxLedNonLin; // check box for nonLinLED noise filter -> NOT USED
 	
-	wxCheckBox* m_ckBoxScatComp;
-	wxCheckBox* m_ckBoxLrnBg;
-	wxCheckBox* m_ckBoxRecord;
+	wxCheckBox* m_ckBoxScatComp; // check box foe activating scattering compensation
+	wxCheckBox* m_ckBoxLrnBg;	 // check box for learning background
+	wxCheckBox* m_ckBoxLrnFg;	 // check box for learning foreground
+	wxCheckBox* m_ckBoxRecord;	 // check box to record current image buffer (after scat comp)
+	wxCheckBox* m_ckBoxFgHidesData;	 // check box for learning foreground
 	
 	/* TextControls */
 	wxTextCtrl* m_TxtDelayStat;

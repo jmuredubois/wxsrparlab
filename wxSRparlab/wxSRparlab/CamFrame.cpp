@@ -130,6 +130,7 @@ CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos
 	m_scat = NULL;
 	m_NaN = NULL;
 	m_bgAvg = NULL;
+	m_fgAvg = NULL;
 	m_CTrf = NULL;
 	m_CTrfBG = NULL;
 	_acqTime = 1000L;
@@ -161,6 +162,7 @@ CamFrame::~CamFrame()
 	if(m_NaN != NULL) { PLNN_Close(m_NaN); m_NaN = NULL; };
 	if(m_scat != NULL) {PLSC_Close(m_scat); m_scat = NULL; };
 	if(m_bgAvg != NULL) {PLAVG_Close(m_bgAvg); m_bgAvg = NULL; };
+	if(m_fgAvg != NULL) {PLAVG_Close(m_fgAvg); m_fgAvg = NULL; };
 	if(m_CTrf != NULL) {PLCTR_Close(m_CTrf); m_CTrf = NULL; };
 	if(m_CTrfBG != NULL) {PLCTR_Close(m_CTrfBG); m_CTrfBG = NULL; };
 	if(m_pAcqSWatch != NULL) { delete(m_pAcqSWatch); m_pAcqSWatch = NULL;};
@@ -183,6 +185,7 @@ BEGIN_EVENT_TABLE(CamFrame, wxFrame)
 	#endif
 	EVT_BUTTON(IDB_SetScatParams, CamFrame::OnSetScatParams)
 	EVT_BUTTON(IDB_ClearBg, CamFrame::OnClearBg)
+	EVT_BUTTON(IDB_ClearFg, CamFrame::OnClearFg)
 	EVT_CHECKBOX(IDC_Record, CamFrame::OnRecord)
 END_EVENT_TABLE()
 
@@ -426,6 +429,7 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	  PLSC_Open(&m_scat, newbuf);
 	  PLNN_Open(&m_NaN, newbuf);
 	  PLAVG_Open(&m_bgAvg, newbuf);
+	  PLAVG_Open(&m_fgAvg, newbuf);
 	  PLCTR_Open(&m_CTrf, newbuf);
 	  PLCTR_Open(&m_CTrfBG, newbuf);
 	  return;
@@ -469,6 +473,7 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   PLSC_Open(&m_scat, newbuf);
   PLNN_Open(&m_NaN, newbuf);
   PLAVG_Open (&m_bgAvg, newbuf);
+  PLAVG_Open (&m_fgAvg, newbuf);
   PLCTR_Open(&m_CTrf, newbuf);
   PLCTR_Open(&m_CTrfBG, newbuf);
 }
@@ -514,6 +519,7 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   if(m_NaN != NULL)   {PLNN_Close(m_NaN);    m_NaN = NULL; };
   if(m_scat != NULL)  {PLSC_Close(m_scat);   m_scat = NULL; };
   if(m_bgAvg != NULL) {PLAVG_Close(m_bgAvg); m_bgAvg = NULL; };
+  if(m_fgAvg != NULL) {PLAVG_Close(m_fgAvg); m_fgAvg = NULL; };
   if(m_CTrf != NULL) {PLCTR_Close(m_CTrf); m_CTrf = NULL; };
   if(m_CTrfBG != NULL) {PLCTR_Close(m_CTrfBG); m_CTrfBG = NULL; };
   if(m_pAcqSWatch != NULL) { delete(m_pAcqSWatch); m_pAcqSWatch = NULL;};
@@ -671,7 +677,7 @@ void CamFrame::AcqOneFrm()
 {
   int res = 0;
   wxString strR;
-  m_pAcqSWatch->Start(0L);
+  m_pAcqSWatch->Start();
   // if buffers are defined
   if( (m_pSrBuf != NULL) && (m_CTrf!=NULL) )
   {
@@ -718,6 +724,12 @@ void CamFrame::AcqOneFrm()
 			scatNaN.nRows = m_nRows;
 			scatNaN.bufferSizeInBytes = m_nCols * m_nRows * sizeof(bool);
 			scatNaN.nanBool = PLNN_FlagNaN(m_NaN, srBuf);
+		if( (m_settingsPane->IsFgHidesDataChecked()) && (m_settingsPane->IsLrnFgChecked()!=true) )
+		{
+			SRBUF fgBuf = PLAVG_GetAvgBuf(m_fgAvg);
+			memcpy( (void*) m_pSrBuf, fgBuf.pha , m_nRows*m_nCols*sizeof(unsigned short));
+			memcpy( (void*) (&m_pSrBuf[m_nRows*m_nCols*sizeof(unsigned short)]), fgBuf.amp , m_nRows*m_nCols*sizeof(unsigned short));
+		}
 		if(m_settingsPane->IsScatChecked())
 		{
 			PLSC_Compensate(m_scat, srBuf, scatNaN);
@@ -725,6 +737,10 @@ void CamFrame::AcqOneFrm()
 		if(m_settingsPane->IsLrnBgChecked())
 		{
 			PLAVG_LearnBackground(m_bgAvg, srBuf);
+		}
+		if(m_settingsPane->IsLrnFgChecked())
+		{
+			PLAVG_LearnBackground(m_fgAvg, srBuf);
 		}
 		PLCTR_CoordTrf(m_CTrf, srBuf, m_ctrParam);
 		errMutex = m_mutexSrBuf->Unlock();
@@ -996,4 +1012,17 @@ void CamFrame::OnClearBg(wxCommandEvent& WXUNUSED(event))
 //  _camBGVtk->hideDataAct(true);
 //#endif
   m_settingsPane->SetText(wxT("Cleared background"));
+}
+
+void CamFrame::OnClearFg(wxCommandEvent& WXUNUSED(event))
+{
+  m_settingsPane->SetText(wxT("Clear foreground"));
+  SRBUF srBuf;
+		    srBuf.pha = (unsigned short*) m_pSrBuf;
+		    srBuf.amp = (unsigned short*) (&m_pSrBuf[m_nRows*m_nCols*sizeof(unsigned short)]);
+		    srBuf.nCols = m_nCols;
+		    srBuf.nRows = m_nRows;
+		    srBuf.bufferSizeInBytes = m_nCols*m_nRows*2*sizeof(unsigned short);
+  PLAVG_LearnBackgroundInitReset( m_fgAvg, srBuf);
+  m_settingsPane->SetText(wxT("Cleared foreground"));
 }
