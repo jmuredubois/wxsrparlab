@@ -92,6 +92,8 @@ public:
 	bool IsScatChecked(){ return m_settingsPane->IsScatChecked(); };
 	void OnClearBg(wxCommandEvent& WXUNUSED(event));
 	bool IsLrnBgChecked(){ return m_settingsPane->IsLrnBgChecked(); };
+	void OnClearFg(wxCommandEvent& WXUNUSED(event));
+	bool IsLrnFgChecked(){ return m_settingsPane->IsLrnFgChecked(); };
 	bool IsAcqContinuous(){ return (m_camReadMode==CAM_RD_CONTINU); };
 	long GetAcqTime(){ return _acqTime;};
 
@@ -137,12 +139,13 @@ private:
 		wxFFile*		m_pFile4TgtCoord; 
 	#endif
 	int _vtkSub;
-	SRPLSCAT m_scat;
-	SRPLNAN  m_NaN;
-	SRPLAVG	 m_bgAvg;
-	SRPLCTR	 m_CTrf;
-	SRPLCTR	 m_CTrfBG;
-	SRCTR m_ctrParam;
+	SRPLSCAT m_scat;		// scattering compensation object
+	SRPLNAN  m_NaN;			// NaN filtering object
+	SRPLAVG	 m_bgAvg;		// background average object
+	SRPLAVG	 m_fgAvg;		// foreground average object
+	SRPLCTR	 m_CTrf;		// Coordinates transform object
+	SRPLCTR	 m_CTrfBG;		// background coordinates transform object
+	SRCTR m_ctrParam;		// camera opticla center parameters
 	long _acqTime;
 	wxStopWatch* m_pAcqSWatch;
 
@@ -170,6 +173,9 @@ enum CamFrameEnum
 	IDB_ClearBg = 15,
 	IDC_Render = 16,
 	IDC_Record = 17,
+	IDC_LrnFg = 18,
+	IDB_ClearFg = 19,
+	IDC_FgHidesData = 20,
 	ID_ThisIsAStop = 255
 };
 
