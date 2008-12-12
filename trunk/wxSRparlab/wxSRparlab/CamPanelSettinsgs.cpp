@@ -85,6 +85,10 @@ int CamPanelSettings::InitSettings()
 
 	m_statText = new wxStaticText( this, IDS_TEXT, wxT("0"));
 
+	// Scat comp controls //
+    m_ckBoxRecord = new wxCheckBox( this, IDC_Record, wxT("Record"),
+        wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
+
 	/* sizer stuff  ...*/
     wxBoxSizer *sizerPanel = new wxBoxSizer(wxVERTICAL);
 
@@ -99,7 +103,7 @@ int CamPanelSettings::InitSettings()
 	#ifdef JMU_TGTFOLLOW  
 		sizerPanel->Add(m_buttonTgtFile, 0, wxEXPAND); 
 	#endif
-
+	sizerPanel->Add(m_ckBoxRecord, 0, wxEXPAND);
 	sizerPanel->Add(m_statText, 1, wxEXPAND);
 
 

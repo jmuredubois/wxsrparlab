@@ -104,6 +104,8 @@ CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos
 
 	m_pFile4ReadPha = NULL;//new wxFFile();
 	m_pFile4ReadAmp = NULL;//new wxFFile();
+	m_pFile4WritePha = NULL;//new wxFFile();
+	m_pFile4WriteAmp = NULL;//new wxFFile();
 	m_nFrmRead = 0; // 0 frames read when creating
 	m_nSerialSR = 0;
 	m_pThreadReadData = NULL;
@@ -154,6 +156,8 @@ CamFrame::~CamFrame()
 	#ifdef JMU_TGTFOLLOW
 		if(m_pFile4TgtCoord != NULL) { delete(m_pFile4TgtCoord); m_pFile4TgtCoord = NULL; };
 	#endif
+	if(m_pFile4WritePha != NULL) { delete(m_pFile4WritePha); m_pFile4WritePha = NULL; };
+	if(m_pFile4WriteAmp != NULL) { delete(m_pFile4WriteAmp); m_pFile4WriteAmp = NULL; };
 	if(m_NaN != NULL) { PLNN_Close(m_NaN); m_NaN = NULL; };
 	if(m_scat != NULL) {PLSC_Close(m_scat); m_scat = NULL; };
 	if(m_bgAvg != NULL) {PLAVG_Close(m_bgAvg); m_bgAvg = NULL; };
@@ -179,6 +183,7 @@ BEGIN_EVENT_TABLE(CamFrame, wxFrame)
 	#endif
 	EVT_BUTTON(IDB_SetScatParams, CamFrame::OnSetScatParams)
 	EVT_BUTTON(IDB_ClearBg, CamFrame::OnClearBg)
+	EVT_CHECKBOX(IDC_Record, CamFrame::OnRecord)
 END_EVENT_TABLE()
 
 /**
@@ -494,6 +499,8 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   }
   if(m_pFile4ReadPha != NULL) { delete(m_pFile4ReadPha); m_pFile4ReadPha = NULL; };
   if(m_pFile4ReadAmp != NULL) { delete(m_pFile4ReadAmp); m_pFile4ReadAmp = NULL; };
+  if(m_pFile4WritePha != NULL) { delete(m_pFile4WritePha); m_pFile4WritePha = NULL; };
+  if(m_pFile4WriteAmp != NULL) { delete(m_pFile4WriteAmp); m_pFile4WriteAmp = NULL; };
   if(m_mutexSrBuf != NULL) { delete(m_mutexSrBuf); m_mutexSrBuf = NULL;};
   if(m_pSrBuf   != NULL) { free((void*) m_pSrBuf  ); m_pSrBuf   = NULL; };
   #ifdef JMU_TGTFOLLOW
@@ -514,6 +521,116 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   m_settingsPane->SetText(wxT("Close successfull"));
   SetStatusText( wxT("cam") );
 }
+//---------------------------------------------------
+/*!
+	- Opens record files. \n
+*/
+//! Open record interface
+void CamFrame::OnRecord(wxCommandEvent& WXUNUSED(event))
+{
+  unsigned int res = 0;
+  m_settingsPane->SetText(wxT("Record attempt..."));
+  wxString strR;
+
+  if( m_settingsPane->IsRecordChecked() )
+  {
+	wxFileDialog* OpenDialogPha = new wxFileDialog(this,
+	  wxT("Choose a SR PHASE file to WRITE to "),	// msg
+	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
+	  wxEmptyString,	// default file
+	  wxT("SR phase files (*.16b)|*.16b|All files (*.*)|*.*"),	// file ext
+	  wxFD_SAVE|wxFD_CHANGE_DIR|wxFD_OVERWRITE_PROMPT,
+	  wxDefaultPosition);
+	wxFileDialog* OpenDialogAmp = new wxFileDialog(this,
+	  wxT("Choose a SR AMPLITUDE file to WRITE to "),	// msg
+	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
+	  wxEmptyString,	// default file
+	  wxT("SR amplitude files (*.16b)|*.16b|All files (*.*)|*.*"),	// file ext
+	  wxFD_SAVE|wxFD_CHANGE_DIR|wxFD_OVERWRITE_PROMPT,
+	  wxDefaultPosition);
+	if( (OpenDialogPha->ShowModal()==wxID_OK) && (OpenDialogAmp->ShowModal()==wxID_OK))
+	{
+	    wxString strPathPha = OpenDialogPha->GetPath();
+	    wxString strPathAmp = OpenDialogAmp->GetPath();
+	    m_pFile4WritePha = new wxFFile(strPathPha, wxT("wb"));
+	    m_pFile4WriteAmp = new wxFFile(strPathAmp, wxT("wb"));
+	    if ( (!(m_pFile4WriteAmp)) || (!(m_pFile4WriteAmp)) || (!(m_pFile4WriteAmp->IsOpened())) || (!(m_pFile4WriteAmp->IsOpened())))
+	    {
+		  res -=4;
+	    }
+
+	    strR.sprintf(wxT("Files opened.")); // ... change text ...
+		
+	    m_settingsPane->SetText(strR);
+		SetStatusText( strR );
+	} // (OpenDialogPha->ShowModal()==wxID_OK) && (OpenDialogAmp->ShowModal()==wxID_OK)
+    delete(OpenDialogPha);
+    delete(OpenDialogAmp);
+  } // 'record' checkbox is checked
+  else
+  {
+	  wxFileDialog* OpenDialogPar = new wxFileDialog(this,
+	  wxT("Choose a SR parameters file to WRITE TO"),	// msg
+	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
+	  wxEmptyString,	// default file
+	  wxT("SR parameters files (*.sr2)|*.sr2|All files (*.*)|*.*"),	// file ext
+	  wxFD_SAVE|wxFD_CHANGE_DIR|wxFD_OVERWRITE_PROMPT,
+	  wxDefaultPosition);
+	  if( (OpenDialogPar->ShowModal()==wxID_OK) )
+	  {
+	    wxString strPathPar = OpenDialogPar->GetPath();
+	    wxFFile* wxFparams = new wxFFile(strPathPar, wxT("wb"));
+	    if ( (wxFparams->IsOpened()) )
+	    {
+	      int tmp = 0; // DANGER = 1 int must be 4 bytes
+		  float tmpFlt = 0;
+		  if(sizeof(int)!=4)
+		  {
+			  res-=64;
+			  m_nCols = (int) 176;
+			  m_nRows = (int) 144;
+			  m_nSrBufSz = (int) (m_nCols*m_nRows*2*2); // *2 amp,pha *2:short
+		  }
+		  else // (sizeof(int)!=4)
+		  {
+			tmp = m_nRows;
+	        size_t wrBytes= wxFparams->Write(&tmp, sizeof(int));
+			tmp = m_nCols;
+		    wrBytes= wxFparams->Write(&tmp, sizeof(int));
+		    tmp = 2;
+		    wrBytes= wxFparams->Write(&tmp, sizeof(int));
+		    tmp = (int) sizeof(unsigned short);
+		    wrBytes = wxFparams->Write(&tmp, sizeof(int));
+		    tmp = m_nSrBufSz;
+		    wrBytes= wxFparams->Write(&tmp, sizeof(int));
+		    tmp = m_nSerialSR;
+		    wrBytes= wxFparams->Write(&tmp, sizeof(unsigned int));
+		    tmp = m_srFrq;
+		    wrBytes = wxFparams->Write(&tmp, sizeof(int));
+		    /*		float focal = 8.0f;   //mm
+					float pixSzX = 0.04f; //mm
+					float pixSzY = 0.04f; //mm
+					float centerX = 95.1f ; float centerY = 56.3f ; // pixels*/
+			tmpFlt = m_ctrParam.f;
+		    wrBytes = wxFparams->Write(&tmpFlt, sizeof(float));
+		    tmpFlt = m_ctrParam.pixDX;
+		    wrBytes = wxFparams->Write(&tmpFlt, sizeof(float));
+		    tmpFlt = m_ctrParam.pixDY;
+		    wrBytes = wxFparams->Write(&tmpFlt, sizeof(float));
+		    tmpFlt = m_ctrParam.cX;
+		    wrBytes = wxFparams->Write(&tmpFlt, sizeof(float));
+		    tmpFlt = m_ctrParam.cY;
+		    wrBytes = wxFparams->Write(&tmpFlt, sizeof(float));
+		    tmpFlt = m_ctrParam.maxMM;
+		    wrBytes = wxFparams->Write(&tmpFlt, sizeof(float));
+		} // (sizeof(int)!=4)
+		delete(wxFparams);
+	  }
+	  delete(OpenDialogPar);
+  } // 'record' checkbox is not checked
+}
+}
+
 //! Acquire 1 Frame
 void CamFrame::Acquire(wxCommandEvent& WXUNUSED(event))
 {
@@ -572,6 +689,11 @@ void CamFrame::AcqOneFrm()
 				m_pFile4ReadPha->Seek(0); // rewind phase
 				m_pFile4ReadAmp->Seek(0); // rewind phase
 				m_nFrmRead = 0;	// reset frame count
+				if((m_pFile4WritePha  != NULL) && (m_pFile4WriteAmp  != NULL) && (m_pFile4WritePha->IsOpened()) && (m_pFile4WriteAmp->IsOpened()))
+				{
+					m_pFile4WritePha->Close();
+					m_pFile4WriteAmp->Close();
+				}
 			}
 		  }
 		  else
@@ -607,6 +729,11 @@ void CamFrame::AcqOneFrm()
 		PLCTR_CoordTrf(m_CTrf, srBuf, m_ctrParam);
 		errMutex = m_mutexSrBuf->Unlock();
 	  } //{errMutex == wxMUTEX_NO_ERROR)
+	  if((m_pFile4WritePha  != NULL) && (m_pFile4WriteAmp  != NULL) && (m_pFile4WritePha->IsOpened()) && (m_pFile4WriteAmp->IsOpened()))
+	  {
+		  res = (int) m_pFile4WritePha->Write(m_pSrBuf, (int)m_nCols*(int)m_nRows*sizeof(unsigned short));
+		  res = (int) m_pFile4WriteAmp->Write(&m_pSrBuf[(int)m_nCols*(int)m_nRows*sizeof(unsigned short)], (int)m_nCols*(int)m_nRows*sizeof(unsigned short));
+	  }
 	  #ifdef JMU_TGTFOLLOW
 		if(m_pFile4TgtCoord != NULL)
 		{
