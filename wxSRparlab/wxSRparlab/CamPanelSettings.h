@@ -45,6 +45,7 @@ public:
 	void CamPanelSettings::SetBtnTxtStop();	//!< sets button text to 'Stop'
 	void CamPanelSettings::SetBtnTxtAcqu();	//!< sets button text to 'Acquire'
 	bool IsScatChecked(){return m_ckBoxScatComp->IsChecked();}; //
+	bool IsRecordChecked(){return m_ckBoxRecord->IsChecked();}; //
 
 	void CamPanelSettings::DisableScatParams(); //!< Disables the "Scat Comp Params" button
 	void CamPanelSettings::EnableScatParams();  //!< Enables the "Scat Comp Params" button
@@ -75,6 +76,7 @@ private:
 	
 	wxCheckBox* m_ckBoxScatComp;
 	wxCheckBox* m_ckBoxLrnBg;
+	wxCheckBox* m_ckBoxRecord;
 	
 	/* TextControls */
 	wxTextCtrl* m_TxtDelayStat;
