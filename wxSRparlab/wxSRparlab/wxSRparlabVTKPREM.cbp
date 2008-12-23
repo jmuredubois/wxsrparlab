@@ -13,15 +13,11 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
-					<Add option="-W -Wall -ansi" />
 					<Add option="-DJMU_USE_VTK" />
 					<Add option="-DJMU_TGTFOLLOW" />
-					<Add option="-D_FILE_OFFSET_BITS=64" />
-					<Add option="-D_LARGE_FILES" />
-					<Add option="-D__WXMAC__" />
-					<Add directory="/usr/local/include/wx-2.8" />
+					<Add option="`wx-config --cxxflags --unicode=no` -W -Wall -ansi" />
+					<Add option="-I/usr/local/lib/wx/include/mac-ansi-release-2.8 -I/usr/local/include/wx-2.8 -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXMAC__" />
 					<Add directory="/usr/local/lib/wx/include/mac-ansi-release-2.8" />
-					<Add directory="/software2/wxMac-2.8.7/include" />
 					<Add directory="/builds/VTK504" />
 					<Add directory="/software/VTK/Graphics" />
 					<Add directory="/software/VTK/Rendering" />
@@ -30,37 +26,33 @@
 					<Add directory="/software/VTK/IO" />
 					<Add directory="/software/VTK/Hybrid" />
 					<Add directory="/software/ticpp" />
-					<Add directory="/opt/local/var/macports/software/fftw-3/3.1.2_5/opt/local/include" />
+					<Add directory="/svnSandBox/trunk/libSRPLscat" />
+					<Add directory="/svnSandBox/trunk/libSRPLavg" />
+					<Add directory="/svnSandBox/trunk/libSRPLcoordTrf" />
 				</Compiler>
 				<Linker>
+					<Add option="`wx-config --libs --unicode=no`" />
+					<Add option="-L/usr/local/lib   -framework IOKit -framework Carbon -framework Cocoa -framework System -framework QuickTime  -lwx_mac_richtext-2.8 -lwx_mac_aui-2.8 -lwx_mac_xrc-2.8 -lwx_mac_qa-2.8 -lwx_mac_html-2.8 -lwx_mac_adv-2.8 -lwx_mac_core-2.8 -lwx_base_carbon_xml-2.8 -lwx_base_carbon_net-2.8 -lwx_base_carbon-2.8" />
 					<Add library="vtkGraphics" />
 					<Add library="vtkRendering" />
 					<Add library="vtkCommon" />
 					<Add library="vtkFiltering" />
 					<Add library="vtkIO" />
 					<Add library="vtkHybrid" />
+					<Add library="libSRPLscat" />
+					<Add library="libSRPLavg" />
+					<Add library="libSRPLcoordTrf" />
 					<Add library="ticppd" />
-					<Add library="libfftw3" />
-					<Add library="libwx_mac_richtext-2.8" />
-					<Add library="libwx_mac_aui-2.8" />
-					<Add library="libwx_mac_xrc-2.8" />
-					<Add library="libwx_mac_qa-2.8" />
-					<Add library="libwx_mac_html-2.8" />
-					<Add library="libwx_mac_adv-2.8" />
-					<Add library="libwx_mac_core-2.8" />
-					<Add library="libwx_base_carbon_xml-2.8" />
-					<Add library="libwx_base_carbon_net-2.8" />
-					<Add library="libwx_base_carbon-2.8" />
 					<Add directory="/builds/Debug/bin" />
 					<Add directory=".." />
 					<Add directory="/usr/local/lib" />
-					<Add directory="/software2/wxMac-2.8.7/build-release" />
 					<Add directory="/builds/VTK504/bin" />
 					<Add directory="/builds/VTK504/bin/release" />
 					<Add directory="/software/ticpp/lib" />
-					<Add directory="/opt/local/var/macports/software/fftw-3/3.1.2_5/opt/local/lib" />
+					<Add directory="/builds/Debug/lib" />
 				</Linker>
 				<ExtraCommands>
+					<Add after="pwd" />
 					<Add after="rm -f -r -v /builds/Debug/bin/wxSRparlabVTKPREM.app" />
 					<Add after="mkdir /builds/Debug/bin/wxSRparlabVTKPREM.app" />
 					<Add after="mkdir /builds/Debug/bin/wxSRparlabVTKPREM.app/Contents" />
@@ -78,17 +70,13 @@
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-O3" />
 					<Add option="-g" />
-					<Add option="-W -Wall -ansi" />
+					<Add option="-O3" />
 					<Add option="-DJMU_USE_VTK" />
 					<Add option="-DJMU_TGTFOLLOW" />
-					<Add option="-D_FILE_OFFSET_BITS=64" />
-					<Add option="-D_LARGE_FILES" />
-					<Add option="-D__WXMAC__" />
-					<Add directory="/usr/local/include/wx-2.8" />
+					<Add option="`wx-config --cxxflags --unicode=no` -W -Wall -ansi" />
+					<Add option="-I/usr/local/lib/wx/include/mac-ansi-release-2.8 -I/usr/local/include/wx-2.8 -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXMAC__" />
 					<Add directory="/usr/local/lib/wx/include/mac-ansi-release-2.8" />
-					<Add directory="/software2/wxMac-2.8.7/include" />
 					<Add directory="/builds/VTK504" />
 					<Add directory="/software/VTK/Graphics" />
 					<Add directory="/software/VTK/Rendering" />
@@ -97,37 +85,33 @@
 					<Add directory="/software/VTK/IO" />
 					<Add directory="/software/VTK/Hybrid" />
 					<Add directory="/software/ticpp" />
-					<Add directory="/opt/local/var/macports/software/fftw-3/3.1.2_5/opt/local/include" />
+					<Add directory="/svnSandBox/trunk/libSRPLscat" />
+					<Add directory="/svnSandBox/trunk/libSRPLavg" />
+					<Add directory="/svnSandBox/trunk/libSRPLcoordTrf" />
 				</Compiler>
 				<Linker>
+					<Add option="`wx-config --libs --unicode=no`" />
+					<Add option="-L/usr/local/lib   -framework IOKit -framework Carbon -framework Cocoa -framework System -framework QuickTime  -lwx_mac_richtext-2.8 -lwx_mac_aui-2.8 -lwx_mac_xrc-2.8 -lwx_mac_qa-2.8 -lwx_mac_html-2.8 -lwx_mac_adv-2.8 -lwx_mac_core-2.8 -lwx_base_carbon_xml-2.8 -lwx_base_carbon_net-2.8 -lwx_base_carbon-2.8" />
 					<Add library="vtkGraphics" />
 					<Add library="vtkRendering" />
 					<Add library="vtkCommon" />
 					<Add library="vtkFiltering" />
 					<Add library="vtkIO" />
 					<Add library="vtkHybrid" />
+					<Add library="libSRPLscat" />
+					<Add library="libSRPLavg" />
+					<Add library="libSRPLcoordTrf" />
 					<Add library="ticpp" />
-					<Add library="libfftw3" />
-					<Add library="libwx_mac_richtext-2.8" />
-					<Add library="libwx_mac_aui-2.8" />
-					<Add library="libwx_mac_xrc-2.8" />
-					<Add library="libwx_mac_qa-2.8" />
-					<Add library="libwx_mac_html-2.8" />
-					<Add library="libwx_mac_adv-2.8" />
-					<Add library="libwx_mac_core-2.8" />
-					<Add library="libwx_base_carbon_xml-2.8" />
-					<Add library="libwx_base_carbon_net-2.8" />
-					<Add library="libwx_base_carbon-2.8" />
 					<Add directory="/builds/Release/bin" />
 					<Add directory=".." />
 					<Add directory="/usr/local/lib" />
-					<Add directory="/software2/wxMac-2.8.7/build-release" />
 					<Add directory="/builds/VTK504/bin" />
 					<Add directory="/builds/VTK504/bin/release" />
 					<Add directory="/software/ticpp/lib" />
-					<Add directory="/opt/local/var/macports/software/fftw-3/3.1.2_5/opt/local/lib" />
+					<Add directory="/builds/Release/lib" />
 				</Linker>
 				<ExtraCommands>
+					<Add after="pwd" />
 					<Add after="rm -f -r -v /builds/Release/bin/wxSRparlabVTKPREM.app" />
 					<Add after="mkdir /builds/Release/bin/wxSRparlabVTKPREM.app" />
 					<Add after="mkdir /builds/Release/bin/wxSRparlabVTKPREM.app/Contents" />
@@ -135,29 +119,21 @@
 					<Add after="mkdir /builds/Release/bin/wxSRparlabVTKPREM.app/Contents/Resources" />
 					<Add after="mkdir /builds/Release/bin/wxSRparlabVTKPREM.app/Contents/Resources/English.lproj" />
 					<Add after="cp /builds/Release/bin/wxSRparlabVTKPREM /builds/Release/bin/wxSRparlabVTKPREM.app/Contents/MacOS/wxSRparlabVTKPREM" />
-					<Add after="cp wxSRparlabVTKPREM.icns /builds/Debug/bin/wxSRparlabVTKPREM.app/Contents/Resources/wxSRparlabVTKPREM.icns" />
+					<Add after="cp wxSRparlabVTKPREM.icns /builds/Release/bin/wxSRparlabVTKPREM.app/Contents/Resources/wxSRparlabVTKPREM.icns" />
 					<Add after="cp Info.plist /builds/Release/bin/wxSRparlabVTKPREM.app/Contents/Info.plist" />
 				</ExtraCommands>
 			</Target>
 		</Build>
 		<Unit filename="CMainWnd.cpp" />
 		<Unit filename="CMainWnd.h" />
-		<Unit filename="CamFlagNaN.cpp" />
-		<Unit filename="CamFlagNaN.h" />
 		<Unit filename="CamFrame.cpp" />
 		<Unit filename="CamFrame.h" />
 		<Unit filename="CamPanelSettings.h" />
 		<Unit filename="CamPanelSettinsgs.cpp" />
-		<Unit filename="CamScattering.cpp" />
-		<Unit filename="CamScattering.h" />
 		<Unit filename="CamViewData.cpp" />
 		<Unit filename="CamViewData.h" />
 		<Unit filename="camVtkView.cpp" />
 		<Unit filename="camVtkView.h" />
-		<Unit filename="imgPadder.cpp" />
-		<Unit filename="imgPadder.h" />
-		<Unit filename="myConvolveHfloat.cpp" />
-		<Unit filename="myConvolveHfloat.h" />
 		<Unit filename="srBuf.h" />
 		<Unit filename="srDummy.cpp" />
 		<Unit filename="srDummy.h" />
