@@ -152,32 +152,12 @@ tinsert( package.libpaths,
 	string.format('%s%s',os.getenv("JMU_SVNSANDBOX_TRUNK"), "/libSRPLscat")
   }
   )
-  tinsert( package.config["DebugVTK"].libpaths, 
-  {
-    string.format('%s%s',os.getenv("JMU_BUILDS"), "/Debug/lib")
-  }
-  )
-  tinsert( package.config["ReleaseVTK"].libpaths, 
-  {
-    string.format('%s%s',os.getenv("JMU_BUILDS"), "/Release/lib")
-  }
-  )
 --END OF package includes for libSRPLscat (uses FFTW)
 --package includes for libSRPLavg
   tinsert(package.links,   { "libSRPLavg"})
   tinsert(package.includepaths,
   {
 	string.format('%s%s',os.getenv("JMU_SVNSANDBOX_TRUNK"), "/libSRPLavg")
-  }
-  )
-  tinsert( package.config["DebugVTK"].libpaths, 
-  {
-    string.format('%s%s',os.getenv("JMU_BUILDS"), "/Debug/lib")
-  }
-  )
-  tinsert( package.config["ReleaseVTK"].libpaths, 
-  {
-    string.format('%s%s',os.getenv("JMU_BUILDS"), "/Release/lib")
   }
   )
 --END OF package includes for libSRPLavg
@@ -188,6 +168,16 @@ tinsert( package.libpaths,
 	string.format('%s%s',os.getenv("JMU_SVNSANDBOX_TRUNK"), "/libSRPLcoordTrf")
   }
   )
+--END OF package includes for libSRPLcoordTrf
+--package includes for libSRPLsegm
+  tinsert(package.links,   { "libSRPLavg"})
+  tinsert(package.includepaths,
+  {
+	string.format('%s%s',os.getenv("JMU_SVNSANDBOX_TRUNK"), "/libSRPLsegm")
+  }
+  )
+--END OF package includes for libSRPLsegm
+
   tinsert( package.config["DebugVTK"].libpaths, 
   {
     string.format('%s%s',os.getenv("JMU_BUILDS"), "/Debug/lib")
@@ -198,8 +188,7 @@ tinsert( package.libpaths,
     string.format('%s%s',os.getenv("JMU_BUILDS"), "/Release/lib")
   }
   )
---END OF package includes for libSRPLcoordTrf
-
+  
 -- --http://wiki.wxwindows.org/WxMac_Issues
 --[
 if (OS == "macosx") then

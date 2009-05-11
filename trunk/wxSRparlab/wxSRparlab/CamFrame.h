@@ -23,6 +23,8 @@
 #pragma comment( lib, "libSRPLavg" )
 #include "libSRPLcoordTrf.h"
 #pragma comment( lib, "libSRPLcoordTrf" )
+#include "libSRPLsegm.h"
+#pragma comment( lib, "libSRPLsegm" )
 
 
 
@@ -146,6 +148,7 @@ private:
 	SRPLCTR	 m_CTrf;		// Coordinates transform object
 	SRPLCTR	 m_CTrfBG;		// background coordinates transform object
 	SRCTR m_ctrParam;		// camera opticla center parameters
+	SRPLSEGM m_segm;		// scattering compensation object
 	long _acqTime;
 	wxStopWatch* m_pAcqSWatch;
 
@@ -176,6 +179,8 @@ enum CamFrameEnum
 	IDC_LrnFg = 18,
 	IDB_ClearFg = 19,
 	IDC_FgHidesData = 20,
+	IDC_SegmBayes = 21,
+	IDB_SegmSetParams = 22,
 	ID_ThisIsAStop = 255
 };
 

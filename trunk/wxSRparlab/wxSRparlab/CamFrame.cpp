@@ -166,6 +166,7 @@ CamFrame::~CamFrame()
 	if(m_CTrf != NULL) {PLCTR_Close(m_CTrf); m_CTrf = NULL; };
 	if(m_CTrfBG != NULL) {PLCTR_Close(m_CTrfBG); m_CTrfBG = NULL; };
 	if(m_pAcqSWatch != NULL) { delete(m_pAcqSWatch); m_pAcqSWatch = NULL;};
+	if(m_segm != NULL) {PLSEGM_Close(m_segm); m_segm = NULL; };
 }
 
 BEGIN_EVENT_TABLE(CamFrame, wxFrame)
@@ -299,6 +300,7 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   m_settingsPane->EnableRadioFrq();		// enable frequency selection
   m_settingsPane->EnableCloseSR();	// enable "Close" button
   m_settingsPane->EnableScatParams(); // enable "Scat comp params" button
+  m_settingsPane->EnableSegmParams(); // enable "Segm params" button
   wxString strR;
   unsigned int serial = 0;
   if(m_sr == NULL)
@@ -432,6 +434,7 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	  PLAVG_Open(&m_fgAvg, newbuf);
 	  PLCTR_Open(&m_CTrf, newbuf);
 	  PLCTR_Open(&m_CTrfBG, newbuf);
+	  PLSEGM_Open(&m_segm, newbuf);
 	  return;
   }
 
@@ -476,6 +479,7 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   PLAVG_Open (&m_fgAvg, newbuf);
   PLCTR_Open(&m_CTrf, newbuf);
   PLCTR_Open(&m_CTrfBG, newbuf);
+  PLSEGM_Open(&m_segm, newbuf);
 }
 
 //---------------------------------------------------
@@ -497,6 +501,7 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   m_settingsPane->DisableRadioFilt();	// disable filter selection
   m_settingsPane->DisableRadioFrq();	// disable frequency selection
   m_settingsPane->DisableScatParams();  // disable "Scat Comp Params" button
+  m_settingsPane->DisableSegmParams();  // disable "Segm Params" button
   if(m_sr != NULL)
   {
 		res = SR_Close(m_sr);
@@ -523,6 +528,7 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   if(m_CTrf != NULL) {PLCTR_Close(m_CTrf); m_CTrf = NULL; };
   if(m_CTrfBG != NULL) {PLCTR_Close(m_CTrfBG); m_CTrfBG = NULL; };
   if(m_pAcqSWatch != NULL) { delete(m_pAcqSWatch); m_pAcqSWatch = NULL;};
+  if(m_segm != NULL)  {PLSEGM_Close(m_segm);   m_segm = NULL; };
   m_settingsPane->EnableOpenSR();	// enable "Open" button
   m_settingsPane->SetText(wxT("Close successfull"));
   SetStatusText( wxT("cam") );
