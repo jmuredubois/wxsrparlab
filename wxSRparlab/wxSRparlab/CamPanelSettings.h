@@ -53,6 +53,10 @@ public:
 	bool IsLrnFgChecked(){return m_ckBoxLrnFg->IsChecked();}; //
 	bool IsFgHidesDataChecked(){return m_ckBoxFgHidesData->IsChecked();}; //
 
+	void CamPanelSettings::DisableSegmParams(); //!< Disables the "Segm Params" button
+	void CamPanelSettings::EnableSegmParams();  //!< Enables the "Segm Params" button
+	bool IsSegmChecked(){return m_ckBoxSegBayes->IsChecked();}; //
+
 
 private:
 
@@ -67,6 +71,7 @@ private:
 	wxButton* m_buttonScatParams;
 	wxButton* m_buttonClearBg; // 'clear background' button
 	wxButton* m_buttonClearFg; // 'clear foreground' button
+	wxButton* m_buttonSegmParams; // segmentation parameters button
 
 	/* Radio boxes */
 	wxRadioBox* m_radioboxFrq;	//!< camera frq
@@ -77,11 +82,12 @@ private:
 	wxCheckBox* m_ckBoxFixPtrn;  // check box for fix pattern noise filter -> NOT USED
 	wxCheckBox* m_ckBoxLedNonLin; // check box for nonLinLED noise filter -> NOT USED
 	
-	wxCheckBox* m_ckBoxScatComp; // check box foe activating scattering compensation
+	wxCheckBox* m_ckBoxScatComp; // check box for activating scattering compensation
 	wxCheckBox* m_ckBoxLrnBg;	 // check box for learning background
 	wxCheckBox* m_ckBoxLrnFg;	 // check box for learning foreground
 	wxCheckBox* m_ckBoxRecord;	 // check box to record current image buffer (after scat comp)
 	wxCheckBox* m_ckBoxFgHidesData;	 // check box for learning foreground
+	wxCheckBox* m_ckBoxSegBayes; // check box for activating bayesian segmentation
 	
 	/* TextControls */
 	wxTextCtrl* m_TxtDelayStat;

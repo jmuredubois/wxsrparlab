@@ -63,6 +63,17 @@ int CamPanelSettings::InitSettings()
 		sizerScat->Add(m_ckBoxScatComp, 0, wxEXPAND);
 		sizerScat->Add(m_buttonScatParams, 1, wxEXPAND);
 
+	// Segmentation controls //
+    m_ckBoxSegBayes = new wxCheckBox( this, IDC_SegmBayes, wxT("Bayesian segmentation"),
+        wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
+        
+    m_buttonSegmParams = new wxButton(this, IDB_SegmSetParams, wxT("Set segm. params"));
+	this->DisableSegmParams(); // button is disabled until cam is opened
+
+	wxBoxSizer *sizerSegm = new wxBoxSizer(wxHORIZONTAL);
+		sizerSegm->Add(m_ckBoxSegBayes, 0, wxEXPAND);
+		sizerSegm->Add(m_buttonSegmParams, 1, wxEXPAND);
+
 	// Learn background controls //
     m_ckBoxLrnBg = new wxCheckBox( this, IDC_LrnBg, wxT("Learn background"),
         wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
@@ -109,6 +120,7 @@ int CamPanelSettings::InitSettings()
     sizerPanel->Add(m_radioboxFrq, 0, wxEXPAND);
 	sizerPanel->Add(sizerLrnBg, 0, wxEXPAND);
     sizerPanel->Add(sizerScat, 0, wxEXPAND);
+	sizerPanel->Add(sizerSegm, 0, wxEXPAND);
     sizerPanel->Add(m_radioboxSrFilt, 0, wxEXPAND);
 	sizerPanel->Add(m_buttonSetTrfMat, 0, wxEXPAND);
 	#ifdef JMU_TGTFOLLOW  
@@ -212,4 +224,15 @@ void CamPanelSettings::DisableScatParams()
 void CamPanelSettings::EnableScatParams()
 {
 	m_buttonScatParams->Enable();
+};
+
+//! Disables the "Segm Params" button
+void CamPanelSettings::DisableSegmParams()
+{
+	m_buttonSegmParams->Disable();
+};
+//! Enables the "Segm Params" button
+void CamPanelSettings::EnableSegmParams()
+{
+	m_buttonSegmParams->Enable();
 };

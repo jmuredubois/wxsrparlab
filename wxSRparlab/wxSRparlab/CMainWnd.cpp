@@ -274,9 +274,9 @@ void MainWnd::Init()
 void MainWnd::AddChildren()
 {
     // temp variables to avoid creating new camFrames on top of each other
-	wxPoint pos = wxPoint(5,450);	// initial position
-	wxPoint incr = wxPoint(220,00);	// increment in position
-	wxSize	sz = wxSize(220,400);	// size for camFrame
+	wxPoint pos = wxPoint(50,50);	// initial position
+	wxPoint incr = wxPoint(320,00);	// increment in position
+	wxSize	sz = wxSize(320,600);	// size for camFrame
 	wxString lab;					// title string for camFrame
 	wxString labT;					// string for cam nickname
 	wxString labBGT;					// string for cam BGnickname
