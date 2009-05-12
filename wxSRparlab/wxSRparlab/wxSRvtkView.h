@@ -63,10 +63,12 @@ public:
 
 	int changeDepthRange(float minVal, float maxVal);
 	int changeAmpRange(float minAmp, float maxAmp);
+	int changeSegmRange(float minSegm, float maxSegm);
 	int hideDataAct(int vtkSub, bool doHide);
 	int setDataActColorRGB(int vtkSub, double r, double g, double b);
 	int setDataMapperColorDepth(int vtkSub);
 	int setDataMapperColorGray(int vtkSub);
+	int setDataMapperColorSegm(int vtkSub);
 	int setDataMapperColorR(int vtkSub);
 	int setDataMapperColorG(int vtkSub);
 	int setDataMapperColorB(int vtkSub);
@@ -74,6 +76,7 @@ public:
 	int setDataMapperColorK(int vtkSub);
 	vtkLookupTable* GetDepthLUT(){return depthLUT;};
 	vtkLookupTable* GetGrayLUT(){return grayLUT;};
+	vtkLookupTable* GetSegmLUT(){return segmLUT;};
 	vtkLookupTable* GetRLUT(){return rLUT;};
 	vtkLookupTable* GetGLUT(){return gLUT;};
 	vtkLookupTable* GetBLUT(){return bLUT;};
@@ -114,6 +117,9 @@ private:
   vtkLookupTable	*grayLUT;	//!< LUT for depth data display
   int addGrayLUT();
   int freeGrayLUT();
+  vtkLookupTable	*segmLUT;	//!< LUT for depth data display
+  int addSegmLUT();
+  int freeSegmLUT();
   vtkLookupTable	*rLUT;	//!< LUT for depth data display
   vtkLookupTable	*gLUT;	//!< LUT for depth data display
   vtkLookupTable	*bLUT;	//!< LUT for depth data display
@@ -126,8 +132,11 @@ private:
   int addScalarBarDepth();
   int freeScalarBarDepth();
 
-  vtkScalarBarActor	*ampSca;  //!< scalar bar for depth values
+  vtkScalarBarActor	*ampSca;  //!< scalar bar for ampl. values
   int addScalarBarAmp();
   int freeScalarBarAmp();
+  vtkScalarBarActor	*segmSca;  //!< scalar bar for segm. values
+  int addScalarBarSegm();
+  int freeScalarBarSegm();
 
 };

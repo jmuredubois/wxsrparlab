@@ -38,6 +38,7 @@ CamVtkView::CamVtkView(int vtkSub, vtkRenderWindow* ParRenWin, vtkLookupTable* L
 	// create a depth LUT
 	depthLUT = LUT;
 	grayLUT = LUT;
+	segmLUT = LUT;
 	rLUT = LUT; gLUT = LUT; bLUT = LUT; wLUT = LUT; kLUT = LUT;
 
 	#ifdef JMU_TGTFOLLOW
@@ -217,6 +218,17 @@ int CamVtkView::changeAmpRange(float minAmp, float maxAmp)
 	return res;
 }
 
+/**
+ * Changes the segmentation range
+ */
+int CamVtkView::changeSegmRange(float minSegm, float maxSegm)
+{
+	int res = 0;
+	dataMapperSegm->SetScalarRange((double) minSegm, (double) maxSegm);
+	dataMapperSegm->Modified();
+	return res;
+}
+
 void CamVtkView::SetDepthLUT(vtkLookupTable* LUT)
 {
 	if(LUT==NULL){return;};
@@ -226,6 +238,11 @@ void CamVtkView::SetGrayLUT(vtkLookupTable* LUT)
 {
 	if(LUT==NULL){return;};
 	grayLUT = LUT;
+}
+void CamVtkView::SetSegmLUT(vtkLookupTable* LUT)
+{
+	if(LUT==NULL){return;};
+	segmLUT = LUT;
 }
 void CamVtkView::SetPlainLUT(vtkLookupTable* LUTr, vtkLookupTable* LUTg, vtkLookupTable* LUTb, vtkLookupTable* LUTw, vtkLookupTable* LUTk)
 {
@@ -250,17 +267,20 @@ int CamVtkView::addDataAct()
 	// Create a float array which represents the points.
     pcoords = vtkFloatArray::New();
 	dData = vtkFloatArray::New();	// scalar depth associated to each point (for coloring)
-	aData = vtkFloatArray::New();	// scalar depth associated to each point (for coloring)
+	aData = vtkFloatArray::New();	// scalar ampl. associated to each point (for coloring)
+	sData = vtkUnsignedCharArray::New();	// scalar segm. associated to each point (for coloring)
 	// Note that by default, an array has 1 component.
     // We have to change it to 3 for points
     pcoords->SetNumberOfComponents(3);
 	dData->SetNumberOfComponents(1);
 	aData->SetNumberOfComponents(1);
+	sData->SetNumberOfComponents(1);
 	// We ask pcoords to allocate room for at least 25344 tuples
 	// and set the number of tuples to 4.
 	pcoords->SetNumberOfTuples(25344);
 	dData->SetNumberOfTuples(25344);
 	aData->SetNumberOfTuples(25344);
+	sData->SetNumberOfTuples(25344);
 
 	// Assign each tuple
 	int row,col;
@@ -284,6 +304,7 @@ int CamVtkView::addDataAct()
 			pcoords->SetTuple((iv1+iv2), pt);
 			dData->SetValue((iv1+iv2),z);
 			aData->SetValue((iv1+iv2),100.0f);
+			sData->SetValue((iv1+iv2),0x1);
 			i++; // le i++ doit être ici, il faut commencer à zéro !!!
 			iv2+=rows;
 			iv3++;
@@ -319,11 +340,15 @@ int CamVtkView::addDataAct()
 
 	dataMapperAmp = vtkPolyDataMapper::New();
 	dataMapperAmp->SetInputConnection(pdata->GetOutputPort());
+	dataMapperSegm = vtkPolyDataMapper::New();
+	dataMapperSegm->SetInputConnection(pdata->GetOutputPort());
+	dataMapperSegm->SetScalarRange((double)-127, (double)128);
 
     dataActor = vtkActor::New();
     dataActor->SetMapper(dataMapperZ);
 	dataMapperZ->Register(dataActor);
 	dataMapperAmp->Register(dataActor);
+	dataMapperSegm->Register(dataActor);
     dataActor->GetProperty()->SetRepresentationToPoints();
 	dataActor->GetProperty()->SetPointSize(3.0);			//! HARD CODED POINT SIZE
 	dataActor->GetProperty()->SetDiffuse(0.0);
@@ -346,7 +371,7 @@ int CamVtkView::addDataAct()
 /**
  * Updates the TOF points
  */
-int CamVtkView::updateTOF(int rows, int cols, unsigned short *z, short *y, short *x, unsigned short* amp)
+int CamVtkView::updateTOF(int rows, int cols, unsigned short *z, short *y, short *x, unsigned short* amp, unsigned char* segm)
 {
 	int res = 0;
 	//if(!sr){return -1;};
@@ -404,7 +429,8 @@ int CamVtkView::updateTOF(int rows, int cols, unsigned short *z, short *y, short
 		for (col = 0; col<cols; col++)
 		{
 			dData->SetValue((iv1+iv2),(float)(pdata->GetOutput()->GetPoints()->GetPoint(iv1+iv2)[2]));		// make sure that depth data is the transformed value; :-( unable to avoid loop yet :-(
-			aData->SetValue((iv1+iv2),(float) amp[i]) ;		// make sure that depth data is the transformed value; :-( unable to avoid loop yet :-(
+			aData->SetValue((iv1+iv2),(float) amp[i]) ;		//  :-( unable to avoid loop yet :-(
+			sData->SetValue((iv1+iv2), segm[i]) ;		//  :-( unable to avoid loop yet :-(
 			i++; // le i++ doit être ici, il faut commencer à zéro !!!
 			iv2+=rows;
 			iv3++;
@@ -423,13 +449,28 @@ int CamVtkView::updateTOF(int rows, int cols, unsigned short *z, short *y, short
 }
 
 /**
+ * Updates the TOF points /n
+ *  - bloated and SLOW since it must allocate segmentation matrix
+ *  - try not to use this
+ */
+int CamVtkView::updateTOF(int rows, int cols, unsigned short *z, short *y, short *x, unsigned short* amp)
+{
+	int res = 0;
+	unsigned char* segm = (unsigned char*) malloc(rows*cols*sizeof(unsigned char));
+	memset(segm, 0x0, rows*cols*sizeof(unsigned char));
+	res += updateTOF(rows, cols, z, y, x, amp, segm);
+	free(segm)	;
+	return res;
+}
+
+/**
  * Updates the TOF points
  */
-int CamVtkView::updateTOF(int rows, int cols, unsigned short *z, short *y, short *x, unsigned short* amp, char* fname)
+int CamVtkView::updateTOF(int rows, int cols, unsigned short *z, short *y, short *x, unsigned short* amp, unsigned char* segm, char* fname)
 {
 	int res = 0;
 	if(!fname){return -1;};
-	res += updateTOF(rows, cols, z, y, x, amp);
+	res += updateTOF(rows, cols, z, y, x, amp, segm);
 	if(res!=0){return -2;};
 	dataWriter->SetFileName(fname);
 	res+=dataWriter->Write();
@@ -449,6 +490,7 @@ int CamVtkView::freeDataAct()
 	pdata->Delete();
 	dData->Delete();
 	aData->Delete();
+	sData->Delete();
 	/*while(dataMapperZ->GetReferenceCount()>1){
 		dataMapperZ->Delete();
 	};*/
@@ -457,6 +499,7 @@ int CamVtkView::freeDataAct()
 		dataMapperAmp->Delete();
 	};*/
 	dataMapperAmp->Delete();
+	dataMapperSegm->Delete();
 	dataActor->Delete();
 	return res-1;
 }
@@ -551,6 +594,15 @@ void CamVtkView::setDataMapperColorGray()
 	data->GetPointData()->SetScalars(aData);
 	dataMapperAmp->SetLookupTable(grayLUT);  // sets color
 	dataActor->SetMapper(dataMapperAmp);
+}
+/**
+ * Sets a data actor color
+ */
+void CamVtkView::setDataMapperColorSegm()
+{
+	data->GetPointData()->SetScalars(sData);  //
+	dataMapperSegm->SetLookupTable(segmLUT);  // sets color
+	dataActor->SetMapper(dataMapperSegm);
 }
 /**
  * Sets a data actor color

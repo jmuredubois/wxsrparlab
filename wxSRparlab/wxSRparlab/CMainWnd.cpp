@@ -151,6 +151,8 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
 	_txtAmpInit = false;
 	_ampMin = 0.000;
 	_ampMax = 2000.0;
+	_segmMin = 0.0;
+	_segmMax = 255.0;
 
 	_vtkWin = NULL;
 
@@ -274,9 +276,9 @@ void MainWnd::Init()
 void MainWnd::AddChildren()
 {
     // temp variables to avoid creating new camFrames on top of each other
-	wxPoint pos = wxPoint(50,50);	// initial position
-	wxPoint incr = wxPoint(320,00);	// increment in position
-	wxSize	sz = wxSize(320,600);	// size for camFrame
+	wxPoint pos = wxPoint(50,500);	// initial position
+	wxPoint incr = wxPoint(100,50);	// increment in position
+	wxSize	sz = wxSize(500,460);	// size for camFrame
 	wxString lab;					// title string for camFrame
 	wxString labT;					// string for cam nickname
 	wxString labBGT;					// string for cam BGnickname
@@ -285,7 +287,7 @@ void MainWnd::AddChildren()
 	_vtkWin = new CViewSrVtk(NULL, 440,50,1024,768);
 #endif
 
-	wxString colors[] = { wxT("Z"), wxT("Amp."), wxT("R"),
+	wxString colors[] = { wxT("Z"), wxT("Amp."), wxT("Segm."), wxT("R"),
         wxT("G"), wxT("B"), wxT("W"), wxT("K") };
 
 	//! - for the max number of cameras ...
@@ -326,6 +328,9 @@ void MainWnd::AddChildren()
 
 
 		camFrm->SendSizeEvent();
+		this->SetSegmVtk();
+		this->SetAmpVtk();
+		this->SetZVtk();
 #endif
 	} // ENDOF for loop on _numCams
 	this->Layout();
@@ -427,6 +432,24 @@ void MainWnd::SetAmpVtk()
 		{
 			(*itCam)->GetCamVtk()->changeAmpRange((float) _ampMin, (float) _ampMax);
 			(*itCam)->GetCamBGVtk()->changeAmpRange((float) _ampMin, (float) _ampMax);
+		}
+		_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
+	}
+#endif
+}
+
+/* Setting vtk display value*/
+void MainWnd::SetSegmVtk()
+{
+#ifdef JMU_USE_VTK
+	if(_vtkWin != NULL){ 
+		std::vector<CamFrame*>::iterator itCam;  // get iterator on the camera frames
+		for ( itCam  =m_camFrm.begin();
+		      itCam !=m_camFrm.end(); 
+		      itCam++)
+		{
+			(*itCam)->GetCamVtk()->changeSegmRange((float) _segmMin, (float) _segmMax);
+			(*itCam)->GetCamBGVtk()->changeSegmRange((float) _segmMin, (float) _segmMax);
 		}
 		_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 	}
@@ -540,7 +563,7 @@ void MainWnd::SetColVtk(wxCommandEvent& event)
 		  itCtrl++, itCam++, i++ )
 	{
 		if(!_vtkWin){return;};
-		/* wxString colors[] = { wxT("Z"), wxT("Amp."), wxT("R"),
+		/* wxString colors[] = { wxT("Z"), wxT("Amp."), wxT("Segm."), wxT("R"),
         wxT("G"), wxT("B"), wxT("W"), wxT("K") };*/
 		wxString strCol = (*itCtrl)->GetStringSelection();
 		double r, g, b; r=0.0; g=0.0; b=0.0;
@@ -553,6 +576,10 @@ void MainWnd::SetColVtk(wxCommandEvent& event)
 		{
 			(*itCam)->GetCamVtk()->setDataMapperColorGray();
 			SetAmpMin(_ampMin); // trick to update data Mapper
+		}
+		if(  strCol.IsSameAs(wxT("Segm."))  )
+		{
+			(*itCam)->GetCamVtk()->setDataMapperColorSegm();
 		}
 		if(  strCol.IsSameAs(wxT("R")) || strCol.IsSameAs(wxT("G")) || strCol.IsSameAs(wxT("B"))
 			 || strCol.IsSameAs(wxT("W")) || strCol.IsSameAs(wxT("K")))
@@ -570,7 +597,7 @@ void MainWnd::SetColVtk(wxCommandEvent& event)
 		  itCtrl++, itCam++, i++ )
 	{
 		if(!_vtkWin){return;};
-		/* wxString colors[] = { wxT("Z"), wxT("Amp."), wxT("R"),
+		/* wxString colors[] = { wxT("Z"), wxT("Amp."), wxT("Segm."), wxT("R"),
         wxT("G"), wxT("B"), wxT("W"), wxT("K") };*/
 		wxString strCol = (*itCtrl)->GetStringSelection();
 		double r, g, b; r=0.0; g=0.0; b=0.0;
@@ -583,6 +610,10 @@ void MainWnd::SetColVtk(wxCommandEvent& event)
 		{
 			(*itCam)->GetCamBGVtk()->setDataMapperColorGray();
 			SetAmpMin(_ampMin); // trick to update data Mapper
+		}
+		if(  strCol.IsSameAs(wxT("Segm."))  )
+		{
+			(*itCam)->GetCamVtk()->setDataMapperColorSegm();
 		}
 		if(  strCol.IsSameAs(wxT("R")) || strCol.IsSameAs(wxT("G")) || strCol.IsSameAs(wxT("B"))
 			 || strCol.IsSameAs(wxT("W")) || strCol.IsSameAs(wxT("K")))
