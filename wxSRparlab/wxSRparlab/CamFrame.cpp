@@ -129,12 +129,13 @@ CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos
 	_vtkSub = 0;
 	m_scat = NULL;
 	m_NaN = NULL;
-	m_bgAvg = NULL;
-	m_fgAvg = NULL;
+	m_bgAvg = NULL; m_bgNaN = NULL;
+	m_fgAvg = NULL; m_fgNaN = NULL;
 	m_CTrf = NULL;
 	m_CTrfBG = NULL;
 	_acqTime = 1000L;
 	m_pAcqSWatch = NULL;
+	m_segm = NULL;
 }
 
 /**
@@ -163,6 +164,8 @@ CamFrame::~CamFrame()
 	if(m_scat != NULL) {PLSC_Close(m_scat); m_scat = NULL; };
 	if(m_bgAvg != NULL) {PLAVG_Close(m_bgAvg); m_bgAvg = NULL; };
 	if(m_fgAvg != NULL) {PLAVG_Close(m_fgAvg); m_fgAvg = NULL; };
+	if(m_bgNaN != NULL) { PLNN_Close(m_bgNaN); m_bgNaN = NULL; };
+	if(m_fgNaN != NULL) { PLNN_Close(m_fgNaN); m_fgNaN = NULL; };
 	if(m_CTrf != NULL) {PLCTR_Close(m_CTrf); m_CTrf = NULL; };
 	if(m_CTrfBG != NULL) {PLCTR_Close(m_CTrfBG); m_CTrfBG = NULL; };
 	if(m_pAcqSWatch != NULL) { delete(m_pAcqSWatch); m_pAcqSWatch = NULL;};
@@ -188,6 +191,7 @@ BEGIN_EVENT_TABLE(CamFrame, wxFrame)
 	EVT_BUTTON(IDB_ClearBg, CamFrame::OnClearBg)
 	EVT_BUTTON(IDB_ClearFg, CamFrame::OnClearFg)
 	EVT_CHECKBOX(IDC_Record, CamFrame::OnRecord)
+	EVT_BUTTON(IDB_SegmSetParams, CamFrame::OnSetSegmParams)
 END_EVENT_TABLE()
 
 /**
@@ -260,6 +264,11 @@ int CamFrame::CreateAndSetNotebook(const wxString& title)
 	m_viewBGAmpPane->InitViewData();
 	m_viewBGAmpPane->SetDispMin(0.0);
 	m_viewBGAmpPane->SetDispMax(1000.0);
+	// %%%%% SEGMENTED panel
+	m_viewSegmPane = new CamViewData(m_camNB, wxT("segm"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
+	m_viewSegmPane->InitViewData();
+	m_viewSegmPane->SetDispMin(0);
+	m_viewSegmPane->SetDispMax(255); 
 
 	/* NBparadigm */
 	m_camNB->AddPage(m_settingsPane, wxT("Settings"), TRUE);//, -1);
@@ -270,6 +279,7 @@ int CamFrame::CreateAndSetNotebook(const wxString& title)
 	m_camNB->AddPage(m_viewYPane, wxT("Y [mm]"), FALSE);//, -1);
 	m_camNB->AddPage(m_viewXPane, wxT("X [mm]"), FALSE);//, -1);
 #endif //DISPXYBUFFERS
+	m_camNB->AddPage(m_viewSegmPane, wxT("Segm"), FALSE);//, -1);
 	m_camNB->AddPage(m_viewBGRangePane, wxT("BG pha"), FALSE);//, -1);
 	m_camNB->AddPage(m_viewBGAmpPane, wxT("BG amp"), FALSE);//, -1);
 	/* EO NBparadigm */
@@ -432,6 +442,8 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	  PLNN_Open(&m_NaN, newbuf);
 	  PLAVG_Open(&m_bgAvg, newbuf);
 	  PLAVG_Open(&m_fgAvg, newbuf);
+	  PLNN_Open(&m_bgNaN, newbuf);
+	  PLNN_Open(&m_fgNaN, newbuf);
 	  PLCTR_Open(&m_CTrf, newbuf);
 	  PLCTR_Open(&m_CTrfBG, newbuf);
 	  PLSEGM_Open(&m_segm, newbuf);
@@ -477,6 +489,8 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   PLNN_Open(&m_NaN, newbuf);
   PLAVG_Open (&m_bgAvg, newbuf);
   PLAVG_Open (&m_fgAvg, newbuf);
+  PLNN_Open(&m_bgNaN, newbuf);
+  PLNN_Open(&m_fgNaN, newbuf);
   PLCTR_Open(&m_CTrf, newbuf);
   PLCTR_Open(&m_CTrfBG, newbuf);
   PLSEGM_Open(&m_segm, newbuf);
@@ -525,6 +539,8 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   if(m_scat != NULL)  {PLSC_Close(m_scat);   m_scat = NULL; };
   if(m_bgAvg != NULL) {PLAVG_Close(m_bgAvg); m_bgAvg = NULL; };
   if(m_fgAvg != NULL) {PLAVG_Close(m_fgAvg); m_fgAvg = NULL; };
+  if(m_bgNaN != NULL) { PLNN_Close(m_bgNaN); m_bgNaN = NULL; };
+  if(m_fgNaN != NULL) { PLNN_Close(m_fgNaN); m_fgNaN = NULL; };
   if(m_CTrf != NULL) {PLCTR_Close(m_CTrf); m_CTrf = NULL; };
   if(m_CTrfBG != NULL) {PLCTR_Close(m_CTrfBG); m_CTrfBG = NULL; };
   if(m_pAcqSWatch != NULL) { delete(m_pAcqSWatch); m_pAcqSWatch = NULL;};
@@ -729,7 +745,7 @@ void CamFrame::AcqOneFrm()
 			scatNaN.nCols = m_nCols;
 			scatNaN.nRows = m_nRows;
 			scatNaN.bufferSizeInBytes = m_nCols * m_nRows * sizeof(bool);
-			scatNaN.nanBool = PLNN_FlagNaN(m_NaN, srBuf);
+			scatNaN.nanBool = PLNN_FlagNaNbool(m_NaN, srBuf);
 		if( (m_settingsPane->IsFgHidesDataChecked()) && (m_settingsPane->IsLrnFgChecked()!=true) )
 		{
 			SRBUF fgBuf = PLAVG_GetAvgBuf(m_fgAvg);
@@ -788,6 +804,14 @@ void CamFrame::AcqOneFrm()
 	    m_viewYPane->SetDataArray<short>(PLCTR_GetY(m_CTrf), m_nRows*m_nCols);
 	    m_viewXPane->SetDataArray<short>(PLCTR_GetX(m_CTrf), m_nRows*m_nCols);
 	  #endif //DISPXYBUFFERS
+		SRBUF srBuf;
+		    srBuf.pha = (unsigned short*) m_pSrBuf;
+		    srBuf.amp = (unsigned short*) (&m_pSrBuf[m_nRows*m_nCols*sizeof(unsigned short)]);
+		    srBuf.nCols = m_nCols;
+		    srBuf.nRows = m_nRows;
+		    srBuf.bufferSizeInBytes = m_nCols*m_nRows*2*sizeof(unsigned short);
+	  PLSEGM_Segment(m_segm, srBuf, PLNN_FlagNaN(m_NaN, srBuf), PLAVG_GetAvgBuf(m_bgAvg), PLNN_FlagNaN(m_NaN, PLAVG_GetAvgBuf(m_bgAvg)), PLAVG_GetAvgVar(m_bgAvg) );
+	  m_viewSegmPane->SetDataArray<unsigned char>((unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).fg, m_nRows*m_nCols);
 	  m_viewBGRangePane->SetDataArray<unsigned short>((unsigned short*) (PLAVG_GetAvgBuf(m_bgAvg)).pha, m_nRows*m_nCols);
 	  m_viewBGAmpPane->SetDataArray<unsigned short>((unsigned short*) (PLAVG_GetAvgBuf(m_bgAvg)).amp, m_nRows*m_nCols);
 	  #ifdef JMU_USE_VTK
@@ -811,6 +835,7 @@ void CamFrame::AcqOneFrm()
 	    m_viewYPane->SetTxtInfo(strR);
 	    m_viewXPane->SetTxtInfo(strR);
 	  #endif //DISPXYBUFFERS
+	  m_viewSegmPane->SetTxtInfo(strR);
 	  wxString strBG; strBG.sprintf(wxT("Average count: %05i"), PLAVG_GetAvgCnt(m_bgAvg));
 	  m_viewBGRangePane->SetTxtInfo(strBG);
 	  m_viewBGAmpPane->SetTxtInfo(strBG);
@@ -1031,4 +1056,32 @@ void CamFrame::OnClearFg(wxCommandEvent& WXUNUSED(event))
 		    srBuf.bufferSizeInBytes = m_nCols*m_nRows*2*sizeof(unsigned short);
   PLAVG_LearnBackgroundInitReset( m_fgAvg, srBuf);
   m_settingsPane->SetText(wxT("Cleared foreground"));
+}
+
+
+void CamFrame::OnSetSegmParams(wxCommandEvent& WXUNUSED(event))
+{
+  //#ifdef JMU_TGTFOLLOW
+
+  //logPrintf("swissrangerTester: SR_Open device");
+  m_settingsPane->SetText(wxT("Modify segmentation parameters"));
+  wxString strR;
+
+  wxFileDialog* OpenDialogSegm = new wxFileDialog(this,
+	  wxT("Choose a segmentation parameters file to open"),	// msg
+	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
+	  wxEmptyString,	// default file
+	  wxT("SR segmentation parameter files (*.xml)|*.xml|All files (*.*)|*.*"),	// file ext
+	  wxFD_OPEN|wxFD_CHANGE_DIR,
+	  wxDefaultPosition);
+
+  if((OpenDialogSegm->ShowModal()==wxID_OK) )
+  {
+	  wxString strPathSegm = OpenDialogSegm->GetPath();
+	  PLSEGM_LoadSegmSettings( m_segm, strPathSegm.char_str() );
+  } // (OpenDialogMat->ShowModal()==wxID_OK) )
+  delete(OpenDialogSegm);
+
+  m_settingsPane->SetText(wxT("Opened scat. params file"));
+  //#endif
 }
