@@ -413,9 +413,10 @@ int CViewSrVtk::addScalarBarSegm()
     segmSca->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
     segmSca->GetPositionCoordinate()->SetValue(0.9,0.15);
     segmSca->SetOrientationToVertical();
+	/*segmSca->SetTextPositionToSucceedScalarBar();*/
     segmSca->SetWidth(0.05);
     segmSca->SetHeight(0.7);
-	segmSca->SetLabelFormat("%03i");
+	segmSca->SetLabelFormat("%05.0f");
 	return segmSca->GetReferenceCount();
 }
 /**

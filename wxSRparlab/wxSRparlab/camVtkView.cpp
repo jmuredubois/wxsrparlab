@@ -268,7 +268,7 @@ int CamVtkView::addDataAct()
     pcoords = vtkFloatArray::New();
 	dData = vtkFloatArray::New();	// scalar depth associated to each point (for coloring)
 	aData = vtkFloatArray::New();	// scalar ampl. associated to each point (for coloring)
-	sData = vtkUnsignedCharArray::New();	// scalar segm. associated to each point (for coloring)
+	sData = vtkFloatArray::New();	// scalar segm. associated to each point (for coloring)
 	// Note that by default, an array has 1 component.
     // We have to change it to 3 for points
     pcoords->SetNumberOfComponents(3);
@@ -342,7 +342,7 @@ int CamVtkView::addDataAct()
 	dataMapperAmp->SetInputConnection(pdata->GetOutputPort());
 	dataMapperSegm = vtkPolyDataMapper::New();
 	dataMapperSegm->SetInputConnection(pdata->GetOutputPort());
-	dataMapperSegm->SetScalarRange((double)-127, (double)128);
+	//dataMapperSegm->SetScalarRange((double)-127, (double)128);
 
     dataActor = vtkActor::New();
     dataActor->SetMapper(dataMapperZ);
@@ -430,7 +430,7 @@ int CamVtkView::updateTOF(int rows, int cols, unsigned short *z, short *y, short
 		{
 			dData->SetValue((iv1+iv2),(float)(pdata->GetOutput()->GetPoints()->GetPoint(iv1+iv2)[2]));		// make sure that depth data is the transformed value; :-( unable to avoid loop yet :-(
 			aData->SetValue((iv1+iv2),(float) amp[i]) ;		//  :-( unable to avoid loop yet :-(
-			sData->SetValue((iv1+iv2), segm[i]) ;		//  :-( unable to avoid loop yet :-(
+			sData->SetValue((iv1+iv2), (float) segm[i]) ;		//  :-( unable to avoid loop yet :-(
 			i++; // le i++ doit être ici, il faut commencer à zéro !!!
 			iv2+=rows;
 			iv3++;
