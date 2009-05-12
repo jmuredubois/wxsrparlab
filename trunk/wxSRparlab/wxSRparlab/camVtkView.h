@@ -150,7 +150,7 @@ private:
   vtkFloatArray* pcoords;
   vtkFloatArray* dData;
   vtkFloatArray* aData; //amplitude
-  vtkUnsignedCharArray*  sData; //segmentation results
+  vtkFloatArray*  sData; //segmentation results
 
   int addDataAct();
   int freeDataAct();

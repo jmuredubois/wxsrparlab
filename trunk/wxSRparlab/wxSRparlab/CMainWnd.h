@@ -45,9 +45,13 @@ public:
 	void SetAmpMin(double val);	//!< set min amp for vtk display
 	void SetAmpMax(double val);	//!< set max amp for vtk display
 	void SetAmpVtk();
-	void SetSegmVtk();
 	void TextChangedAmpMin(wxCommandEvent &); //!< react on event changed min amp
 	void TextChangedAmpMax(wxCommandEvent &); //!< react on event changed max amp
+	void SetSegMin(double val);	//!< set min seg for vtk display
+	void SetSegMax(double val);	//!< set max seg for vtk display
+	void SetSegmVtk();
+	void TextChangedSegMin(wxCommandEvent &); //!< react on event changed min seg
+	void TextChangedSegMax(wxCommandEvent &); //!< react on event changed max seg
 	void AcqAll(wxCommandEvent& event);	//!< send Acquire command to all cams
 	void SetVisVtk(wxCommandEvent& event); //!< react on event changed visibility
 	void SetColVtk(wxCommandEvent& event); //!< react on event changed color options
@@ -71,9 +75,12 @@ private:
 	wxTextCtrl *_txtAmpMax;		//!< control txt : max amp
 	double _ampMin;				//!< stored min amp
 	double _ampMax;				//!< stored max amp
+	bool _txtAmpInit;			//!< helper var: ensure amp ctrl txt are initialized
+	wxTextCtrl *_txtSegMin;		//!< control txt : min seg
+	wxTextCtrl *_txtSegMax;		//!< control txt : max seg
 	double _segmMin;				//!< stored min segm
 	double _segmMax;				//!< stored max segm
-	bool _txtAmpInit;			//!< helper var: ensure amp ctrl txt are initialized
+	bool _txtSegInit;			//!< helper var: ensure seg ctrl txt are initialized
 	int			_numCams;		//!< count of cameras
 	std::vector<CamFrame*> m_camFrm;		//!< list of camFrames
 	CViewSrVtk	*_vtkWin ; //!< pointer to vtk window
@@ -99,6 +106,8 @@ enum MainWndEnum
 	IDT_zMax,
 	IDT_ampMin,
 	IDT_ampMax,
+	IDT_segMin,
+	IDT_segMax,
 	IDB_AcqAll,
 	IDC_visVtk,
 	IDC_colVtk,

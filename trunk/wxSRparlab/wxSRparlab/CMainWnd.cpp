@@ -100,6 +100,8 @@ BEGIN_EVENT_TABLE(MainWnd, wxFrame)
 	EVT_TEXT(IDT_zMax, MainWnd::TextChangedZMax)
 	EVT_TEXT(IDT_ampMin, MainWnd::TextChangedAmpMin)
 	EVT_TEXT(IDT_ampMax, MainWnd::TextChangedAmpMax)
+	EVT_TEXT(IDT_segMin, MainWnd::TextChangedSegMin)
+	EVT_TEXT(IDT_segMax, MainWnd::TextChangedSegMax)
 	EVT_BUTTON(IDB_AcqAll, MainWnd::AcqAll)
 	EVT_CHECKBOX(IDC_visVtk, MainWnd::SetVisVtk)
 	EVT_RADIOBOX(IDC_colVtk, MainWnd::SetColVtk)
@@ -151,6 +153,9 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
 	_txtAmpInit = false;
 	_ampMin = 0.000;
 	_ampMax = 2000.0;
+	_txtSegMin = NULL;
+	_txtSegMax = NULL;
+	_txtSegInit = false;
 	_segmMin = 0.0;
 	_segmMax = 255.0;
 
@@ -235,9 +240,21 @@ void MainWnd::Init()
 		sizerAmpScale->AddStretchSpacer();
 	    sizerAmpScale->Add(_txtAmpMax, flagsExpand);
 
+	// segmentation min and max controls
+	_txtSegMin = new wxTextCtrl( _bgPanel, IDT_segMin, wxString::Format(wxT("%d"), _ampMin) ); 
+	_txtSegMax = new wxTextCtrl( _bgPanel, IDT_segMax, wxString::Format(wxT("%d"), _ampMax) );
+	_txtSegInit = true; _txtSegMin->SetModified(true); _txtSegMax->SetModified(true);
+	
+	wxBoxSizer *sizerSegScale = new wxBoxSizer(wxHORIZONTAL);
+	    sizerSegScale->Add(_txtSegMin, flagsExpand);
+		sizerSegScale->AddStretchSpacer();
+	    sizerSegScale->Add(_txtSegMax, flagsExpand);
+
+	// group scale textboxes
 	wxFlexGridSizer *sizerZAmpScales = new wxFlexGridSizer(2,1,0,0);
 		sizerZAmpScales->Add( sizerZscale, flagsExpand);
 		sizerZAmpScales->Add( sizerAmpScale, flagsExpand);
+		sizerZAmpScales->Add( sizerSegScale, flagsExpand);
 		
 
 	_buttAcqAll = new wxButton(_bgPanel, IDB_AcqAll, wxT("Acq. all") );
@@ -437,7 +454,22 @@ void MainWnd::SetAmpVtk()
 	}
 #endif
 }
-
+/* Setting display min value*/
+void MainWnd::SetSegMin(double val)
+{
+	_segmMin = val;
+	_txtSegMin->GetValue().Printf(wxT("%d"), val);
+	_txtSegMin->SetModified(true);
+	SetSegmVtk();
+}
+/* Setting display min value*/
+void MainWnd::SetSegMax(double val)
+{
+	_segmMax = val;
+	_txtSegMax->GetValue().Printf(wxT("%d"), val);
+	_txtSegMax->SetModified(true);
+	SetSegmVtk();
+}
 /* Setting vtk display value*/
 void MainWnd::SetSegmVtk()
 {
@@ -489,7 +521,39 @@ void MainWnd::TextChangedAmpMax(wxCommandEvent &)
 		_txtAmpMax->GetValue().Printf(wxT("%d"), _ampMax);
 	}
 }
+/* acting on changed text value */
+void MainWnd::TextChangedSegMin(wxCommandEvent &)
+{
+	double val = 0;
+	if( !_txtSegInit){return ;};
+	wxString strVal = _txtSegMin->GetValue();
+	if( strVal.ToDouble(& val) ) /* read value as double*/
+	{
+		SetSegMin(val);
+	}
+	else
+	{
+		_txtSegMin->DiscardEdits();
+		_txtSegMin->GetValue().Printf(wxT("%d"), _segmMin);
+	}
+}
 
+/* acting on changed text value */
+void MainWnd::TextChangedSegMax(wxCommandEvent &)
+{
+	double val = 0;
+	if( !_txtSegInit){return ;};
+	wxString strVal = _txtSegMax->GetValue();
+	if( strVal.ToDouble(& val) ) /* read value as double*/
+	{
+		SetSegMax(val);
+	}
+	else
+	{
+		_txtSegMax->DiscardEdits();
+		_txtSegMax->GetValue().Printf(wxT("%d"), _segmMax);
+	}
+}
 /* acting on "AcquireAll" value button*/
 void MainWnd::AcqAll(wxCommandEvent& event)
 {
@@ -614,6 +678,7 @@ void MainWnd::SetColVtk(wxCommandEvent& event)
 		if(  strCol.IsSameAs(wxT("Segm."))  )
 		{
 			(*itCam)->GetCamVtk()->setDataMapperColorSegm();
+			SetSegMin(_segmMin); // trick to update data Mapper
 		}
 		if(  strCol.IsSameAs(wxT("R")) || strCol.IsSameAs(wxT("G")) || strCol.IsSameAs(wxT("B"))
 			 || strCol.IsSameAs(wxT("W")) || strCol.IsSameAs(wxT("K")))
