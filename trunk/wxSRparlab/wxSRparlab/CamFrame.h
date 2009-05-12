@@ -98,6 +98,7 @@ public:
 	bool IsLrnFgChecked(){ return m_settingsPane->IsLrnFgChecked(); };
 	bool IsAcqContinuous(){ return (m_camReadMode==CAM_RD_CONTINU); };
 	long GetAcqTime(){ return _acqTime;};
+	void OnSetSegmParams(wxCommandEvent& WXUNUSED(event));
 
 private:
 	MainWnd	*_pWin; // parent main wnd
@@ -124,6 +125,7 @@ private:
 #endif //DISPXYBUFFERS
 	CamViewData* m_viewBGRangePane;		//! panel for BACKGROUND RANGE data display
 	CamViewData* m_viewBGAmpPane;		//! panel for BACKGROUND RANGE data display
+	CamViewData* m_viewSegmPane;		//! panel for SEGMENTED data display
 	int m_nFrmRead;		//! number of frames read
 	unsigned int m_nSerialSR;		//! SR serial
 	CamReadModeEnum  m_camReadMode;		//! read  mode
@@ -145,6 +147,8 @@ private:
 	SRPLNAN  m_NaN;			// NaN filtering object
 	SRPLAVG	 m_bgAvg;		// background average object
 	SRPLAVG	 m_fgAvg;		// foreground average object
+	SRPLNAN  m_bgNaN;		// NaN filtering object
+	SRPLNAN  m_fgNaN;		// NaN filtering object
 	SRPLCTR	 m_CTrf;		// Coordinates transform object
 	SRPLCTR	 m_CTrfBG;		// background coordinates transform object
 	SRCTR m_ctrParam;		// camera opticla center parameters
