@@ -45,6 +45,7 @@ public:
 	void SetAmpMin(double val);	//!< set min amp for vtk display
 	void SetAmpMax(double val);	//!< set max amp for vtk display
 	void SetAmpVtk();
+	void SetSegmVtk();
 	void TextChangedAmpMin(wxCommandEvent &); //!< react on event changed min amp
 	void TextChangedAmpMax(wxCommandEvent &); //!< react on event changed max amp
 	void AcqAll(wxCommandEvent& event);	//!< send Acquire command to all cams
@@ -70,6 +71,8 @@ private:
 	wxTextCtrl *_txtAmpMax;		//!< control txt : max amp
 	double _ampMin;				//!< stored min amp
 	double _ampMax;				//!< stored max amp
+	double _segmMin;				//!< stored min segm
+	double _segmMax;				//!< stored max segm
 	bool _txtAmpInit;			//!< helper var: ensure amp ctrl txt are initialized
 	int			_numCams;		//!< count of cameras
 	std::vector<CamFrame*> m_camFrm;		//!< list of camFrames

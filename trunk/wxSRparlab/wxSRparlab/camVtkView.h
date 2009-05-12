@@ -18,6 +18,7 @@
 #include "vtkDataSetMapper.h"		// requires $(JMU_VTKSRCBASE)/Rendering
 #include "vtkRenderWindowInteractor.h"	// requires $(JMU_VTKSRCBASE)/Rendering
 #include "vtkRenderer.h"		// requires $(JMU_VTKSRCBASE)/Rendering
+#include "vtkUnsignedCharArray.h"		// requires $(JMU_VTKSRCBASE)/Common
 #include "vtkFloatArray.h"		// requires $(JMU_VTKSRCBASE)/Common
 #include "vtkDoubleArray.h"		// requires $(JMU_VTKSRCBASE)/Common
 
@@ -74,19 +75,22 @@ public:
 	  int updateTarget(); //overloaded operator to reset to camera center
 	  int updateTarget(float *ptsF, int nCoord);
 	#endif
-
 	int updateTOF(int rows, int cols, unsigned short *z, short *y, short *x, unsigned short* amp);
-	int updateTOF(int rows, int cols, unsigned short *z, short *y, short *x, unsigned short* amp, char* fname);
+	int updateTOF(int rows, int cols, unsigned short *z, short *y, short *x, unsigned short* amp, unsigned char* segm);
+	int updateTOF(int rows, int cols, unsigned short *z, short *y, short *x, unsigned short* amp, unsigned char* segm, char* fname);
 
 	int changeDepthRange(float minVal, float maxVal);
 	int changeAmpRange(float minAmp, float maxAmp);
+	int changeSegmRange(float minSegm, float maxSegm);
 	void SetDepthLUT(vtkLookupTable* LUT);
 	void SetGrayLUT(vtkLookupTable* LUT);
+	void SetSegmLUT(vtkLookupTable* LUT);
 	void SetPlainLUT(vtkLookupTable* LUTr, vtkLookupTable* LUTg, vtkLookupTable* LUTb, vtkLookupTable* LUTw, vtkLookupTable* LUTk);
 	void hideDataAct(bool doHide);
 	void setDataActColorRGB( double r, double g, double b);
 	void setDataMapperColorDepth();
 	void setDataMapperColorGray();
+	void setDataMapperColorSegm();
 	void setDataMapperColorR();
 	void setDataMapperColorG();
 	void setDataMapperColorB();
@@ -126,7 +130,8 @@ private:
   #endif
 
   vtkLookupTable	*depthLUT;	//!< LUT for depth data display
-  vtkLookupTable	*grayLUT;	//!< LUT for depth data display
+  vtkLookupTable	*grayLUT;	//!< LUT for ampl. data display
+  vtkLookupTable	*segmLUT;	//!< LUT for segm. data display
   vtkLookupTable	*rLUT;	//!< LUT for depth data display
   vtkLookupTable	*gLUT;	//!< LUT for depth data display
   vtkLookupTable	*bLUT;	//!< LUT for depth data display
@@ -138,12 +143,14 @@ private:
   vtkStructuredGridGeometryFilter	*pdata;			//!< geometry filter to obtain PolyData
   vtkPolyDataMapper					*dataMapperZ;	//!< mapper for TOF data
   vtkPolyDataMapper					*dataMapperAmp;	//!< mapper for TOF data
+  vtkPolyDataMapper					*dataMapperSegm;//!< mapper for TOF data
   vtkActor							*dataActor;		//!< actor for TOF data
 
   // Create a float array which represents the points.
   vtkFloatArray* pcoords;
   vtkFloatArray* dData;
   vtkFloatArray* aData; //amplitude
+  vtkUnsignedCharArray*  sData; //segmentation results
 
   int addDataAct();
   int freeDataAct();

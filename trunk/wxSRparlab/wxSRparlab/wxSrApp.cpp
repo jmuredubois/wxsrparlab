@@ -37,7 +37,7 @@ bool SrApp::OnInit()
 	_mainWnd = NULL;
 
 	//! - creates a new main window \n
-    _mainWnd = new MainWnd( _T("wxSRparlab"), wxPoint(05,50), wxSize(300,150) );
+    _mainWnd = new MainWnd( _T("wxSRparlab"), wxPoint(05,50), wxSize(920,300) );
 	if(_mainWnd != NULL){
 		_mainWnd->Init();
 		_mainWnd->Show(TRUE); // show the main window
@@ -51,7 +51,7 @@ bool SrApp::OnInit()
 	// success: wxApp::OnRun() will be called which will enter the main message
     // loop and the application will run. If we returned false here, the
     // application would exit immediately.
-	_mainWnd->SendSizeEvent();
+	//_mainWnd->SendSizeEvent();
 	_mainWnd->Layout();
 	int wdt, hgt;
 	_mainWnd->GetSize(&wdt, &hgt);

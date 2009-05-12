@@ -38,6 +38,7 @@ CViewSrVtk::CViewSrVtk(wxFrame* pWnd, int x, int y, int w, int h)
 	// create a depth LUT
 	addDepthLUT();
 	addGrayLUT();
+	addSegmLUT();
 	addPlainLUT();
 
 	// add axes
@@ -48,10 +49,12 @@ CViewSrVtk::CViewSrVtk(wxFrame* pWnd, int x, int y, int w, int h)
 	// add a scalar bar
 	addScalarBarDepth();
 	addScalarBarAmp();
+	addScalarBarSegm();
 
     renderer->AddActor(srBoxActor);
     renderer->AddActor(depthSca);
 	renderer->AddActor(ampSca);
+	renderer->AddActor(segmSca);
 	//BGdataActor->Register(renderer);
     renderer->AddActor(axesActor);
 	renderer->AddActor(fpsTxtActor);
@@ -99,10 +102,12 @@ CViewSrVtk::~CViewSrVtk()
 	// free depth LUT
 	res+= freeDepthLUT();
 	res+= freeGrayLUT();
+	res+= freeSegmLUT();
 	res+= freePlainLUT();
 	// free scalar bar
 	res+= freeScalarBarDepth();
 	res+= freeScalarBarAmp();
+	res+= freeScalarBarSegm();
 };
 
 
@@ -201,6 +206,21 @@ int CViewSrVtk::addGrayLUT()
 	return grayLUT->GetReferenceCount();
 }
 /**
+ * Creates the segm LUT
+ *  -> Creates a new object that must be deleted
+ *  --> freeSegmLUT() must be called
+ */
+int CViewSrVtk::addSegmLUT()
+{
+	segmLUT = vtkLookupTable::New();
+	segmLUT->SetHueRange(0.7, 0.0);
+	//segmLUT->SetSaturationRange(0.0, 1.0);
+	//segmLUT->SetValueRange(0.0, 1.0);
+	segmLUT->SetRampToLinear();
+	segmLUT->SetNumberOfTableValues(256);
+	return segmLUT->GetReferenceCount();
+}
+/**
  * Creates the plain LUTs
  *  -> Creates new objects that must be deleted
  *  --> freePlainLUT() must be called
@@ -258,7 +278,7 @@ int CViewSrVtk::changeDepthRange(float minVal, float maxVal)
 }
 
 /**
- * Changes the depth range
+ * Changes the amplitude range
  */
 int CViewSrVtk::changeAmpRange(float minAmp, float maxAmp)
 {
@@ -268,6 +288,16 @@ int CViewSrVtk::changeAmpRange(float minAmp, float maxAmp)
 	return res-i;
 }
 
+/**
+ * Changes the segmentation range
+ */
+int CViewSrVtk::changeSegmRange(float minSegm, float maxSegm)
+{
+	int res = _vtkSubMax;
+	int i = 0;
+	//renWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
+	return res-i;
+}
 
 /**
  * Frees the depth LUT
@@ -286,6 +316,16 @@ int CViewSrVtk::freeGrayLUT()
 {
 	int res = grayLUT->GetReferenceCount();
 	grayLUT->Delete();
+	return res-1;
+}
+
+/**
+ * Frees the segm LUT
+ */
+int CViewSrVtk::freeSegmLUT()
+{
+	int res = segmLUT->GetReferenceCount();
+	segmLUT->Delete();
 	return res-1;
 }
 
@@ -361,6 +401,34 @@ int CViewSrVtk::freeScalarBarAmp()
 }
 
 /**
+ * Creates the scalar bar
+ *  -> Creates new objects that must be deleted
+ *  --> freeScalarBarSegm() must be called
+ */
+int CViewSrVtk::addScalarBarSegm()
+{
+	segmSca = vtkScalarBarActor::New();
+    segmSca->SetLookupTable(segmLUT);
+    segmSca->SetTitle("Segm. (a.u.)");
+    segmSca->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
+    segmSca->GetPositionCoordinate()->SetValue(0.9,0.15);
+    segmSca->SetOrientationToVertical();
+    segmSca->SetWidth(0.05);
+    segmSca->SetHeight(0.7);
+	segmSca->SetLabelFormat("%03i");
+	return segmSca->GetReferenceCount();
+}
+/**
+ * Frees the scalar bar
+ */
+int CViewSrVtk::freeScalarBarSegm()
+{
+	int res = segmSca->GetReferenceCount();
+	segmSca->Delete();
+	return res-1;
+}
+
+/**
  * Hides a data actor
  */
 int CViewSrVtk::hideDataAct(int vtkSub, bool doHide)
@@ -422,6 +490,22 @@ int CViewSrVtk::setDataMapperColorGray(int vtkSub)
 		if( (*it)->getVtkSub() == vtkSub )
 		{
 			(*it)->setDataMapperColorGray();
+		}
+	}
+	return vtkSub;
+}
+/**
+ * Sets a data actor color
+ */
+int CViewSrVtk::setDataMapperColorSegm(int vtkSub)
+{
+	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
+	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
+	for ( it=cameras.begin() ; it != cameras.end(); it++)
+	{
+		if( (*it)->getVtkSub() == vtkSub )
+		{
+			(*it)->setDataMapperColorSegm();
 		}
 	}
 	return vtkSub;

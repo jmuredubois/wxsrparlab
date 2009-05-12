@@ -6,7 +6,7 @@
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = wxSRparlab
 PROJECT_NUMBER         = 0.1.0.0
-OUTPUT_DIRECTORY       = "C:\Documents and Settings\murej\My Documents\svnSandbox\trunk\wxSRparlab\docs"
+OUTPUT_DIRECTORY       = "C:\Documents and Settings\muredubo\My Documents\svnSandbox\trunk\wxSRparlab\docs"
 CREATE_SUBDIRS         = NO
 OUTPUT_LANGUAGE        = English
 BRIEF_MEMBER_DESC      = YES
@@ -25,7 +25,7 @@ ABBREVIATE_BRIEF       = "The $name class" \
 ALWAYS_DETAILED_SEC    = NO
 INLINE_INHERITED_MEMB  = NO
 FULL_PATH_NAMES        = YES
-STRIP_FROM_PATH        = "C:/Documents and Settings/murej/Desktop/"
+STRIP_FROM_PATH        = "C:/Documents and Settings/muredubo/Desktop/"
 STRIP_FROM_INC_PATH    = 
 SHORT_NAMES            = NO
 JAVADOC_AUTOBRIEF      = NO
@@ -93,7 +93,7 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = "C:\Documents and Settings\murej\My Documents\svnSandbox\trunk\wxSRparlab\wxSRparlab"
+INPUT                  = "C:\Documents and Settings\muredubo\My Documents\svnSandbox\trunk\wxSRparlab\wxSRparlab"
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.c \
                          *.cc \
@@ -256,8 +256,8 @@ PERL_PATH              = /usr/bin/perl
 #---------------------------------------------------------------------------
 CLASS_DIAGRAMS         = NO
 MSCGEN_PATH            = 
-HIDE_UNDOC_RELATIONS   = YES
-HAVE_DOT               = YES
+HIDE_UNDOC_RELATIONS   = NO
+HAVE_DOT               = NO
 DOT_FONTNAME           = FreeSans
 DOT_FONTPATH           = 
 CLASS_GRAPH            = YES

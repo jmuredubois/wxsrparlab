@@ -816,11 +816,11 @@ void CamFrame::AcqOneFrm()
 	  m_viewBGAmpPane->SetDataArray<unsigned short>((unsigned short*) (PLAVG_GetAvgBuf(m_bgAvg)).amp, m_nRows*m_nCols);
 	  #ifdef JMU_USE_VTK
 		//if(m_camReadMode==CAM_RD_ONESHOT) // vtk does not support access from different threads
-			_camVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrf), PLCTR_GetY(m_CTrf), PLCTR_GetX(m_CTrf), (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2]);
+			_camVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrf), PLCTR_GetY(m_CTrf), PLCTR_GetX(m_CTrf), (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2], (PLSEGM_GetSegmBuf(m_segm)).fg);
 		if(m_settingsPane->IsLrnBgChecked())
 		{
 			PLCTR_CoordTrf(m_CTrfBG, PLAVG_GetAvgBuf(m_bgAvg), m_ctrParam);
-			_camBGVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLAVG_GetAvgBuf(m_bgAvg).amp);
+			_camBGVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLAVG_GetAvgBuf(m_bgAvg).amp,(PLSEGM_GetSegmBuf(m_segm)).fg);
 		}
 		if(!m_bReadContinuously)
 		{
@@ -935,10 +935,12 @@ void CamFrame::SetVtkWin(CViewSrVtk *vtkWin, int vtkSub)
 		_camVtk = new CamVtkView(_vtkSub, _vtkWin->GetRenWin(), _vtkWin->GetDepthLUT());
 		_camVtk->SetDepthLUT(_vtkWin->GetDepthLUT());
 		_camVtk->SetGrayLUT(_vtkWin->GetGrayLUT());
+		_camVtk->SetSegmLUT(_vtkWin->GetSegmLUT());
 		_camVtk->SetPlainLUT(_vtkWin->GetRLUT(), _vtkWin->GetGLUT(), _vtkWin->GetBLUT(), _vtkWin->GetWLUT(), _vtkWin->GetKLUT());
 		_camBGVtk = new CamVtkView(_vtkSub, _vtkWin->GetRenWin(), _vtkWin->GetDepthLUT());
 		_camBGVtk->SetDepthLUT(_vtkWin->GetDepthLUT());
 		_camBGVtk->SetGrayLUT(_vtkWin->GetGrayLUT());
+		_camBGVtk->SetSegmLUT(_vtkWin->GetSegmLUT());
 		_camBGVtk->SetPlainLUT(_vtkWin->GetRLUT(), _vtkWin->GetGLUT(), _vtkWin->GetBLUT(), _vtkWin->GetWLUT(), _vtkWin->GetKLUT());
 		_camBGVtk->setDataRepBG();
 	}
@@ -1083,5 +1085,7 @@ void CamFrame::OnSetSegmParams(wxCommandEvent& WXUNUSED(event))
   delete(OpenDialogSegm);
 
   m_settingsPane->SetText(wxT("Opened scat. params file"));
+  //_camVtk->changeSegmRange((float) 255.0f, (float) 0.0f);
+  _pWin->SetSegmVtk();
   //#endif
 }
