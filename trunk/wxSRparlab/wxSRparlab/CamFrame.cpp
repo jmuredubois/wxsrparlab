@@ -810,17 +810,30 @@ void CamFrame::AcqOneFrm()
 		    srBuf.nCols = m_nCols;
 		    srBuf.nRows = m_nRows;
 		    srBuf.bufferSizeInBytes = m_nCols*m_nRows*2*sizeof(unsigned short);
-	  PLSEGM_Segment(m_segm, srBuf, PLNN_FlagNaN(m_NaN, srBuf), PLAVG_GetAvgBuf(m_bgAvg), PLNN_FlagNaN(m_NaN, PLAVG_GetAvgBuf(m_bgAvg)), PLAVG_GetAvgVar(m_bgAvg) );
-	  m_viewSegmPane->SetDataArray<unsigned char>((unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).fg, m_nRows*m_nCols);
+	  PLSEGM_Segment(m_segm, srBuf, PLNN_FlagNaN(m_NaN, srBuf), 
+				PLAVG_GetAvgBuf(m_bgAvg), PLNN_FlagNaN(m_NaN, PLAVG_GetAvgBuf(m_bgAvg)), PLAVG_GetAvgVar(m_bgAvg) );
+	  unsigned char* segmBuf = NULL;
+	  if(IsSegmChecked())
+	  {
+		  PLSEGM_SegmentXYZ(m_segm, srBuf, PLNN_FlagNaN(m_NaN, srBuf), 
+			  PLAVG_GetAvgBuf(m_bgAvg), PLNN_FlagNaN(m_NaN, PLAVG_GetAvgBuf(m_bgAvg)), PLAVG_GetAvgVar(m_bgAvg),
+			  PLCTR_GetZ(m_CTrf), PLCTR_GetZ(m_CTrfBG));
+		  segmBuf = (unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).bg;
+	  }
+	  else
+	  {
+		  segmBuf = (unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).fg;
+	  }
+	  m_viewSegmPane->SetDataArray<unsigned char>( segmBuf, m_nRows*m_nCols);
 	  m_viewBGRangePane->SetDataArray<unsigned short>((unsigned short*) (PLAVG_GetAvgBuf(m_bgAvg)).pha, m_nRows*m_nCols);
 	  m_viewBGAmpPane->SetDataArray<unsigned short>((unsigned short*) (PLAVG_GetAvgBuf(m_bgAvg)).amp, m_nRows*m_nCols);
 	  #ifdef JMU_USE_VTK
 		//if(m_camReadMode==CAM_RD_ONESHOT) // vtk does not support access from different threads
-			_camVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrf), PLCTR_GetY(m_CTrf), PLCTR_GetX(m_CTrf), (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2], (PLSEGM_GetSegmBuf(m_segm)).fg);
+			_camVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrf), PLCTR_GetY(m_CTrf), PLCTR_GetX(m_CTrf), (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2], segmBuf);
 		if(m_settingsPane->IsLrnBgChecked())
 		{
 			PLCTR_CoordTrf(m_CTrfBG, PLAVG_GetAvgBuf(m_bgAvg), m_ctrParam);
-			_camBGVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLAVG_GetAvgBuf(m_bgAvg).amp,(PLSEGM_GetSegmBuf(m_segm)).fg);
+			_camBGVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLAVG_GetAvgBuf(m_bgAvg).amp,segmBuf);
 		}
 		if(!m_bReadContinuously)
 		{

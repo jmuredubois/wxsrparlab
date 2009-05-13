@@ -99,6 +99,7 @@ public:
 	bool IsAcqContinuous(){ return (m_camReadMode==CAM_RD_CONTINU); };
 	long GetAcqTime(){ return _acqTime;};
 	void OnSetSegmParams(wxCommandEvent& WXUNUSED(event));
+	bool IsSegmChecked(){ return m_settingsPane->IsSegmChecked(); };
 
 private:
 	MainWnd	*_pWin; // parent main wnd
