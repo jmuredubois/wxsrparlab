@@ -331,21 +331,21 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 
   wxFileDialog* OpenDialogPar = new wxFileDialog(this,
 	  wxT("Choose a SR parameters file to open"),	// msg
-	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
+	  wxT(""), //wxT("D:\\dataSR3\\"),	// default dir
 	  wxEmptyString,	// default file
 	  wxT("SR parameters files (*.sr2)|*.sr2|All files (*.*)|*.*"),	// file ext
 	  wxFD_OPEN|wxFD_CHANGE_DIR,
 	  wxDefaultPosition);
   wxFileDialog* OpenDialogPha = new wxFileDialog(this,
 	  wxT("Choose a SR PHASE file to open"),	// msg
-	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
+	  wxT(""), //wxT("D:\\dataSR3\\"),	// default dir
 	  wxEmptyString,	// default file
 	  wxT("SR phase files (*.16b)|*.16b|All files (*.*)|*.*"),	// file ext
 	  wxFD_OPEN|wxFD_CHANGE_DIR,
 	  wxDefaultPosition);
   wxFileDialog* OpenDialogAmp = new wxFileDialog(this,
 	  wxT("Choose a SR AMPLITUDE file to open"),	// msg
-	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
+	  wxT(""), //wxT("D:\\dataSR3\\"),	// default dir
 	  wxEmptyString,	// default file
 	  wxT("SR amplitude files (*.16b)|*.16b|All files (*.*)|*.*"),	// file ext
 	  wxFD_OPEN|wxFD_CHANGE_DIR,
@@ -564,14 +564,14 @@ void CamFrame::OnRecord(wxCommandEvent& WXUNUSED(event))
   {
 	wxFileDialog* OpenDialogPha = new wxFileDialog(this,
 	  wxT("Choose a SR PHASE file to WRITE to "),	// msg
-	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
+	  wxT(""), //wxT("D:\\dataSR3\\"),	// default dir
 	  wxEmptyString,	// default file
 	  wxT("SR phase files (*.16b)|*.16b|All files (*.*)|*.*"),	// file ext
 	  wxFD_SAVE|wxFD_CHANGE_DIR|wxFD_OVERWRITE_PROMPT,
 	  wxDefaultPosition);
 	wxFileDialog* OpenDialogAmp = new wxFileDialog(this,
 	  wxT("Choose a SR AMPLITUDE file to WRITE to "),	// msg
-	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
+	  wxT(""), //wxT("D:\\dataSR3\\"),	// default dir
 	  wxEmptyString,	// default file
 	  wxT("SR amplitude files (*.16b)|*.16b|All files (*.*)|*.*"),	// file ext
 	  wxFD_SAVE|wxFD_CHANGE_DIR|wxFD_OVERWRITE_PROMPT,
@@ -599,7 +599,7 @@ void CamFrame::OnRecord(wxCommandEvent& WXUNUSED(event))
   {
 	  wxFileDialog* OpenDialogPar = new wxFileDialog(this,
 	  wxT("Choose a SR parameters file to WRITE TO"),	// msg
-	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
+	  wxT(""), //wxT("D:\\dataSR3\\"),	// default dir
 	  wxEmptyString,	// default file
 	  wxT("SR parameters files (*.sr2)|*.sr2|All files (*.*)|*.*"),	// file ext
 	  wxFD_SAVE|wxFD_CHANGE_DIR|wxFD_OVERWRITE_PROMPT,
@@ -956,7 +956,7 @@ void CamFrame::OnSetTrfMat(wxCommandEvent& WXUNUSED(event))
 
   wxFileDialog* OpenDialogMat = new wxFileDialog(this,
 	  wxT("Choose a coordinates transformation matrix file to open"),	// msg
-	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
+	  wxT(""), //wxT("D:\\dataSR3\\"),	// default dir
 	  wxEmptyString,	// default file
 	  wxT("Coordinates transformation matrix files (*.xml)|*.xml|All files (*.*)|*.*"),	// file ext
 	  wxFD_OPEN|wxFD_CHANGE_DIR,
@@ -985,7 +985,7 @@ void CamFrame::OnTgtFile(wxCommandEvent& WXUNUSED(event))
 
   wxFileDialog* OpenDialogTgt = new wxFileDialog(this,
 	  wxT("Choose a target coordinates file to open"),	// msg
-	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
+	  wxT(""), //wxT("D:\\dataSR3\\"),	// default dir
 	  wxEmptyString,	// default file
 	  wxT("Target coordinates files (*.dat)|*.dat|All files (*.*)|*.*"),	// file ext
 	  wxFD_OPEN|wxFD_CHANGE_DIR,
@@ -1014,7 +1014,7 @@ void CamFrame::OnSetScatParams(wxCommandEvent& WXUNUSED(event))
 
   wxFileDialog* OpenDialogScat = new wxFileDialog(this,
 	  wxT("Choose a scattering compensation parameters file to open"),	// msg
-	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
+	  wxT(""), //wxT("D:\\dataSR3\\"),	// default dir
 	  wxEmptyString,	// default file
 	  wxT("Scattering compensation parameter files (*.xml)|*.xml|All files (*.*)|*.*"),	// file ext
 	  wxFD_OPEN|wxFD_CHANGE_DIR,
@@ -1071,7 +1071,7 @@ void CamFrame::OnSetSegmParams(wxCommandEvent& WXUNUSED(event))
 
   wxFileDialog* OpenDialogSegm = new wxFileDialog(this,
 	  wxT("Choose a segmentation parameters file to open"),	// msg
-	  wxT(""), //wxT("D:\\Users\\murej\\Documents\\PersPassRecords"),	// default dir
+	  wxT(""), //wxT("D:\\dataSR3\\"),	// default dir
 	  wxEmptyString,	// default file
 	  wxT("SR segmentation parameter files (*.xml)|*.xml|All files (*.*)|*.*"),	// file ext
 	  wxFD_OPEN|wxFD_CHANGE_DIR,
