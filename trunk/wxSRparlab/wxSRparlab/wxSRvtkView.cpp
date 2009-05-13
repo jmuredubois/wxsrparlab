@@ -416,7 +416,7 @@ int CViewSrVtk::addScalarBarSegm()
 	/*segmSca->SetTextPositionToSucceedScalarBar();*/
     segmSca->SetWidth(0.05);
     segmSca->SetHeight(0.7);
-	segmSca->SetLabelFormat("%05.0f");
+	segmSca->SetLabelFormat("%03.0f");
 	return segmSca->GetReferenceCount();
 }
 /**
