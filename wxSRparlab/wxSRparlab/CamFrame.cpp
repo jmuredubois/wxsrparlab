@@ -136,6 +136,9 @@ CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos
 	_acqTime = 1000L;
 	m_pAcqSWatch = NULL;
 	m_segm = NULL;
+#ifdef JMU_RANSAC
+	m_ransac = NULL;
+#endif
 }
 
 /**
@@ -170,6 +173,9 @@ CamFrame::~CamFrame()
 	if(m_CTrfBG != NULL) {PLCTR_Close(m_CTrfBG); m_CTrfBG = NULL; };
 	if(m_pAcqSWatch != NULL) { delete(m_pAcqSWatch); m_pAcqSWatch = NULL;};
 	if(m_segm != NULL) {PLSEGM_Close(m_segm); m_segm = NULL; };
+#ifdef JMU_RANSAC
+	if(m_ransac != NULL) {PLRSC_Close(m_ransac); m_ransac = NULL; };
+#endif
 }
 
 BEGIN_EVENT_TABLE(CamFrame, wxFrame)
@@ -447,6 +453,9 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	  PLCTR_Open(&m_CTrf, newbuf);
 	  PLCTR_Open(&m_CTrfBG, newbuf);
 	  PLSEGM_Open(&m_segm, newbuf);
+#ifdef JMU_RANSAC
+	  PLRSC_Open(&m_ransac, newbuf);
+#endif
 	  return;
   }
 
@@ -494,6 +503,9 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   PLCTR_Open(&m_CTrf, newbuf);
   PLCTR_Open(&m_CTrfBG, newbuf);
   PLSEGM_Open(&m_segm, newbuf);
+#ifdef JMU_RANSAC
+  PLRSC_Open(&m_ransac, newbuf);
+#endif
 }
 
 //---------------------------------------------------
@@ -545,6 +557,9 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   if(m_CTrfBG != NULL) {PLCTR_Close(m_CTrfBG); m_CTrfBG = NULL; };
   if(m_pAcqSWatch != NULL) { delete(m_pAcqSWatch); m_pAcqSWatch = NULL;};
   if(m_segm != NULL)  {PLSEGM_Close(m_segm);   m_segm = NULL; };
+#ifdef JMU_RANSAC
+  if(m_ransac != NULL) {PLRSC_Close(m_ransac); m_ransac = NULL; };
+#endif
   m_settingsPane->EnableOpenSR();	// enable "Open" button
   m_settingsPane->SetText(wxT("Close successfull"));
   SetStatusText( wxT("cam") );
@@ -824,6 +839,9 @@ void CamFrame::AcqOneFrm()
 	  {
 		  segmBuf = (unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).fg;
 	  }
+#ifdef JMU_RANSAC
+	  PLRSC_ransac(m_ransac, srBuf, PLCTR_GetZ(m_CTrf), PLCTR_GetY(m_CTrf), PLCTR_GetX(m_CTrf), PLNN_FlagNaNbool(m_NaN, srBuf), segmBuf, 0);
+#endif
 	  m_viewSegmPane->SetDataArray<unsigned char>( segmBuf, m_nRows*m_nCols);
 	  m_viewBGRangePane->SetDataArray<unsigned short>((unsigned short*) (PLAVG_GetAvgBuf(m_bgAvg)).pha, m_nRows*m_nCols);
 	  m_viewBGAmpPane->SetDataArray<unsigned short>((unsigned short*) (PLAVG_GetAvgBuf(m_bgAvg)).amp, m_nRows*m_nCols);

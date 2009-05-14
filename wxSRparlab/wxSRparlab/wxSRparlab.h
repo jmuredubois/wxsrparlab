@@ -85,4 +85,6 @@
 	#include "wxSRvtkView.h"
 #endif
 
+#define JMU_RANSAC // testing experimental C++ RANSAC
+
 #include "srBuf.h"

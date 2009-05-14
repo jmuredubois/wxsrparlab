@@ -8,6 +8,7 @@
 
 #pragma once
 #include "wxSRparlab.h" //!< top-level header file
+#define JMU_RANSAC // testing experimental C++ RANSAC
 #include "wxSrApp.h"	//!< application header file
 #include "CMainWnd.h"	//!< main window header file
 #include "CamPanelSettings.h" //!< camera settings panel header file
@@ -25,7 +26,10 @@
 #pragma comment( lib, "libSRPLcoordTrf" )
 #include "libSRPLsegm.h"
 #pragma comment( lib, "libSRPLsegm" )
-
+#ifdef JMU_RANSAC
+#include "libSRPLransac.h"
+#pragma comment( lib, "libSRPLransac" )
+#endif
 
 
 /** the environment variable WXWIN should point to a valid wxWidget 
@@ -154,6 +158,9 @@ private:
 	SRPLCTR	 m_CTrfBG;		// background coordinates transform object
 	SRCTR m_ctrParam;		// camera opticla center parameters
 	SRPLSEGM m_segm;		// scattering compensation object
+#ifdef JMU_RANSAC
+	SRPLRSC m_ransac;		// ransac object
+#endif
 	long _acqTime;
 	wxStopWatch* m_pAcqSWatch;
 

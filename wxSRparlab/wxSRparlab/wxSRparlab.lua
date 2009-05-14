@@ -151,6 +151,14 @@ tinsert( package.libpaths,
   }
   )
 --END OF package includes for libSRPLsegm
+--package includes for libSRPLransac
+  tinsert(package.links,   { "libSRPLransac"})
+  tinsert(package.includepaths,
+  {
+	string.format('%s%s',os.getenv("JMU_SVNSANDBOX_TRUNK"), "/libSRPLranssac")
+  }
+  )
+--END OF package includes for libSRPLransac
 
   tinsert( package.config["Debug"].libpaths, 
   {
