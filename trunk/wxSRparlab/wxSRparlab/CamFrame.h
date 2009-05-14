@@ -8,7 +8,7 @@
 
 #pragma once
 #include "wxSRparlab.h" //!< top-level header file
-//#define JMU_RANSAC // testing experimental C++ RANSAC
+#define JMU_RANSAC // testing experimental C++ RANSAC
 #include "wxSrApp.h"	//!< application header file
 #include "CMainWnd.h"	//!< main window header file
 #include "CamPanelSettings.h" //!< camera settings panel header file
