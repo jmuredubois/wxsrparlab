@@ -8,7 +8,7 @@
 
 #pragma once
 #include "wxSRparlab.h" //!< top-level header file
-#define JMU_RANSAC // testing experimental C++ RANSAC
+//#define JMU_RANSAC // testing experimental C++ RANSAC
 #include "wxSrApp.h"	//!< application header file
 #include "CMainWnd.h"	//!< main window header file
 #include "CamPanelSettings.h" //!< camera settings panel header file
@@ -150,6 +150,7 @@ private:
 	int _vtkSub;
 	SRPLSCAT m_scat;		// scattering compensation object
 	SRPLNAN  m_NaN;			// NaN filtering object
+	SRPLNAN  m_NaNbg;		// NaN filtering object for BG
 	SRPLAVG	 m_bgAvg;		// background average object
 	SRPLAVG	 m_fgAvg;		// foreground average object
 	SRPLNAN  m_bgNaN;		// NaN filtering object
