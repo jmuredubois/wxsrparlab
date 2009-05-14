@@ -129,6 +129,7 @@ CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos
 	_vtkSub = 0;
 	m_scat = NULL;
 	m_NaN = NULL;
+	m_NaNbg = NULL;
 	m_bgAvg = NULL; m_bgNaN = NULL;
 	m_fgAvg = NULL; m_fgNaN = NULL;
 	m_CTrf = NULL;
@@ -164,6 +165,7 @@ CamFrame::~CamFrame()
 	if(m_pFile4WritePha != NULL) { delete(m_pFile4WritePha); m_pFile4WritePha = NULL; };
 	if(m_pFile4WriteAmp != NULL) { delete(m_pFile4WriteAmp); m_pFile4WriteAmp = NULL; };
 	if(m_NaN != NULL) { PLNN_Close(m_NaN); m_NaN = NULL; };
+	if(m_NaNbg != NULL) { PLNN_Close(m_NaNbg); m_NaNbg = NULL; };
 	if(m_scat != NULL) {PLSC_Close(m_scat); m_scat = NULL; };
 	if(m_bgAvg != NULL) {PLAVG_Close(m_bgAvg); m_bgAvg = NULL; };
 	if(m_fgAvg != NULL) {PLAVG_Close(m_fgAvg); m_fgAvg = NULL; };
@@ -548,6 +550,7 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   m_nFrmRead = 0;
   m_nSerialSR = 0;
   if(m_NaN != NULL)   {PLNN_Close(m_NaN);    m_NaN = NULL; };
+  if(m_NaN != NULL)   {PLNN_Close(m_NaN);    m_NaN = NULL; };
   if(m_scat != NULL)  {PLSC_Close(m_scat);   m_scat = NULL; };
   if(m_bgAvg != NULL) {PLAVG_Close(m_bgAvg); m_bgAvg = NULL; };
   if(m_fgAvg != NULL) {PLAVG_Close(m_fgAvg); m_fgAvg = NULL; };
@@ -756,11 +759,7 @@ void CamFrame::AcqOneFrm()
 		    srBuf.nCols = m_nCols;
 		    srBuf.nRows = m_nRows;
 		    srBuf.bufferSizeInBytes = m_nCols*m_nRows*2*sizeof(unsigned short);
-			NANBUF scatNaN;
-			scatNaN.nCols = m_nCols;
-			scatNaN.nRows = m_nRows;
-			scatNaN.bufferSizeInBytes = m_nCols * m_nRows * sizeof(bool);
-			scatNaN.nanBool = PLNN_FlagNaNbool(m_NaN, srBuf);
+			res+=PLNN_FlagNaN(m_NaN, srBuf);
 		if( (m_settingsPane->IsFgHidesDataChecked()) && (m_settingsPane->IsLrnFgChecked()!=true) )
 		{
 			SRBUF fgBuf = PLAVG_GetAvgBuf(m_fgAvg);
@@ -769,7 +768,7 @@ void CamFrame::AcqOneFrm()
 		}
 		if(m_settingsPane->IsScatChecked())
 		{
-			PLSC_Compensate(m_scat, srBuf, scatNaN);
+			PLSC_Compensate(m_scat, srBuf, PLNN_GetNaNbuf(m_NaN));
 		}
 		if(m_settingsPane->IsLrnBgChecked())
 		{
@@ -825,13 +824,15 @@ void CamFrame::AcqOneFrm()
 		    srBuf.nCols = m_nCols;
 		    srBuf.nRows = m_nRows;
 		    srBuf.bufferSizeInBytes = m_nCols*m_nRows*2*sizeof(unsigned short);
-	  PLSEGM_Segment(m_segm, srBuf, PLNN_FlagNaN(m_NaN, srBuf), 
-				PLAVG_GetAvgBuf(m_bgAvg), PLNN_FlagNaN(m_NaN, PLAVG_GetAvgBuf(m_bgAvg)), PLAVG_GetAvgVar(m_bgAvg) );
+	  res+=PLNN_FlagNaN(m_NaN, srBuf);
+	  res+=PLNN_FlagNaN(m_NaNbg, PLAVG_GetAvgBuf(m_bgAvg));
+	  PLSEGM_Segment(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN), 
+				PLAVG_GetAvgBuf(m_bgAvg), PLNN_GetNaNbuf(m_NaNbg), PLAVG_GetAvgVar(m_bgAvg) );
 	  unsigned char* segmBuf = NULL;
 	  if(IsSegmChecked())
 	  {
-		  PLSEGM_SegmentXYZ(m_segm, srBuf, PLNN_FlagNaN(m_NaN, srBuf), 
-			  PLAVG_GetAvgBuf(m_bgAvg), PLNN_FlagNaN(m_NaN, PLAVG_GetAvgBuf(m_bgAvg)), PLAVG_GetAvgVar(m_bgAvg),
+		  PLSEGM_SegmentXYZ(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN), 
+			  PLAVG_GetAvgBuf(m_bgAvg), PLNN_GetNaNbuf(m_NaNbg), PLAVG_GetAvgVar(m_bgAvg),
 			  PLCTR_GetZ(m_CTrf), PLCTR_GetZ(m_CTrfBG));
 		  segmBuf = (unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).bg;
 	  }
@@ -840,7 +841,7 @@ void CamFrame::AcqOneFrm()
 		  segmBuf = (unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).fg;
 	  }
 #ifdef JMU_RANSAC
-	  PLRSC_ransac(m_ransac, srBuf, PLCTR_GetZ(m_CTrf), PLCTR_GetY(m_CTrf), PLCTR_GetX(m_CTrf), PLNN_FlagNaNbool(m_NaN, srBuf), segmBuf, 0);
+	  PLRSC_ransac(m_ransac, srBuf, PLCTR_GetZ(m_CTrf), PLCTR_GetY(m_CTrf), PLCTR_GetX(m_CTrf), PLNN_GetBoolBuf(m_NaN), segmBuf, 0);
 #endif
 	  m_viewSegmPane->SetDataArray<unsigned char>( segmBuf, m_nRows*m_nCols);
 	  m_viewBGRangePane->SetDataArray<unsigned short>((unsigned short*) (PLAVG_GetAvgBuf(m_bgAvg)).pha, m_nRows*m_nCols);
