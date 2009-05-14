@@ -170,13 +170,21 @@ tinsert( package.libpaths,
   )
 --END OF package includes for libSRPLcoordTrf
 --package includes for libSRPLsegm
-  tinsert(package.links,   { "libSRPLavg"})
+  tinsert(package.links,   { "libSRPLsegm"})
   tinsert(package.includepaths,
   {
 	string.format('%s%s',os.getenv("JMU_SVNSANDBOX_TRUNK"), "/libSRPLsegm")
   }
   )
 --END OF package includes for libSRPLsegm
+--package includes for libSRPLransac
+  tinsert(package.links,   { "libSRPLransac"})
+  tinsert(package.includepaths,
+  {
+	string.format('%s%s',os.getenv("JMU_SVNSANDBOX_TRUNK"), "/libSRPLransac")
+  }
+  )
+--END OF package includes for libSRPLransac
 
   tinsert( package.config["DebugVTK"].libpaths, 
   {
