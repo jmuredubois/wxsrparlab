@@ -644,6 +644,7 @@ void MainWnd::SetColVtk(wxCommandEvent& event)
 		if(  strCol.IsSameAs(wxT("Segm."))  )
 		{
 			(*itCam)->GetCamVtk()->setDataMapperColorSegm();
+			SetSegMin(_segmMin); // trick to update data Mapper
 		}
 		if(  strCol.IsSameAs(wxT("R")) || strCol.IsSameAs(wxT("G")) || strCol.IsSameAs(wxT("B"))
 			 || strCol.IsSameAs(wxT("W")) || strCol.IsSameAs(wxT("K")))
@@ -677,7 +678,7 @@ void MainWnd::SetColVtk(wxCommandEvent& event)
 		}
 		if(  strCol.IsSameAs(wxT("Segm."))  )
 		{
-			(*itCam)->GetCamVtk()->setDataMapperColorSegm();
+			(*itCam)->GetCamBGVtk()->setDataMapperColorSegm();
 			SetSegMin(_segmMin); // trick to update data Mapper
 		}
 		if(  strCol.IsSameAs(wxT("R")) || strCol.IsSameAs(wxT("G")) || strCol.IsSameAs(wxT("B"))
