@@ -129,7 +129,6 @@ CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos
 	_vtkSub = 0;
 	m_scat = NULL;
 	m_NaN = NULL;
-	m_NaNbg = NULL;
 	m_bgAvg = NULL; m_bgNaN = NULL;
 	m_fgAvg = NULL; m_fgNaN = NULL;
 	m_CTrf = NULL;
@@ -165,7 +164,6 @@ CamFrame::~CamFrame()
 	if(m_pFile4WritePha != NULL) { delete(m_pFile4WritePha); m_pFile4WritePha = NULL; };
 	if(m_pFile4WriteAmp != NULL) { delete(m_pFile4WriteAmp); m_pFile4WriteAmp = NULL; };
 	if(m_NaN != NULL) { PLNN_Close(m_NaN); m_NaN = NULL; };
-	if(m_NaNbg != NULL) { PLNN_Close(m_NaNbg); m_NaNbg = NULL; };
 	if(m_scat != NULL) {PLSC_Close(m_scat); m_scat = NULL; };
 	if(m_bgAvg != NULL) {PLAVG_Close(m_bgAvg); m_bgAvg = NULL; };
 	if(m_fgAvg != NULL) {PLAVG_Close(m_fgAvg); m_fgAvg = NULL; };
@@ -773,6 +771,7 @@ void CamFrame::AcqOneFrm()
 		if(m_settingsPane->IsLrnBgChecked())
 		{
 			PLAVG_LearnBackground(m_bgAvg, srBuf);
+			res+=PLNN_FlagNaN(m_bgNaN, PLAVG_GetAvgBuf(m_bgAvg));
 		}
 		if(m_settingsPane->IsLrnFgChecked())
 		{
@@ -808,7 +807,7 @@ void CamFrame::AcqOneFrm()
 				_camVtk->updateTarget(&(tgt[0]), 15); // to update line and triangles
 			}
 		}
-	  #endif
+	  #endif // JMU_TGTFOLLOW
 
 	  strR.sprintf(wxT("frm:%05u - pixFileRead %i - %ix%i  - %i"), m_nFrmRead, res, m_nRows, m_nCols, m_nSrBufSz);
 	  m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[0], m_nRows*m_nCols);
@@ -824,15 +823,15 @@ void CamFrame::AcqOneFrm()
 		    srBuf.nCols = m_nCols;
 		    srBuf.nRows = m_nRows;
 		    srBuf.bufferSizeInBytes = m_nCols*m_nRows*2*sizeof(unsigned short);
-	  res+=PLNN_FlagNaN(m_NaN, srBuf);
-	  res+=PLNN_FlagNaN(m_NaNbg, PLAVG_GetAvgBuf(m_bgAvg));
+	  // res+=PLNN_FlagNaN(m_NaN, srBuf); // already done on line 760
+	  //res+=PLNN_FlagNaN(m_NaNbg, PLAVG_GetAvgBuf(m_bgAvg)); // already done on line 774
 	  PLSEGM_Segment(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN), 
-				PLAVG_GetAvgBuf(m_bgAvg), PLNN_GetNaNbuf(m_NaNbg), PLAVG_GetAvgVar(m_bgAvg) );
+				PLAVG_GetAvgBuf(m_bgAvg), PLNN_GetNaNbuf(m_bgNaN), PLAVG_GetAvgVar(m_bgAvg) );
 	  unsigned char* segmBuf = NULL;
 	  if(IsSegmChecked())
 	  {
 		  PLSEGM_SegmentXYZ(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN), 
-			  PLAVG_GetAvgBuf(m_bgAvg), PLNN_GetNaNbuf(m_NaNbg), PLAVG_GetAvgVar(m_bgAvg),
+			  PLAVG_GetAvgBuf(m_bgAvg), PLNN_GetNaNbuf(m_bgNaN), PLAVG_GetAvgVar(m_bgAvg),
 			  PLCTR_GetZ(m_CTrf), PLCTR_GetZ(m_CTrfBG));
 		  segmBuf = (unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).bg;
 	  }
