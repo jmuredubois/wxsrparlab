@@ -32,6 +32,9 @@ int CamPanelSettings::InitSettings()
 	m_buttonOpenDev = new wxButton(this, IDB_OpenDev, wxT("OpenSR"));
 	m_buttonCloseDev = new wxButton(this, IDB_CloseDev, wxT("CloseSR"));
 	m_buttonDevSRsettings = new wxButton(this, IDB_DevSRsettings, wxT("SR settings"));
+#ifdef DUMMYSR
+	m_buttonDevSRsettings->Disable();
+#endif
 	m_buttonOpenDev->SetFocus();
 	this->DisableCloseSR();
 	  wxBoxSizer *sizerButtons = new wxBoxSizer(wxHORIZONTAL);
