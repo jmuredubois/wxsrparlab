@@ -31,6 +31,7 @@ int CamPanelSettings::InitSettings()
 
 	m_buttonOpenDev = new wxButton(this, IDB_OpenDev, wxT("OpenSR"));
 	m_buttonCloseDev = new wxButton(this, IDB_CloseDev, wxT("CloseSR"));
+	m_buttonDevSRsettings = new wxButton(this, IDB_DevSRsettings, wxT("SR settings"));
 	m_buttonOpenDev->SetFocus();
 	this->DisableCloseSR();
 	  wxBoxSizer *sizerButtons = new wxBoxSizer(wxHORIZONTAL);
@@ -39,6 +40,10 @@ int CamPanelSettings::InitSettings()
 
 	m_buttonSetTrfMat = new wxButton(this, IDB_SetTrfMat, wxT("Cam. trf. matrix"));
 	m_buttonAcq = new wxButton(this, IDB_Acquire, wxT("Acquire"));
+
+	wxBoxSizer *sizerButtons2 = new wxBoxSizer(wxHORIZONTAL);
+	    sizerButtons2->Add(m_buttonAcq, 2, wxEXPAND);
+	    sizerButtons2->Add(m_buttonDevSRsettings, 1, wxEXPAND);
 
 	#ifdef JMU_TGTFOLLOW 
 		m_buttonTgtFile = new wxButton(this, IDB_TgtFile, wxT("Target file")); 
@@ -94,6 +99,10 @@ int CamPanelSettings::InitSettings()
 		sizerLrnFg->Add(m_ckBoxLrnFg, 0, wxEXPAND);
 		sizerLrnFg->Add(m_buttonClearFg, 1, wxEXPAND);
 
+	// DisableFlagNaN controls
+	m_ckBoxNoFlagNaN = new wxCheckBox( this, IDC_NoFlagNaN, wxT(" Disable NaN filtering"),
+		wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
+
 
 	// Frequency controls
     m_radioboxSrFilt = new wxRadioBox(this, wxID_ANY,
@@ -114,7 +123,7 @@ int CamPanelSettings::InitSettings()
 	/* sizer stuff  ...*/
     wxBoxSizer *sizerPanel = new wxBoxSizer(wxVERTICAL);
 
-	sizerPanel->Add(m_buttonAcq, 0, wxEXPAND);
+	sizerPanel->Add(sizerButtons2, 0, wxEXPAND);
 	sizerPanel->Add(sizerButtons, 0, wxEXPAND);
 	sizerPanel->Add(m_radioboxReadMode, 0, wxEXPAND);
     sizerPanel->Add(m_radioboxFrq, 0, wxEXPAND);
@@ -129,6 +138,7 @@ int CamPanelSettings::InitSettings()
 	sizerPanel->Add(m_ckBoxRecord, 0, wxEXPAND);
 	sizerPanel->Add(sizerLrnFg, 0, wxEXPAND);
 	sizerPanel->Add(m_ckBoxFgHidesData, 0, wxEXPAND);
+	sizerPanel->Add(m_ckBoxNoFlagNaN, 0, wxEXPAND);
 	sizerPanel->Add(m_statText, 1, wxEXPAND);
 
 

@@ -52,6 +52,7 @@ public:
 	bool IsLrnBgChecked(){return m_ckBoxLrnBg->IsChecked();}; //
 	bool IsLrnFgChecked(){return m_ckBoxLrnFg->IsChecked();}; //
 	bool IsFgHidesDataChecked(){return m_ckBoxFgHidesData->IsChecked();}; //
+	bool IsNoFlagNaNChecked(){return m_ckBoxNoFlagNaN->IsChecked();}; //
 
 	void CamPanelSettings::DisableSegmParams(); //!< Disables the "Segm Params" button
 	void CamPanelSettings::EnableSegmParams();  //!< Enables the "Segm Params" button
@@ -63,6 +64,7 @@ private:
 	/* Buttons */
 	wxButton* m_buttonOpenDev; //!< Open camera
 	wxButton* m_buttonCloseDev; //!< Close camera
+	wxButton* m_buttonDevSRsettings; //!< button to call Swissranger settings dialog box (windows only)
 	wxButton* m_buttonSetTrfMat; //!< Set camera trf Mat
 	wxButton* m_buttonAcq; //!< Acquire button
 	#ifdef JMU_TGTFOLLOW  
@@ -88,6 +90,7 @@ private:
 	wxCheckBox* m_ckBoxRecord;	 // check box to record current image buffer (after scat comp)
 	wxCheckBox* m_ckBoxFgHidesData;	 // check box for learning foreground
 	wxCheckBox* m_ckBoxSegBayes; // check box for activating bayesian segmentation
+	wxCheckBox* m_ckBoxNoFlagNaN; // check box for DEactivating FlagNaN
 	
 	/* TextControls */
 	wxTextCtrl* m_TxtDelayStat;

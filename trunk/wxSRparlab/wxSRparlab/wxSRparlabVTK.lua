@@ -29,6 +29,21 @@ package.excludes = {
 package.buildflags = {"no-pch","no-main"}
 --package.defines = {""}
 
+--- setup of libUSBSR
+if (OS == "windows") then
+  tinsert(package.includepaths,
+    {
+      string.format('%s',os.getenv("JMU_MESA_LIBUSBSR"))
+    }
+  )
+  tinsert(package.libpaths,
+    {
+      string.format('%s',os.getenv("JMU_MESA_LIBUSBSR"))
+    }
+  )
+end
+--- END OF setup of libUSBSR
+
 --- setup of wxWidgets build options
 if (OS == "windows") then
   tinsert(package.includepaths,
