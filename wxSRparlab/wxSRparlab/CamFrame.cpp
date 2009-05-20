@@ -182,6 +182,7 @@ BEGIN_EVENT_TABLE(CamFrame, wxFrame)
     EVT_MENU(IDM_Close, CamFrame::OnClose)
 	EVT_BUTTON(IDB_OpenDev,  CamFrame::OnOpenDev)
 	EVT_BUTTON(IDB_CloseDev,  CamFrame::OnCloseDev)
+	EVT_BUTTON(IDB_DevSRsettings,  CamFrame::OnDevSRsettings)
 	EVT_BUTTON(IDB_Acquire,  CamFrame::Acquire)
 	EVT_RADIOBOX(IDR_Freq, CamFrame::SetFreq)
 	EVT_RADIOBOX(IDR_ReadMode, CamFrame::SetReadMode)
@@ -567,6 +568,35 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
 }
 //---------------------------------------------------
 /*!
+	- Checks if camera is open. \n
+	- Calls SR settings. \n
+	- Closes record interface (if opened). \n
+	- Closes SR device. \n
+	- Closes PP object. \n
+*/
+//! Calls SR settings dialog box (windows only)
+void CamFrame::OnDevSRsettings(wxCommandEvent& WXUNUSED(event))
+{
+  int res = 0;
+  //_sr=0;//there are no valid device opened
+  m_settingsPane->SetText(wxT("Attempt to open SR settings"));
+#ifndef DUMMYSR
+  if(m_sr != NULL)
+  {
+		res+=SR_OpenSettingsDlg(m_sr, (HWND) (this->GetHandle()) ); //20080228 apparently  SR_OpenSettingsDlgModal is deprecated in driver 1.0.9
+		m_settingsPane->SetText(wxT("SR settings Dlg Box opened"));
+  }
+  else
+  {
+	  m_settingsPane->SetText(wxT("No SR device open: impossible to open SR settings Dlg Box."));
+  }
+#else
+  m_settingsPane->SetText(wxT("DUMMYSR is defined: impossible to open SR settings Dlg Box."));
+#endif
+  SetStatusText( wxT("cam") );
+}
+//---------------------------------------------------
+/*!
 	- Opens record files. \n
 */
 //! Open record interface
@@ -757,7 +787,10 @@ void CamFrame::AcqOneFrm()
 		    srBuf.nCols = m_nCols;
 		    srBuf.nRows = m_nRows;
 		    srBuf.bufferSizeInBytes = m_nCols*m_nRows*2*sizeof(unsigned short);
-			res+=PLNN_FlagNaN(m_NaN, srBuf);
+			if( !(m_settingsPane->IsNoFlagNaNChecked()))
+			{
+				res+=PLNN_FlagNaN(m_NaN, srBuf);
+			}
 		if( (m_settingsPane->IsFgHidesDataChecked()) && (m_settingsPane->IsLrnFgChecked()!=true) )
 		{
 			SRBUF fgBuf = PLAVG_GetAvgBuf(m_fgAvg);
@@ -772,6 +805,10 @@ void CamFrame::AcqOneFrm()
 		{
 			PLAVG_LearnBackground(m_bgAvg, srBuf);
 			res+=PLNN_FlagNaN(m_bgNaN, PLAVG_GetAvgBuf(m_bgAvg));
+			if( !(m_settingsPane->IsNoFlagNaNChecked()))
+			{
+				res+=PLNN_FlagNaN(m_bgNaN, PLAVG_GetAvgBuf(m_bgAvg));
+			}
 		}
 		if(m_settingsPane->IsLrnFgChecked())
 		{

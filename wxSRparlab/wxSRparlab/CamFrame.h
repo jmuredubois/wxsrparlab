@@ -74,6 +74,7 @@ public:
 	int CreateAndSetNotebook(const wxString& title); //!< creates a new Notebook
 	void OnOpenDev(wxCommandEvent& WXUNUSED(event));
 	void OnCloseDev(wxCommandEvent& WXUNUSED(event));
+	void OnDevSRsettings(wxCommandEvent& WXUNUSED(event));
 	void OnRecord(wxCommandEvent& WXUNUSED(event));
 	void Acquire(wxCommandEvent& WXUNUSED(event));
 	void SetFreq(wxCommandEvent& event);
@@ -193,6 +194,8 @@ enum CamFrameEnum
 	IDC_FgHidesData = 20,
 	IDC_SegmBayes = 21,
 	IDB_SegmSetParams = 22,
+	IDC_NoFlagNaN = 23,
+	IDB_DevSRsettings = 24,
 	ID_ThisIsAStop = 255
 };
 
