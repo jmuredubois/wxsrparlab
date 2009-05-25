@@ -60,6 +60,9 @@ public:
 	void OnRendTimer(wxTimerEvent& event); //! Render timer event action
 	std::vector<CamFrame*>* GetCamFrms(){return &m_camFrm;}; //! Get cam frames list
 	CViewSrVtk* GetVtkWin(){return _vtkWin;} ; //!< pointer to vtk window
+	void OnSegmCbar(wxCommandEvent& event);  //! Display or hide segm colorbar
+	void OnAmplCbar(wxCommandEvent& event);  //! Display or hide ampl colorbar
+	void OnDepthCbar(wxCommandEvent& event); //! Display or hide depth colorbar
 
 
     DECLARE_EVENT_TABLE()
@@ -95,6 +98,9 @@ private:
 	int _rendTgt; //! target rendering time in ms
 	double _rendCapms; //!rendering capacity in ms
 	ThreadReadDataSync*		m_pThreadReadDataSync; // THREAD for reading data
+	wxCheckBox* _ckSegmCbar;  //! Show segmentation colorbar checkbox
+	wxCheckBox* _ckAmplCbar;  //! Show amplitude    colorbar checkbox
+	wxCheckBox* _ckDepthCbar; //! Show depth        colorbar checkbox
 };
 
 //! enum used by main wnd
@@ -112,5 +118,8 @@ enum MainWndEnum
 	IDC_visVtk,
 	IDC_colVtk,
 	IDE_RendTimer,
-	IDC_ParaProj
+	IDC_ParaProj,
+	IDC_SegmCbar,
+	IDC_AmplCbar,
+	IDC_DepthCbar
 };

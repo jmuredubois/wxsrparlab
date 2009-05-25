@@ -634,3 +634,42 @@ int CViewSrVtk::setReadFpsTxt(char* txt)
 	fpsReadTxtActor->SetInput(txt);
 	return res;
 }
+
+void CViewSrVtk::hideSegmCbar(bool doHide)
+{
+	if(doHide)
+	{
+		segmSca->VisibilityOff();
+	}
+	else
+	{
+		segmSca->VisibilityOn();
+	}
+	return;
+}
+
+void CViewSrVtk::hideAmplCbar(bool doHide)
+{
+	if(doHide)
+	{
+		ampSca->VisibilityOff();
+	}
+	else
+	{
+		ampSca->VisibilityOn();
+	}
+	return;
+}
+
+void CViewSrVtk::hideDepthCbar(bool doHide)
+{
+	if(doHide)
+	{
+		depthSca->VisibilityOff();
+	}
+	else
+	{
+		depthSca->VisibilityOn();
+	}
+	return;
+}
