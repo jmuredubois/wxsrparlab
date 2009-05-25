@@ -74,6 +74,11 @@ private:
 	wxButton* m_buttonClearBg; // 'clear background' button
 	wxButton* m_buttonClearFg; // 'clear foreground' button
 	wxButton* m_buttonSegmParams; // segmentation parameters button
+	#ifdef JMU_RANSAC
+	  wxButton* m_buttonRansacBG; // call RANSAC on bg data
+	  wxButton* m_buttonRansacFG; // call RANSAC of fg data
+	  wxTextCtrl* m_TxtRansacDepth; // RANSAC search depth
+	#endif
 
 	/* Radio boxes */
 	wxRadioBox* m_radioboxFrq;	//!< camera frq

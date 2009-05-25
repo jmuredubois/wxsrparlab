@@ -123,6 +123,15 @@ int CamPanelSettings::InitSettings()
     m_ckBoxRecord = new wxCheckBox( this, IDC_Record, wxT("Record"),
         wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
 
+	// RANSAC controls //
+	#ifdef JMU_RANSAC
+		m_buttonRansacBG = new wxButton(this, IDB_RansacBG, wxT("RANSAC bg."));
+		m_buttonRansacFG = new wxButton(this, IDB_RansacFG, wxT("RANSAC fg."));
+		wxBoxSizer *sizerRansac = new wxBoxSizer(wxHORIZONTAL);
+	    sizerRansac->Add(m_buttonRansacBG, 1, wxEXPAND);
+	    sizerRansac->Add(m_buttonRansacFG, 1, wxEXPAND);
+	#endif
+
 	/* sizer stuff  ...*/
     wxBoxSizer *sizerPanel = new wxBoxSizer(wxVERTICAL);
 
@@ -142,6 +151,9 @@ int CamPanelSettings::InitSettings()
 	sizerPanel->Add(sizerLrnFg, 0, wxEXPAND);
 	sizerPanel->Add(m_ckBoxFgHidesData, 0, wxEXPAND);
 	sizerPanel->Add(m_ckBoxNoFlagNaN, 0, wxEXPAND);
+	#ifdef JMU_RANSAC
+		sizerPanel->Add(sizerRansac, 1, wxEXPAND);
+	#endif
 	sizerPanel->Add(m_statText, 1, wxEXPAND);
 
 

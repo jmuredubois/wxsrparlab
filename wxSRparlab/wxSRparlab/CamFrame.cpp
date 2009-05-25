@@ -192,13 +192,17 @@ BEGIN_EVENT_TABLE(CamFrame, wxFrame)
 	#endif
 	EVT_COMMAND(IDC_AcqOne, wxEVT_JMUACQONEFRM, CamFrame::AcqOneFrmEvt)
 	#ifdef JMU_USE_VTK
-	EVT_COMMAND(IDC_Render, wxEVT_JMURENDER, CamFrame::RenderEvt)
+		EVT_COMMAND(IDC_Render, wxEVT_JMURENDER, CamFrame::RenderEvt)
 	#endif
 	EVT_BUTTON(IDB_SetScatParams, CamFrame::OnSetScatParams)
 	EVT_BUTTON(IDB_ClearBg, CamFrame::OnClearBg)
 	EVT_BUTTON(IDB_ClearFg, CamFrame::OnClearFg)
 	EVT_CHECKBOX(IDC_Record, CamFrame::OnRecord)
 	EVT_BUTTON(IDB_SegmSetParams, CamFrame::OnSetSegmParams)
+	#ifdef JMU_RANSAC
+		EVT_BUTTON(IDB_RansacBG, CamFrame::RansacBG)
+		EVT_BUTTON(IDB_RansacFG, CamFrame::RansacFG)
+	#endif
 END_EVENT_TABLE()
 
 /**
@@ -1158,3 +1162,54 @@ void CamFrame::OnSetSegmParams(wxCommandEvent& WXUNUSED(event))
   _pWin->SetSegmVtk();
   //#endif
 }
+
+#ifdef JMU_RANSAC
+void CamFrame::RansacBG(wxCommandEvent& WXUNUSED(event))
+{
+  // // here just for debuggin purposes: the logical place is after a 'learn background' action
+	/*PLSEGM_Segment(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN), 
+				PLAVG_GetAvgBuf(m_bgAvg), PLNN_GetNaNbuf(m_bgNaN), PLAVG_GetAvgVar(m_bgAvg) );*/ // done in AcqOneFrm
+	  unsigned char* segmBuf = NULL;
+	  if(IsSegmChecked())
+	  {
+		  /*PLSEGM_SegmentXYZ(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN), 
+			  PLAVG_GetAvgBuf(m_bgAvg), PLNN_GetNaNbuf(m_bgNaN), PLAVG_GetAvgVar(m_bgAvg),
+			  PLCTR_GetZ(m_CTrf), PLCTR_GetZ(m_CTrfBG)); */ // done in AcqOneFrm
+		  segmBuf = (unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).bg;
+	  }
+	  else
+	  {
+		  segmBuf = (unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).fg;
+	  }
+  int res = PLRSC_ransac(m_ransac, PLAVG_GetAvgBuf(m_bgAvg), PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLNN_GetBoolBuf(m_bgNaN), segmBuf, 0);
+  return;
+}
+#endif // JMU_RANSAC
+#ifdef JMU_RANSAC
+void CamFrame::RansacFG(wxCommandEvent& WXUNUSED(event))
+{
+  // // here just for debuggin purposes: the logical place is after a 'learn background' action
+	SRBUF srBuf;
+	srBuf.pha = (unsigned short*) m_pSrBuf;
+	srBuf.amp = (unsigned short*) (&m_pSrBuf[m_nRows*m_nCols*sizeof(unsigned short)]);
+	srBuf.nCols = m_nCols;
+	srBuf.nRows = m_nRows;
+	srBuf.bufferSizeInBytes = m_nCols*m_nRows*2*sizeof(unsigned short);
+	/*PLSEGM_Segment(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN), 
+				PLAVG_GetAvgBuf(m_bgAvg), PLNN_GetNaNbuf(m_bgNaN), PLAVG_GetAvgVar(m_bgAvg) );*/ // done in AcqOneFrm
+	  unsigned char* segmBuf = NULL;
+	  if(IsSegmChecked())
+	  {
+		  /*PLSEGM_SegmentXYZ(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN), 
+			  PLAVG_GetAvgBuf(m_bgAvg), PLNN_GetNaNbuf(m_bgNaN), PLAVG_GetAvgVar(m_bgAvg),
+			  PLCTR_GetZ(m_CTrf), PLCTR_GetZ(m_CTrfBG)); */ // done in AcqOneFrm
+		  segmBuf = (unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).bg;
+	  }
+	  else
+	  {
+		  segmBuf = (unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).fg;
+	  }
+  int res = PLRSC_ransac(m_ransac, srBuf, PLCTR_GetZ(m_CTrf), PLCTR_GetY(m_CTrf), PLCTR_GetX(m_CTrf), PLNN_GetBoolBuf(m_NaN), segmBuf, 0);
+  return;
+}
+#endif // JMU_RANSAC
