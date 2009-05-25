@@ -1182,6 +1182,35 @@ void CamFrame::RansacBG(wxCommandEvent& WXUNUSED(event))
 		  segmBuf = (unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).fg;
 	  }
   int res = PLRSC_ransac(m_ransac, PLAVG_GetAvgBuf(m_bgAvg), PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLNN_GetBoolBuf(m_bgNaN), segmBuf, 0);
+
+  #ifdef JMU_TGTFOLLOW
+		//if(m_pFile4TgtCoord != NULL)
+		{
+			RSCPLAN pla = PLRSC_GetPlaBest(m_ransac);
+			double* nVec = &(pla.nVec[0]);
+			float frmCntFl;
+			float tgt[15];
+			tgt[ 0] = PLCTR_GetAvgX(m_CTrfBG);
+			tgt[ 1] = PLCTR_GetAvgY(m_CTrfBG);
+			tgt[ 3] = PLCTR_GetMinX(m_CTrfBG);
+			tgt[ 4] = PLCTR_GetMinY(m_CTrfBG);
+			tgt[ 6] = PLCTR_GetMinX(m_CTrfBG);
+			tgt[ 7] = PLCTR_GetMaxY(m_CTrfBG);
+			tgt[ 9] = PLCTR_GetMaxX(m_CTrfBG);
+			tgt[10] = PLCTR_GetMaxY(m_CTrfBG);
+			tgt[12] = PLCTR_GetMaxX(m_CTrfBG);
+			tgt[13] = PLCTR_GetMinY(m_CTrfBG);
+			for(int p=2; p<15; p+=3)
+			{
+				tgt[p] = -(nVec[0]*tgt[p-2] + nVec[1]*tgt[p-1] + nVec[3] ) / nVec[2];
+			}
+
+			//res  =(int) m_pFile4TgtCoord->Read(&frmCntFl, sizeof(float));
+			//res  =(int) m_pFile4TgtCoord->Read(&tgt, 15*sizeof(float));
+				//_camVtk->updateTarget(&(tgt[0]), 3); // to update only line
+				_camVtk->updateTarget(&(tgt[0]), 15); // to update line and triangles
+		}
+  #endif // JMU_TGTFOLLOW
   return;
 }
 #endif // JMU_RANSAC
