@@ -88,6 +88,9 @@ public:
 	void setParallelProj(bool para);
 	int setFpsTxt(char* txt);
 	int setReadFpsTxt(char* txt);
+	void hideSegmCbar(bool doHide);
+	void hideAmplCbar(bool doHide);
+	void hideDepthCbar(bool doHide);
 
 private:
 	static const int _vtkSubMax = NUMCAMS ; // VTKSUBMAX undeclared identifier bug 20080114

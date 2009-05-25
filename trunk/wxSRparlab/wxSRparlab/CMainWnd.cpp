@@ -106,6 +106,9 @@ BEGIN_EVENT_TABLE(MainWnd, wxFrame)
 	EVT_CHECKBOX(IDC_visVtk, MainWnd::SetVisVtk)
 	EVT_RADIOBOX(IDC_colVtk, MainWnd::SetColVtk)
 	EVT_CHECKBOX(IDC_ParaProj, MainWnd::OnParaProj)
+	EVT_CHECKBOX(IDC_SegmCbar, MainWnd::OnSegmCbar)
+	EVT_CHECKBOX(IDC_AmplCbar, MainWnd::OnAmplCbar)
+	EVT_CHECKBOX(IDC_DepthCbar, MainWnd::OnDepthCbar)
 	EVT_TIMER(IDE_RendTimer, MainWnd::OnRendTimer)
 END_EVENT_TABLE()
 
@@ -167,6 +170,7 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
 
 	_buttAcqAll = NULL;
 	_ckParaProj = NULL;
+	_ckSegmCbar = NULL; _ckAmplCbar = NULL; _ckDepthCbar = NULL;
 	m_pThreadReadDataSync = NULL;
 }
 
@@ -260,6 +264,14 @@ void MainWnd::Init()
 	_buttAcqAll = new wxButton(_bgPanel, IDB_AcqAll, wxT("Acq. all") );
 #ifdef JMU_USE_VTK
 	_ckParaProj = new wxCheckBox(_bgPanel, IDC_ParaProj, wxT("Parallel projection"));
+	_ckSegmCbar  = new wxCheckBox(_bgPanel, IDC_SegmCbar, wxT("Hide Segm. scale"));
+	_ckAmplCbar  = new wxCheckBox(_bgPanel, IDC_AmplCbar, wxT("Hide Ampl. scale"));
+	_ckDepthCbar = new wxCheckBox(_bgPanel, IDC_DepthCbar, wxT("Hide Depth. scale"));
+	wxBoxSizer *sizerCk = new wxBoxSizer(wxHORIZONTAL); // create sizer for frame
+		sizerCk->Add(_ckParaProj, flagsExpand);
+		sizerCk->Add(_ckSegmCbar, flagsExpand);
+		sizerCk->Add(_ckAmplCbar, flagsExpand);
+		sizerCk->Add(_ckDepthCbar, flagsExpand);
 #endif
 	wxFlexGridSizer *sizerAcqScales = new wxFlexGridSizer(1,2,0,0);
 		sizerAcqScales->Add(_buttAcqAll, flagsExpand);
@@ -271,7 +283,8 @@ void MainWnd::Init()
 		sizerPanel->Add(_sizerCamVisCol, wxGBPosition(0,0), wxGBSpan(8,4));
 		sizerPanel->Add(sizerAcqScales, wxGBPosition(8,0), wxGBSpan(2,4));
 #ifdef JMU_USE_VTK
-		sizerPanel->Add(_ckParaProj, wxGBPosition(10,0), wxGBSpan(1,4));
+		//sizerPanel->Add(_ckParaProj, wxGBPosition(10,0), wxGBSpan(1,4));
+		sizerPanel->Add(sizerCk, wxGBPosition(10,0), wxGBSpan(1,8));
 #endif
 
 	wxBoxSizer *sizerFrame = new wxBoxSizer(wxVERTICAL); // create sizer for frame
@@ -754,5 +767,35 @@ void MainWnd::OnRendTimer(wxTimerEvent& event) //! Render timer event action
 		_rendTgt = (int)(0.9*_rendCapms); // shorten allowed rendering time
 		_renderTimer.Start(_rendTgt);
 	}
+#endif
+}
+
+/* acting on "Hide Segm. colorbar" checkBox*/
+void MainWnd::OnSegmCbar(wxCommandEvent& event)
+{
+#ifdef JMU_USE_VTK
+	if(_ckSegmCbar == NULL) return;
+	_vtkWin->hideSegmCbar( _ckSegmCbar->IsChecked() );
+	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
+#endif
+}
+
+/* acting on "Hide Ampl. colorbar" checkBox*/
+void MainWnd::OnAmplCbar(wxCommandEvent& event)
+{
+#ifdef JMU_USE_VTK
+	if(_ckAmplCbar == NULL) return;
+	_vtkWin->hideAmplCbar( _ckAmplCbar->IsChecked() );
+	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
+#endif
+}
+
+/* acting on "Hide Depth colorbar" checkBox*/
+void MainWnd::OnDepthCbar(wxCommandEvent& event)
+{
+#ifdef JMU_USE_VTK
+	if(_ckSegmCbar == NULL) return;
+	_vtkWin->hideDepthCbar( _ckDepthCbar->IsChecked() );
+	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 #endif
 }

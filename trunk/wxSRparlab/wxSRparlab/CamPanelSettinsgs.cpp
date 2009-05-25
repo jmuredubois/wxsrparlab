@@ -72,9 +72,8 @@ int CamPanelSettings::InitSettings()
 		sizerScat->Add(m_buttonScatParams, 1, wxEXPAND);
 
 	// Segmentation controls //
-    m_ckBoxSegBayes = new wxCheckBox( this, IDC_SegmBayes, wxT("Bayesian segmentation"),
+    m_ckBoxSegBayes = new wxCheckBox( this, IDC_SegmBayes, wxT("Flat segm."),
         wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
-        
     m_buttonSegmParams = new wxButton(this, IDB_SegmSetParams, wxT("Set segm. params"));
 	this->DisableSegmParams(); // button is disabled until cam is opened
 
