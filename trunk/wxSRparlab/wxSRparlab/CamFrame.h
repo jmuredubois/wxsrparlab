@@ -105,6 +105,10 @@ public:
 	long GetAcqTime(){ return _acqTime;};
 	void OnSetSegmParams(wxCommandEvent& WXUNUSED(event));
 	bool IsSegmChecked(){ return m_settingsPane->IsSegmChecked(); };
+#ifdef JMU_RANSAC
+	void RansacBG(wxCommandEvent& WXUNUSED(event));
+	void RansacFG(wxCommandEvent& WXUNUSED(event));
+#endif
 
 private:
 	MainWnd	*_pWin; // parent main wnd
@@ -196,6 +200,9 @@ enum CamFrameEnum
 	IDB_SegmSetParams = 22,
 	IDC_NoFlagNaN = 23,
 	IDB_DevSRsettings = 24,
+	IDB_RansacBG = 25,
+	IDB_RansacFG = 26,
+	IDT_RansacDepth = 27,
 	ID_ThisIsAStop = 255
 };
 
