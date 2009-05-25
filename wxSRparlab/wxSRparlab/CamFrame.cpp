@@ -876,9 +876,10 @@ void CamFrame::AcqOneFrm()
 	  {
 		  segmBuf = (unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).fg;
 	  }
-#ifdef JMU_RANSAC
-	  PLRSC_ransac(m_ransac, srBuf, PLCTR_GetZ(m_CTrf), PLCTR_GetY(m_CTrf), PLCTR_GetX(m_CTrf), PLNN_GetBoolBuf(m_NaN), segmBuf, 0);
-#endif
+//#ifdef JMU_RANSAC
+//	  // // here just for debuggin purposes: the logical place is after a 'learn background' action
+//	  //PLRSC_ransac(m_ransac, srBuf, PLCTR_GetZ(m_CTrf), PLCTR_GetY(m_CTrf), PLCTR_GetX(m_CTrf), PLNN_GetBoolBuf(m_NaN), segmBuf, 0);
+//#endif
 	  m_viewSegmPane->SetDataArray<unsigned char>( segmBuf, m_nRows*m_nCols);
 	  m_viewBGRangePane->SetDataArray<unsigned short>((unsigned short*) (PLAVG_GetAvgBuf(m_bgAvg)).pha, m_nRows*m_nCols);
 	  m_viewBGAmpPane->SetDataArray<unsigned short>((unsigned short*) (PLAVG_GetAvgBuf(m_bgAvg)).amp, m_nRows*m_nCols);
