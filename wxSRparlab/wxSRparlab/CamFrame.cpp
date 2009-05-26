@@ -202,6 +202,7 @@ BEGIN_EVENT_TABLE(CamFrame, wxFrame)
 	#ifdef JMU_RANSAC
 		EVT_BUTTON(IDB_RansacBG, CamFrame::RansacBG)
 		EVT_BUTTON(IDB_RansacFG, CamFrame::RansacFG)
+		EVT_TEXT(IDT_RansacNiterMax, CamFrame::OnSetRansacNiterMax)
 	#endif
 END_EVENT_TABLE()
 
@@ -1083,7 +1084,7 @@ void CamFrame::OnSetScatParams(wxCommandEvent& WXUNUSED(event))
 
   //logPrintf("swissrangerTester: SR_Open device");
   m_settingsPane->SetText(wxT("Modify scattering compensation parameters"));
-  wxString strR;
+  //wxString strR;
 
   wxFileDialog* OpenDialogScat = new wxFileDialog(this,
 	  wxT("Choose a scattering compensation parameters file to open"),	// msg
@@ -1140,7 +1141,7 @@ void CamFrame::OnSetSegmParams(wxCommandEvent& WXUNUSED(event))
 
   //logPrintf("swissrangerTester: SR_Open device");
   m_settingsPane->SetText(wxT("Modify segmentation parameters"));
-  wxString strR;
+  //wxString strR;
 
   wxFileDialog* OpenDialogSegm = new wxFileDialog(this,
 	  wxT("Choose a segmentation parameters file to open"),	// msg
@@ -1182,11 +1183,15 @@ void CamFrame::RansacBG(wxCommandEvent& WXUNUSED(event))
 		  segmBuf = (unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).fg;
 	  }
   int res = PLRSC_ransac(m_ransac, PLAVG_GetAvgBuf(m_bgAvg), PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLNN_GetBoolBuf(m_bgNaN), segmBuf, 0);
+  RSCPLAN pla = PLRSC_GetPlaBest(m_ransac);
+  double* nVec = &(pla.nVec[0]);
+  wxString strS;
+  strS.Printf(wxT("Best plane at iter %u  -  %+06.4G x  %+06.4G y  %+06.4G z  - (%+06.4G)  = 0"), pla.iter, nVec[0], nVec[1], nVec[2], nVec[3]);
+  m_settingsPane->SetText(strS);
 
   #ifdef JMU_TGTFOLLOW
 		//if(m_pFile4TgtCoord != NULL)
 		{
-			RSCPLAN pla = PLRSC_GetPlaBest(m_ransac);
 			double* nVec = &(pla.nVec[0]);
 			float frmCntFl;
 			float tgt[15];
@@ -1240,5 +1245,13 @@ void CamFrame::RansacFG(wxCommandEvent& WXUNUSED(event))
 	  }
   int res = PLRSC_ransac(m_ransac, srBuf, PLCTR_GetZ(m_CTrf), PLCTR_GetY(m_CTrf), PLCTR_GetX(m_CTrf), PLNN_GetBoolBuf(m_NaN), segmBuf, 0);
   return;
+}
+#endif // JMU_RANSAC
+#ifdef JMU_RANSAC
+void CamFrame::OnSetRansacNiterMax(wxCommandEvent& event)
+{
+    int val = 0;
+	val = m_settingsPane->GetRansacNiterMax();
+	PLRSC_SetIterMax(m_ransac, val);
 }
 #endif // JMU_RANSAC
