@@ -19,7 +19,7 @@
 CamPanelSettings::CamPanelSettings(wxWindow* parent, const wxString& title, const wxPoint& pos, const wxSize& size)
 : wxPanel(parent, wxID_ANY, pos, size, wxBORDER_NONE, title)
 {
-
+	m_TxtRansacNiterMax = NULL;
 }
 
 /**
@@ -126,9 +126,11 @@ int CamPanelSettings::InitSettings()
 	#ifdef JMU_RANSAC
 		m_buttonRansacBG = new wxButton(this, IDB_RansacBG, wxT("RANSAC bg."));
 		m_buttonRansacFG = new wxButton(this, IDB_RansacFG, wxT("RANSAC fg."));
+		m_TxtRansacNiterMax = new wxTextCtrl( this, IDT_RansacNiterMax, wxString::Format(wxT("%i"),2800) ); 
 		wxBoxSizer *sizerRansac = new wxBoxSizer(wxHORIZONTAL);
 	    sizerRansac->Add(m_buttonRansacBG, 1, wxEXPAND);
 	    sizerRansac->Add(m_buttonRansacFG, 1, wxEXPAND);
+		sizerRansac->Add(m_TxtRansacNiterMax, 1, wxEXPAND);
 	#endif
 
 	/* sizer stuff  ...*/
@@ -260,3 +262,24 @@ void CamPanelSettings::EnableSegmParams()
 {
 	m_buttonSegmParams->Enable();
 };
+
+#ifdef JMU_RANSAC
+//! Enables the "Segm Params" button
+int CamPanelSettings::GetRansacNiterMax()
+{
+	if(!m_TxtRansacNiterMax){return -1;};
+	long val = 0;
+	wxString strVal = m_TxtRansacNiterMax->GetValue();
+	if( strVal.ToLong(&val) ) /* read value as int*/
+	{
+		//SetAmpMax(val);
+	}
+	else
+	{
+		m_TxtRansacNiterMax->DiscardEdits();
+		return -1;
+		//m_TxtRansacIterMax->GetValue().Printf(wxT("%d"), _ampMax);
+	}
+	return (int)val;
+};
+#endif

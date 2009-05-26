@@ -108,6 +108,7 @@ public:
 #ifdef JMU_RANSAC
 	void RansacBG(wxCommandEvent& WXUNUSED(event));
 	void RansacFG(wxCommandEvent& WXUNUSED(event));
+	void OnSetRansacNiterMax(wxCommandEvent& event);
 #endif
 
 private:
@@ -202,7 +203,7 @@ enum CamFrameEnum
 	IDB_DevSRsettings = 24,
 	IDB_RansacBG = 25,
 	IDB_RansacFG = 26,
-	IDT_RansacDepth = 27,
+	IDT_RansacNiterMax = 27,
 	ID_ThisIsAStop = 255
 };
 

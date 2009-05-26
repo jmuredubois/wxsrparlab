@@ -57,6 +57,9 @@ public:
 	void CamPanelSettings::DisableSegmParams(); //!< Disables the "Segm Params" button
 	void CamPanelSettings::EnableSegmParams();  //!< Enables the "Segm Params" button
 	bool IsSegmChecked(){return m_ckBoxSegBayes->IsChecked();}; //
+	#ifdef JMU_RANSAC
+		int GetRansacNiterMax();
+	#endif
 
 
 private:
@@ -77,7 +80,9 @@ private:
 	#ifdef JMU_RANSAC
 	  wxButton* m_buttonRansacBG; // call RANSAC on bg data
 	  wxButton* m_buttonRansacFG; // call RANSAC of fg data
-	  wxTextCtrl* m_TxtRansacDepth; // RANSAC search depth
+	  wxTextCtrl* m_TxtRansacNiterMax; // RANSAC max number of iterations
+	  int _ransacNiterMax; // RANSAC max number of iterations
+	  //bool _TxtRansacNiterMaxInit;
 	#endif
 
 	/* Radio boxes */
