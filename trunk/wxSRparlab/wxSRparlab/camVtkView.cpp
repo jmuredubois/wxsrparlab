@@ -281,6 +281,9 @@ int CamVtkView::addDataAct()
 	dData->SetNumberOfTuples(25344);
 	aData->SetNumberOfTuples(25344);
 	sData->SetNumberOfTuples(25344);
+	dData->SetName("Depth");
+	aData->SetName("Amplitude");
+	sData->SetName("Segmentation");
 
 	// Assign each tuple
 	int row,col;
@@ -329,6 +332,8 @@ int CamVtkView::addDataAct()
 	int dim[3];
 	data->GetDimensions(dim);
 	data->SetDimensions(144,176,1);
+	ptdata->AddArray(aData);
+	ptdata->AddArray(sData);
 
 	camTranFilter->SetInput(data);	// 20080118 transf
 
@@ -357,6 +362,9 @@ int CamVtkView::addDataAct()
 
 	//dataWriter->SetInput(data); // write StructuredGrid data
 	dataWriter->SetInput(camTranFilter->GetOutputDataObject(0)); // 20080118 transf
+	dataWriter->GetInput()->GetPointData()->AddArray(dData);
+	dataWriter->GetInput()->GetPointData()->AddArray(aData);
+	dataWriter->GetInput()->GetPointData()->AddArray(sData);
 
 #ifdef _DEBUG
 	dataWriter->SetFileTypeToASCII();
@@ -473,7 +481,22 @@ int CamVtkView::updateTOF(int rows, int cols, unsigned short *z, short *y, short
 	res += updateTOF(rows, cols, z, y, x, amp, segm);
 	if(res!=0){return -2;};
 	dataWriter->SetFileName(fname);
-	res+=dataWriter->Write();
+	std::ostream* fpU = dataWriter->OpenVTKFile();
+	int bad = dataWriter->WriteHeader(fpU);
+	if(bad ==0){return -1;}; //
+	//dataWriter->WriteData();
+	//dataWriter->WritePoints(fpU, dataPoints);
+	dataWriter->GetInput()->GetPointData()->AddArray(dData);
+	dataWriter->GetInput()->GetPointData()->AddArray(aData);
+	dataWriter->GetInput()->GetPointData()->AddArray(sData);
+	dataWriter->WritePoints(fpU, dataWriter->GetInput()->GetPoints());
+	dataWriter->CloseVTKFile(fpU);
+
+
+	/*dataWriter->GetInput()->GetPointData()->AddArray(dData);
+	dataWriter->GetInput()->GetPointData()->AddArray(aData);
+	dataWriter->GetInput()->GetPointData()->AddArray(sData);
+	res+=dataWriter->Write();*/
 	return res;
 }
 /**
