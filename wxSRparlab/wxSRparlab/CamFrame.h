@@ -121,22 +121,24 @@ private:
 	int m_nRows;
 	int m_nCols;
 	wxAuiNotebook* m_camNB; //!< a notebook interface
-	wxFFile*		m_pFile4ReadPha; // PHASE file for read operation
-	wxFFile*		m_pFile4ReadAmp; // AMPLITUDE file for read operation
-	ThreadReadData*		m_pThreadReadData; // THREAD for reading data
-	wxFFile*		m_pFile4WritePha; // PHASE file for WRITE operation
-	wxFFile*		m_pFile4WriteAmp; // AMPLITUDE file for WRITE operation
-	CamPanelSettings* m_settingsPane;	//! panel for CAMERA SETTINGS
-	CamViewData* m_viewRangePane;		//! panel for RANGE data display
-	CamViewData* m_viewAmpPane;			//! panel for AMPLITUDE data display
-	CamViewData* m_viewZPane;			//! panel for Z data display
+	wxFFile*		m_pFile4ReadPha; //! PHASE file for read operation
+	wxFFile*		m_pFile4ReadAmp; //! AMPLITUDE file for read operation
+	ThreadReadData*		m_pThreadReadData; //!< THREAD for reading data
+	wxFFile*		m_pFile4WritePha; //!< PHASE file for WRITE operation
+	wxFFile*		m_pFile4WriteAmp; //!< AMPLITUDE file for WRITE operation
+	wxFFile*		m_pFile4WriteXYZ;   //!< XYZ file for WRITE operation
+	wxFFile*		m_pFile4WriteSeg;   //!< SEGM file for WRITE operation
+	CamPanelSettings* m_settingsPane;	//!< panel for CAMERA SETTINGS
+	CamViewData* m_viewRangePane;		//!< panel for RANGE data display
+	CamViewData* m_viewAmpPane;			//!< panel for AMPLITUDE data display
+	CamViewData* m_viewZPane;			//!< panel for Z data display
 #ifdef DISPXYBUFFERS
 	CamViewData* m_viewYPane;			//! panel for Y data display
 	CamViewData* m_viewXPane;			//! panel for X data display
 #endif //DISPXYBUFFERS
-	CamViewData* m_viewBGRangePane;		//! panel for BACKGROUND RANGE data display
-	CamViewData* m_viewBGAmpPane;		//! panel for BACKGROUND RANGE data display
-	CamViewData* m_viewSegmPane;		//! panel for SEGMENTED data display
+	CamViewData* m_viewBGRangePane;		//!< panel for BACKGROUND RANGE data display
+	CamViewData* m_viewBGAmpPane;		//!< panel for BACKGROUND RANGE data display
+	CamViewData* m_viewSegmPane;		//!< panel for SEGMENTED data display
 	int m_nFrmRead;		//! number of frames read
 	unsigned int m_nSerialSR;		//! SR serial
 	CamReadModeEnum  m_camReadMode;		//! read  mode
@@ -204,6 +206,9 @@ enum CamFrameEnum
 	IDB_RansacBG = 25,
 	IDB_RansacFG = 26,
 	IDT_RansacNiterMax = 27,
+	IDC_RecordXYZ = 28,
+	IDC_RecordSeg = 29,
+	IDC_RecordVTK = 30,
 	ID_ThisIsAStop = 255
 };
 

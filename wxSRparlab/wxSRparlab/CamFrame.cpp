@@ -103,9 +103,11 @@ CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos
 	m_mutexSrBuf = NULL;
 
 	m_pFile4ReadPha = NULL;//new wxFFile();
-	m_pFile4ReadAmp = NULL;//new wxFFile();
-	m_pFile4WritePha = NULL;//new wxFFile();
-	m_pFile4WriteAmp = NULL;//new wxFFile();
+	m_pFile4ReadAmp = NULL;
+	m_pFile4WritePha = NULL;
+	m_pFile4WriteAmp = NULL;
+	m_pFile4WriteXYZ = NULL;
+	m_pFile4WriteSeg = NULL;
 	m_nFrmRead = 0; // 0 frames read when creating
 	m_nSerialSR = 0;
 	m_pThreadReadData = NULL;
@@ -163,6 +165,8 @@ CamFrame::~CamFrame()
 	#endif
 	if(m_pFile4WritePha != NULL) { delete(m_pFile4WritePha); m_pFile4WritePha = NULL; };
 	if(m_pFile4WriteAmp != NULL) { delete(m_pFile4WriteAmp); m_pFile4WriteAmp = NULL; };
+	if(m_pFile4WriteXYZ != NULL) { delete(m_pFile4WriteXYZ); m_pFile4WriteXYZ = NULL; };
+	if(m_pFile4WriteSeg != NULL) { delete(m_pFile4WriteSeg); m_pFile4WriteSeg = NULL; };
 	if(m_NaN != NULL) { PLNN_Close(m_NaN); m_NaN = NULL; };
 	if(m_scat != NULL) {PLSC_Close(m_scat); m_scat = NULL; };
 	if(m_bgAvg != NULL) {PLAVG_Close(m_bgAvg); m_bgAvg = NULL; };
@@ -543,6 +547,8 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   if(m_pFile4ReadAmp != NULL) { delete(m_pFile4ReadAmp); m_pFile4ReadAmp = NULL; };
   if(m_pFile4WritePha != NULL) { delete(m_pFile4WritePha); m_pFile4WritePha = NULL; };
   if(m_pFile4WriteAmp != NULL) { delete(m_pFile4WriteAmp); m_pFile4WriteAmp = NULL; };
+  if(m_pFile4WriteXYZ != NULL) { delete(m_pFile4WriteXYZ); m_pFile4WriteXYZ = NULL; };
+  if(m_pFile4WriteSeg != NULL) { delete(m_pFile4WriteSeg); m_pFile4WriteSeg = NULL; };
   if(m_mutexSrBuf != NULL) { delete(m_mutexSrBuf); m_mutexSrBuf = NULL;};
   if(m_pSrBuf   != NULL) { free((void*) m_pSrBuf  ); m_pSrBuf   = NULL; };
   #ifdef JMU_TGTFOLLOW
@@ -764,19 +770,19 @@ void CamFrame::AcqOneFrm()
 			res = (int) m_pFile4ReadAmp->Read(&m_pSrBuf[(int)m_nCols*(int)m_nRows*sizeof(unsigned short)], (int)m_nCols*(int)m_nRows*sizeof(unsigned short));
 			m_nFrmRead +=1;
 			if( (m_pFile4ReadPha->Eof()) || (m_pFile4ReadAmp->Eof()) )
-			{
+			{  // when read files are finished (EOF)
 				m_pFile4ReadPha->Seek(0); // rewind phase
 				m_pFile4ReadAmp->Seek(0); // rewind phase
 				m_nFrmRead = 0;	// reset frame count
-				if((m_pFile4WritePha  != NULL) && (m_pFile4WriteAmp  != NULL) && (m_pFile4WritePha->IsOpened()) && (m_pFile4WriteAmp->IsOpened()))
-				{
-					m_pFile4WritePha->Close();
-					m_pFile4WriteAmp->Close();
-				}
+				// close writer files when record loops, to avoid writing indefinitely
+				if((m_pFile4WritePha  != NULL) && (m_pFile4WritePha->IsOpened())) { m_pFile4WritePha->Close();};
+				if((m_pFile4WriteAmp  != NULL) && (m_pFile4WriteAmp->IsOpened())) { m_pFile4WriteAmp->Close();};
+				if((m_pFile4WriteXYZ  != NULL) && (m_pFile4WriteXYZ->IsOpened())) { m_pFile4WriteXYZ->Close();};
+				if((m_pFile4WriteSeg  != NULL) && (m_pFile4WriteSeg->IsOpened())) { m_pFile4WriteSeg->Close();};
 			}
 		  }
 		  else
-		  {
+		  { // not reading from file -> ACQUIRING
 			  if((m_sr != NULL) && (m_pSrBuf != NULL) && (m_CTrf!=NULL) )
 			  {
 				res = SR_SetMode(m_sr, AM_COR_FIX_PTRN ); //|| AM_COR_LED_NON_LIN );
@@ -785,7 +791,7 @@ void CamFrame::AcqOneFrm()
 				memcpy( (void*) (&m_pSrBuf[m_nRows*m_nCols*sizeof(unsigned short)]), SR_GetImage(m_sr,1), m_nRows*m_nCols*sizeof(unsigned short));
 				m_nFrmRead +=1;
 			  }
-		  }
+		  } // END OF if changing behavior if reading from file or Acquring from cam
 		    SRBUF srBuf;
 		    srBuf.pha = (unsigned short*) m_pSrBuf;
 		    srBuf.amp = (unsigned short*) (&m_pSrBuf[m_nRows*m_nCols*sizeof(unsigned short)]);
@@ -793,21 +799,21 @@ void CamFrame::AcqOneFrm()
 		    srBuf.nRows = m_nRows;
 		    srBuf.bufferSizeInBytes = m_nCols*m_nRows*2*sizeof(unsigned short);
 			if( !(m_settingsPane->IsNoFlagNaNChecked()))
-			{
+			{  // flag NaNs except if not desired (only for illustration purposes)
 				res+=PLNN_FlagNaN(m_NaN, srBuf);
 			}
 		if( (m_settingsPane->IsFgHidesDataChecked()) && (m_settingsPane->IsLrnFgChecked()!=true) )
-		{
+		{ // replace camera buf data by recorded foreground if GUI checkbox is checked
 			SRBUF fgBuf = PLAVG_GetAvgBuf(m_fgAvg);
 			memcpy( (void*) m_pSrBuf, fgBuf.pha , m_nRows*m_nCols*sizeof(unsigned short));
 			memcpy( (void*) (&m_pSrBuf[m_nRows*m_nCols*sizeof(unsigned short)]), fgBuf.amp , m_nRows*m_nCols*sizeof(unsigned short));
 		}
 		if(m_settingsPane->IsScatChecked())
-		{
+		{ // compensate for scattering if GUI checkbox is cheked
 			PLSC_Compensate(m_scat, srBuf, PLNN_GetNaNbuf(m_NaN));
 		}
 		if(m_settingsPane->IsLrnBgChecked())
-		{
+		{ //  learn background
 			PLAVG_LearnBackground(m_bgAvg, srBuf);
 			res+=PLNN_FlagNaN(m_bgNaN, PLAVG_GetAvgBuf(m_bgAvg));
 			if( !(m_settingsPane->IsNoFlagNaNChecked()))
@@ -816,14 +822,14 @@ void CamFrame::AcqOneFrm()
 			}
 		}
 		if(m_settingsPane->IsLrnFgChecked())
-		{
+		{ // learn foreground
 			PLAVG_LearnBackground(m_fgAvg, srBuf);
 		}
-		PLCTR_CoordTrf(m_CTrf, srBuf, m_ctrParam);
+		PLCTR_CoordTrf(m_CTrf, srBuf, m_ctrParam);  // transform coordinates
 		errMutex = m_mutexSrBuf->Unlock();
 	  } //{errMutex == wxMUTEX_NO_ERROR)
 	  if((m_pFile4WritePha  != NULL) && (m_pFile4WriteAmp  != NULL) && (m_pFile4WritePha->IsOpened()) && (m_pFile4WriteAmp->IsOpened()))
-	  {
+	  {  // write phase and amplitude data to file
 		  res = (int) m_pFile4WritePha->Write(m_pSrBuf, (int)m_nCols*(int)m_nRows*sizeof(unsigned short));
 		  res = (int) m_pFile4WriteAmp->Write(&m_pSrBuf[(int)m_nCols*(int)m_nRows*sizeof(unsigned short)], (int)m_nCols*(int)m_nRows*sizeof(unsigned short));
 	  }
@@ -901,6 +907,16 @@ void CamFrame::AcqOneFrm()
 			_vtkWin->Render(); // avoid rendering twice for BG and FG ; PROBLEM rendering is done once for each camera, should be done only once :-(
 		}
       #endif
+	  if((m_pFile4WriteXYZ  != NULL) && (m_pFile4WriteXYZ->IsOpened()))
+	  {  // write XYZ data to file
+		  res = (int) m_pFile4WriteXYZ->Write(PLCTR_GetX(m_CTrf), (int)m_nCols*(int)m_nRows*sizeof(short));
+		  res = (int) m_pFile4WriteXYZ->Write(PLCTR_GetY(m_CTrf), (int)m_nCols*(int)m_nRows*sizeof(short));
+		  res = (int) m_pFile4WriteXYZ->Write(PLCTR_GetZ(m_CTrf), (int)m_nCols*(int)m_nRows*sizeof(short));
+	  }
+	  if((m_pFile4WriteSeg  != NULL) && (m_pFile4WriteSeg->IsOpened()))
+	  {  // write SEGMENTATION data to file
+		  res = (int) m_pFile4WriteSeg->Write(segmBuf, (int)m_nCols*(int)m_nRows*sizeof(unsigned char));
+	  } 
 	  m_settingsPane->SetText(strR);
 	  m_viewRangePane->SetTxtInfo(strR);
 	  m_viewAmpPane->SetTxtInfo(strR);
@@ -1193,7 +1209,7 @@ void CamFrame::RansacBG(wxCommandEvent& WXUNUSED(event))
 		//if(m_pFile4TgtCoord != NULL)
 		{
 			double* nVec = &(pla.nVec[0]);
-			float frmCntFl;
+			//float frmCntFl;
 			float tgt[15];
 			tgt[ 0] = PLCTR_GetAvgX(m_CTrfBG);
 			tgt[ 1] = PLCTR_GetAvgY(m_CTrfBG);
