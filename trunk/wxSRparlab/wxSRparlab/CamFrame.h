@@ -110,6 +110,9 @@ public:
 	void RansacFG(wxCommandEvent& WXUNUSED(event));
 	void OnSetRansacNiterMax(wxCommandEvent& event);
 #endif
+	void OnRecXYZ(wxCommandEvent& WXUNUSED(event));
+	void OnRecSeg(wxCommandEvent& WXUNUSED(event));
+	void OnRecVTK(wxCommandEvent& WXUNUSED(event));
 
 private:
 	MainWnd	*_pWin; // parent main wnd
@@ -151,6 +154,7 @@ private:
 	CViewSrVtk	*_vtkWin ; //!< pointer to vtk window
 	CamVtkView *_camVtk; //!< point to vtk camera structure
 	CamVtkView *_camBGVtk; //!< point to background vtk camera structure
+	wxString _vtkRecPrefix; //!< vtk recording string prefix
 #endif
 	#ifdef JMU_TGTFOLLOW  
 		wxFFile*		m_pFile4TgtCoord; 
