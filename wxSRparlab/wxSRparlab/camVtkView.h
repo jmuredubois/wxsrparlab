@@ -100,6 +100,9 @@ public:
 	void setDataRepSurface();
 	void setDataRepPoints();
 	void setDataOpacity(double alpha);
+	vtkFloatArray* GetDdata(){return dData;};
+	vtkFloatArray* GetAdata(){return aData;};
+	vtkFloatArray* GetSdata(){return sData;};
 
 private:
 	static const int _vtkSubMax = NUMCAMS ; // VTKSUBMAX undeclared identifier bug 20080114
