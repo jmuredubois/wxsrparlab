@@ -101,6 +101,9 @@ private:
 	wxCheckBox* m_ckBoxFgHidesData;	 // check box for learning foreground
 	wxCheckBox* m_ckBoxSegBayes; // check box for activating bayesian segmentation
 	wxCheckBox* m_ckBoxNoFlagNaN; // check box for DEactivating FlagNaN
+	wxCheckBox* m_ckBoxRecordXYZ; // check box to record current XYZ buffers (after scat comp)
+	wxCheckBox* m_ckBoxRecordSeg; // check box to record current XYZ buffers (after scat comp)
+	wxCheckBox* m_ckBoxRecordVTK; // check box to record current VTK data (after scat comp)
 	
 	/* TextControls */
 	wxTextCtrl* m_TxtDelayStat;

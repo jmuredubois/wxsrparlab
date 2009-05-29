@@ -118,9 +118,21 @@ int CamPanelSettings::InitSettings()
 
 	m_statText = new wxStaticText( this, IDS_TEXT, wxT("0"));
 
-	// Scat comp controls //
+	// Record controls //
     m_ckBoxRecord = new wxCheckBox( this, IDC_Record, wxT("Record"),
         wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
+	m_ckBoxRecordXYZ = new wxCheckBox( this, IDC_RecordXYZ, wxT("Record XYZ"),
+        wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
+	m_ckBoxRecordSeg = new wxCheckBox( this, IDC_RecordSeg, wxT("Record Seg"),
+        wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
+	m_ckBoxRecordVTK = new wxCheckBox( this, IDC_RecordVTK, wxT("Record VTK"),
+        wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
+	
+	wxBoxSizer *sizerRecord = new wxBoxSizer(wxHORIZONTAL);
+		sizerRecord->Add(m_ckBoxRecord, 0, wxEXPAND);
+		sizerRecord->Add(m_ckBoxRecordXYZ, 0, wxEXPAND);
+		sizerRecord->Add(m_ckBoxRecordSeg, 0, wxEXPAND);
+		sizerRecord->Add(m_ckBoxRecordVTK, 0, wxEXPAND);
 
 	// RANSAC controls //
 	#ifdef JMU_RANSAC
@@ -148,7 +160,7 @@ int CamPanelSettings::InitSettings()
 	#ifdef JMU_TGTFOLLOW  
 		sizerPanel->Add(m_buttonTgtFile, 0, wxEXPAND); 
 	#endif
-	sizerPanel->Add(m_ckBoxRecord, 0, wxEXPAND);
+	sizerPanel->Add(sizerRecord, 0, wxEXPAND);
 	sizerPanel->Add(sizerLrnFg, 0, wxEXPAND);
 	sizerPanel->Add(m_ckBoxFgHidesData, 0, wxEXPAND);
 	sizerPanel->Add(m_ckBoxNoFlagNaN, 0, wxEXPAND);
