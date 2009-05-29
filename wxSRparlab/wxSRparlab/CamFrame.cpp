@@ -124,6 +124,7 @@ CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos
 	_vtkWin=NULL;
 	_camVtk = NULL;
 	_camBGVtk = NULL;
+	_vtkRecPrefix.Empty();
 #endif
 	#ifdef JMU_TGTFOLLOW
 		m_pFile4TgtCoord = NULL;
@@ -154,6 +155,7 @@ CamFrame::~CamFrame()
 #ifdef JMU_USE_VTK
 	if(_camVtk != NULL) { delete(_camVtk); _camVtk = NULL; } ;
 	if(_camBGVtk != NULL) { delete(_camBGVtk); _camVtk = NULL; } ;
+	//if(_vtkRecPrefix != NULL) { delete(_vtkRecPrefix); _vtkRecPrefix = NULL; } ;
 #endif
 	if(m_sr		  != NULL) { res = SR_Close(m_sr);	m_sr = NULL; };
 	if(m_mutexSrBuf != NULL) { delete(m_mutexSrBuf); m_mutexSrBuf = NULL;};
@@ -208,6 +210,9 @@ BEGIN_EVENT_TABLE(CamFrame, wxFrame)
 		EVT_BUTTON(IDB_RansacFG, CamFrame::RansacFG)
 		EVT_TEXT(IDT_RansacNiterMax, CamFrame::OnSetRansacNiterMax)
 	#endif
+	EVT_CHECKBOX(IDC_RecordXYZ, CamFrame::OnRecXYZ)
+	EVT_CHECKBOX(IDC_RecordSeg, CamFrame::OnRecSeg)
+	EVT_CHECKBOX(IDC_RecordVTK, CamFrame::OnRecVTK)
 END_EVENT_TABLE()
 
 /**
@@ -654,6 +659,10 @@ void CamFrame::OnRecord(wxCommandEvent& WXUNUSED(event))
   } // 'record' checkbox is checked
   else
   {
+	  // Properly close record by deleting wxFile 
+	  if(m_pFile4WritePha != NULL) { delete(m_pFile4WritePha); m_pFile4WritePha = NULL; };
+      if(m_pFile4WriteAmp != NULL) { delete(m_pFile4WriteAmp); m_pFile4WriteAmp = NULL; };
+	  // save record params
 	  wxFileDialog* OpenDialogPar = new wxFileDialog(this,
 	  wxT("Choose a SR parameters file to WRITE TO"),	// msg
 	  wxT(""), //wxT("D:\\dataSR3\\"),	// default dir
@@ -896,7 +905,16 @@ void CamFrame::AcqOneFrm()
 	  m_viewBGAmpPane->SetDataArray<unsigned short>((unsigned short*) (PLAVG_GetAvgBuf(m_bgAvg)).amp, m_nRows*m_nCols);
 	  #ifdef JMU_USE_VTK
 		//if(m_camReadMode==CAM_RD_ONESHOT) // vtk does not support access from different threads
+		if(m_settingsPane->IsRecVTKChecked())
+		{
+			wxString curImg;
+			curImg.sprintf(wxT("%s%04u.vtk"), _vtkRecPrefix, m_nFrmRead);
+			_camVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrf), PLCTR_GetY(m_CTrf), PLCTR_GetX(m_CTrf), (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2], segmBuf, (char*)curImg.ToAscii());
+		}
+		else
+		{
 			_camVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrf), PLCTR_GetY(m_CTrf), PLCTR_GetX(m_CTrf), (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2], segmBuf);
+		}
 		if(m_settingsPane->IsLrnBgChecked())
 		{
 			PLCTR_CoordTrf(m_CTrfBG, PLAVG_GetAvgBuf(m_bgAvg), m_ctrParam);
@@ -1271,3 +1289,126 @@ void CamFrame::OnSetRansacNiterMax(wxCommandEvent& event)
 	PLRSC_SetIterMax(m_ransac, val);
 }
 #endif // JMU_RANSAC
+
+//---------------------------------------------------
+/*!
+	- Opens record file for XYZ data. \n
+*/
+//! Open record interface
+void CamFrame::OnRecXYZ(wxCommandEvent& WXUNUSED(event))
+{
+  unsigned int res = 0;
+  m_settingsPane->SetText(wxT("Record XYZ attempt..."));
+  wxString strR;
+
+  if( m_settingsPane->IsRecXYZChecked() )
+  {
+	wxFileDialog* OpenDialog = new wxFileDialog(this,
+	  wxT("Choose a raw XYZ file to WRITE to "),	// msg
+	  wxT(""), //wxT("D:\\dataSR3\\"),	// default dir
+	  wxEmptyString,	// default file
+	  wxT("Raw XYZ files (ShortShortUShort) (*.raw)|*.raw|All files (*.*)|*.*"),	// file ext
+	  wxFD_SAVE|wxFD_CHANGE_DIR|wxFD_OVERWRITE_PROMPT,
+	  wxDefaultPosition);
+	if( (OpenDialog->ShowModal()==wxID_OK) )
+	{
+	    wxString strPath = OpenDialog->GetPath();
+	    m_pFile4WriteXYZ = new wxFFile(strPath, wxT("wb"));
+	    if ( (!(m_pFile4WriteXYZ)) || (!(m_pFile4WriteXYZ->IsOpened())) )
+	    {
+		  res -=4;
+	    }
+
+	    strR.sprintf(wxT("XYZ file opened.")); // ... change text ...
+		
+	    m_settingsPane->SetText(strR);
+		SetStatusText( strR );
+	} // (OpenDialog->ShowModal()==wxID_OK)
+    delete(OpenDialog);
+  } // 'recXYZ' checkbox is checked
+  else
+  {
+	  // Properly close record by deleting file
+	 if(m_pFile4WriteXYZ != NULL) { delete(m_pFile4WriteXYZ); m_pFile4WriteXYZ = NULL; };
+  } // 'record' checkbox is not checked
+}
+
+//---------------------------------------------------
+/*!
+	- Opens record file for Seg data. \n
+*/
+//! Open record interface for seg data
+void CamFrame::OnRecSeg(wxCommandEvent& WXUNUSED(event))
+{
+  unsigned int res = 0;
+  m_settingsPane->SetText(wxT("Record Segmentation attempt..."));
+  wxString strR;
+
+  if( m_settingsPane->IsRecSegChecked() )
+  {
+	wxFileDialog* OpenDialog = new wxFileDialog(this,
+	  wxT("Choose a raw Segmentation file to WRITE to "),	// msg
+	  wxT(""), //wxT("D:\\dataSR3\\"),	// default dir
+	  wxEmptyString,	// default file
+	  wxT("Raw seg files (Uchar) (*.08b)|*.08b|All files (*.*)|*.*"),	// file ext
+	  wxFD_SAVE|wxFD_CHANGE_DIR|wxFD_OVERWRITE_PROMPT,
+	  wxDefaultPosition);
+	if( (OpenDialog->ShowModal()==wxID_OK) )
+	{
+	    wxString strPath = OpenDialog->GetPath();
+	    m_pFile4WriteSeg = new wxFFile(strPath, wxT("wb"));
+	    if ( (!(m_pFile4WriteSeg)) || (!(m_pFile4WriteSeg->IsOpened())) )
+	    {
+		  res -=4;
+	    }
+
+	    strR.sprintf(wxT("Seg file opened.")); // ... change text ...
+		
+	    m_settingsPane->SetText(strR);
+		SetStatusText( strR );
+	} // (OpenDialog->ShowModal()==wxID_OK)
+    delete(OpenDialog);
+  } // 'recSeg' checkbox is checked
+  else
+  {
+	  // Properly close record by deleting file
+	 if(m_pFile4WriteSeg != NULL) { delete(m_pFile4WriteSeg); m_pFile4WriteSeg = NULL; };
+  } // 'record' checkbox is not checked
+}
+
+//---------------------------------------------------
+/*!
+	- Opens record file for VTK data. \n
+*/
+//! Open record interface for VTK data
+void CamFrame::OnRecVTK(wxCommandEvent& WXUNUSED(event))
+{
+#ifdef JMU_USE_VTK
+  unsigned int res = 0;
+  m_settingsPane->SetText(wxT("Record VTK attempt..."));
+  wxString strR;
+
+  if( m_settingsPane->IsRecVTKChecked() )
+  {
+    wxTextEntryDialog* txtDlg = new wxTextEntryDialog(this, wxT("Choose a prefix for VTK files"), wxT("Please enter prefix"), wxT("vtk_SR3100_noScatComp"));
+	if( (txtDlg->ShowModal()==wxID_OK) )
+	{
+		// save str to some string
+		_vtkRecPrefix = txtDlg->GetValue();
+		m_settingsPane->SetText(_vtkRecPrefix);
+	}
+	else
+	{
+		// set empty string to avoid saving
+		m_settingsPane->SetText(wxT("Not recording VTK ..."));
+	}
+  }
+  else
+  {
+	m_settingsPane->SetText(wxT("Stopped recording VTK."));
+  } // 'record' checkbox is not checked
+#else
+	m_settingsPane->SetText(wxT("CheckBox does nothing since VTK not used..."));
+#endif //#ifdef JMU_USE_VTK
+}
+
