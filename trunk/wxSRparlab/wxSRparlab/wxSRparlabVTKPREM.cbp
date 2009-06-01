@@ -29,6 +29,7 @@
 					<Add directory="/svnSandBox/trunk/libSRPLscat" />
 					<Add directory="/svnSandBox/trunk/libSRPLavg" />
 					<Add directory="/svnSandBox/trunk/libSRPLcoordTrf" />
+					<Add directory="/svnSandBox/trunk/libSRPLsegm" />
 				</Compiler>
 				<Linker>
 					<Add option="`wx-config --libs --unicode=no`" />
@@ -88,6 +89,7 @@
 					<Add directory="/svnSandBox/trunk/libSRPLscat" />
 					<Add directory="/svnSandBox/trunk/libSRPLavg" />
 					<Add directory="/svnSandBox/trunk/libSRPLcoordTrf" />
+					<Add directory="/svnSandBox/trunk/libSRPLsegm" />
 				</Compiler>
 				<Linker>
 					<Add option="`wx-config --libs --unicode=no`" />
