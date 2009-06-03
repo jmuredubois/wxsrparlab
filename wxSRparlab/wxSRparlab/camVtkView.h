@@ -145,7 +145,7 @@ private:
   vtkLookupTable	*kLUT;	//!< LUT for depth data display
 
   vtkStructuredGrid					*data;			//!< read TOF depth data
-  vtkPoints							*dataPoints;    //!< points vtk objects to store SR dara
+  vtkPoints							*dataPoints;    //!< points vtk objects to store SR data
   vtkStructuredGridGeometryFilter	*pdata;			//!< geometry filter to obtain PolyData
   vtkPolyDataMapper					*dataMapperZ;	//!< mapper for TOF data
   vtkPolyDataMapper					*dataMapperAmp;	//!< mapper for TOF data

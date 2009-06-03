@@ -439,6 +439,14 @@ int CamVtkView::updateTOF(int rows, int cols, unsigned short *z, short *y, short
 			dData->SetValue((iv1+iv2),(float)(pdata->GetOutput()->GetPoints()->GetPoint(iv1+iv2)[2]));		// make sure that depth data is the transformed value; :-( unable to avoid loop yet :-(
 			aData->SetValue((iv1+iv2),(float) amp[i]) ;		//  :-( unable to avoid loop yet :-(
 			sData->SetValue((iv1+iv2), (float) segm[i]) ;		//  :-( unable to avoid loop yet :-(
+			if(segm[i] < 120)
+			{
+				data->BlankPoint(iv1+iv2); 
+			}
+			else
+			{
+				data->UnBlankPoint(iv1+iv2);
+			}
 			i++; // le i++ doit être ici, il faut commencer à zéro !!!
 			iv2+=rows;
 			iv3++;
@@ -465,7 +473,7 @@ int CamVtkView::updateTOF(int rows, int cols, unsigned short *z, short *y, short
 {
 	int res = 0;
 	unsigned char* segm = (unsigned char*) malloc(rows*cols*sizeof(unsigned char));
-	memset(segm, 0x0, rows*cols*sizeof(unsigned char));
+	memset(segm, 250, rows*cols*sizeof(unsigned char));
 	res += updateTOF(rows, cols, z, y, x, amp, segm);
 	free(segm)	;
 	return res;

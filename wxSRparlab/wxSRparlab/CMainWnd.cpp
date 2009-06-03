@@ -810,6 +810,7 @@ void MainWnd::OnDepthCbar(wxCommandEvent& event)
 void MainWnd::OnICP(wxCommandEvent& event)
 {
 #ifdef JMU_USE_VTK
+	#ifdef JMU_ICPVTK
 	//int i = 0;
 	//std::vector<wxCheckBox*>::iterator itCtrl;  // get iterator on the controls
 	//std::vector<CamFrame*>::iterator itCam;  // get iterator on the camera frames
@@ -833,5 +834,6 @@ void MainWnd::OnICP(wxCommandEvent& event)
 	vtkStructuredGrid* icpSource = _vtkWin->icpCam(source, target);
 	(m_camFrm.back() )->GetCamVtk()->ShowStructGrid(icpSource);
 	_vtkWin->Render();
-#endif
+	#endif JMU_ICPVTK
+#endif // JMU_USEVTK
 }
