@@ -110,6 +110,7 @@ BEGIN_EVENT_TABLE(MainWnd, wxFrame)
 	EVT_CHECKBOX(IDC_AmplCbar, MainWnd::OnAmplCbar)
 	EVT_CHECKBOX(IDC_DepthCbar, MainWnd::OnDepthCbar)
 	EVT_TIMER(IDE_RendTimer, MainWnd::OnRendTimer)
+	EVT_BUTTON(IDB_icpVtk, MainWnd::OnICP)
 END_EVENT_TABLE()
 
 IMPLEMENT_APP(SrApp)
@@ -172,6 +173,7 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
 	_ckParaProj = NULL;
 	_ckSegmCbar = NULL; _ckAmplCbar = NULL; _ckDepthCbar = NULL;
 	m_pThreadReadDataSync = NULL;
+	_buttICP = NULL;
 }
 
 
@@ -263,12 +265,16 @@ void MainWnd::Init()
 
 	_buttAcqAll = new wxButton(_bgPanel, IDB_AcqAll, wxT("Acq. all") );
 #ifdef JMU_USE_VTK
+	_buttICP = new wxButton(_bgPanel, IDB_icpVtk, wxT("ICP") );
 	_ckParaProj = new wxCheckBox(_bgPanel, IDC_ParaProj, wxT("Parallel projection"));
+	wxBoxSizer *sizerVtk0 = new wxBoxSizer(wxHORIZONTAL); // create sizer for frame
+		sizerVtk0->Add(_ckParaProj, flagsExpand);
+		sizerVtk0->Add(_buttICP, flagsExpand);
 	_ckSegmCbar  = new wxCheckBox(_bgPanel, IDC_SegmCbar, wxT("Hide Segm. scale"));
 	_ckAmplCbar  = new wxCheckBox(_bgPanel, IDC_AmplCbar, wxT("Hide Ampl. scale"));
 	_ckDepthCbar = new wxCheckBox(_bgPanel, IDC_DepthCbar, wxT("Hide Depth. scale"));
 	wxBoxSizer *sizerCk = new wxBoxSizer(wxHORIZONTAL); // create sizer for frame
-		sizerCk->Add(_ckParaProj, flagsExpand);
+		sizerCk->Add(sizerVtk0, flagsExpand);
 		sizerCk->Add(_ckSegmCbar, flagsExpand);
 		sizerCk->Add(_ckAmplCbar, flagsExpand);
 		sizerCk->Add(_ckDepthCbar, flagsExpand);
@@ -797,5 +803,34 @@ void MainWnd::OnDepthCbar(wxCommandEvent& event)
 	if(_ckSegmCbar == NULL) return;
 	_vtkWin->hideDepthCbar( _ckDepthCbar->IsChecked() );
 	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
+#endif
+}
+
+/* acting on "Para proj" checkBox*/
+void MainWnd::OnICP(wxCommandEvent& event)
+{
+#ifdef JMU_USE_VTK
+	//int i = 0;
+	//std::vector<wxCheckBox*>::iterator itCtrl;  // get iterator on the controls
+	//std::vector<CamFrame*>::iterator itCam;  // get iterator on the camera frames
+	//for ( itCtrl  =_visVtk.begin(), itCam  =m_camFrm.begin();
+	//	  itCtrl !=_visVtk.end()  , itCam !=m_camFrm.end(); 
+	//	  itCtrl++, itCam++, i++ )
+	//{
+	//	if(!_vtkWin){return;};
+	//	(*itCam)->GetCamVtk()->hideDataAct( !((*itCtrl)->IsChecked()) );
+	//}
+	//for ( itCtrl  =_visBGVtk.begin(), itCam  =m_camFrm.begin();
+	//	  itCtrl !=_visBGVtk.end()  , itCam !=m_camFrm.end(); 
+	//	  itCtrl++, itCam++, i++ )
+	//{
+	//	if(!_vtkWin){return;};
+	//	(*itCam)->GetCamBGVtk()->hideDataAct( !((*itCtrl)->IsChecked()) );
+	//}
+	//_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
+	vtkStructuredGrid* source = (*(m_camFrm.begin()))->GetCamVtk()->GetTransformedStructGrid();
+	vtkStructuredGrid* target = (m_camFrm[1] )->GetCamVtk()->GetTransformedStructGrid();
+	int res = 0;
+	res += _vtkWin->icpCam(source, target);
 #endif
 }
