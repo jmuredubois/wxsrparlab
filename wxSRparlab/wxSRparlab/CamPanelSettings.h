@@ -49,6 +49,10 @@ public:
 	bool IsRecXYZChecked(){return m_ckBoxRecordXYZ->IsChecked();}; //
 	bool IsRecSegChecked(){return m_ckBoxRecordSeg->IsChecked();}; //
 	bool IsRecVTKChecked(){return m_ckBoxRecordVTK->IsChecked();}; //
+	#ifdef JMU_USE_VTK
+		bool IsBlankSegmVTKChecked(){return m_ckBoxBlankSegmVTK->IsChecked();}; //!< helper fct for "Blank segmentation" checkbox
+		unsigned char GetBlankSegmThr(); //!< Reads the value in the text control for number of RANSAC iterations
+	#endif // JMU_USE_VTK
 
 	void CamPanelSettings::DisableScatParams(); //!< Disables the "Scat Comp Params" button
 	void CamPanelSettings::EnableScatParams();  //!< Enables the "Scat Comp Params" button
@@ -97,16 +101,20 @@ private:
 	wxCheckBox* m_ckBoxFixPtrn;  // check box for fix pattern noise filter -> NOT USED
 	wxCheckBox* m_ckBoxLedNonLin; // check box for nonLinLED noise filter -> NOT USED
 	
-	wxCheckBox* m_ckBoxScatComp; // check box for activating scattering compensation
-	wxCheckBox* m_ckBoxLrnBg;	 // check box for learning background
-	wxCheckBox* m_ckBoxLrnFg;	 // check box for learning foreground
-	wxCheckBox* m_ckBoxRecord;	 // check box to record current image buffer (after scat comp)
-	wxCheckBox* m_ckBoxFgHidesData;	 // check box for learning foreground
-	wxCheckBox* m_ckBoxSegBayes; // check box for activating bayesian segmentation
-	wxCheckBox* m_ckBoxNoFlagNaN; // check box for DEactivating FlagNaN
-	wxCheckBox* m_ckBoxRecordXYZ; // check box to record current XYZ buffers (after scat comp)
-	wxCheckBox* m_ckBoxRecordSeg; // check box to record current XYZ buffers (after scat comp)
-	wxCheckBox* m_ckBoxRecordVTK; // check box to record current VTK data (after scat comp)
+	wxCheckBox* m_ckBoxScatComp; //!< check box for activating scattering compensation
+	wxCheckBox* m_ckBoxLrnBg;	 //!< check box for learning background
+	wxCheckBox* m_ckBoxLrnFg;	 //!< check box for learning foreground
+	wxCheckBox* m_ckBoxRecord;	 //!< check box to record current image buffer (after scat comp)
+	wxCheckBox* m_ckBoxFgHidesData;	 //!< check box for learning foreground
+	wxCheckBox* m_ckBoxSegBayes; //!< check box for activating bayesian segmentation
+	wxCheckBox* m_ckBoxNoFlagNaN; //!< check box for DEactivating FlagNaN
+	wxCheckBox* m_ckBoxRecordXYZ; //!< check box to record current XYZ buffers (after scat comp)
+	wxCheckBox* m_ckBoxRecordSeg; //!< check box to record current XYZ buffers (after scat comp)
+	wxCheckBox* m_ckBoxRecordVTK; //!< check box to record current VTK data (after scat comp)
+	#ifdef JMU_USE_VTK
+		wxCheckBox* m_ckBoxBlankSegmVTK; //!< check box to blank points with segm below thr in VTK display
+		wxTextCtrl* m_TxtBlankSegmThr; // RANSAC max number of iterations
+	#endif // JMU_USE_VTK
 	
 	/* TextControls */
 	wxTextCtrl* m_TxtDelayStat;

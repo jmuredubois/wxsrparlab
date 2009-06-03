@@ -199,6 +199,7 @@ BEGIN_EVENT_TABLE(CamFrame, wxFrame)
 	EVT_COMMAND(IDC_AcqOne, wxEVT_JMUACQONEFRM, CamFrame::AcqOneFrmEvt)
 	#ifdef JMU_USE_VTK
 		EVT_COMMAND(IDC_Render, wxEVT_JMURENDER, CamFrame::RenderEvt)
+		EVT_TEXT(IDT_BlankSegmThr, CamFrame::OnBlankSegmThr)
 	#endif
 	EVT_BUTTON(IDB_SetScatParams, CamFrame::OnSetScatParams)
 	EVT_BUTTON(IDB_ClearBg, CamFrame::OnClearBg)
@@ -905,14 +906,17 @@ void CamFrame::AcqOneFrm()
 	  m_viewBGAmpPane->SetDataArray<unsigned short>((unsigned short*) (PLAVG_GetAvgBuf(m_bgAvg)).amp, m_nRows*m_nCols);
 	  #ifdef JMU_USE_VTK
 		//if(m_camReadMode==CAM_RD_ONESHOT) // vtk does not support access from different threads
+	    // flag for supporting blanking of vtk data with segm results
+		_camVtk->setBlankSegm(m_settingsPane->IsBlankSegmVTKChecked());
+		// will update TOF VTK display, but function call is different if VTK data shall be saved
 		if(m_settingsPane->IsRecVTKChecked())
-		{
+		{ // when wanting to save, a filename must be provided
 			wxString curImg;
 			curImg.sprintf(wxT("%s%04u.vtk"), _vtkRecPrefix, m_nFrmRead);
 			_camVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrf), PLCTR_GetY(m_CTrf), PLCTR_GetX(m_CTrf), (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2], segmBuf, (char*)curImg.ToAscii());
 		}
 		else
-		{
+		{ // when not saving, just forget entering a filename
 			_camVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrf), PLCTR_GetY(m_CTrf), PLCTR_GetX(m_CTrf), (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2], segmBuf);
 		}
 		if(m_settingsPane->IsLrnBgChecked())
@@ -1415,3 +1419,12 @@ void CamFrame::OnRecVTK(wxCommandEvent& WXUNUSED(event))
 #endif //#ifdef JMU_USE_VTK
 }
 
+#ifdef JMU_USE_VTK
+void CamFrame::OnBlankSegmThr(wxCommandEvent& event)
+{
+    unsigned char val = 0;
+	val = m_settingsPane->GetBlankSegmThr();
+	if(_camVtk == NULL){return;};
+	_camVtk->setBlankThr(val);
+}
+#endif // JMU_USE_VTK

@@ -19,7 +19,13 @@
 CamPanelSettings::CamPanelSettings(wxWindow* parent, const wxString& title, const wxPoint& pos, const wxSize& size)
 : wxPanel(parent, wxID_ANY, pos, size, wxBORDER_NONE, title)
 {
-	m_TxtRansacNiterMax = NULL;
+	#ifdef JMU_RANSAC
+		m_TxtRansacNiterMax = NULL;
+	#endif
+	#ifdef JMU_USE_VTK
+		m_ckBoxBlankSegmVTK = NULL;
+		m_TxtBlankSegmThr = NULL;
+	#endif
 }
 
 /**
@@ -80,6 +86,17 @@ int CamPanelSettings::InitSettings()
 	wxBoxSizer *sizerSegm = new wxBoxSizer(wxHORIZONTAL);
 		sizerSegm->Add(m_ckBoxSegBayes, 0, wxEXPAND);
 		sizerSegm->Add(m_buttonSegmParams, 1, wxEXPAND);
+
+	#ifdef JMU_USE_VTK
+	// Blank segmentation results controls //
+    m_ckBoxBlankSegmVTK = new wxCheckBox( this, IDC_BlankSegmVtk, wxT("Blank segm. in VTK"),
+        wxDefaultPosition, wxDefaultSize, wxCHK_2STATE);
+    m_TxtBlankSegmThr = new wxTextCtrl( this, IDT_BlankSegmThr, wxString::Format(wxT("%i"),000) );
+
+	wxBoxSizer *sizerBlank = new wxBoxSizer(wxHORIZONTAL);
+		sizerBlank->Add(m_ckBoxBlankSegmVTK, 0, wxEXPAND);
+		sizerBlank->Add(m_TxtBlankSegmThr, 1, wxEXPAND);
+	#endif // JMU_USE_VTK
 
 	// Learn background controls //
     m_ckBoxLrnBg = new wxCheckBox( this, IDC_LrnBg, wxT("Learn background"),
@@ -155,6 +172,9 @@ int CamPanelSettings::InitSettings()
 	sizerPanel->Add(sizerLrnBg, 0, wxEXPAND);
     sizerPanel->Add(sizerScat, 0, wxEXPAND);
 	sizerPanel->Add(sizerSegm, 0, wxEXPAND);
+	#ifdef JMU_USE_VTK
+		sizerPanel->Add(sizerBlank, 0, wxEXPAND);
+	#endif
     sizerPanel->Add(m_radioboxSrFilt, 0, wxEXPAND);
 	sizerPanel->Add(m_buttonSetTrfMat, 0, wxEXPAND);
 	#ifdef JMU_TGTFOLLOW  
@@ -276,7 +296,7 @@ void CamPanelSettings::EnableSegmParams()
 };
 
 #ifdef JMU_RANSAC
-//! Enables the "Segm Params" button
+//! Reads the value in the text control for number of RANSAC iterations
 int CamPanelSettings::GetRansacNiterMax()
 {
 	if(!m_TxtRansacNiterMax){return -1;};
@@ -293,5 +313,26 @@ int CamPanelSettings::GetRansacNiterMax()
 		//m_TxtRansacIterMax->GetValue().Printf(wxT("%d"), _ampMax);
 	}
 	return (int)val;
+};
+#endif
+
+#ifdef JMU_USE_VTK
+//! Reads the value in the text control for number of RANSAC iterations
+unsigned char CamPanelSettings::GetBlankSegmThr()
+{
+	if(!m_TxtBlankSegmThr){return 0;};
+	long val = 0;
+	wxString strVal = m_TxtBlankSegmThr->GetValue();
+	if( strVal.ToLong(&val) ) /* read value as int*/
+	{
+		//SetAmpMax(val);
+	}
+	else
+	{
+		m_TxtBlankSegmThr->DiscardEdits();
+		return 0;
+		//m_TxtRansacIterMax->GetValue().Printf(wxT("%d"), _ampMax);
+	}
+	return (unsigned char)val;
 };
 #endif
