@@ -675,7 +675,7 @@ void CViewSrVtk::hideDepthCbar(bool doHide)
 }
 
 #ifdef JMU_ICPVTK
-int CViewSrVtk::icpCam(vtkStructuredGrid* source, vtkStructuredGrid* target)
+vtkStructuredGrid* CViewSrVtk::icpCam(vtkStructuredGrid* source, vtkStructuredGrid* target)
 {
 	int res = 0;
 
@@ -693,11 +693,13 @@ int CViewSrVtk::icpCam(vtkStructuredGrid* source, vtkStructuredGrid* target)
 	icp->Update();
 
 	//transform the source points by the ICP solution
-	vtkTransformPolyDataFilter* ICPTransFilter = vtkTransformPolyDataFilter::New();
+	vtkTransformFilter* ICPTransFilter = vtkTransformFilter::New();
 	ICPTransFilter->SetInput(source);
 	ICPTransFilter->SetTransform(icp);
 	ICPTransFilter->Update();
 
-	return res;
+	return ICPTransFilter->GetStructuredGridOutput();
+
+	//return res;
 }
 #endif

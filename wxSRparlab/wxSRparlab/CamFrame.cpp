@@ -765,7 +765,7 @@ void CamFrame::AcqOneFrm()
 {
   int res = 0;
   wxString strR;
-  m_pAcqSWatch->Start();
+  if(m_pAcqSWatch != NULL){  m_pAcqSWatch->Start();};
   // if buffers are defined
   if( (m_pSrBuf != NULL) && (m_CTrf!=NULL) )
   {
@@ -951,8 +951,11 @@ void CamFrame::AcqOneFrm()
   }
   //if((m_viewRangePane->IsShownOnScreen())){ m_viewRangePane->SetNewImage();};
   //if((m_viewAmpPane->IsShownOnScreen())){ m_viewAmpPane->SetNewImage();};
-  _acqTime = m_pAcqSWatch->Time();
-  m_pAcqSWatch->Pause();
+  if(m_pAcqSWatch != NULL)
+  {
+	_acqTime = m_pAcqSWatch->Time();
+	m_pAcqSWatch->Pause();
+  }
 };
 
 

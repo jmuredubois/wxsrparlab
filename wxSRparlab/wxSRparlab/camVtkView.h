@@ -105,6 +105,7 @@ public:
 	vtkFloatArray* GetSdata(){return sData;};
 	vtkStructuredGrid* GetTransformedStructGrid();
 	vtkDataObject* GetTransformedDataObj();
+	void ShowStructGrid(vtkStructuredGrid* grid2show);
 
 private:
 	static const int _vtkSubMax = NUMCAMS ; // VTKSUBMAX undeclared identifier bug 20080114

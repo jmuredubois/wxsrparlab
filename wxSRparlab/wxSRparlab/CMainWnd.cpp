@@ -828,9 +828,10 @@ void MainWnd::OnICP(wxCommandEvent& event)
 	//	(*itCam)->GetCamBGVtk()->hideDataAct( !((*itCtrl)->IsChecked()) );
 	//}
 	//_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
-	vtkStructuredGrid* source = (*(m_camFrm.begin()))->GetCamVtk()->GetTransformedStructGrid();
-	vtkStructuredGrid* target = (m_camFrm[1] )->GetCamVtk()->GetTransformedStructGrid();
-	int res = 0;
-	res += _vtkWin->icpCam(source, target);
+	vtkStructuredGrid* target = (m_camFrm.front())->GetCamVtk()->GetTransformedStructGrid();
+	vtkStructuredGrid* source = (m_camFrm.back() )->GetCamVtk()->GetTransformedStructGrid();
+	vtkStructuredGrid* icpSource = _vtkWin->icpCam(source, target);
+	(m_camFrm.back() )->GetCamVtk()->ShowStructGrid(icpSource);
+	_vtkWin->Render();
 #endif
 }
