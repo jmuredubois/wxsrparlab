@@ -882,3 +882,9 @@ vtkDataObject* CamVtkView::GetTransformedDataObj()
 {
 	return camTranFilter->GetOutputDataObject(0);
 }
+
+void CamVtkView::ShowStructGrid(vtkStructuredGrid* grid2show)
+{
+	pdata->SetInput(grid2show);
+	pdata->Modified();
+}

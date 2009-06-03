@@ -103,7 +103,7 @@ public:
 	void hideAmplCbar(bool doHide);
 	void hideDepthCbar(bool doHide);
 #ifdef JMU_ICPVTK
-	int icpCam(vtkStructuredGrid* source, vtkStructuredGrid* target);
+	vtkStructuredGrid* icpCam(vtkStructuredGrid* source, vtkStructuredGrid* target);
 #endif
 
 private:
