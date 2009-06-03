@@ -8,6 +8,10 @@
 # pragma once
 
 //#include "windows.h"
+#include "wxSRparlab.h"
+#include "CMainWnd.h"
+
+#define JMU_ICPVTK // testing experimental ICP from VTK
 
 // to stop complaints about vtkConfigure.h, include $(JMU_VTKBINBASE)
 // first include the required header files for the vtk classes we are using
@@ -43,11 +47,18 @@
 #include "vtkMatrix4x4.h"		// requires $(JMU_VTKSRCBASE)/Graphics
 #include "vtkStructuredGridWriter.h"	// requires $(JMU_VTKSRCBASE)/Graphics
 #include "vtkTextActor.h"		// requires $(JMU_VTKSRCBASE)/Rendering
+// JMU_ICPVTK
+#include "vtkCellArray.h"
+#include "vtkSmartPointer.h"
+#include "vtkIterativeClosestPointTransform.h"
+#include "vtkTransformPolyDataFilter.h"
+#include "vtkLandmarkTransform.h" //to set type to ridgid body
+
+
 
 //#include "libusbSR.h"
 //#include "libSRparlab.h" // for SRCAM
-#include "wxSRparlab.h"
-#include "CMainWnd.h"
+
 
 class CamVtkView; // a class to represent ONE camera of the scene
 
@@ -91,6 +102,9 @@ public:
 	void hideSegmCbar(bool doHide);
 	void hideAmplCbar(bool doHide);
 	void hideDepthCbar(bool doHide);
+#ifdef JMU_ICPVTK
+	int icpCam(vtkStructuredGrid* source, vtkStructuredGrid* target);
+#endif
 
 private:
 	static const int _vtkSubMax = NUMCAMS ; // VTKSUBMAX undeclared identifier bug 20080114

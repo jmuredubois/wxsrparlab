@@ -673,3 +673,31 @@ void CViewSrVtk::hideDepthCbar(bool doHide)
 	}
 	return;
 }
+
+#ifdef JMU_ICPVTK
+int CViewSrVtk::icpCam(vtkStructuredGrid* source, vtkStructuredGrid* target)
+{
+	int res = 0;
+
+	// ripped off from : http://www.vtk.org/Wiki/Iterative_Closest_Points_(ICP)_Transform
+
+	//setup ICP transform
+	vtkIterativeClosestPointTransform* icp = vtkIterativeClosestPointTransform::New();
+	icp->SetSource(source);
+	icp->SetTarget(target);
+	icp->GetLandmarkTransform()->SetModeToRigidBody();
+	//icp->DebugOn();
+	icp->SetMaximumNumberOfIterations(20);
+	icp->StartByMatchingCentroidsOn();
+	icp->Modified();
+	icp->Update();
+
+	//transform the source points by the ICP solution
+	vtkTransformPolyDataFilter* ICPTransFilter = vtkTransformPolyDataFilter::New();
+	ICPTransFilter->SetInput(source);
+	ICPTransFilter->SetTransform(icp);
+	ICPTransFilter->Update();
+
+	return res;
+}
+#endif

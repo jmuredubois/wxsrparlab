@@ -63,6 +63,7 @@ public:
 	void OnSegmCbar(wxCommandEvent& event);  //! Display or hide segm colorbar
 	void OnAmplCbar(wxCommandEvent& event);  //! Display or hide ampl colorbar
 	void OnDepthCbar(wxCommandEvent& event); //! Display or hide depth colorbar
+	void OnICP(wxCommandEvent& event); //! try to use VTK's ICP
 
 
     DECLARE_EVENT_TABLE()
@@ -101,6 +102,7 @@ private:
 	wxCheckBox* _ckSegmCbar;  //! Show segmentation colorbar checkbox
 	wxCheckBox* _ckAmplCbar;  //! Show amplitude    colorbar checkbox
 	wxCheckBox* _ckDepthCbar; //! Show depth        colorbar checkbox
+	wxButton* _buttICP; //! button for ICP
 };
 
 //! enum used by main wnd
@@ -121,5 +123,6 @@ enum MainWndEnum
 	IDC_ParaProj,
 	IDC_SegmCbar,
 	IDC_AmplCbar,
-	IDC_DepthCbar
+	IDC_DepthCbar,
+	IDB_icpVtk
 };

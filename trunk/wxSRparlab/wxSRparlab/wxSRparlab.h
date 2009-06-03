@@ -86,5 +86,6 @@
 #endif
 
 #define JMU_RANSAC // testing experimental C++ RANSAC
+#define JMU_ICPVTK // testing experimental ICP from VTK
 
 #include "srBuf.h"

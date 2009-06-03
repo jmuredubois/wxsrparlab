@@ -871,3 +871,14 @@ void CamVtkView::setDataOpacity(double alpha)
 	if( (alpha<0.0) || (alpha > 1.0)){return;};
 	dataActor->GetProperty()->SetOpacity(alpha);
 }
+
+vtkStructuredGrid* CamVtkView::GetTransformedStructGrid()
+{
+	vtkStructuredGrid* toto = dataWriter->GetInput(0);
+	return toto;
+}
+
+vtkDataObject* CamVtkView::GetTransformedDataObj()
+{
+	return camTranFilter->GetOutputDataObject(0);
+}
