@@ -58,6 +58,8 @@ CamVtkView::CamVtkView(int vtkSub, vtkRenderWindow* ParRenWin, vtkLookupTable* L
 	renderer->AddActor(srCubeActor);
 	renderer->AddActor(dataActor);
 	renderer->AddActor(srLabelActor);
+	blankThr = 0;
+	blankSegm = false;
 };
 
 /**
@@ -439,7 +441,7 @@ int CamVtkView::updateTOF(int rows, int cols, unsigned short *z, short *y, short
 			dData->SetValue((iv1+iv2),(float)(pdata->GetOutput()->GetPoints()->GetPoint(iv1+iv2)[2]));		// make sure that depth data is the transformed value; :-( unable to avoid loop yet :-(
 			aData->SetValue((iv1+iv2),(float) amp[i]) ;		//  :-( unable to avoid loop yet :-(
 			sData->SetValue((iv1+iv2), (float) segm[i]) ;		//  :-( unable to avoid loop yet :-(
-			if(segm[i] < 120)
+			if(blankSegm && (segm[i] < blankThr) )
 			{
 				data->BlankPoint(iv1+iv2); 
 			}
@@ -895,4 +897,18 @@ void CamVtkView::ShowStructGrid(vtkStructuredGrid* grid2show)
 {
 	pdata->SetInput(grid2show);
 	pdata->Modified();
+}
+
+void CamVtkView::setBlankThr(unsigned char thr)
+{
+	blankThr = thr; // this is easy at the end
+}
+
+void CamVtkView::setBlankSegm(bool blank)
+{
+	if( (blankSegm == true) && (blank == false) )
+	{ // unblank all points
+
+	}
+	blankSegm = blank; // this is easy at the end
 }

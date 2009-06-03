@@ -106,6 +106,10 @@ public:
 	vtkStructuredGrid* GetTransformedStructGrid();
 	vtkDataObject* GetTransformedDataObj();
 	void ShowStructGrid(vtkStructuredGrid* grid2show);
+	void setBlankThr(unsigned char thr);
+	unsigned char getBlankThr(){ return blankThr;};
+	void setBlankSegm(bool blank);
+	bool getBlankSegm(){return blankSegm;};
 
 private:
 	static const int _vtkSubMax = NUMCAMS ; // VTKSUBMAX undeclared identifier bug 20080114
@@ -176,4 +180,6 @@ private:
 
   vtkStructuredGridWriter	*dataWriter;	//! Structured Grid datawriter
   vtkStructuredGridWriter	*BGdataWriter;	//! Structured Grid datawriter
+  bool blankSegm;
+  unsigned char blankThr;
 };

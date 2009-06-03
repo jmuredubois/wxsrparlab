@@ -90,6 +90,7 @@ public:
 	CamVtkView* GetCamVtk(){return _camVtk;};
 	CamVtkView* GetCamBGVtk(){return _camBGVtk;};
 	void RenderEvt(wxCommandEvent& WXUNUSED(event));
+	void OnBlankSegmThr(wxCommandEvent& event);
 #endif
 	int GetVtkSub(){return _vtkSub;};
 	int GetNumCols(){return m_nCols;};
@@ -213,6 +214,8 @@ enum CamFrameEnum
 	IDC_RecordXYZ = 28,
 	IDC_RecordSeg = 29,
 	IDC_RecordVTK = 30,
+	IDC_BlankSegmVtk = 31,
+	IDT_BlankSegmThr = 32,
 	ID_ThisIsAStop = 255
 };
 
