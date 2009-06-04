@@ -491,22 +491,24 @@ int CamVtkView::updateTOF(int rows, int cols, unsigned short *z, short *y, short
 	res += updateTOF(rows, cols, z, y, x, amp, segm);
 	if(res!=0){return -2;};
 	dataWriter->SetFileName(fname);
-	std::ostream* fpU = dataWriter->OpenVTKFile();
-	int bad = dataWriter->WriteHeader(fpU);
-	if(bad ==0){return -1;}; //
-	//dataWriter->WriteData();
-	//dataWriter->WritePoints(fpU, dataPoints);
+
+
+	//std::ostream* fpU = dataWriter->OpenVTKFile();
+	//int bad = dataWriter->WriteHeader(fpU);
+	//if(bad ==0){return -1;}; //
+	////dataWriter->WriteData();
+	////dataWriter->WritePoints(fpU, dataPoints);
+	//dataWriter->GetInput()->GetPointData()->AddArray(dData);
+	//dataWriter->GetInput()->GetPointData()->AddArray(aData);
+	//dataWriter->GetInput()->GetPointData()->AddArray(sData);
+	//dataWriter->WritePoints(fpU, dataWriter->GetInput()->GetPoints());
+	//dataWriter->CloseVTKFile(fpU);
+
+
 	dataWriter->GetInput()->GetPointData()->AddArray(dData);
 	dataWriter->GetInput()->GetPointData()->AddArray(aData);
 	dataWriter->GetInput()->GetPointData()->AddArray(sData);
-	dataWriter->WritePoints(fpU, dataWriter->GetInput()->GetPoints());
-	dataWriter->CloseVTKFile(fpU);
-
-
-	/*dataWriter->GetInput()->GetPointData()->AddArray(dData);
-	dataWriter->GetInput()->GetPointData()->AddArray(aData);
-	dataWriter->GetInput()->GetPointData()->AddArray(sData);
-	res+=dataWriter->Write();*/
+	res+=dataWriter->Write();
 	return res;
 }
 /**
