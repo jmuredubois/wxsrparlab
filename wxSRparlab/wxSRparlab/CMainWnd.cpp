@@ -111,6 +111,7 @@ BEGIN_EVENT_TABLE(MainWnd, wxFrame)
 	EVT_CHECKBOX(IDC_DepthCbar, MainWnd::OnDepthCbar)
 	EVT_TIMER(IDE_RendTimer, MainWnd::OnRendTimer)
 	EVT_BUTTON(IDB_icpVtk, MainWnd::OnICP)
+	EVT_BUTTON(IDB_kdDistVtk, MainWnd::OnKdDist)
 END_EVENT_TABLE()
 
 IMPLEMENT_APP(SrApp)
@@ -266,10 +267,18 @@ void MainWnd::Init()
 	_buttAcqAll = new wxButton(_bgPanel, IDB_AcqAll, wxT("Acq. all") );
 #ifdef JMU_USE_VTK
 	_buttICP = new wxButton(_bgPanel, IDB_icpVtk, wxT("ICP") );
+	#ifndef JMU_ICPVTK
+		_buttICP->Disable();
+	#endif
+	_buttKdDistVtk = new wxButton(_bgPanel, IDB_kdDistVtk, wxT("kdDist") );
+	#ifndef JMU_KDTREEVTK
+		_buttKdDistVtk->Disable();
+	#endif
 	_ckParaProj = new wxCheckBox(_bgPanel, IDC_ParaProj, wxT("Parallel projection"));
 	wxBoxSizer *sizerVtk0 = new wxBoxSizer(wxHORIZONTAL); // create sizer for frame
 		sizerVtk0->Add(_ckParaProj, flagsExpand);
 		sizerVtk0->Add(_buttICP, flagsExpand);
+		sizerVtk0->Add(_buttKdDistVtk, flagsExpand);
 	_ckSegmCbar  = new wxCheckBox(_bgPanel, IDC_SegmCbar, wxT("Hide Segm. scale"));
 	_ckAmplCbar  = new wxCheckBox(_bgPanel, IDC_AmplCbar, wxT("Hide Ampl. scale"));
 	_ckDepthCbar = new wxCheckBox(_bgPanel, IDC_DepthCbar, wxT("Hide Depth. scale"));
@@ -806,7 +815,10 @@ void MainWnd::OnDepthCbar(wxCommandEvent& event)
 #endif
 }
 
-/* acting on "Para proj" checkBox*/
+/** acting on "ICP" button \n
+ * - bug: for now only first and last cam are used \n
+ * - todo: make dataset choice configurable
+ */
 void MainWnd::OnICP(wxCommandEvent& event)
 {
 #ifdef JMU_USE_VTK
@@ -834,6 +846,41 @@ void MainWnd::OnICP(wxCommandEvent& event)
 	vtkStructuredGrid* icpSource = _vtkWin->icpCam(source, target);
 	(m_camFrm.back() )->GetCamVtk()->ShowStructGrid(icpSource);
 	_vtkWin->Render();
-	#endif JMU_ICPVTK
+	#endif //JMU_ICPVTK
+#endif // JMU_USEVTK
+}
+
+/** acting on "kdDist" button \n
+ * - bug: for now only first and last cam are used \n
+ * - todo: make dataset choice configurable
+ */
+void MainWnd::OnKdDist(wxCommandEvent& event)
+{
+#ifdef JMU_USE_VTK
+	#ifdef JMU_KDTREEVTK
+	//int i = 0;
+	//std::vector<wxCheckBox*>::iterator itCtrl;  // get iterator on the controls
+	//std::vector<CamFrame*>::iterator itCam;  // get iterator on the camera frames
+	//for ( itCtrl  =_visVtk.begin(), itCam  =m_camFrm.begin();
+	//	  itCtrl !=_visVtk.end()  , itCam !=m_camFrm.end(); 
+	//	  itCtrl++, itCam++, i++ )
+	//{
+	//	if(!_vtkWin){return;};
+	//	(*itCam)->GetCamVtk()->hideDataAct( !((*itCtrl)->IsChecked()) );
+	//}
+	//for ( itCtrl  =_visBGVtk.begin(), itCam  =m_camFrm.begin();
+	//	  itCtrl !=_visBGVtk.end()  , itCam !=m_camFrm.end(); 
+	//	  itCtrl++, itCam++, i++ )
+	//{
+	//	if(!_vtkWin){return;};
+	//	(*itCam)->GetCamBGVtk()->hideDataAct( !((*itCtrl)->IsChecked()) );
+	//}
+	//_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
+	vtkStructuredGrid* target = (m_camFrm.front())->GetCamVtk()->GetTransformedStructGrid();
+	vtkStructuredGrid* source = (m_camFrm.back() )->GetCamVtk()->GetTransformedStructGrid();
+	double dist = _vtkWin->kdTreeEps(source, target);
+	wxString strDist = wxT("kdDist returned: ");
+	SetStatusText(strDist);
+	#endif //JMU_KDTREEVTK
 #endif // JMU_USEVTK
 }
