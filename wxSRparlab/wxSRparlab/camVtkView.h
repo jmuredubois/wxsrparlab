@@ -104,7 +104,7 @@ public:
 	vtkFloatArray* GetAdata(){return aData;};
 	vtkFloatArray* GetSdata(){return sData;};
 	vtkStructuredGrid* GetTransformedStructGrid();
-	vtkStructuredGrid* GetTransformedStructGridBG();
+	//vtkStructuredGrid* GetTransformedStructGridBG();
 	vtkDataObject* GetTransformedDataObj();
 	void ShowStructGrid(vtkStructuredGrid* grid2show);
 	void setBlankThr(unsigned char thr);
@@ -177,10 +177,8 @@ private:
   vtkTransform			*camTran;			//!< transformation between camera coordinates
   vtkMatrix4x4			*camTranMat;		//!< 4D transformation matrix
   vtkTransformFilter	*camTranFilter;	//!< filter for transformation between camera coordinates
-  vtkTransformFilter	*BGcamTranFilter;	//!< filter for transformation between camera coordinates
 
   vtkStructuredGridWriter	*dataWriter;	//! Structured Grid datawriter
-  vtkStructuredGridWriter	*BGdataWriter;	//! Structured Grid datawriter
   bool blankSegm;
   unsigned char blankThr;
 };
