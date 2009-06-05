@@ -104,6 +104,7 @@ public:
 	vtkFloatArray* GetAdata(){return aData;};
 	vtkFloatArray* GetSdata(){return sData;};
 	vtkStructuredGrid* GetTransformedStructGrid();
+	vtkStructuredGrid* GetTransformedStructGridBG();
 	vtkDataObject* GetTransformedDataObj();
 	void ShowStructGrid(vtkStructuredGrid* grid2show);
 	void setBlankThr(unsigned char thr);

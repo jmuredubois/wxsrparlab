@@ -889,6 +889,11 @@ vtkStructuredGrid* CamVtkView::GetTransformedStructGrid()
 	vtkStructuredGrid* toto = dataWriter->GetInput(0);
 	return toto;
 }
+vtkStructuredGrid* CamVtkView::GetTransformedStructGridBG()
+{
+	vtkStructuredGrid* toto = vtkStructuredGrid::SafeDownCast( BGcamTranFilter->GetOutputDataObject(0));
+	return toto;
+}
 
 vtkDataObject* CamVtkView::GetTransformedDataObj()
 {

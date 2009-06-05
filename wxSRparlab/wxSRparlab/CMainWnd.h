@@ -36,7 +36,10 @@ public:
     void OnQuit(wxCommandEvent& event);	//!< cleanup
 	//! About(..) method
     void OnAbout(wxCommandEvent& event); //!< about box
-
+	void AcqAll(wxCommandEvent& event);	//!< send Acquire command to all cams
+	void PopCam(int vtkSub); //!< remove camFrame object from list if window is closed
+	std::vector<CamFrame*>* GetCamFrms(){return &m_camFrm;}; //! Get cam frames list
+#ifdef JMU_USE_VTK
 	void SetZMin(double val);	//!< set min Z for vtk display
 	void SetZMax(double val);	//!< set max Z for vtk display
 	void SetZVtk();
@@ -52,25 +55,27 @@ public:
 	void SetSegmVtk();
 	void TextChangedSegMin(wxCommandEvent &); //!< react on event changed min seg
 	void TextChangedSegMax(wxCommandEvent &); //!< react on event changed max seg
-	void AcqAll(wxCommandEvent& event);	//!< send Acquire command to all cams
 	void SetVisVtk(wxCommandEvent& event); //!< react on event changed visibility
 	void SetColVtk(wxCommandEvent& event); //!< react on event changed color options
-	void PopCam(int vtkSub); //!< remove camFrame object from list if window is closed
 	void OnParaProj(wxCommandEvent& event); //! Set projection to parallel or perpective
 	void OnRendTimer(wxTimerEvent& event); //! Render timer event action
-	std::vector<CamFrame*>* GetCamFrms(){return &m_camFrm;}; //! Get cam frames list
 	CViewSrVtk* GetVtkWin(){return _vtkWin;} ; //!< pointer to vtk window
 	void OnSegmCbar(wxCommandEvent& event);  //! Display or hide segm colorbar
 	void OnAmplCbar(wxCommandEvent& event);  //! Display or hide ampl colorbar
 	void OnDepthCbar(wxCommandEvent& event); //! Display or hide depth colorbar
 	void OnICP(wxCommandEvent& event); //! try to use VTK's ICP
 	void OnKdDist(wxCommandEvent& event); //!  point set distance based on VTK kd-tree
+#endif // JMU_USE_VTK
 
 
     DECLARE_EVENT_TABLE()
 
 private:
 	wxPanel *_bgPanel; //!< background panel for main wnd
+	int			_numCams;		//!< count of cameras
+	std::vector<CamFrame*> m_camFrm;		//!< list of camFrames
+	wxButton* _buttAcqAll; //!< Acquire image camera
+#ifdef JMU_USE_VTK
 	wxTextCtrl *_txtZMin;		//!< control text : min Z
 	wxTextCtrl *_txtZMax;		//!< control text : max Z
 	double	_zMin;				//!< stored min Z
@@ -86,10 +91,7 @@ private:
 	double _segmMin;				//!< stored min segm
 	double _segmMax;				//!< stored max segm
 	bool _txtSegInit;			//!< helper var: ensure seg ctrl txt are initialized
-	int			_numCams;		//!< count of cameras
-	std::vector<CamFrame*> m_camFrm;		//!< list of camFrames
 	CViewSrVtk	*_vtkWin ; //!< pointer to vtk window
-	wxButton* _buttAcqAll; //!< Acquire image camera
 	std::vector<wxCheckBox*> _visVtk;		//!< list of visibility checkboxes
 	std::vector<wxComboBox*> _colVtk;		//!< list of vtk color options
 	std::vector<wxCheckBox*> _visBGVtk;		//!< list of BACKGROUND visibility checkboxes
@@ -105,6 +107,7 @@ private:
 	wxCheckBox* _ckDepthCbar; //! Show depth        colorbar checkbox
 	wxButton* _buttICP; //! button for ICP
 	wxButton* _buttKdDistVtk; //! button for point set distance based on VTK kd-tree
+#endif // JMU_USE_VTK
 };
 
 //! enum used by main wnd
