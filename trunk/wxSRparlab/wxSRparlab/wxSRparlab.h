@@ -50,6 +50,7 @@
 #include "wx/app.h"			//!< for posting events
 #include "wx/timer.h"		//!< for timer interface (used in rendering for example);
 #include "wx/stopwatch.h"	//!< for stopwatch interface;
+#include "wx/combobox.h"		//!< for listbox
 
 #include <list>		//STL list
 #include <vector>		//STL list

@@ -104,7 +104,7 @@ BEGIN_EVENT_TABLE(MainWnd, wxFrame)
 	EVT_TEXT(IDT_segMax, MainWnd::TextChangedSegMax)
 	EVT_BUTTON(IDB_AcqAll, MainWnd::AcqAll)
 	EVT_CHECKBOX(IDC_visVtk, MainWnd::SetVisVtk)
-	EVT_RADIOBOX(IDC_colVtk, MainWnd::SetColVtk)
+	EVT_COMBOBOX(IDC_colVtk, MainWnd::SetColVtk)
 	EVT_CHECKBOX(IDC_ParaProj, MainWnd::OnParaProj)
 	EVT_CHECKBOX(IDC_SegmCbar, MainWnd::OnSegmCbar)
 	EVT_CHECKBOX(IDC_AmplCbar, MainWnd::OnAmplCbar)
@@ -283,7 +283,7 @@ void MainWnd::Init()
 	_ckAmplCbar  = new wxCheckBox(_bgPanel, IDC_AmplCbar, wxT("Hide Ampl. scale"));
 	_ckDepthCbar = new wxCheckBox(_bgPanel, IDC_DepthCbar, wxT("Hide Depth. scale"));
 	wxBoxSizer *sizerCk = new wxBoxSizer(wxHORIZONTAL); // create sizer for frame
-		sizerCk->Add(sizerVtk0, flagsExpand);
+		//sizerCk->Add(sizerVtk0, flagsExpand);
 		sizerCk->Add(_ckSegmCbar, flagsExpand);
 		sizerCk->Add(_ckAmplCbar, flagsExpand);
 		sizerCk->Add(_ckDepthCbar, flagsExpand);
@@ -295,11 +295,12 @@ void MainWnd::Init()
 	_sizerCamVisCol = new wxGridBagSizer();
 
 	wxGridBagSizer *sizerPanel = new wxGridBagSizer();
-		sizerPanel->Add(_sizerCamVisCol, wxGBPosition(0,0), wxGBSpan(8,4));
-		sizerPanel->Add(sizerAcqScales, wxGBPosition(8,0), wxGBSpan(2,4));
+		sizerPanel->Add(_sizerCamVisCol, wxGBPosition(0,0), wxGBSpan(4,4));
+		sizerPanel->Add(sizerAcqScales, wxGBPosition(6,0), wxGBSpan(2,4));
 #ifdef JMU_USE_VTK
 		//sizerPanel->Add(_ckParaProj, wxGBPosition(10,0), wxGBSpan(1,4));
-		sizerPanel->Add(sizerCk, wxGBPosition(10,0), wxGBSpan(1,8));
+		sizerPanel->Add(sizerVtk0, wxGBPosition(8,0), wxGBSpan(1,4));
+		sizerPanel->Add(sizerCk, wxGBPosition(9,0), wxGBSpan(1,4));
 #endif
 
 	wxBoxSizer *sizerFrame = new wxBoxSizer(wxVERTICAL); // create sizer for frame
@@ -332,8 +333,8 @@ void MainWnd::AddChildren()
 	_vtkWin = new CViewSrVtk(NULL, 440,50,1024,768);
 #endif
 
-	wxString colors[] = { wxT("Z"), wxT("Amp."), wxT("Segm."), wxT("R"),
-        wxT("G"), wxT("B"), wxT("W"), wxT("K") };
+	wxString colors[] = { wxT("Depth (Z)"), wxT("Amplitude"), wxT("Segmentation"), wxT("red"),
+        wxT("green"), wxT("blue"), wxT("white"), wxT("black") };
 
 	//! - for the max number of cameras ...
 	for(int i = 0; i<_numCams; i++){
@@ -357,17 +358,17 @@ void MainWnd::AddChildren()
 		_sizerCamVisCol->Add(chkBox, wxGBPosition(i,0));
 		_visVtk.push_back(chkBox);	// add visibility checkbox to container
 
-		wxRadioBox *colBox = new wxRadioBox(_bgPanel, IDC_colVtk, wxT("Color"), 
-			wxDefaultPosition, wxDefaultSize, 7, colors, 0, wxRA_SPECIFY_COLS );
-		_sizerCamVisCol->Add(colBox, wxGBPosition(i,2));
+		wxComboBox* colBox = new wxComboBox(_bgPanel, IDC_colVtk, wxT("Depth (Z)"),
+			wxDefaultPosition, wxDefaultSize, 7, colors, wxCB_READONLY);
+		_sizerCamVisCol->Add(colBox, wxGBPosition(i,1));
 		_colVtk.push_back(colBox);
 
 		wxCheckBox *chkBGBox = new wxCheckBox(_bgPanel, IDC_visVtk, labBGT);	
 		chkBGBox->SetValue(true);
-		_sizerCamVisCol->Add(chkBGBox, wxGBPosition(i,1));
+		_sizerCamVisCol->Add(chkBGBox, wxGBPosition(i,2));
 		_visBGVtk.push_back(chkBGBox);	// add visibility checkbox to container
-		wxRadioBox *colBGBox = new wxRadioBox(_bgPanel, IDC_colVtk, wxT("BG Color"), 
-			wxDefaultPosition, wxDefaultSize, 7, colors, 0, wxRA_SPECIFY_COLS );
+		wxComboBox* colBGBox = new wxComboBox(_bgPanel, IDC_colVtk, wxT("Depth (Z)"),
+			wxDefaultPosition, wxDefaultSize, 7, colors, wxCB_READONLY);
 		_sizerCamVisCol->Add(colBGBox, wxGBPosition(i,3));
 		_colBGVtk.push_back(colBGBox);
 
@@ -648,40 +649,40 @@ void MainWnd::SetColVtk(wxCommandEvent& event)
 {
 #ifdef JMU_USE_VTK
 	int i = 0;
-	std::vector<wxRadioBox*>::iterator itCtrl;  // get iterator on the controls
+	std::vector<wxComboBox*>::iterator itCtrl;  // get iterator on the controls
 	std::vector<CamFrame*>::iterator itCam;  // get iterator on the camera frames
 	for ( itCtrl  =_colVtk.begin(), itCam  =m_camFrm.begin();
 		  itCtrl !=_colVtk.end()  , itCam !=m_camFrm.end(); 
 		  itCtrl++, itCam++, i++ )
 	{
 		if(!_vtkWin){return;};
-		/* wxString colors[] = { wxT("Z"), wxT("Amp."), wxT("Segm."), wxT("R"),
-        wxT("G"), wxT("B"), wxT("W"), wxT("K") };*/
-		wxString strCol = (*itCtrl)->GetStringSelection();
+		/* wxString colors[] = { wxT("Depth (Z)"), wxT("Amplitude"), wxT("Segmentation"), wxT("red"),
+        wxT("green"), wxT("blue"), wxT("white"), wxT("black") };*/
+		wxString strCol = (*itCtrl)->GetValue();
 		double r, g, b; r=0.0; g=0.0; b=0.0;
-		if(  strCol.IsSameAs(wxT("Z"))  )
+		if(  strCol.IsSameAs(wxT("Depth (Z)"))  )
 		{
 			(*itCam)->GetCamVtk()->setDataMapperColorDepth();
 			SetZMin(_zMin); // trick to update data Mapper
 		}
-		if(  strCol.IsSameAs(wxT("Amp."))  )
+		if(  strCol.IsSameAs(wxT("Amplitude"))  )
 		{
 			(*itCam)->GetCamVtk()->setDataMapperColorGray();
 			SetAmpMin(_ampMin); // trick to update data Mapper
 		}
-		if(  strCol.IsSameAs(wxT("Segm."))  )
+		if(  strCol.IsSameAs(wxT("Segmentation"))  )
 		{
 			(*itCam)->GetCamVtk()->setDataMapperColorSegm();
 			SetSegMin(_segmMin); // trick to update data Mapper
 		}
-		if(  strCol.IsSameAs(wxT("R")) || strCol.IsSameAs(wxT("G")) || strCol.IsSameAs(wxT("B"))
-			 || strCol.IsSameAs(wxT("W")) || strCol.IsSameAs(wxT("K")))
+		if(  strCol.IsSameAs(wxT("red")) || strCol.IsSameAs(wxT("green")) || strCol.IsSameAs(wxT("blue"))
+			 || strCol.IsSameAs(wxT("white")) || strCol.IsSameAs(wxT("black")))
 		{
-			if(  strCol.IsSameAs(wxT("R"))  ) { (*itCam)->GetCamVtk()->setDataMapperColorR();/*/r=1.0; g=0.0; b=0.0;/**/} ;
-			if(  strCol.IsSameAs(wxT("G"))  ) { (*itCam)->GetCamVtk()->setDataMapperColorG();/*/r=0.0; g=1.0; b=0.0;/**/} ;
-			if(  strCol.IsSameAs(wxT("B"))  ) { (*itCam)->GetCamVtk()->setDataMapperColorB();/*/r=0.0; g=0.0; b=1.0;/**/} ;
-			if(  strCol.IsSameAs(wxT("W"))  ) { (*itCam)->GetCamVtk()->setDataMapperColorW();/*/r=1.0; g=1.0; b=1.0;/**/} ;
-			if(  strCol.IsSameAs(wxT("K"))  ) { (*itCam)->GetCamVtk()->setDataMapperColorK();/*/r=0.0; g=0.0; b=0.0;/**/} ;
+			if(  strCol.IsSameAs(wxT("red"))  ) { (*itCam)->GetCamVtk()->setDataMapperColorR();/*/r=1.0; g=0.0; b=0.0;/**/} ;
+			if(  strCol.IsSameAs(wxT("green"))  ) { (*itCam)->GetCamVtk()->setDataMapperColorG();/*/r=0.0; g=1.0; b=0.0;/**/} ;
+			if(  strCol.IsSameAs(wxT("blue"))  ) { (*itCam)->GetCamVtk()->setDataMapperColorB();/*/r=0.0; g=0.0; b=1.0;/**/} ;
+			if(  strCol.IsSameAs(wxT("white"))  ) { (*itCam)->GetCamVtk()->setDataMapperColorW();/*/r=1.0; g=1.0; b=1.0;/**/} ;
+			if(  strCol.IsSameAs(wxT("black"))  ) { (*itCam)->GetCamVtk()->setDataMapperColorK();/*/r=0.0; g=0.0; b=0.0;/**/} ;
 			/*/(*itCam)->GetCamVtk()->setDataActColorRGB(r,g,b);/**/
 		}
 	}
@@ -690,33 +691,33 @@ void MainWnd::SetColVtk(wxCommandEvent& event)
 		  itCtrl++, itCam++, i++ )
 	{
 		if(!_vtkWin){return;};
-		/* wxString colors[] = { wxT("Z"), wxT("Amp."), wxT("Segm."), wxT("R"),
-        wxT("G"), wxT("B"), wxT("W"), wxT("K") };*/
-		wxString strCol = (*itCtrl)->GetStringSelection();
+		/* wxString colors[] = { wxT("Depth (Z)"), wxT("Amplitude"), wxT("Segmentation"), wxT("red"),
+        wxT("green"), wxT("blue"), wxT("white"), wxT("black") };*/
+		wxString strCol = (*itCtrl)->GetValue();
 		double r, g, b; r=0.0; g=0.0; b=0.0;
-		if(  strCol.IsSameAs(wxT("Z"))  )
+		if(  strCol.IsSameAs(wxT("Depth (Z)"))  )
 		{
 			(*itCam)->GetCamBGVtk()->setDataMapperColorDepth();
 			SetZMin(_zMin); // trick to update data Mapper
 		}
-		if(  strCol.IsSameAs(wxT("Amp."))  )
+		if(  strCol.IsSameAs(wxT("Amplitude"))  )
 		{
 			(*itCam)->GetCamBGVtk()->setDataMapperColorGray();
 			SetAmpMin(_ampMin); // trick to update data Mapper
 		}
-		if(  strCol.IsSameAs(wxT("Segm."))  )
+		if(  strCol.IsSameAs(wxT("Segmentation"))  )
 		{
 			(*itCam)->GetCamBGVtk()->setDataMapperColorSegm();
 			SetSegMin(_segmMin); // trick to update data Mapper
 		}
-		if(  strCol.IsSameAs(wxT("R")) || strCol.IsSameAs(wxT("G")) || strCol.IsSameAs(wxT("B"))
-			 || strCol.IsSameAs(wxT("W")) || strCol.IsSameAs(wxT("K")))
+		if(  strCol.IsSameAs(wxT("red")) || strCol.IsSameAs(wxT("green")) || strCol.IsSameAs(wxT("blue"))
+			 || strCol.IsSameAs(wxT("white")) || strCol.IsSameAs(wxT("black")))
 		{
-			if(  strCol.IsSameAs(wxT("R"))  ) { (*itCam)->GetCamBGVtk()->setDataMapperColorR();/*/r=1.0; g=0.0; b=0.0;/**/} ;
-			if(  strCol.IsSameAs(wxT("G"))  ) { (*itCam)->GetCamBGVtk()->setDataMapperColorG();/*/r=0.0; g=1.0; b=0.0;/**/} ;
-			if(  strCol.IsSameAs(wxT("B"))  ) { (*itCam)->GetCamBGVtk()->setDataMapperColorB();/*/r=0.0; g=0.0; b=1.0;/**/} ;
-			if(  strCol.IsSameAs(wxT("W"))  ) { (*itCam)->GetCamBGVtk()->setDataMapperColorW();/*/r=1.0; g=1.0; b=1.0;/**/} ;
-			if(  strCol.IsSameAs(wxT("K"))  ) { (*itCam)->GetCamBGVtk()->setDataMapperColorK();/*/r=0.0; g=0.0; b=0.0;/**/} ;
+			if(  strCol.IsSameAs(wxT("red"))  ) { (*itCam)->GetCamBGVtk()->setDataMapperColorR();/*/r=1.0; g=0.0; b=0.0;/**/} ;
+			if(  strCol.IsSameAs(wxT("green"))  ) { (*itCam)->GetCamBGVtk()->setDataMapperColorG();/*/r=0.0; g=1.0; b=0.0;/**/} ;
+			if(  strCol.IsSameAs(wxT("blue"))  ) { (*itCam)->GetCamBGVtk()->setDataMapperColorB();/*/r=0.0; g=0.0; b=1.0;/**/} ;
+			if(  strCol.IsSameAs(wxT("white"))  ) { (*itCam)->GetCamBGVtk()->setDataMapperColorW();/*/r=1.0; g=1.0; b=1.0;/**/} ;
+			if(  strCol.IsSameAs(wxT("black"))  ) { (*itCam)->GetCamBGVtk()->setDataMapperColorK();/*/r=0.0; g=0.0; b=0.0;/**/} ;
 			/*/(*itCam)->GetCamVtk()->setDataActColorRGB(r,g,b);/**/
 		}
 	}
@@ -729,9 +730,9 @@ void MainWnd::PopCam(int vtkSub)
 {
 #ifdef JMU_USE_VTK
 	int i = 0;
-	std::vector<wxRadioBox*>::iterator itCtrl;  // get iterator on the controls
+	std::vector<wxComboBox*>::iterator itCtrl;  // get iterator on the controls
 	std::vector<wxCheckBox*>::iterator itCtrl2;  // get iterator on the controls
-	std::vector<wxRadioBox*>::iterator itCtrl3;  // get iterator on the controls
+	std::vector<wxComboBox*>::iterator itCtrl3;  // get iterator on the controls
 	std::vector<wxCheckBox*>::iterator itCtrl4;  // get iterator on the controls
 	std::vector<CamFrame*>::iterator itCam;  // get iterator on the camera frames
 	for ( itCtrl  =_colVtk.begin(), itCtrl2  =_visVtk.begin(), itCtrl3  =_colBGVtk.begin(), itCtrl4  =_visBGVtk.begin(), itCam  =m_camFrm.begin();

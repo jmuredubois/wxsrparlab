@@ -91,9 +91,9 @@ private:
 	CViewSrVtk	*_vtkWin ; //!< pointer to vtk window
 	wxButton* _buttAcqAll; //!< Acquire image camera
 	std::vector<wxCheckBox*> _visVtk;		//!< list of visibility checkboxes
-	std::vector<wxRadioBox*> _colVtk;		//!< list of vtk color options
+	std::vector<wxComboBox*> _colVtk;		//!< list of vtk color options
 	std::vector<wxCheckBox*> _visBGVtk;		//!< list of BACKGROUND visibility checkboxes
-	std::vector<wxRadioBox*> _colBGVtk;		//!< list of BACKGROUND vtk color options
+	std::vector<wxComboBox*> _colBGVtk;		//!< list of BACKGROUND vtk color options
 	wxGridBagSizer *_sizerCamVisCol;
 	wxCheckBox* _ckParaProj; //! Parallel projection button
 	wxTimer	_renderTimer; //! timer for rendering events
