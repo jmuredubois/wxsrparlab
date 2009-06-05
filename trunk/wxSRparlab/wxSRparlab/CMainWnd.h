@@ -64,6 +64,7 @@ public:
 	void OnAmplCbar(wxCommandEvent& event);  //! Display or hide ampl colorbar
 	void OnDepthCbar(wxCommandEvent& event); //! Display or hide depth colorbar
 	void OnICP(wxCommandEvent& event); //! try to use VTK's ICP
+	void OnKdDist(wxCommandEvent& event); //!  point set distance based on VTK kd-tree
 
 
     DECLARE_EVENT_TABLE()
@@ -103,6 +104,7 @@ private:
 	wxCheckBox* _ckAmplCbar;  //! Show amplitude    colorbar checkbox
 	wxCheckBox* _ckDepthCbar; //! Show depth        colorbar checkbox
 	wxButton* _buttICP; //! button for ICP
+	wxButton* _buttKdDistVtk; //! button for point set distance based on VTK kd-tree
 };
 
 //! enum used by main wnd
@@ -124,5 +126,6 @@ enum MainWndEnum
 	IDC_SegmCbar,
 	IDC_AmplCbar,
 	IDC_DepthCbar,
-	IDB_icpVtk
+	IDB_icpVtk,
+	IDB_kdDistVtk
 };

@@ -12,6 +12,7 @@
 #include "CMainWnd.h"
 
 #define JMU_ICPVTK // testing experimental ICP from VTK
+#define JMU_KDTREEVTK // testing KDTREE from VTK
 
 // to stop complaints about vtkConfigure.h, include $(JMU_VTKBINBASE)
 // first include the required header files for the vtk classes we are using
@@ -47,12 +48,16 @@
 #include "vtkMatrix4x4.h"		// requires $(JMU_VTKSRCBASE)/Graphics
 #include "vtkStructuredGridWriter.h"	// requires $(JMU_VTKSRCBASE)/Graphics
 #include "vtkTextActor.h"		// requires $(JMU_VTKSRCBASE)/Rendering
-// JMU_ICPVTK
+#ifdef JMU_ICPVTK
 #include "vtkCellArray.h"
 #include "vtkSmartPointer.h"
 #include "vtkIterativeClosestPointTransform.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkLandmarkTransform.h" //to set type to ridgid body
+#endif
+#ifdef JMU_KDTREEVTK
+#include "vtkKdTree.h"
+#endif
 
 
 
@@ -104,6 +109,9 @@ public:
 	void hideDepthCbar(bool doHide);
 #ifdef JMU_ICPVTK
 	vtkStructuredGrid* icpCam(vtkStructuredGrid* source, vtkStructuredGrid* target);
+#endif
+#ifdef JMU_KDTREEVTK
+	double		kdTreeEps(vtkStructuredGrid* source, vtkStructuredGrid* target);
 #endif
 
 private:

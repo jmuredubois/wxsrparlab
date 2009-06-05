@@ -703,3 +703,24 @@ vtkStructuredGrid* CViewSrVtk::icpCam(vtkStructuredGrid* source, vtkStructuredGr
 	//return res;
 }
 #endif
+
+#ifdef JMU_KDTREEVTK
+double CViewSrVtk::kdTreeEps(vtkStructuredGrid* source, vtkStructuredGrid* target)
+{
+	double eps = 0;
+	vtkKdTree* kdtree = vtkKdTree::New();
+	vtkPoints* srcPoints = source->GetPoints();
+	vtkPoints* tgtPoints = target->GetPoints();
+	kdtree->BuildLocatorFromPoints(srcPoints);
+	vtkIdType numPoints = target->GetNumberOfPoints();
+	//double x[3];
+	double* ptXYZ = NULL;
+	double dist2=0;
+	for(vtkIdType pt=0; pt < numPoints; pt++)
+	{
+		ptXYZ = tgtPoints->GetPoint(pt);
+		kdtree->FindClosestPoint(ptXYZ, dist2);
+	}
+	return eps;
+}
+#endif
