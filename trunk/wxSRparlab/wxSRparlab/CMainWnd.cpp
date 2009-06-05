@@ -172,8 +172,16 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
 	_ckParaProj = NULL;
 	_ckSegmCbar = NULL; _ckAmplCbar = NULL; _ckDepthCbar = NULL;
 	m_pThreadReadDataSync = NULL;
-	_buttICP = NULL;
-	_buttKdDistVtk = NULL;
+	#ifdef JMU_ICPVTK
+		_buttICP = NULL;
+		_icpSrc = NULL;
+		_icpTgt = NULL;
+	#endif
+	#ifdef JMU_KDTREEVTK
+		_buttKdDistVtk = NULL;
+		_kdDistSrc = NULL;
+		_kdDistTgt = NULL;
+	#endif
 #endif // JMU_USE_VTK
 
 	wxString date1 = now.Format();
@@ -269,20 +277,42 @@ void MainWnd::Init()
 		sizerZAmpScales->Add( sizerAmpScale, flagsExpand);
 		sizerZAmpScales->Add( sizerSegScale, flagsExpand);
 		
-
-	_buttICP = new wxButton(_bgPanel, IDB_icpVtk, wxT("ICP") );
-	#ifndef JMU_ICPVTK
-		_buttICP->Disable();
-	#endif
-	_buttKdDistVtk = new wxButton(_bgPanel, IDB_kdDistVtk, wxT("kdDist") );
-	#ifndef JMU_KDTREEVTK
-		_buttKdDistVtk->Disable();
+	#ifdef JMU_KDTREEVTK
+	
 	#endif
 	_ckParaProj = new wxCheckBox(_bgPanel, IDC_ParaProj, wxT("Parallel projection"));
-	wxBoxSizer *sizerVtk0 = new wxBoxSizer(wxHORIZONTAL); // create sizer for frame
+	wxBoxSizer *sizerVtk0 = new wxBoxSizer(wxVERTICAL); // create sizer for frame
 		sizerVtk0->Add(_ckParaProj, flagsExpand);
-		sizerVtk0->Add(_buttICP, flagsExpand);
-		sizerVtk0->Add(_buttKdDistVtk, flagsExpand);
+
+	wxString srcTgt[] = { wxT("Current"), wxT("Background"), wxT("Foreground"), wxT("Segmentation")};
+#ifdef JMU_ICPVTK
+	_buttICP = new wxButton(_bgPanel, IDB_icpVtk, wxT("ICP") );
+	_icpSrc = new wxComboBox(_bgPanel, IDC_icpSrc, wxT("Current"),
+			wxDefaultPosition, wxDefaultSize, 4, srcTgt, wxCB_READONLY);
+	_icpTgt = new wxComboBox(_bgPanel, IDC_icpTgt, wxT("Current"),
+			wxDefaultPosition, wxDefaultSize, 4, srcTgt, wxCB_READONLY);
+
+	wxBoxSizer *sizerICP = new wxBoxSizer(wxHORIZONTAL); // create sizer ICP params
+		sizerICP->Add(_buttICP, flagsExpand);
+		sizerICP->Add(_icpSrc , flagsExpand);
+		sizerICP->Add(_icpTgt , flagsExpand);
+
+	sizerVtk0->Add(sizerICP, flagsExpand);
+#endif
+#ifdef JMU_KDTREEVTK
+	_buttKdDistVtk = new wxButton(_bgPanel, IDB_kdDistVtk, wxT("kdDist") );
+	_kdDistSrc = new wxComboBox(_bgPanel, IDC_kdDistSrc, wxT("Current"),
+			wxDefaultPosition, wxDefaultSize, 4, srcTgt, wxCB_READONLY);
+	_kdDistTgt = new wxComboBox(_bgPanel, IDC_kdDistTgt, wxT("Current"),
+			wxDefaultPosition, wxDefaultSize, 4, srcTgt, wxCB_READONLY);
+
+	wxBoxSizer *sizerKdDist = new wxBoxSizer(wxHORIZONTAL); // create sizer KdDist params
+		sizerKdDist->Add(_buttKdDistVtk, flagsExpand);
+		sizerKdDist->Add(_kdDistSrc    , flagsExpand);
+		sizerKdDist->Add(_kdDistTgt    , flagsExpand);
+
+	sizerVtk0->Add(sizerKdDist, flagsExpand);
+#endif
 	_ckSegmCbar  = new wxCheckBox(_bgPanel, IDC_SegmCbar, wxT("Hide Segm. scale"));
 	_ckAmplCbar  = new wxCheckBox(_bgPanel, IDC_AmplCbar, wxT("Hide Ampl. scale"));
 	_ckDepthCbar = new wxCheckBox(_bgPanel, IDC_DepthCbar, wxT("Hide Depth. scale"));
