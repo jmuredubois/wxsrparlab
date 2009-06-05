@@ -37,7 +37,7 @@ bool SrApp::OnInit()
 	_mainWnd = NULL;
 
 	//! - creates a new main window \n
-    _mainWnd = new MainWnd( _T("wxSRparlab"), wxPoint(05,50), wxSize(920,300) );
+    _mainWnd = new MainWnd( _T("wxSRparlab"), wxPoint(05,50), wxSize(300,300) );
 	if(_mainWnd != NULL){
 		_mainWnd->Init();
 		_mainWnd->Show(TRUE); // show the main window
