@@ -878,8 +878,9 @@ void MainWnd::OnKdDist(wxCommandEvent& event)
 	//_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 	vtkStructuredGrid* target = (m_camFrm.front())->GetCamVtk()->GetTransformedStructGrid();
 	vtkStructuredGrid* source = (m_camFrm.back() )->GetCamVtk()->GetTransformedStructGrid();
-	double dist = _vtkWin->kdTreeEps(source, target);
-	wxString strDist = wxT("kdDist returned: ");
+	double eps = _vtkWin->kdTreeEps(source, target);
+	wxString strDist;
+	strDist.sprintf(wxT("kdDist returned: %g"), eps);
 	SetStatusText(strDist);
 	#endif //JMU_KDTREEVTK
 #endif // JMU_USEVTK

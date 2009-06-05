@@ -713,14 +713,32 @@ double CViewSrVtk::kdTreeEps(vtkStructuredGrid* source, vtkStructuredGrid* targe
 	vtkPoints* tgtPoints = target->GetPoints();
 	kdtree->BuildLocatorFromPoints(srcPoints);
 	vtkIdType numPoints = target->GetNumberOfPoints();
-	//double x[3];
-	double* ptXYZ = NULL;
-	double dist2=0;
+	double* ptXYZ = NULL;	// pointer for current point coordinates
+	double dist2=0;			// container for squared distance
+	double distSum = 0;		// sum  of UNSQUARED distances
+	double* dists = NULL;	// list of UNSQUARED distances
+	dists = (double*) malloc( numPoints *sizeof(double));
+	if(dists == NULL){ return -1;};
+	memset( dists, 0x0, numPoints *sizeof(double));
+
+	// loop on all target points
 	for(vtkIdType pt=0; pt < numPoints; pt++)
 	{
 		ptXYZ = tgtPoints->GetPoint(pt);
 		kdtree->FindClosestPoint(ptXYZ, dist2);
+		dist2 = sqrt(dist2);
+		distSum += dist2;
+		dists[pt] = dist2;
 	}
+	double avg = distSum / ( (double) numPoints);
+	double diffSqSum = 0;
+	for(vtkIdType pt=0; pt < numPoints; pt++)
+	{
+		diffSqSum += ( (dists[pt]-avg) * (dists[pt]-avg) );
+	}
+	double std = sqrt(diffSqSum / ( (double) numPoints));
+	eps = std + avg;
+	if(dists != NULL){ free(dists); dists=NULL;};
 	return eps;
 }
 #endif
