@@ -10,6 +10,9 @@
 #include "wxSRparlab.h" //!< top-level header file
 #include "wxSrApp.h"	//!< this class header file
 
+#define JMU_ICPVTK // testing ICP from VTK
+#define JMU_KDTREEVTK // testing KDTREE from VTK
+
 class ThreadReadDataSync; // synchronized read data
 class CamFrame;		// camera frame
 class CViewSrVtk;	// vtk window
@@ -105,8 +108,16 @@ private:
 	wxCheckBox* _ckSegmCbar;  //! Show segmentation colorbar checkbox
 	wxCheckBox* _ckAmplCbar;  //! Show amplitude    colorbar checkbox
 	wxCheckBox* _ckDepthCbar; //! Show depth        colorbar checkbox
+#ifdef JMU_ICPVTK
 	wxButton* _buttICP; //! button for ICP
+	wxComboBox* _icpSrc;
+	wxComboBox* _icpTgt;
+#endif
+#ifdef JMU_KDTREEVTK
 	wxButton* _buttKdDistVtk; //! button for point set distance based on VTK kd-tree
+	wxComboBox* _kdDistSrc;
+	wxComboBox* _kdDistTgt;
+#endif
 #endif // JMU_USE_VTK
 };
 
@@ -130,5 +141,9 @@ enum MainWndEnum
 	IDC_AmplCbar,
 	IDC_DepthCbar,
 	IDB_icpVtk,
-	IDB_kdDistVtk
+	IDC_icpSrc,
+	IDC_icpTgt,
+	IDB_kdDistVtk,
+	IDC_kdDistSrc,
+	IDC_kdDistTgt
 };
