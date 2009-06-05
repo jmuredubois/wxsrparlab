@@ -96,13 +96,14 @@ void *ThreadReadDataSync::Entry()
 BEGIN_EVENT_TABLE(MainWnd, wxFrame)
     EVT_MENU(ID_Quit, MainWnd::OnQuit)
     EVT_MENU(ID_About, MainWnd::OnAbout)
+	EVT_BUTTON(IDB_AcqAll, MainWnd::AcqAll)
+#ifdef JMU_USE_VTK
 	EVT_TEXT(IDT_zMin, MainWnd::TextChangedZMin)
 	EVT_TEXT(IDT_zMax, MainWnd::TextChangedZMax)
 	EVT_TEXT(IDT_ampMin, MainWnd::TextChangedAmpMin)
 	EVT_TEXT(IDT_ampMax, MainWnd::TextChangedAmpMax)
 	EVT_TEXT(IDT_segMin, MainWnd::TextChangedSegMin)
 	EVT_TEXT(IDT_segMax, MainWnd::TextChangedSegMax)
-	EVT_BUTTON(IDB_AcqAll, MainWnd::AcqAll)
 	EVT_CHECKBOX(IDC_visVtk, MainWnd::SetVisVtk)
 	EVT_COMBOBOX(IDC_colVtk, MainWnd::SetColVtk)
 	EVT_CHECKBOX(IDC_ParaProj, MainWnd::OnParaProj)
@@ -112,6 +113,7 @@ BEGIN_EVENT_TABLE(MainWnd, wxFrame)
 	EVT_TIMER(IDE_RendTimer, MainWnd::OnRendTimer)
 	EVT_BUTTON(IDB_icpVtk, MainWnd::OnICP)
 	EVT_BUTTON(IDB_kdDistVtk, MainWnd::OnKdDist)
+#endif // JMU_USE_VTK
 END_EVENT_TABLE()
 
 IMPLEMENT_APP(SrApp)
@@ -127,7 +129,6 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
 : wxFrame((wxFrame *)NULL, -1, title, pos, size),_renderTimer(this, IDE_RendTimer)
 {
 	_numCams = NUMCAMS;
-	_vtkWin = NULL;
     wxMenu *menuFile = new wxMenu;
 
 
@@ -147,6 +148,10 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
 
 	wxDateTime now = wxDateTime::Now();
 
+	_buttAcqAll = NULL;
+#ifdef JMU_USE_VTK
+	_vtkWin = NULL;
+
 	_txtZMin = NULL;
 	_txtZMax = NULL;
 	_txtMinMaxInit = false;
@@ -164,17 +169,17 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
 	_segmMin = 0.0;
 	_segmMax = 255.0;
 
-	_vtkWin = NULL;
+	_ckParaProj = NULL;
+	_ckSegmCbar = NULL; _ckAmplCbar = NULL; _ckDepthCbar = NULL;
+	m_pThreadReadDataSync = NULL;
+	_buttICP = NULL;
+	_buttKdDistVtk = NULL;
+#endif // JMU_USE_VTK
 
 	wxString date1 = now.Format();
 	wxString strW = date1 + strM + strU + strP;
 	SetStatusText(strW);
 
-	_buttAcqAll = NULL;
-	_ckParaProj = NULL;
-	_ckSegmCbar = NULL; _ckAmplCbar = NULL; _ckDepthCbar = NULL;
-	m_pThreadReadDataSync = NULL;
-	_buttICP = NULL;
 }
 
 
@@ -183,11 +188,11 @@ MainWnd::~MainWnd()
 	if(m_pThreadReadDataSync != NULL){ m_pThreadReadDataSync->Delete(); }
 #ifdef JMU_USE_VTK
 	if(_vtkWin){ delete(_vtkWin); _vtkWin =NULL; };
-#endif
 	_visVtk.clear();
 	_colVtk.clear();
 	_visBGVtk.clear();
 	_colBGVtk.clear();
+#endif // JMU_USE_VTK
 }
 
 /**
@@ -225,7 +230,8 @@ void MainWnd::Init()
 	_bgPanel = new wxPanel(this); // a panel to contain our controls
 	wxSizerFlags flagsExpand(1); flagsExpand.Expand(); // sizer flags for expanding sizer
 	wxSizerFlags flagsNoExpand(1);	// sizer flags for non-expanding sizer
-
+	_buttAcqAll = new wxButton(_bgPanel, IDB_AcqAll, wxT("Acq. all") );
+#ifdef JMU_USE_VTK
 	// depth min and max text controls
     _txtZMin = new wxTextCtrl( _bgPanel, IDT_zMin, wxT("0.0"));
 	_txtZMax = new wxTextCtrl( _bgPanel, IDT_zMax, wxT("3500.0"));
@@ -264,8 +270,6 @@ void MainWnd::Init()
 		sizerZAmpScales->Add( sizerSegScale, flagsExpand);
 		
 
-	_buttAcqAll = new wxButton(_bgPanel, IDB_AcqAll, wxT("Acq. all") );
-#ifdef JMU_USE_VTK
 	_buttICP = new wxButton(_bgPanel, IDB_icpVtk, wxT("ICP") );
 	#ifndef JMU_ICPVTK
 		_buttICP->Disable();
@@ -287,21 +291,26 @@ void MainWnd::Init()
 		sizerCk->Add(_ckSegmCbar, flagsExpand);
 		sizerCk->Add(_ckAmplCbar, flagsExpand);
 		sizerCk->Add(_ckDepthCbar, flagsExpand);
-#endif
+#endif // JMU_USE_VTK
+
 	wxFlexGridSizer *sizerAcqScales = new wxFlexGridSizer(1,2,0,0);
 		sizerAcqScales->Add(_buttAcqAll, flagsExpand);
+#ifdef JMU_USE_VTK
 		sizerAcqScales->Add( sizerZAmpScales, flagsExpand);
 
-	_sizerCamVisCol = new wxGridBagSizer();
+	_sizerCamVisCol = new wxGridBagSizer(); // used later, in AddChildren
+#endif // JMU_USE_VTK
 
 	wxGridBagSizer *sizerPanel = new wxGridBagSizer();
+#ifdef JMU_USE_VTK
 		sizerPanel->Add(_sizerCamVisCol, wxGBPosition(0,0), wxGBSpan(4,4));
+#endif // JMU_USE_VTK
 		sizerPanel->Add(sizerAcqScales, wxGBPosition(6,0), wxGBSpan(2,4));
 #ifdef JMU_USE_VTK
 		//sizerPanel->Add(_ckParaProj, wxGBPosition(10,0), wxGBSpan(1,4));
 		sizerPanel->Add(sizerVtk0, wxGBPosition(8,0), wxGBSpan(1,4));
 		sizerPanel->Add(sizerCk, wxGBPosition(9,0), wxGBSpan(1,4));
-#endif
+#endif // JMU_USE_VTK
 
 	wxBoxSizer *sizerFrame = new wxBoxSizer(wxVERTICAL); // create sizer for frame
 		sizerFrame->Add(_bgPanel, flagsExpand);
@@ -331,10 +340,10 @@ void MainWnd::AddChildren()
 
 #ifdef JMU_USE_VTK
 	_vtkWin = new CViewSrVtk(NULL, 440,50,1024,768);
-#endif
 
 	wxString colors[] = { wxT("Depth (Z)"), wxT("Amplitude"), wxT("Segmentation"), wxT("red"),
         wxT("green"), wxT("blue"), wxT("white"), wxT("black") };
+#endif
 
 	//! - for the max number of cameras ...
 	for(int i = 0; i<_numCams; i++){
@@ -382,6 +391,7 @@ void MainWnd::AddChildren()
 	this->Layout();
 }
 
+#ifdef JMU_USE_VTK
 /* Setting display min value*/
 void MainWnd::SetZMin(double val)
 {
@@ -390,6 +400,8 @@ void MainWnd::SetZMin(double val)
 	_txtZMin->SetModified(true);
 	SetZVtk();
 }
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
 /* Setting display min value*/
 void MainWnd::SetZMax(double val)
 {
@@ -398,10 +410,11 @@ void MainWnd::SetZMax(double val)
 	_txtZMax->SetModified(true);
 	SetZVtk();
 }
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
 /* Setting vtk display value*/
 void MainWnd::SetZVtk()
 {
-#ifdef JMU_USE_VTK
 	if(_vtkWin != NULL){
 		std::vector<CamFrame*>::iterator itCam;  // get iterator on the camera frames
 		for ( itCam  =m_camFrm.begin();
@@ -413,9 +426,9 @@ void MainWnd::SetZVtk()
 		}
 		_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 	}
-#endif
 }
-
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
 /* acting on chaged text value */
 void MainWnd::TextChangedZMin(wxCommandEvent &)
 {
@@ -432,7 +445,8 @@ void MainWnd::TextChangedZMin(wxCommandEvent &)
 		_txtZMin->GetValue().Printf(wxT("%d"), _zMin);
 	}
 }
-
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
 /* acting on chaged text value */
 void MainWnd::TextChangedZMax(wxCommandEvent &)
 {
@@ -449,7 +463,8 @@ void MainWnd::TextChangedZMax(wxCommandEvent &)
 		_txtZMax->GetValue().Printf(wxT("%d"), _zMax);
 	}
 }
-
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
 /* Setting display min value*/
 void MainWnd::SetAmpMin(double val)
 {
@@ -458,6 +473,8 @@ void MainWnd::SetAmpMin(double val)
 	_txtAmpMin->SetModified(true);
 	SetAmpVtk();
 }
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
 /* Setting display min value*/
 void MainWnd::SetAmpMax(double val)
 {
@@ -466,6 +483,8 @@ void MainWnd::SetAmpMax(double val)
 	_txtAmpMax->SetModified(true);
 	SetAmpVtk();
 }
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
 /* Setting vtk display value*/
 void MainWnd::SetAmpVtk()
 {
@@ -483,6 +502,8 @@ void MainWnd::SetAmpVtk()
 	}
 #endif
 }
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
 /* Setting display min value*/
 void MainWnd::SetSegMin(double val)
 {
@@ -491,6 +512,8 @@ void MainWnd::SetSegMin(double val)
 	_txtSegMin->SetModified(true);
 	SetSegmVtk();
 }
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
 /* Setting display min value*/
 void MainWnd::SetSegMax(double val)
 {
@@ -499,6 +522,8 @@ void MainWnd::SetSegMax(double val)
 	_txtSegMax->SetModified(true);
 	SetSegmVtk();
 }
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
 /* Setting vtk display value*/
 void MainWnd::SetSegmVtk()
 {
@@ -516,7 +541,8 @@ void MainWnd::SetSegmVtk()
 	}
 #endif
 }
-
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
 /* acting on changed text value */
 void MainWnd::TextChangedAmpMin(wxCommandEvent &)
 {
@@ -533,7 +559,8 @@ void MainWnd::TextChangedAmpMin(wxCommandEvent &)
 		_txtAmpMin->GetValue().Printf(wxT("%d"), _ampMin);
 	}
 }
-
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
 /* acting on changed text value */
 void MainWnd::TextChangedAmpMax(wxCommandEvent &)
 {
@@ -550,6 +577,8 @@ void MainWnd::TextChangedAmpMax(wxCommandEvent &)
 		_txtAmpMax->GetValue().Printf(wxT("%d"), _ampMax);
 	}
 }
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
 /* acting on changed text value */
 void MainWnd::TextChangedSegMin(wxCommandEvent &)
 {
@@ -566,7 +595,8 @@ void MainWnd::TextChangedSegMin(wxCommandEvent &)
 		_txtSegMin->GetValue().Printf(wxT("%d"), _segmMin);
 	}
 }
-
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
 /* acting on changed text value */
 void MainWnd::TextChangedSegMax(wxCommandEvent &)
 {
@@ -583,6 +613,8 @@ void MainWnd::TextChangedSegMax(wxCommandEvent &)
 		_txtSegMax->GetValue().Printf(wxT("%d"), _segmMax);
 	}
 }
+#endif // JMU_USE_VTK
+
 /* acting on "AcquireAll" value button*/
 void MainWnd::AcqAll(wxCommandEvent& event)
 {
@@ -619,10 +651,10 @@ void MainWnd::AcqAll(wxCommandEvent& event)
 
 }
 
+#ifdef JMU_USE_VTK
 /* acting on visVTK checkbox*/
 void MainWnd::SetVisVtk(wxCommandEvent& event)
 {
-#ifdef JMU_USE_VTK
 	int i = 0;
 	std::vector<wxCheckBox*>::iterator itCtrl;  // get iterator on the controls
 	std::vector<CamFrame*>::iterator itCam;  // get iterator on the camera frames
@@ -641,13 +673,12 @@ void MainWnd::SetVisVtk(wxCommandEvent& event)
 		(*itCam)->GetCamBGVtk()->hideDataAct( !((*itCtrl)->IsChecked()) );
 	}
 	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
-#endif
 }
-
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
 /* acting on colVTK radio box*/
 void MainWnd::SetColVtk(wxCommandEvent& event)
 {
-#ifdef JMU_USE_VTK
 	int i = 0;
 	std::vector<wxComboBox*>::iterator itCtrl;  // get iterator on the controls
 	std::vector<CamFrame*>::iterator itCam;  // get iterator on the camera frames
@@ -722,8 +753,8 @@ void MainWnd::SetColVtk(wxCommandEvent& event)
 		}
 	}
 	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
-#endif
 }
+#endif // JMU_USE_VTK
 
 /* remove CamFrame object from list if window is closed */
 void MainWnd::PopCam(int vtkSub)
@@ -752,19 +783,18 @@ void MainWnd::PopCam(int vtkSub)
 #endif
 }
 
+#ifdef JMU_USE_VTK
 /* acting on "Para proj" checkBox*/
 void MainWnd::OnParaProj(wxCommandEvent& event)
 {
-#ifdef JMU_USE_VTK
 	if(_ckParaProj == NULL) return;
 	_vtkWin->setParallelProj( _ckParaProj->IsChecked() );
 	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
-#endif
 }
-
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
 void MainWnd::OnRendTimer(wxTimerEvent& event) //! Render timer event action
 {
-#ifdef JMU_USE_VTK
 	if(_vtkWin == NULL) return;
 	float fps = 1.0; wxString strFps;
 	fps = 1000.0f/(float)_rendTgt;
@@ -783,46 +813,42 @@ void MainWnd::OnRendTimer(wxTimerEvent& event) //! Render timer event action
 		_rendTgt = (int)(0.9*_rendCapms); // shorten allowed rendering time
 		_renderTimer.Start(_rendTgt);
 	}
-#endif
 }
-
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
 /* acting on "Hide Segm. colorbar" checkBox*/
 void MainWnd::OnSegmCbar(wxCommandEvent& event)
 {
-#ifdef JMU_USE_VTK
 	if(_ckSegmCbar == NULL) return;
 	_vtkWin->hideSegmCbar( _ckSegmCbar->IsChecked() );
 	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
-#endif
 }
-
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
 /* acting on "Hide Ampl. colorbar" checkBox*/
 void MainWnd::OnAmplCbar(wxCommandEvent& event)
 {
-#ifdef JMU_USE_VTK
 	if(_ckAmplCbar == NULL) return;
 	_vtkWin->hideAmplCbar( _ckAmplCbar->IsChecked() );
 	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
-#endif
 }
-
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
 /* acting on "Hide Depth colorbar" checkBox*/
 void MainWnd::OnDepthCbar(wxCommandEvent& event)
 {
-#ifdef JMU_USE_VTK
 	if(_ckSegmCbar == NULL) return;
 	_vtkWin->hideDepthCbar( _ckDepthCbar->IsChecked() );
 	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
-#endif
 }
-
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
 /** acting on "ICP" button \n
  * - bug: for now only first and last cam are used \n
  * - todo: make dataset choice configurable
  */
 void MainWnd::OnICP(wxCommandEvent& event)
 {
-#ifdef JMU_USE_VTK
 	#ifdef JMU_ICPVTK
 	//int i = 0;
 	//std::vector<wxCheckBox*>::iterator itCtrl;  // get iterator on the controls
@@ -848,16 +874,15 @@ void MainWnd::OnICP(wxCommandEvent& event)
 	(m_camFrm.back() )->GetCamVtk()->ShowStructGrid(icpSource);
 	_vtkWin->Render();
 	#endif //JMU_ICPVTK
-#endif // JMU_USEVTK
 }
-
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
 /** acting on "kdDist" button \n
  * - bug: for now only first and last cam are used \n
  * - todo: make dataset choice configurable
  */
 void MainWnd::OnKdDist(wxCommandEvent& event)
 {
-#ifdef JMU_USE_VTK
 	#ifdef JMU_KDTREEVTK
 	//int i = 0;
 	//std::vector<wxCheckBox*>::iterator itCtrl;  // get iterator on the controls
@@ -884,5 +909,6 @@ void MainWnd::OnKdDist(wxCommandEvent& event)
 	strDist.sprintf(wxT("kdDist returned: %g"), eps);
 	SetStatusText(strDist);
 	#endif //JMU_KDTREEVTK
-#endif // JMU_USEVTK
 }
+#endif // JMU_USE_VTK
+
