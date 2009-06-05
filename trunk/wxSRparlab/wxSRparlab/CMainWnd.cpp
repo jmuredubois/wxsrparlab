@@ -932,8 +932,26 @@ void MainWnd::OnKdDist(wxCommandEvent& event)
 	//	(*itCam)->GetCamBGVtk()->hideDataAct( !((*itCtrl)->IsChecked()) );
 	//}
 	//_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
-	vtkStructuredGrid* target = (m_camFrm.front())->GetCamVtk()->GetTransformedStructGrid();
-	vtkStructuredGrid* source = (m_camFrm.back() )->GetCamVtk()->GetTransformedStructGrid();
+	wxString strTgt = _kdDistTgt->GetValue();
+	vtkStructuredGrid* target = NULL;
+	if(  strTgt.IsSameAs(wxT("Current"))  )
+	{
+		target = (m_camFrm.front())->GetCamVtk()->GetTransformedStructGrid();
+	}
+	if(  strTgt.IsSameAs(wxT("Background"))  )
+	{
+		target = (m_camFrm.front())->GetCamBGVtk()->GetTransformedStructGrid();
+	}
+	wxString strSrc = _kdDistSrc->GetValue();
+	vtkStructuredGrid* source = NULL;
+	if(  strSrc.IsSameAs(wxT("Current"))  )
+	{
+		source = (m_camFrm.back())->GetCamVtk()->GetTransformedStructGrid();
+	}
+	if(  strSrc.IsSameAs(wxT("Background"))  )
+	{
+		source = (m_camFrm.back())->GetCamBGVtk()->GetTransformedStructGrid();
+	}
 	double eps = _vtkWin->kdTreeEps(source, target);
 	wxString strDist;
 	strDist.sprintf(wxT("kdDist returned: %g"), eps);
