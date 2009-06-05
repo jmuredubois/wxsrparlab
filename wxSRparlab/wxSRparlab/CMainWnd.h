@@ -112,11 +112,15 @@ private:
 	wxButton* _buttICP; //! button for ICP
 	wxComboBox* _icpSrc;
 	wxComboBox* _icpTgt;
+	wxRadioBox* _icpIdxSrc;
+	wxRadioBox* _icpIdxTgt;
 #endif
 #ifdef JMU_KDTREEVTK
 	wxButton* _buttKdDistVtk; //! button for point set distance based on VTK kd-tree
 	wxComboBox* _kdDistSrc;
 	wxComboBox* _kdDistTgt;
+	wxRadioBox* _kdDistIdxSrc;
+	wxRadioBox* _kdDistIdxTgt;
 #endif
 #endif // JMU_USE_VTK
 };
@@ -143,7 +147,11 @@ enum MainWndEnum
 	IDB_icpVtk,
 	IDC_icpSrc,
 	IDC_icpTgt,
+	IDC_icpIdxSrc,
+	IDC_icpIdxTgt,
 	IDB_kdDistVtk,
 	IDC_kdDistSrc,
-	IDC_kdDistTgt
+	IDC_kdDistTgt,
+	IDC_kdDistIdxSrc,
+	IDC_kdDistIdxTgt
 };

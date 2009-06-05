@@ -174,13 +174,13 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
 	m_pThreadReadDataSync = NULL;
 	#ifdef JMU_ICPVTK
 		_buttICP = NULL;
-		_icpSrc = NULL;
-		_icpTgt = NULL;
+		_icpSrc = NULL; _icpTgt = NULL;
+		_icpIdxSrc = NULL; _icpIdxTgt = NULL;
 	#endif
 	#ifdef JMU_KDTREEVTK
 		_buttKdDistVtk = NULL;
-		_kdDistSrc = NULL;
-		_kdDistTgt = NULL;
+		_kdDistSrc = NULL; _kdDistTgt = NULL;
+		_kdDistIdxSrc = NULL; _kdDistIdxTgt = NULL;
 	#endif
 #endif // JMU_USE_VTK
 
@@ -285,16 +285,27 @@ void MainWnd::Init()
 		sizerVtk0->Add(_ckParaProj, flagsExpand);
 
 	wxString srcTgt[] = { wxT("Current"), wxT("Background"), wxT("Foreground"), wxT("Segmentation")};
+	wxString strCams[NUMCAMS]; 
+	for(int i = 0; i<NUMCAMS; i++){
+		strCams[i].sprintf(wxT("%i"),i); 
+		//labT.sprintf(wxT("Cam %i"), i); // ... change cam nickname ...
+	}
 #ifdef JMU_ICPVTK
 	_buttICP = new wxButton(_bgPanel, IDB_icpVtk, wxT("ICP") );
 	_icpSrc = new wxComboBox(_bgPanel, IDC_icpSrc, wxT("Current"),
 			wxDefaultPosition, wxDefaultSize, 4, srcTgt, wxCB_READONLY);
 	_icpTgt = new wxComboBox(_bgPanel, IDC_icpTgt, wxT("Current"),
 			wxDefaultPosition, wxDefaultSize, 4, srcTgt, wxCB_READONLY);
+	_icpIdxSrc = new wxRadioBox(_bgPanel, IDC_kdDistIdxSrc, wxT("Cam"),
+			wxDefaultPosition, wxDefaultSize, NUMCAMS, strCams);
+	_icpIdxTgt = new wxRadioBox(_bgPanel, IDC_kdDistIdxTgt, wxT("Cam"),
+			wxDefaultPosition, wxDefaultSize, NUMCAMS, strCams);
 
 	wxBoxSizer *sizerICP = new wxBoxSizer(wxHORIZONTAL); // create sizer ICP params
 		sizerICP->Add(_buttICP, flagsExpand);
+		sizerICP->Add(_icpIdxSrc , flagsExpand);
 		sizerICP->Add(_icpSrc , flagsExpand);
+		sizerICP->Add(_icpIdxTgt , flagsExpand);
 		sizerICP->Add(_icpTgt , flagsExpand);
 
 	sizerVtk0->Add(sizerICP, flagsExpand);
@@ -305,10 +316,16 @@ void MainWnd::Init()
 			wxDefaultPosition, wxDefaultSize, 4, srcTgt, wxCB_READONLY);
 	_kdDistTgt = new wxComboBox(_bgPanel, IDC_kdDistTgt, wxT("Current"),
 			wxDefaultPosition, wxDefaultSize, 4, srcTgt, wxCB_READONLY);
+	_kdDistIdxSrc = new wxRadioBox(_bgPanel, IDC_kdDistIdxSrc, wxT("Cam"),
+			wxDefaultPosition, wxDefaultSize, NUMCAMS, strCams);
+	_kdDistIdxTgt = new wxRadioBox(_bgPanel, IDC_kdDistIdxTgt, wxT("Cam"),
+			wxDefaultPosition, wxDefaultSize, NUMCAMS, strCams);
 
 	wxBoxSizer *sizerKdDist = new wxBoxSizer(wxHORIZONTAL); // create sizer KdDist params
 		sizerKdDist->Add(_buttKdDistVtk, flagsExpand);
+		sizerKdDist->Add(_kdDistIdxSrc , flagsExpand);
 		sizerKdDist->Add(_kdDistSrc    , flagsExpand);
+		sizerKdDist->Add(_kdDistIdxTgt , flagsExpand);
 		sizerKdDist->Add(_kdDistTgt    , flagsExpand);
 
 	sizerVtk0->Add(sizerKdDist, flagsExpand);
@@ -807,6 +824,10 @@ void MainWnd::PopCam(int vtkSub)
 			(*itCtrl2)->Disable();
 			(*itCtrl3)->Disable();
 			(*itCtrl4)->Disable();
+			_icpIdxSrc->Enable(vtkSub, false);
+			_icpIdxTgt->Enable(vtkSub, false);
+			_kdDistIdxSrc->Enable(vtkSub, false);
+			_kdDistIdxTgt->Enable(vtkSub, false);
 			break;
 		}
 	}
@@ -932,25 +953,27 @@ void MainWnd::OnKdDist(wxCommandEvent& event)
 	//	(*itCam)->GetCamBGVtk()->hideDataAct( !((*itCtrl)->IsChecked()) );
 	//}
 	//_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
+	int idxTgt = _kdDistIdxTgt->GetSelection();
 	wxString strTgt = _kdDistTgt->GetValue();
 	vtkStructuredGrid* target = NULL;
 	if(  strTgt.IsSameAs(wxT("Current"))  )
 	{
-		target = (m_camFrm.front())->GetCamVtk()->GetTransformedStructGrid();
+		target = (m_camFrm[idxTgt])->GetCamVtk()->GetTransformedStructGrid();
 	}
 	if(  strTgt.IsSameAs(wxT("Background"))  )
 	{
-		target = (m_camFrm.front())->GetCamBGVtk()->GetTransformedStructGrid();
+		target = (m_camFrm[idxTgt])->GetCamBGVtk()->GetTransformedStructGrid();
 	}
+	int idxSrc = _kdDistIdxSrc->GetSelection();
 	wxString strSrc = _kdDistSrc->GetValue();
 	vtkStructuredGrid* source = NULL;
 	if(  strSrc.IsSameAs(wxT("Current"))  )
 	{
-		source = (m_camFrm.back())->GetCamVtk()->GetTransformedStructGrid();
+		source = (m_camFrm[idxSrc])->GetCamVtk()->GetTransformedStructGrid();
 	}
 	if(  strSrc.IsSameAs(wxT("Background"))  )
 	{
-		source = (m_camFrm.back())->GetCamBGVtk()->GetTransformedStructGrid();
+		source = (m_camFrm[idxSrc])->GetCamBGVtk()->GetTransformedStructGrid();
 	}
 	double eps = _vtkWin->kdTreeEps(source, target);
 	wxString strDist;
