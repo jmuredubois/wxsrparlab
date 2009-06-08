@@ -89,8 +89,22 @@ public:
 	void SetVtkWin(CViewSrVtk *vtkWin, int vtkSub);
 	CamVtkView* GetCamVtk(){return _camVtk;};
 	CamVtkView* GetCamBGVtk(){return _camBGVtk;};
+	CamVtkView* GetCamFGVtk(){return _camFGVtk;};
+	CamVtkView* GetCamSegmVtk(){return _camSegmVtk;};
 	void RenderEvt(wxCommandEvent& WXUNUSED(event));
 	void OnBlankSegmThr(wxCommandEvent& event);
+	void changeDepthRangeVtk(float zMin, float zMax);
+	void changeAmpRangeVtk(float ampMin, float ampMax);
+	void changeSegmRangeVtk(float segmMin, float segmMax);
+	void hideDataActVtk(bool doHide, int idx);
+	void setDataMapperColorDepth(int idx);
+	void setDataMapperColorGray(int idx);
+	void setDataMapperColorSegm(int idx);
+	void setDataMapperColorR(int idx);
+	void setDataMapperColorG(int idx);
+	void setDataMapperColorB(int idx);
+	void setDataMapperColorW(int idx);
+	void setDataMapperColorK(int idx);
 #endif
 	int GetVtkSub(){return _vtkSub;};
 	int GetNumCols(){return m_nCols;};
@@ -155,6 +169,8 @@ private:
 	CViewSrVtk	*_vtkWin ; //!< pointer to vtk window
 	CamVtkView *_camVtk; //!< point to vtk camera structure
 	CamVtkView *_camBGVtk; //!< point to background vtk camera structure
+	CamVtkView *_camFGVtk; //!< point to foreground vtk camera structure
+	CamVtkView *_camSegmVtk; //!< point to segmentation vtk camera structure
 	wxString _vtkRecPrefix; //!< vtk recording string prefix
 #endif
 	#ifdef JMU_TGTFOLLOW  

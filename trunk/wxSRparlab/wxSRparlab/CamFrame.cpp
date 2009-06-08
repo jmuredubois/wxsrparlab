@@ -124,6 +124,8 @@ CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos
 	_vtkWin=NULL;
 	_camVtk = NULL;
 	_camBGVtk = NULL;
+	_camFGVtk = NULL;
+	_camSegmVtk = NULL;
 	_vtkRecPrefix.Empty();
 #endif
 	#ifdef JMU_TGTFOLLOW
@@ -154,7 +156,9 @@ CamFrame::~CamFrame()
 	if(m_bReadContinuously){ if(m_pThreadReadData != NULL){ m_pThreadReadData->Delete(); } } ;
 #ifdef JMU_USE_VTK
 	if(_camVtk != NULL) { delete(_camVtk); _camVtk = NULL; } ;
-	if(_camBGVtk != NULL) { delete(_camBGVtk); _camVtk = NULL; } ;
+	if(_camBGVtk != NULL) { delete(_camBGVtk); _camBGVtk = NULL; } ;
+	if(_camFGVtk != NULL) { delete(_camFGVtk); _camFGVtk = NULL; } ;
+	if(_camSegmVtk != NULL) { delete(_camSegmVtk); _camSegmVtk = NULL; } ;
 	//if(_vtkRecPrefix != NULL) { delete(_vtkRecPrefix); _vtkRecPrefix = NULL; } ;
 #endif
 	if(m_sr		  != NULL) { res = SR_Close(m_sr);	m_sr = NULL; };
@@ -825,7 +829,6 @@ void CamFrame::AcqOneFrm()
 		if(m_settingsPane->IsLrnBgChecked())
 		{ //  learn background
 			PLAVG_LearnBackground(m_bgAvg, srBuf);
-			res+=PLNN_FlagNaN(m_bgNaN, PLAVG_GetAvgBuf(m_bgAvg));
 			if( !(m_settingsPane->IsNoFlagNaNChecked()))
 			{
 				res+=PLNN_FlagNaN(m_bgNaN, PLAVG_GetAvgBuf(m_bgAvg));
@@ -834,6 +837,10 @@ void CamFrame::AcqOneFrm()
 		if(m_settingsPane->IsLrnFgChecked())
 		{ // learn foreground
 			PLAVG_LearnBackground(m_fgAvg, srBuf);
+			if( !(m_settingsPane->IsNoFlagNaNChecked()))
+			{
+				res+=PLNN_FlagNaN(m_fgNaN, PLAVG_GetAvgBuf(m_fgAvg));
+			}
 		}
 		PLCTR_CoordTrf(m_CTrf, srBuf, m_ctrParam);  // transform coordinates
 		errMutex = m_mutexSrBuf->Unlock();
@@ -1058,6 +1065,18 @@ void CamFrame::SetVtkWin(CViewSrVtk *vtkWin, int vtkSub)
 		_camBGVtk->SetSegmLUT(_vtkWin->GetSegmLUT());
 		_camBGVtk->SetPlainLUT(_vtkWin->GetRLUT(), _vtkWin->GetGLUT(), _vtkWin->GetBLUT(), _vtkWin->GetWLUT(), _vtkWin->GetKLUT());
 		_camBGVtk->setDataRepBG();
+		_camFGVtk = new CamVtkView(_vtkSub, _vtkWin->GetRenWin(), _vtkWin->GetDepthLUT());
+		_camFGVtk->SetDepthLUT(_vtkWin->GetDepthLUT());
+		_camFGVtk->SetGrayLUT(_vtkWin->GetGrayLUT());
+		_camFGVtk->SetSegmLUT(_vtkWin->GetSegmLUT());
+		_camFGVtk->SetPlainLUT(_vtkWin->GetRLUT(), _vtkWin->GetGLUT(), _vtkWin->GetBLUT(), _vtkWin->GetWLUT(), _vtkWin->GetKLUT());
+		_camFGVtk->setDataRepPoints(); _camFGVtk->setDataOpacity(0.7);
+		_camSegmVtk = new CamVtkView(_vtkSub, _vtkWin->GetRenWin(), _vtkWin->GetDepthLUT());
+		_camSegmVtk->SetDepthLUT(_vtkWin->GetDepthLUT());
+		_camSegmVtk->SetGrayLUT(_vtkWin->GetGrayLUT());
+		_camSegmVtk->SetSegmLUT(_vtkWin->GetSegmLUT());
+		_camSegmVtk->SetPlainLUT(_vtkWin->GetRLUT(), _vtkWin->GetGLUT(), _vtkWin->GetBLUT(), _vtkWin->GetWLUT(), _vtkWin->GetKLUT());
+		_camSegmVtk->setDataRepPoints(); _camSegmVtk->setDataOpacity(0.9);
 	}
 };
 #endif
@@ -1426,5 +1445,269 @@ void CamFrame::OnBlankSegmThr(wxCommandEvent& event)
 	val = m_settingsPane->GetBlankSegmThr();
 	if(_camVtk == NULL){return;};
 	_camVtk->setBlankThr(val);
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+void CamFrame::changeDepthRangeVtk(float zMin, float zMax)
+{
+	if(_camVtk == NULL){return;};
+	_camVtk->changeDepthRange(zMin,zMax);
+	if(_camBGVtk == NULL){return;};
+	_camBGVtk->changeDepthRange(zMin,zMax);
+	if(_camFGVtk == NULL){return;};
+	_camFGVtk->changeDepthRange(zMin,zMax);
+	if(_camSegmVtk == NULL){return;};
+	_camSegmVtk->changeDepthRange(zMin,zMax);
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+void CamFrame::changeAmpRangeVtk(float ampMin, float ampMax)
+{
+	if(_camVtk == NULL){return;};
+	_camVtk->changeAmpRange(ampMin,ampMax);
+	if(_camBGVtk == NULL){return;};
+	_camBGVtk->changeAmpRange(ampMin,ampMax);
+	if(_camFGVtk == NULL){return;};
+	_camFGVtk->changeAmpRange(ampMin,ampMax);
+	if(_camSegmVtk == NULL){return;};
+	_camSegmVtk->changeAmpRange(ampMin,ampMax);
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+void CamFrame::changeSegmRangeVtk(float segmMin, float segmMax)
+{
+	if(_camVtk == NULL){return;};
+	_camVtk->changeSegmRange(segmMin,segmMax);
+	if(_camBGVtk == NULL){return;};
+	_camBGVtk->changeSegmRange(segmMin,segmMax);
+	if(_camFGVtk == NULL){return;};
+	_camFGVtk->changeSegmRange(segmMin,segmMax);
+	if(_camSegmVtk == NULL){return;};
+	_camSegmVtk->changeSegmRange(segmMin,segmMax);
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+void CamFrame::hideDataActVtk(bool doHide, int idx)
+{
+	if(idx==0)
+	{
+		if(_camVtk == NULL){return;};
+		_camVtk->hideDataAct(doHide);
+	}
+	if(idx==1)
+	{
+		if(_camBGVtk == NULL){return;};
+		_camBGVtk->hideDataAct(doHide);
+	}
+	if(idx==2)
+	{
+		if(_camFGVtk == NULL){return;};
+		_camFGVtk->hideDataAct(doHide);
+	}
+	if(idx==3)
+	{
+		if(_camSegmVtk == NULL){return;};
+		_camSegmVtk->hideDataAct(doHide);
+	}
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+void CamFrame::setDataMapperColorDepth(int idx)
+{
+	if(idx==0)
+	{
+		if(_camVtk == NULL){return;};
+		_camVtk->setDataMapperColorDepth();
+	}
+	if(idx==1)
+	{
+		if(_camBGVtk == NULL){return;};
+		_camBGVtk->setDataMapperColorDepth();
+	}
+	if(idx==2)
+	{
+		if(_camFGVtk == NULL){return;};
+		_camFGVtk->setDataMapperColorDepth();
+	}
+	if(idx==3)
+	{
+		if(_camSegmVtk == NULL){return;};
+		_camSegmVtk->setDataMapperColorDepth();
+	}
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+void CamFrame::setDataMapperColorGray(int idx)
+{
+	if(idx==0)
+	{
+		if(_camVtk == NULL){return;};
+		_camVtk->setDataMapperColorGray();
+	}
+	if(idx==1)
+	{
+		if(_camBGVtk == NULL){return;};
+		_camBGVtk->setDataMapperColorGray();
+	}
+	if(idx==2)
+	{
+		if(_camFGVtk == NULL){return;};
+		_camFGVtk->setDataMapperColorGray();
+	}
+	if(idx==3)
+	{
+		if(_camSegmVtk == NULL){return;};
+		_camSegmVtk->setDataMapperColorGray();
+	}
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+void CamFrame::setDataMapperColorSegm(int idx)
+{
+	if(idx==0)
+	{
+		if(_camVtk == NULL){return;};
+		_camVtk->setDataMapperColorSegm();
+	}
+	if(idx==1)
+	{
+		if(_camBGVtk == NULL){return;};
+		_camBGVtk->setDataMapperColorSegm();
+	}
+	if(idx==2)
+	{
+		if(_camFGVtk == NULL){return;};
+		_camFGVtk->setDataMapperColorSegm();
+	}
+	if(idx==3)
+	{
+		if(_camSegmVtk == NULL){return;};
+		_camSegmVtk->setDataMapperColorSegm();
+	}
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+void CamFrame::setDataMapperColorR(int idx)
+{
+	if(idx==0)
+	{
+		if(_camVtk == NULL){return;};
+		_camVtk->setDataMapperColorR();
+	}
+	if(idx==1)
+	{
+		if(_camBGVtk == NULL){return;};
+		_camBGVtk->setDataMapperColorR();
+	}
+	if(idx==2)
+	{
+		if(_camFGVtk == NULL){return;};
+		_camFGVtk->setDataMapperColorR();
+	}
+	if(idx==3)
+	{
+		if(_camSegmVtk == NULL){return;};
+		_camSegmVtk->setDataMapperColorR();
+	}
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+void CamFrame::setDataMapperColorG(int idx)
+{
+	if(idx==0)
+	{
+		if(_camVtk == NULL){return;};
+		_camVtk->setDataMapperColorG();
+	}
+	if(idx==1)
+	{
+		if(_camBGVtk == NULL){return;};
+		_camBGVtk->setDataMapperColorG();
+	}
+	if(idx==2)
+	{
+		if(_camFGVtk == NULL){return;};
+		_camFGVtk->setDataMapperColorG();
+	}
+	if(idx==3)
+	{
+		if(_camSegmVtk == NULL){return;};
+		_camSegmVtk->setDataMapperColorG();
+	}
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+void CamFrame::setDataMapperColorB(int idx)
+{
+	if(idx==0)
+	{
+		if(_camVtk == NULL){return;};
+		_camVtk->setDataMapperColorB();
+	}
+	if(idx==1)
+	{
+		if(_camBGVtk == NULL){return;};
+		_camBGVtk->setDataMapperColorB();
+	}
+	if(idx==2)
+	{
+		if(_camFGVtk == NULL){return;};
+		_camFGVtk->setDataMapperColorB();
+	}
+	if(idx==3)
+	{
+		if(_camSegmVtk == NULL){return;};
+		_camSegmVtk->setDataMapperColorB();
+	}
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+void CamFrame::setDataMapperColorW(int idx)
+{
+	if(idx==0)
+	{
+		if(_camVtk == NULL){return;};
+		_camVtk->setDataMapperColorW();
+	}
+	if(idx==1)
+	{
+		if(_camBGVtk == NULL){return;};
+		_camBGVtk->setDataMapperColorW();
+	}
+	if(idx==2)
+	{
+		if(_camFGVtk == NULL){return;};
+		_camFGVtk->setDataMapperColorW();
+	}
+	if(idx==3)
+	{
+		if(_camSegmVtk == NULL){return;};
+		_camSegmVtk->setDataMapperColorW();
+	}
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+void CamFrame::setDataMapperColorK(int idx)
+{
+	if(idx==0)
+	{
+		if(_camVtk == NULL){return;};
+		_camVtk->setDataMapperColorK();
+	}
+	if(idx==1)
+	{
+		if(_camBGVtk == NULL){return;};
+		_camBGVtk->setDataMapperColorK();
+	}
+	if(idx==2)
+	{
+		if(_camFGVtk == NULL){return;};
+		_camFGVtk->setDataMapperColorK();
+	}
+	if(idx==3)
+	{
+		if(_camSegmVtk == NULL){return;};
+		_camSegmVtk->setDataMapperColorK();
+	}
 }
 #endif // JMU_USE_VTK
