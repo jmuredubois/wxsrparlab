@@ -138,6 +138,7 @@ CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos
 	m_fgAvg = NULL; m_fgNaN = NULL;
 	m_CTrf = NULL;
 	m_CTrfBG = NULL;
+	m_CTrfFG = NULL;
 	_acqTime = 1000L;
 	m_pAcqSWatch = NULL;
 	m_segm = NULL;
@@ -181,6 +182,7 @@ CamFrame::~CamFrame()
 	if(m_fgNaN != NULL) { PLNN_Close(m_fgNaN); m_fgNaN = NULL; };
 	if(m_CTrf != NULL) {PLCTR_Close(m_CTrf); m_CTrf = NULL; };
 	if(m_CTrfBG != NULL) {PLCTR_Close(m_CTrfBG); m_CTrfBG = NULL; };
+	if(m_CTrfFG != NULL) {PLCTR_Close(m_CTrfFG); m_CTrfFG = NULL; };
 	if(m_pAcqSWatch != NULL) { delete(m_pAcqSWatch); m_pAcqSWatch = NULL;};
 	if(m_segm != NULL) {PLSEGM_Close(m_segm); m_segm = NULL; };
 #ifdef JMU_RANSAC
@@ -472,6 +474,7 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 	  PLNN_Open(&m_fgNaN, newbuf);
 	  PLCTR_Open(&m_CTrf, newbuf);
 	  PLCTR_Open(&m_CTrfBG, newbuf);
+	  PLCTR_Open(&m_CTrfFG, newbuf);
 	  PLSEGM_Open(&m_segm, newbuf);
 #ifdef JMU_RANSAC
 	  PLRSC_Open(&m_ransac, newbuf);
@@ -522,6 +525,7 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   PLNN_Open(&m_fgNaN, newbuf);
   PLCTR_Open(&m_CTrf, newbuf);
   PLCTR_Open(&m_CTrfBG, newbuf);
+  PLCTR_Open(&m_CTrfFG, newbuf);
   PLSEGM_Open(&m_segm, newbuf);
 #ifdef JMU_RANSAC
   PLRSC_Open(&m_ransac, newbuf);
@@ -578,6 +582,7 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   if(m_fgNaN != NULL) { PLNN_Close(m_fgNaN); m_fgNaN = NULL; };
   if(m_CTrf != NULL) {PLCTR_Close(m_CTrf); m_CTrf = NULL; };
   if(m_CTrfBG != NULL) {PLCTR_Close(m_CTrfBG); m_CTrfBG = NULL; };
+  if(m_CTrfFG != NULL) {PLCTR_Close(m_CTrfFG); m_CTrfFG = NULL; };
   if(m_pAcqSWatch != NULL) { delete(m_pAcqSWatch); m_pAcqSWatch = NULL;};
   if(m_segm != NULL)  {PLSEGM_Close(m_segm);   m_segm = NULL; };
 #ifdef JMU_RANSAC
@@ -930,6 +935,11 @@ void CamFrame::AcqOneFrm()
 		{
 			PLCTR_CoordTrf(m_CTrfBG, PLAVG_GetAvgBuf(m_bgAvg), m_ctrParam);
 			_camBGVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLAVG_GetAvgBuf(m_bgAvg).amp,segmBuf);
+		}
+		if(m_settingsPane->IsLrnFgChecked())
+		{
+			PLCTR_CoordTrf(m_CTrfFG, PLAVG_GetAvgBuf(m_fgAvg), m_ctrParam);
+			_camFGVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrfFG), PLCTR_GetY(m_CTrfFG), PLCTR_GetX(m_CTrfFG), PLAVG_GetAvgBuf(m_fgAvg).amp,segmBuf);
 		}
 		if(!m_bReadContinuously)
 		{

@@ -726,8 +726,8 @@ void MainWnd::SetVisVtk(wxCommandEvent& event)
 {
 	SetVisVtk(_visVtk, m_camFrm,0);
 	SetVisVtk(_visBGVtk, m_camFrm,1);
-	//SetVisVtk(_visFGVtk, m_camFrm,1);
-	//SetVisVtk(_visSegmVtk, m_camFrm,1);
+	SetVisVtk(_visFGVtk, m_camFrm,2);
+	SetVisVtk(_visSegmVtk, m_camFrm,3);
 	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 }
 #endif // JMU_USE_VTK
@@ -753,8 +753,8 @@ void MainWnd::SetColVtk(wxCommandEvent& event)
 {
 	SetColVtk(_colVtk, m_camFrm,0);
 	SetColVtk(_colBGVtk, m_camFrm,1);
-	SetColVtk(_colFGVtk, m_camFrm,1);
-	SetColVtk(_colSegmVtk, m_camFrm,1);
+	SetColVtk(_colFGVtk, m_camFrm,2);
+	SetColVtk(_colSegmVtk, m_camFrm,3);
 	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 }
 #endif // JMU_USE_VTK

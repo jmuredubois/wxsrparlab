@@ -185,6 +185,7 @@ private:
 	SRPLNAN  m_fgNaN;		// NaN filtering object for FG
 	SRPLCTR	 m_CTrf;		// Coordinates transform object
 	SRPLCTR	 m_CTrfBG;		// background coordinates transform object
+	SRPLCTR	 m_CTrfFG;		// foreground coordinates transform object
 	SRCTR m_ctrParam;		// camera opticla center parameters
 	SRPLSEGM m_segm;		// scattering compensation object
 #ifdef JMU_RANSAC
