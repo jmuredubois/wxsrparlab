@@ -895,6 +895,14 @@ vtkDataObject* CamVtkView::GetTransformedDataObj()
 	return camTranFilter->GetOutputDataObject(0);
 }
 
+//vtkPointSet* CamVtkView::GetTransformedPtSet(bool segmented)
+//{
+//	vtkStructuredGrid* toto = vtkStructuredGrid::SafeDownCast(camTranFilter->GetOutputDataObject(0));
+//	if(segmented==true)
+//
+//	return toto;
+//}
+
 void CamVtkView::ShowStructGrid(vtkStructuredGrid* grid2show)
 {
 	pdata->SetInput(grid2show);

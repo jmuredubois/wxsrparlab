@@ -709,6 +709,8 @@ double CViewSrVtk::kdTreeEps(vtkStructuredGrid* source, vtkStructuredGrid* targe
 {
 	double eps = 0;
 	vtkKdTree* kdtree = vtkKdTree::New();
+	if(source==NULL){return -1;};
+	if(target==NULL){return -1;};
 	vtkPoints* srcPoints = source->GetPoints();
 	vtkPoints* tgtPoints = target->GetPoints();
 	kdtree->BuildLocatorFromPoints(srcPoints);
