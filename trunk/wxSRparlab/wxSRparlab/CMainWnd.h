@@ -104,8 +104,8 @@ private:
 	std::vector<wxCheckBox*> _visSegmVtk;		//!< list of SEGMENTED visibility checkboxes
 	std::vector<wxComboBox*> _colSegmVtk;		//!< list of SEGMENTED vtk color options
 	wxGridBagSizer *_sizerCamVisCol;
-	void SetVisVtk(std::vector<wxCheckBox*> visChkBox, std::vector<CamFrame*> camFrm, int idx); //!< react on event changed visibility
-	void SetColVtk(std::vector<wxComboBox*> colCmbBox, std::vector<CamFrame*> camFrm, int idx);  //!< react on event changed colormap
+	void SetVisVtkIdx(std::vector<wxCheckBox*> visChkBox, std::vector<CamFrame*> camFrm, int idx); //!< react on event changed visibility
+	void SetColVtkIdx(std::vector<wxComboBox*> colCmbBox, std::vector<CamFrame*> camFrm, int idx);  //!< react on event changed colormap
 	wxCheckBox* _ckParaProj; //! Parallel projection button
 	wxTimer	_renderTimer; //! timer for rendering events
 	int _rendTgt; //! target rendering time in ms
