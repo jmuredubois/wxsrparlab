@@ -6,149 +6,160 @@
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
-			<Target title="DebugVTK">
-				<Option output="/builds/Debug/bin/wxSRparlabVTKPREM" prefix_auto="0" extension_auto="0" />
-				<Option object_output="/builds/Debug/obj" />
+			<Target title="Debug">
+				<Option output="../../../../builds/Debug/bin/wxSRparlabVTKPREMd.app/Contents/MacOS/wxSRparlabVTKPREMd.dylib" prefix_auto="0" extension_auto="0" />
+				<Option object_output="../../../../builds/Debug/obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
 					<Add option="-DJMU_USE_VTK" />
 					<Add option="-DJMU_TGTFOLLOW" />
-					<Add option="`wx-config --cxxflags --unicode=no` -W -Wall -ansi" />
-					<Add option="-I/usr/local/lib/wx/include/mac-ansi-release-2.8 -I/usr/local/include/wx-2.8 -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXMAC__" />
-					<Add directory="/usr/local/lib/wx/include/mac-ansi-release-2.8" />
-					<Add directory="/builds/VTK504" />
-					<Add directory="/software/VTK/Graphics" />
-					<Add directory="/software/VTK/Rendering" />
-					<Add directory="/software/VTK/Common" />
-					<Add directory="/software/VTK/Filtering" />
-					<Add directory="/software/VTK/IO" />
-					<Add directory="/software/VTK/Hybrid" />
-					<Add directory="/software/ticpp" />
-					<Add directory="/svnSandBox/trunk/libSRPLscat" />
-					<Add directory="/svnSandBox/trunk/libSRPLavg" />
-					<Add directory="/svnSandBox/trunk/libSRPLcoordTrf" />
-					<Add directory="/svnSandBox/trunk/libSRPLsegm" />
+					<Add option="-DDEBUG" />
+					<Add option="-D_DEBUG" />
+					<Add option="`wx-config --cxxflags` -W -Wall -ansi" />
+					<Add directory="../../../../software/ticpp" />
+					<Add directory="../../libSRPLscat" />
+					<Add directory="../../libSRPLavg" />
+					<Add directory="../../libSRPLcoordTrf" />
+					<Add directory="../../libSRPLsegm" />
+					<Add directory="../../libSRPLransac" />
+					<Add directory="../../../../builds/VTK504" />
+					<Add directory="../../../../software/VTK/Graphics" />
+					<Add directory="../../../../software/VTK/Rendering" />
+					<Add directory="../../../../software/VTK/Common" />
+					<Add directory="../../../../software/VTK/Filtering" />
+					<Add directory="../../../../software/VTK/IO" />
+					<Add directory="../../../../software/VTK/Hybrid" />
+					<Add directory="../../../../software/fftw-3.2.1/include" />
+					<Add directory="../../../../software/VTK" />
 				</Compiler>
 				<Linker>
-					<Add option="`wx-config --libs --unicode=no`" />
-					<Add option="-L/usr/local/lib   -framework IOKit -framework Carbon -framework Cocoa -framework System -framework QuickTime  -lwx_mac_richtext-2.8 -lwx_mac_aui-2.8 -lwx_mac_xrc-2.8 -lwx_mac_qa-2.8 -lwx_mac_html-2.8 -lwx_mac_adv-2.8 -lwx_mac_core-2.8 -lwx_base_carbon_xml-2.8 -lwx_base_carbon_net-2.8 -lwx_base_carbon-2.8" />
+					<Add option="-dynamiclib" />
+					<Add option="`wx-config --libs`" />
+					<Add directory="../../../../software/ticpp/lib" />
+					<Add directory="../../../../builds/VTK504" />
+					<Add directory="../../../../builds/Debug/bin" />
+					<Add directory="../../../../usr/local/lib" />
+					<Add directory="../../../../software/fftw-3.2.1/lib" />
+					<Add directory="../../../../software/fftw-3.2.1/lib" />
+					<Add directory="../../../../opt/local/var/macports/software/wxWidgets/2.8.10_0/opt/local/lib" />
 					<Add library="vtkGraphics" />
 					<Add library="vtkRendering" />
 					<Add library="vtkCommon" />
 					<Add library="vtkFiltering" />
 					<Add library="vtkIO" />
 					<Add library="vtkHybrid" />
-					<Add library="libSRPLscat" />
-					<Add library="libSRPLavg" />
-					<Add library="libSRPLcoordTrf" />
 					<Add library="ticppd" />
-					<Add directory="/builds/Debug/bin" />
-					<Add directory=".." />
-					<Add directory="/usr/local/lib" />
-					<Add directory="/builds/VTK504/bin" />
-					<Add directory="/builds/VTK504/bin/release" />
-					<Add directory="/software/ticpp/lib" />
-					<Add directory="/builds/Debug/lib" />
+					<Add library="SRPLscatd" />
+					<Add library="SRPLavgd" />
+					<Add library="SRPLcoordTrfd" />
+					<Add library="SRPLsegmd" />
+					<Add library="SRPLransacd" />
+					<Add library="fftw3" />
 				</Linker>
-				<ExtraCommands>
-					<Add after="pwd" />
-					<Add after="rm -f -r -v /builds/Debug/bin/wxSRparlabVTKPREM.app" />
-					<Add after="mkdir /builds/Debug/bin/wxSRparlabVTKPREM.app" />
-					<Add after="mkdir /builds/Debug/bin/wxSRparlabVTKPREM.app/Contents" />
-					<Add after="mkdir /builds/Debug/bin/wxSRparlabVTKPREM.app/Contents/MacOS" />
-					<Add after="mkdir /builds/Debug/bin/wxSRparlabVTKPREM.app/Contents/Resources" />
-					<Add after="mkdir /builds/Debug/bin/wxSRparlabVTKPREM.app/Contents/Resources/English.lproj" />
-					<Add after="cp /builds/Debug/bin/wxSRparlabVTKPREM /builds/Debug/bin/wxSRparlabVTKPREM.app/Contents/MacOS/wxSRparlabVTKPREM" />
-					<Add after="cp wxSRparlabVTKPREM.icns /builds/Debug/bin/wxSRparlabVTKPREM.app/Contents/Resources/wxSRparlabVTKPREM.icns" />
-					<Add after="cp Info.plist /builds/Debug/bin/wxSRparlabVTKPREM.app/Contents/Info.plist" />
-				</ExtraCommands>
 			</Target>
-			<Target title="ReleaseVTK">
-				<Option output="/builds/Release/bin/wxSRparlabVTKPREM" prefix_auto="0" extension_auto="0" />
-				<Option object_output="/builds/Release/obj" />
+			<Target title="Release">
+				<Option output="../../../../builds/Release/bin/wxSRparlabVTKPREM.app/Contents/MacOS/wxSRparlabVTKPREM.dylib" prefix_auto="0" extension_auto="0" />
+				<Option object_output="../../../../builds/Release/obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-g" />
 					<Add option="-O3" />
 					<Add option="-DJMU_USE_VTK" />
 					<Add option="-DJMU_TGTFOLLOW" />
-					<Add option="`wx-config --cxxflags --unicode=no` -W -Wall -ansi" />
-					<Add option="-I/usr/local/lib/wx/include/mac-ansi-release-2.8 -I/usr/local/include/wx-2.8 -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXMAC__" />
-					<Add directory="/usr/local/lib/wx/include/mac-ansi-release-2.8" />
-					<Add directory="/builds/VTK504" />
-					<Add directory="/software/VTK/Graphics" />
-					<Add directory="/software/VTK/Rendering" />
-					<Add directory="/software/VTK/Common" />
-					<Add directory="/software/VTK/Filtering" />
-					<Add directory="/software/VTK/IO" />
-					<Add directory="/software/VTK/Hybrid" />
-					<Add directory="/software/ticpp" />
-					<Add directory="/svnSandBox/trunk/libSRPLscat" />
-					<Add directory="/svnSandBox/trunk/libSRPLavg" />
-					<Add directory="/svnSandBox/trunk/libSRPLcoordTrf" />
-					<Add directory="/svnSandBox/trunk/libSRPLsegm" />
+					<Add option="-DNDEBUG" />
+					<Add option="`wx-config --cxxflags` -W -Wall -ansi" />
+					<Add directory="../../../../software/ticpp" />
+					<Add directory="../../libSRPLscat" />
+					<Add directory="../../libSRPLavg" />
+					<Add directory="../../libSRPLcoordTrf" />
+					<Add directory="../../libSRPLsegm" />
+					<Add directory="../../libSRPLransac" />
+					<Add directory="../../../../builds/VTK504" />
+					<Add directory="../../../../software/VTK/Graphics" />
+					<Add directory="../../../../software/VTK/Rendering" />
+					<Add directory="../../../../software/VTK/Common" />
+					<Add directory="../../../../software/VTK/Filtering" />
+					<Add directory="../../../../software/VTK/IO" />
+					<Add directory="../../../../software/VTK/Hybrid" />
+					<Add directory="../../../../software/fftw-3.2.1/include" />
+					<Add directory="../../../../software/VTK" />
 				</Compiler>
 				<Linker>
-					<Add option="`wx-config --libs --unicode=no`" />
-					<Add option="-L/usr/local/lib   -framework IOKit -framework Carbon -framework Cocoa -framework System -framework QuickTime  -lwx_mac_richtext-2.8 -lwx_mac_aui-2.8 -lwx_mac_xrc-2.8 -lwx_mac_qa-2.8 -lwx_mac_html-2.8 -lwx_mac_adv-2.8 -lwx_mac_core-2.8 -lwx_base_carbon_xml-2.8 -lwx_base_carbon_net-2.8 -lwx_base_carbon-2.8" />
+					<Add option="-Wl,-x" />
+					<Add option="-dynamiclib" />
+					<Add option="`wx-config --libs`" />
+					<Add directory="../../../../software/ticpp/lib" />
+					<Add directory="../../../../builds/VTK504" />
+					<Add directory="../../../../builds/Release/bin" />
+					<Add directory="../../../../usr/local/lib" />
+					<Add directory="../../../../software/fftw-3.2.1/lib" />
+					<Add directory="../../../../software/fftw-3.2.1/lib" />
+					<Add directory="../../../../opt/local/var/macports/software/wxWidgets/2.8.10_0/opt/local/lib" />
 					<Add library="vtkGraphics" />
 					<Add library="vtkRendering" />
 					<Add library="vtkCommon" />
 					<Add library="vtkFiltering" />
 					<Add library="vtkIO" />
 					<Add library="vtkHybrid" />
-					<Add library="libSRPLscat" />
-					<Add library="libSRPLavg" />
-					<Add library="libSRPLcoordTrf" />
 					<Add library="ticpp" />
-					<Add directory="/builds/Release/bin" />
-					<Add directory=".." />
-					<Add directory="/usr/local/lib" />
-					<Add directory="/builds/VTK504/bin" />
-					<Add directory="/builds/VTK504/bin/release" />
-					<Add directory="/software/ticpp/lib" />
-					<Add directory="/builds/Release/lib" />
+					<Add library="SRPLscat" />
+					<Add library="SRPLavg" />
+					<Add library="SRPLcoordTrf" />
+					<Add library="SRPLsegm" />
+					<Add library="SRPLransac" />
+					<Add library="fftw3" />
 				</Linker>
-				<ExtraCommands>
-					<Add after="pwd" />
-					<Add after="rm -f -r -v /builds/Release/bin/wxSRparlabVTKPREM.app" />
-					<Add after="mkdir /builds/Release/bin/wxSRparlabVTKPREM.app" />
-					<Add after="mkdir /builds/Release/bin/wxSRparlabVTKPREM.app/Contents" />
-					<Add after="mkdir /builds/Release/bin/wxSRparlabVTKPREM.app/Contents/MacOS" />
-					<Add after="mkdir /builds/Release/bin/wxSRparlabVTKPREM.app/Contents/Resources" />
-					<Add after="mkdir /builds/Release/bin/wxSRparlabVTKPREM.app/Contents/Resources/English.lproj" />
-					<Add after="cp /builds/Release/bin/wxSRparlabVTKPREM /builds/Release/bin/wxSRparlabVTKPREM.app/Contents/MacOS/wxSRparlabVTKPREM" />
-					<Add after="cp wxSRparlabVTKPREM.icns /builds/Release/bin/wxSRparlabVTKPREM.app/Contents/Resources/wxSRparlabVTKPREM.icns" />
-					<Add after="cp Info.plist /builds/Release/bin/wxSRparlabVTKPREM.app/Contents/Info.plist" />
-				</ExtraCommands>
 			</Target>
 		</Build>
-		<Unit filename="CMainWnd.cpp" />
-		<Unit filename="CMainWnd.h" />
-		<Unit filename="CamFrame.cpp" />
-		<Unit filename="CamFrame.h" />
-		<Unit filename="CamPanelSettings.h" />
-		<Unit filename="CamPanelSettinsgs.cpp" />
-		<Unit filename="CamViewData.cpp" />
-		<Unit filename="CamViewData.h" />
-		<Unit filename="camVtkView.cpp" />
-		<Unit filename="camVtkView.h" />
-		<Unit filename="srBuf.h" />
-		<Unit filename="srDummy.cpp" />
-		<Unit filename="srDummy.h" />
-		<Unit filename="srDummyDefines.h" />
-		<Unit filename="wxSRparlab.h" />
-		<Unit filename="wxSRvtkView.cpp" />
-		<Unit filename="wxSRvtkView.h" />
-		<Unit filename="wxSrApp.cpp" />
-		<Unit filename="wxSrApp.h" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-			<debugger />
-		</Extensions>
+		<Unit filename="CamFrame.cpp">
+			<Option compilerVar="CPP" />
+		</Unit>
+		<Unit filename="CamPanelSettinsgs.cpp">
+			<Option compilerVar="CPP" />
+		</Unit>
+		<Unit filename="CamViewData.cpp">
+			<Option compilerVar="CPP" />
+		</Unit>
+		<Unit filename="camVtkView.cpp">
+			<Option compilerVar="CPP" />
+		</Unit>
+		<Unit filename="CMainWnd.cpp">
+			<Option compilerVar="CPP" />
+		</Unit>
+		<Unit filename="srDummy.cpp">
+			<Option compilerVar="CPP" />
+		</Unit>
+		<Unit filename="wxSrApp.cpp">
+			<Option compilerVar="CPP" />
+		</Unit>
+		<Unit filename="wxSRvtkView.cpp">
+			<Option compilerVar="CPP" />
+		</Unit>
+		<Unit filename="CamFrame.h">
+		</Unit>
+		<Unit filename="CamPanelSettings.h">
+		</Unit>
+		<Unit filename="CamViewData.h">
+		</Unit>
+		<Unit filename="camVtkView.h">
+		</Unit>
+		<Unit filename="CMainWnd.h">
+		</Unit>
+		<Unit filename="lutDef.h">
+		</Unit>
+		<Unit filename="srDummy.h">
+		</Unit>
+		<Unit filename="srDummyDefines.h">
+		</Unit>
+		<Unit filename="wxSrApp.h">
+		</Unit>
+		<Unit filename="wxSRparlab.h">
+		</Unit>
+		<Unit filename="wxSRvtkView.h">
+		</Unit>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
+

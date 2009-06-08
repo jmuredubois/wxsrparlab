@@ -724,16 +724,16 @@ void MainWnd::AcqAll(wxCommandEvent& event)
 /* acting on visVTK checkbox*/
 void MainWnd::SetVisVtk(wxCommandEvent& event)
 {
-	SetVisVtk(_visVtk, m_camFrm,0);
-	SetVisVtk(_visBGVtk, m_camFrm,1);
-	SetVisVtk(_visFGVtk, m_camFrm,2);
-	SetVisVtk(_visSegmVtk, m_camFrm,3);
+	SetVisVtkIdx(_visVtk, m_camFrm,0);
+	SetVisVtkIdx(_visBGVtk, m_camFrm,1);
+	SetVisVtkIdx(_visFGVtk, m_camFrm,2);
+	SetVisVtkIdx(_visSegmVtk, m_camFrm,3);
 	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 }
 #endif // JMU_USE_VTK
 #ifdef JMU_USE_VTK
 /* acting on visVTK checkbox*/
-void MainWnd::SetVisVtk(std::vector<wxCheckBox*> visChkBox, std::vector<CamFrame*> camFrm, int idx)
+void MainWnd::SetVisVtkIdx(std::vector<wxCheckBox*> visChkBox, std::vector<CamFrame*> camFrm, int idx)
 {
 	int i = 0;
 	std::vector<wxCheckBox*>::iterator itCtrl;  // get iterator on the controls
@@ -751,16 +751,16 @@ void MainWnd::SetVisVtk(std::vector<wxCheckBox*> visChkBox, std::vector<CamFrame
 /* acting on colVTK radio box*/
 void MainWnd::SetColVtk(wxCommandEvent& event)
 {
-	SetColVtk(_colVtk, m_camFrm,0);
-	SetColVtk(_colBGVtk, m_camFrm,1);
-	SetColVtk(_colFGVtk, m_camFrm,2);
-	SetColVtk(_colSegmVtk, m_camFrm,3);
+	SetColVtkIdx(_colVtk, m_camFrm,0);
+	SetColVtkIdx(_colBGVtk, m_camFrm,1);
+	SetColVtkIdx(_colFGVtk, m_camFrm,2);
+	SetColVtkIdx(_colSegmVtk, m_camFrm,3);
 	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 }
 #endif // JMU_USE_VTK
 #ifdef JMU_USE_VTK
 /* acting on colVTK radio box*/
-void MainWnd::SetColVtk(std::vector<wxComboBox*> colCmbBox, std::vector<CamFrame*> camFrm, int idx)
+void MainWnd::SetColVtkIdx(std::vector<wxComboBox*> colCmbBox, std::vector<CamFrame*> camFrm, int idx)
 {
 	int i = 0;
 	std::vector<wxComboBox*>::iterator itCtrl;  // get iterator on the controls
