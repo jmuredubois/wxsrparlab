@@ -115,8 +115,6 @@ project "wxSRparlabVTKPREM"
 		libdirs					(string.format('%s', "/usr/local/lib"))
 		
 	configuration "macosx"
-		targetextension		".dylib"
-		linkoptions			"-dynamiclib"
 		includedirs				{string.format('%s%s',os.getenv("JMU_FFTW3"), "/include")} --FFTW3 includes
 		libdirs				{string.format('%s%s',os.getenv("JMU_FFTW3"), "/lib")} --FFTW3 binaries
 		includedirs				{string.format('%s%s',os.getenv("JMU_VTKSRCBASE"), "")} --FFTW3 includes
