@@ -48,6 +48,9 @@
 #include "vtkMatrix4x4.h"		// requires $(JMU_VTKSRCBASE)/Graphics
 #include "vtkStructuredGridWriter.h"	// requires $(JMU_VTKSRCBASE)/Graphics
 #include "vtkTextActor.h"		// requires $(JMU_VTKSRCBASE)/Rendering
+#include "vtkPointSet.h"			// for ICP or kdDist, when segmenting dataset
+#include "vtkUnstructuredGrid.h"	// for ICP or kdDist, when segmenting dataset
+#include "vtkSmartPointer.h"		// for ICP or kdDist, when segmenting dataset
 #ifdef JMU_ICPVTK
 #include "vtkCellArray.h"
 #include "vtkSmartPointer.h"
@@ -80,16 +83,6 @@ public:
 	int changeDepthRange(float minVal, float maxVal);
 	int changeAmpRange(float minAmp, float maxAmp);
 	int changeSegmRange(float minSegm, float maxSegm);
-	int hideDataAct(int vtkSub, bool doHide);
-	int setDataActColorRGB(int vtkSub, double r, double g, double b);
-	int setDataMapperColorDepth(int vtkSub);
-	int setDataMapperColorGray(int vtkSub);
-	int setDataMapperColorSegm(int vtkSub);
-	int setDataMapperColorR(int vtkSub);
-	int setDataMapperColorG(int vtkSub);
-	int setDataMapperColorB(int vtkSub);
-	int setDataMapperColorW(int vtkSub);
-	int setDataMapperColorK(int vtkSub);
 	vtkLookupTable* GetDepthLUT(){return depthLUT;};
 	vtkLookupTable* GetGrayLUT(){return grayLUT;};
 	vtkLookupTable* GetSegmLUT(){return segmLUT;};
@@ -111,7 +104,7 @@ public:
 	vtkStructuredGrid* icpCam(vtkStructuredGrid* source, vtkStructuredGrid* target);
 #endif
 #ifdef JMU_KDTREEVTK
-	double		kdDist(int idxSrc, int srcField, int idxTgt, int tgtField);
+	double		kdDist(std::vector<CamFrame*>* camFrm, int idxSrc, int srcField, int idxTgt, int tgtField);
 	double		kdTreeEps(vtkPointSet* source, vtkPointSet* target);
 #endif
 
@@ -120,7 +113,6 @@ private:
   vtkRenderWindow			*renWin;		//!< render window
   vtkRenderer				*renderer;		//!< renderer
   vtkRenderWindowInteractor *iren;			//!< renderer interactor
-  std::vector<CamVtkView*>	cameras;
 
   vtkCubeSource			*srBox;				//!< box to represent TOF camera FoV
   vtkOutlineFilter		*srBoxOutline;		//!< FoV box represented as outline
@@ -164,5 +156,13 @@ private:
   vtkScalarBarActor	*segmSca;  //!< scalar bar for segm. values
   int addScalarBarSegm();
   int freeScalarBarSegm();
+#ifdef JMU_ICPVTK
+	vtkPointSet* _icpPtsSrc;
+	vtkPointSet* _icpPtsTgt;
+#endif
+#ifdef JMU_KDTREEVTK
+	vtkPointSet* _kdPtsSrc;
+	vtkPointSet* _kdPtsTgt;
+#endif
 
 };
