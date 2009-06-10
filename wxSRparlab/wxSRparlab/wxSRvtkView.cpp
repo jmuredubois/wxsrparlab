@@ -705,7 +705,7 @@ vtkStructuredGrid* CViewSrVtk::icpCam(vtkStructuredGrid* source, vtkStructuredGr
 #endif
 
 #ifdef JMU_KDTREEVTK
-double CViewSrVtk::kdTreeEps(vtkStructuredGrid* source, vtkStructuredGrid* target)
+double CViewSrVtk::kdTreeEps(vtkPointSet* source, vtkPointSet* target)
 {
 	double eps = 0;
 	vtkKdTree* kdtree = vtkKdTree::New();
@@ -744,3 +744,38 @@ double CViewSrVtk::kdTreeEps(vtkStructuredGrid* source, vtkStructuredGrid* targe
 	return eps;
 }
 #endif
+#ifdef JMU_KDTREEVTK
+/** acting on "kdDist" button \n
+ * - bug: for now only first and last cam are used \n
+ * - todo: make dataset choice configurable
+ */
+double CViewSrVtk::kdDist(int idxSrc, int srcField, int idxTgt, int tgtField)
+{
+	if( cameras[idxTgt] == NULL){ return -1;};
+	if( cameras[idxSrc] == NULL){ return -1;};
+	vtkStructuredGrid* target = NULL;
+	switch(tgtField){
+		case 0:
+			target = cameras[idxTgt]->GetTransformedStructGrid();
+			break;
+		case 1:
+			target = cameras[idxTgt]->GetTransformedStructGrid();
+			break;
+		default:
+			break;
+	}
+	vtkStructuredGrid* source = NULL;
+	switch(srcField){
+		case 0:
+			source = cameras[idxSrc]->GetTransformedStructGrid();
+			break;
+		case 1:
+			source = cameras[idxSrc]->GetTransformedStructGrid();
+			break;
+		default:
+			break;
+	}
+	double eps = kdTreeEps(source, target);
+	return eps;
+}
+#endif // JMU_USE_VTK

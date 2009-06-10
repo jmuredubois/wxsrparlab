@@ -202,8 +202,8 @@ MainWnd::~MainWnd()
 	_colBGVtk.clear();
 	_visFGVtk.clear();
 	_colFGVtk.clear();
-	_visSegmVtk.clear();
-	_colSegmVtk.clear();
+	//_visSegmVtk.clear();
+	//_colSegmVtk.clear();
 #endif // JMU_USE_VTK
 }
 
@@ -444,14 +444,14 @@ void MainWnd::AddChildren()
 		_sizerCamVisCol->Add(colFGBox, wxGBPosition(i,5));
 		_colFGVtk.push_back(colFGBox);
 		// labSegmT.sprintf(wxT("Segm. %i"), i); // ... change cam Segm nickname ...
-		wxCheckBox *chkSegmBox = new wxCheckBox(_bgPanel, IDC_visVtk, labSegmT);	
+		/*wxCheckBox *chkSegmBox = new wxCheckBox(_bgPanel, IDC_visVtk, labSegmT);	
 		chkSegmBox->SetValue(true);
 		_sizerCamVisCol->Add(chkSegmBox, wxGBPosition(i,6));
 		_visSegmVtk.push_back(chkSegmBox);	// add visibility checkbox to container
 		wxComboBox* colSegmBox = new wxComboBox(_bgPanel, IDC_colVtk, wxT("Depth (Z)"),
 			wxDefaultPosition, wxDefaultSize, 7, colors, wxCB_READONLY);
 		_sizerCamVisCol->Add(colSegmBox, wxGBPosition(i,7));
-		_colSegmVtk.push_back(colSegmBox);
+		_colSegmVtk.push_back(colSegmBox);*/
 
 
 		camFrm->SendSizeEvent();
@@ -727,7 +727,7 @@ void MainWnd::SetVisVtk(wxCommandEvent& event)
 	SetVisVtkIdx(_visVtk, m_camFrm,0);
 	SetVisVtkIdx(_visBGVtk, m_camFrm,1);
 	SetVisVtkIdx(_visFGVtk, m_camFrm,2);
-	SetVisVtkIdx(_visSegmVtk, m_camFrm,3);
+	//SetVisVtkIdx(_visSegmVtk, m_camFrm,3);
 	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 }
 #endif // JMU_USE_VTK
@@ -754,7 +754,7 @@ void MainWnd::SetColVtk(wxCommandEvent& event)
 	SetColVtkIdx(_colVtk, m_camFrm,0);
 	SetColVtkIdx(_colBGVtk, m_camFrm,1);
 	SetColVtkIdx(_colFGVtk, m_camFrm,2);
-	SetColVtkIdx(_colSegmVtk, m_camFrm,3);
+	//SetColVtkIdx(_colSegmVtk, m_camFrm,3);
 	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 }
 #endif // JMU_USE_VTK
@@ -813,20 +813,20 @@ void MainWnd::PopCam(int vtkSub)
 	std::vector<wxCheckBox*>::iterator itCtrl4;  // get iterator on the controls
 	std::vector<wxComboBox*>::iterator itCtrl5;  // get iterator on the controls
 	std::vector<wxCheckBox*>::iterator itCtrl6;  // get iterator on the controls
-	std::vector<wxComboBox*>::iterator itCtrl7;  // get iterator on the controls
-	std::vector<wxCheckBox*>::iterator itCtrl8;  // get iterator on the controls
+	//std::vector<wxComboBox*>::iterator itCtrl7;  // get iterator on the controls
+	//std::vector<wxCheckBox*>::iterator itCtrl8;  // get iterator on the controls
 	std::vector<CamFrame*>::iterator itCam;  // get iterator on the camera frames
 	for ( itCtrl  =_colVtk.begin()  , itCtrl2  =_visVtk.begin()  , 
 		  itCtrl3 =_colBGVtk.begin(), itCtrl4  =_visBGVtk.begin(), 
 		  itCtrl5 =_colFGVtk.begin(), itCtrl6  =_visFGVtk.begin(), 
-		  itCtrl7 =_colSegmVtk.begin(), itCtrl8  =_visSegmVtk.begin(), 
+		  //itCtrl7 =_colSegmVtk.begin(), itCtrl8  =_visSegmVtk.begin(), 
 		  itCam  =m_camFrm.begin();
 		  itCtrl  !=_colVtk.end()   , itCtrl2 !=_visVtk.end()  ,
 	      itCtrl3 !=_colBGVtk.end() , itCtrl4 !=_visBGVtk.end(),
 		  itCtrl5 !=_colFGVtk.end() , itCtrl6 !=_visFGVtk.end(),
-		  itCtrl7 !=_colSegmVtk.end() , itCtrl8 !=_visSegmVtk.end(),
+		  //itCtrl7 !=_colSegmVtk.end() , itCtrl8 !=_visSegmVtk.end(),
 		  itCam !=m_camFrm.end(); 
-		  itCtrl++, itCtrl2++, itCtrl3++, itCtrl4++,itCtrl5++, itCtrl6++,itCtrl7++, itCtrl8++, itCam++, i++ )
+		  itCtrl++, itCtrl2++, itCtrl3++, itCtrl4++,itCtrl5++, itCtrl6++,/*itCtrl7++, itCtrl8++,*/ itCam++, i++ )
 	{
 		if( (*itCam)->GetVtkSub() == vtkSub)
 		{
@@ -837,8 +837,8 @@ void MainWnd::PopCam(int vtkSub)
 			(*itCtrl4)->Disable();
 			(*itCtrl5)->Disable();
 			(*itCtrl6)->Disable();
-			(*itCtrl7)->Disable();
-			(*itCtrl8)->Disable();
+			//(*itCtrl7)->Disable();
+			//(*itCtrl8)->Disable();
 			_icpIdxSrc->Enable(vtkSub, false);
 			_icpIdxTgt->Enable(vtkSub, false);
 			_kdDistIdxSrc->Enable(vtkSub, false);
@@ -916,24 +916,6 @@ void MainWnd::OnDepthCbar(wxCommandEvent& event)
 void MainWnd::OnICP(wxCommandEvent& event)
 {
 	#ifdef JMU_ICPVTK
-	//int i = 0;
-	//std::vector<wxCheckBox*>::iterator itCtrl;  // get iterator on the controls
-	//std::vector<CamFrame*>::iterator itCam;  // get iterator on the camera frames
-	//for ( itCtrl  =_visVtk.begin(), itCam  =m_camFrm.begin();
-	//	  itCtrl !=_visVtk.end()  , itCam !=m_camFrm.end(); 
-	//	  itCtrl++, itCam++, i++ )
-	//{
-	//	if(!_vtkWin){return;};
-	//	(*itCam)->GetCamVtk()->hideDataAct( !((*itCtrl)->IsChecked()) );
-	//}
-	//for ( itCtrl  =_visBGVtk.begin(), itCam  =m_camFrm.begin();
-	//	  itCtrl !=_visBGVtk.end()  , itCam !=m_camFrm.end(); 
-	//	  itCtrl++, itCam++, i++ )
-	//{
-	//	if(!_vtkWin){return;};
-	//	(*itCam)->GetCamBGVtk()->hideDataAct( !((*itCtrl)->IsChecked()) );
-	//}
-	//_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 	vtkStructuredGrid* target = (m_camFrm.front())->GetCamVtk()->GetTransformedStructGrid();
 	vtkStructuredGrid* source = (m_camFrm.back() )->GetCamVtk()->GetTransformedStructGrid();
 	vtkStructuredGrid* icpSource = _vtkWin->icpCam(source, target);
@@ -950,27 +932,9 @@ void MainWnd::OnICP(wxCommandEvent& event)
 void MainWnd::OnKdDist(wxCommandEvent& event)
 {
 	#ifdef JMU_KDTREEVTK
-	//int i = 0;
-	//std::vector<wxCheckBox*>::iterator itCtrl;  // get iterator on the controls
-	//std::vector<CamFrame*>::iterator itCam;  // get iterator on the camera frames
-	//for ( itCtrl  =_visVtk.begin(), itCam  =m_camFrm.begin();
-	//	  itCtrl !=_visVtk.end()  , itCam !=m_camFrm.end(); 
-	//	  itCtrl++, itCam++, i++ )
-	//{
-	//	if(!_vtkWin){return;};
-	//	(*itCam)->GetCamVtk()->hideDataAct( !((*itCtrl)->IsChecked()) );
-	//}
-	//for ( itCtrl  =_visBGVtk.begin(), itCam  =m_camFrm.begin();
-	//	  itCtrl !=_visBGVtk.end()  , itCam !=m_camFrm.end(); 
-	//	  itCtrl++, itCam++, i++ )
-	//{
-	//	if(!_vtkWin){return;};
-	//	(*itCam)->GetCamBGVtk()->hideDataAct( !((*itCtrl)->IsChecked()) );
-	//}
-	//_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 	int idxTgt = _kdDistIdxTgt->GetSelection();
 	wxString strTgt = _kdDistTgt->GetValue();
-	vtkStructuredGrid* target = NULL;
+	vtkPointSet* target = NULL;
 	if(  strTgt.IsSameAs(wxT("Current"))  )
 	{
 		target = (m_camFrm[idxTgt])->GetCamVtk()->GetTransformedStructGrid();
@@ -979,9 +943,23 @@ void MainWnd::OnKdDist(wxCommandEvent& event)
 	{
 		target = (m_camFrm[idxTgt])->GetCamBGVtk()->GetTransformedStructGrid();
 	}
+	if(  strTgt.IsSameAs(wxT("Segmentation"))  )
+	{
+		vtkStructuredGrid* tgt = (m_camFrm[idxTgt])->GetCamVtk()->GetTransformedStructGrid();
+		vtkSmartPointer<vtkPoints> TargetPoints = vtkSmartPointer<vtkPoints>::New();
+		for (vtkIdType i=0; i < tgt->GetNumberOfPoints(); i++)
+		{
+			if( tgt->IsPointVisible(i) )
+			{
+				TargetPoints->InsertNextPoint( tgt->GetPoint(i));
+			}
+		}
+		target = vtkUnstructuredGrid::New();
+		target->SetPoints(TargetPoints);
+	}
 	int idxSrc = _kdDistIdxSrc->GetSelection();
 	wxString strSrc = _kdDistSrc->GetValue();
-	vtkStructuredGrid* source = NULL;
+	vtkPointSet* source = NULL;
 	if(  strSrc.IsSameAs(wxT("Current"))  )
 	{
 		source = (m_camFrm[idxSrc])->GetCamVtk()->GetTransformedStructGrid();
@@ -989,6 +967,20 @@ void MainWnd::OnKdDist(wxCommandEvent& event)
 	if(  strSrc.IsSameAs(wxT("Background"))  )
 	{
 		source = (m_camFrm[idxSrc])->GetCamBGVtk()->GetTransformedStructGrid();
+	}
+	if(  strSrc.IsSameAs(wxT("Segmentation"))  )
+	{
+		vtkStructuredGrid* src = (m_camFrm[idxSrc])->GetCamVtk()->GetTransformedStructGrid();
+		vtkSmartPointer<vtkPoints> SourcePoints = vtkSmartPointer<vtkPoints>::New();
+		for (vtkIdType i=0; i < src->GetNumberOfPoints(); i++)
+		{
+			if( src->IsPointVisible(i) )
+			{
+				SourcePoints->InsertNextPoint( src->GetPoint(i));
+			}
+		}
+		source = vtkUnstructuredGrid::New();
+		source->SetPoints(SourcePoints);
 	}
 	double eps = _vtkWin->kdTreeEps(source, target);
 	wxString strDist;
