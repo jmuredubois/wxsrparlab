@@ -926,7 +926,7 @@ void CamFrame::AcqOneFrm()
 			wxString curImg;
 			curImg.sprintf(wxT("%s%04u.vtk"), _vtkRecPrefix, m_nFrmRead);
 			char charBuf[512];
-			strcpy( charBuf, (const char*) curImg.mb_str(wxConvUTF8) );
+			strcpy( charBuf, (const char*) curImg.char_str() );
 			_camVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrf), PLCTR_GetY(m_CTrf), PLCTR_GetX(m_CTrf), (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2], segmBuf, charBuf);
 		}
 		else

@@ -65,6 +65,16 @@ CViewSrVtk::CViewSrVtk(wxFrame* pWnd, int x, int y, int w, int h)
 
 	fpsReadTxtActor->SetDisplayPosition(3,3);
 	fpsTxtActor->SetDisplayPosition(w-125,3);
+	#ifdef JMU_ICPVTK
+		_icpTxtActor = vtkTextActor::New();	//!< actor for icp res. display
+		renderer->AddActor(_icpTxtActor);
+		_icpTxtActor->SetDisplayPosition(w-125, h-20);
+	#endif
+	#ifdef JMU_KDTREEVTK
+		_kdTxtActor = vtkTextActor::New() ;	//!< actor for kdDist display
+		renderer->AddActor(_kdTxtActor);
+		_kdTxtActor->SetDisplayPosition(3, h-20);
+	#endif
 	//renderer->GetActiveCamera()->SetParallelProjection(1);
 	renderer->GetActiveCamera()->SetParallelScale(2000);
 	//renderer->GetActiveCamera()->SetPosition(0,0,-5000);
@@ -87,6 +97,13 @@ CViewSrVtk::~CViewSrVtk()
 	renderer->Delete();
 	// delete the interactor
 	iren->Delete();
+
+	#ifdef JMU_ICPVTK
+		_icpTxtActor->Delete();
+	#endif
+	#ifdef JMU_KDTREEVTK
+		_kdTxtActor->Delete();
+	#endif
 
 	int res = 0;
 	// free axes
@@ -611,7 +628,14 @@ vtkStructuredGrid* CViewSrVtk::icpFct(std::vector<CamFrame*>* camFrms, int idxSr
 	vtkStructuredGrid* ptsSetICP = icpWork(source, target, mat);
 	return ptsSetICP;
 }
-#endif
+#endif // JMU_ICPVTK
+#ifdef JMU_ICPVTK
+void CViewSrVtk::setIcpTxt(char* txt)
+{
+	if(_icpTxtActor==NULL){return;};
+	_icpTxtActor->SetInput(txt);
+}
+#endif // JMU_ICPVTK
 
 #ifdef JMU_KDTREEVTK
 double CViewSrVtk::kdTreeEps(vtkPointSet* source, vtkPointSet* target, double res[3])
@@ -734,6 +758,18 @@ double CViewSrVtk::kdDist(std::vector<CamFrame*>* camFrms, int idxSrc, int srcFi
 			break;
 	}
 	double eps = kdTreeEps(source, target, res);
+	char kdText[512];
+	sprintf(kdText, "kdDist: target: cam%i field%i (%i pts) / source: cam%i field%i (%i pts) -> avg=%g - std=%g - eps=%g",
+		idxTgt, tgtField, (int)target->GetNumberOfPoints(), idxSrc, srcField, (int)source->GetNumberOfPoints(),
+		res[1], res[2], res[0]);
+	setKdDistTxt(kdText);
 	return eps;
 }
-#endif // JMU_USE_VTK
+#endif // JMU_KDTREEVTK
+#ifdef JMU_KDTREEVTK
+void CViewSrVtk::setKdDistTxt(char* txt)
+{
+	if(_kdTxtActor==NULL){return;};
+	_kdTxtActor->SetInput(txt);
+}
+#endif // JMU_KDTREEVTK
