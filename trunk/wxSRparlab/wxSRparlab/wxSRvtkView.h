@@ -57,6 +57,7 @@
 #include "vtkIterativeClosestPointTransform.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkLandmarkTransform.h" //to set type to ridgid body
+#include "vtkUnstructuredGridToPolyDataFilter.h"	// requires $(JMU_VTKSRCBASE)/Graphics
 #endif
 #ifdef JMU_KDTREEVTK
 #include "vtkKdTree.h"
@@ -102,7 +103,7 @@ public:
 	void hideDepthCbar(bool doHide);
 #ifdef JMU_ICPVTK
 	vtkStructuredGrid* icpWork(vtkPointSet* source, vtkPointSet* target, double mat[16]);
-	vtkStructuredGrid* icpFct(std::vector<CamFrame*>* camFrms, int idxSrc, int srcField, int idxTgt, int tgtField, double mat[16]);
+	void icpFct(std::vector<CamFrame*>* camFrms, int idxSrc, int srcField, int idxTgt, int tgtField, double mat[16]);
 #endif
 #ifdef JMU_KDTREEVTK
 	double		kdDist(std::vector<CamFrame*>* camFrms, int idxSrc, int srcField, int idxTgt, int tgtField, double res[3]);
@@ -160,7 +161,12 @@ private:
 #ifdef JMU_ICPVTK
 	vtkPointSet* _icpPtsSrc;
 	vtkPointSet* _icpPtsTgt;
-	vtkStructuredGrid* _icpStructGrid;
+	vtkStructuredGrid*	_icpGrid; 
+	vtkStructuredGridGeometryFilter* _icpToPoly;
+	vtkPolyDataMapper*		_icpMapperZ;		//!< mapper for icp
+	vtkPolyDataMapper*		_icpMapperAmp;		//!< mapper for icp
+	vtkPolyDataMapper*		_icpMapperSegm;		//!< mapper for icp
+    vtkActor*				_icpActor;			//!< actor for icp
 	vtkTextActor* _icpTxtActor;	//!< actor for icpRes display
 	void setIcpTxt(char* txt);
 #endif
