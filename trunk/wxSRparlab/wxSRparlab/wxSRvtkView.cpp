@@ -88,12 +88,6 @@ CViewSrVtk::~CViewSrVtk()
 	// delete the interactor
 	iren->Delete();
 
-	int i = 0;
-	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
-	for ( it=cameras.begin() ; it != cameras.end(); it++, i++ )
-	{
-		delete((*it));
-	}
 	int res = 0;
 	// free axes
 	res+= freeSrAxes();
@@ -430,168 +424,6 @@ int CViewSrVtk::freeScalarBarSegm()
 }
 
 /**
- * Hides a data actor
- */
-int CViewSrVtk::hideDataAct(int vtkSub, bool doHide)
-{
-	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
-	for ( it=cameras.begin() ; it != cameras.end(); it++ )
-	{
-		if( (*it)->getVtkSub() == vtkSub )
-		{
-			(*it)->hideDataAct(doHide);
-		}
-	}
-	return vtkSub;
-}
-
-/**
- * Sets a data actor color
- */
-int CViewSrVtk::setDataActColorRGB(int vtkSub, double r, double g, double b)
-{
-	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
-	for ( it=cameras.begin() ; it != cameras.end(); it++)
-	{
-		if( (*it)->getVtkSub() == vtkSub )
-		{
-			(*it)->setDataActColorRGB(r, g, b);
-		}
-	}
-	return vtkSub;
-}
-
-/**
- * Sets a data actor color
- */
-int CViewSrVtk::setDataMapperColorDepth(int vtkSub)
-{
-	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
-	for ( it=cameras.begin() ; it != cameras.end(); it++)
-	{
-		if( (*it)->getVtkSub() == vtkSub )
-		{
-			(*it)->setDataMapperColorDepth();
-		}
-	}
-	return vtkSub;
-}
-/**
- * Sets a data actor color
- */
-int CViewSrVtk::setDataMapperColorGray(int vtkSub)
-{
-	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
-	for ( it=cameras.begin() ; it != cameras.end(); it++)
-	{
-		if( (*it)->getVtkSub() == vtkSub )
-		{
-			(*it)->setDataMapperColorGray();
-		}
-	}
-	return vtkSub;
-}
-/**
- * Sets a data actor color
- */
-int CViewSrVtk::setDataMapperColorSegm(int vtkSub)
-{
-	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
-	for ( it=cameras.begin() ; it != cameras.end(); it++)
-	{
-		if( (*it)->getVtkSub() == vtkSub )
-		{
-			(*it)->setDataMapperColorSegm();
-		}
-	}
-	return vtkSub;
-}
-/**
- * Sets a data actor color
- */
-int CViewSrVtk::setDataMapperColorR(int vtkSub)
-{
-	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
-	for ( it=cameras.begin() ; it != cameras.end(); it++)
-	{
-		if( (*it)->getVtkSub() == vtkSub )
-		{
-			(*it)->setDataMapperColorR();
-		}
-	}
-	return vtkSub;
-}
-/**
- * Sets a data actor color
- */
-int CViewSrVtk::setDataMapperColorG(int vtkSub)
-{
-	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
-	for ( it=cameras.begin() ; it != cameras.end(); it++)
-	{
-		if( (*it)->getVtkSub() == vtkSub )
-		{
-			(*it)->setDataMapperColorG();
-		}
-	}
-	return vtkSub;
-}
-/**
- * Sets a data actor color
- */
-int CViewSrVtk::setDataMapperColorB(int vtkSub)
-{
-	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
-	for ( it=cameras.begin() ; it != cameras.end(); it++)
-	{
-		if( (*it)->getVtkSub() == vtkSub )
-		{
-			(*it)->setDataMapperColorB();
-		}
-	}
-	return vtkSub;
-}
-/**
- * Sets a data actor color
- */
-int CViewSrVtk::setDataMapperColorW(int vtkSub)
-{
-	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
-	for ( it=cameras.begin() ; it != cameras.end(); it++)
-	{
-		if( (*it)->getVtkSub() == vtkSub )
-		{
-			(*it)->setDataMapperColorW();
-		}
-	}
-	return vtkSub;
-}
-/**
- * Sets a data actor color
- */
-int CViewSrVtk::setDataMapperColorK(int vtkSub)
-{
-	if((vtkSub >= _vtkSubMax) || (vtkSub<0)){ return -1;};
-	std::vector<CamVtkView*>::iterator it;  // get iterator on the cameras
-	for ( it=cameras.begin() ; it != cameras.end(); it++)
-	{
-		if( (*it)->getVtkSub() == vtkSub )
-		{
-			(*it)->setDataMapperColorK();
-		}
-	}
-	return vtkSub;
-}
-/**
  * Renders
  */
 int CViewSrVtk::Render()
@@ -749,28 +581,69 @@ double CViewSrVtk::kdTreeEps(vtkPointSet* source, vtkPointSet* target)
  * - bug: for now only first and last cam are used \n
  * - todo: make dataset choice configurable
  */
-double CViewSrVtk::kdDist(int idxSrc, int srcField, int idxTgt, int tgtField)
+double CViewSrVtk::kdDist(std::vector<CamFrame*>* camFrm, int idxSrc, int srcField, int idxTgt, int tgtField)
 {
-	if( cameras[idxTgt] == NULL){ return -1;};
-	if( cameras[idxSrc] == NULL){ return -1;};
-	vtkStructuredGrid* target = NULL;
+	if( camFrm == NULL) { return -1;};
+	//if( (int) camFrm.size() < idxSrc+1) { return -1;};
+	//if( (int) camFrm.size() < idxTgt+1) { return -1;};
+	CamFrame* srcVtk = camFrm->at(idxSrc); 
+	CamFrame* tgtVtk = camFrm->at(idxTgt);
+	if( srcVtk == NULL){ return -1;};
+	if( tgtVtk == NULL){ return -1;};
+	vtkPointSet* target = NULL;
 	switch(tgtField){
 		case 0:
-			target = cameras[idxTgt]->GetTransformedStructGrid();
+			target = tgtVtk->GetCamVtk()->GetTransformedStructGrid();
 			break;
 		case 1:
-			target = cameras[idxTgt]->GetTransformedStructGrid();
+			target = tgtVtk->GetCamBGVtk()->GetTransformedStructGrid();
+			break;
+		case 2:
+			target = tgtVtk->GetCamFGVtk()->GetTransformedStructGrid();
+			break;
+		case 3:
+			{
+			vtkStructuredGrid* tgt = tgtVtk->GetCamVtk()->GetTransformedStructGrid();
+			vtkSmartPointer<vtkPoints> TargetPoints = vtkSmartPointer<vtkPoints>::New();
+			for (vtkIdType i=0; i < tgt->GetNumberOfPoints(); i++)
+			{
+				if( tgt->IsPointVisible(i) )
+				{
+					TargetPoints->InsertNextPoint( tgt->GetPoint(i));
+				}
+			}
+			target = vtkUnstructuredGrid::New();
+			target->SetPoints(TargetPoints);
+			}
 			break;
 		default:
 			break;
 	}
-	vtkStructuredGrid* source = NULL;
+	vtkPointSet* source = NULL;
 	switch(srcField){
 		case 0:
-			source = cameras[idxSrc]->GetTransformedStructGrid();
+			source = srcVtk->GetCamVtk()->GetTransformedStructGrid();
 			break;
 		case 1:
-			source = cameras[idxSrc]->GetTransformedStructGrid();
+			source = srcVtk->GetCamBGVtk()->GetTransformedStructGrid();
+			break;
+		case 2:
+			source = srcVtk->GetCamFGVtk()->GetTransformedStructGrid();
+			break;
+		case 3:
+			{
+			vtkStructuredGrid* src = srcVtk->GetCamVtk()->GetTransformedStructGrid();
+			vtkSmartPointer<vtkPoints> SourcePoints = vtkSmartPointer<vtkPoints>::New();
+			for (vtkIdType i=0; i < src->GetNumberOfPoints(); i++)
+			{
+				if( src->IsPointVisible(i) )
+				{
+					SourcePoints->InsertNextPoint( src->GetPoint(i));
+				}
+			}
+			source = vtkUnstructuredGrid::New();
+			source->SetPoints(SourcePoints);
+			}
 			break;
 		default:
 			break;

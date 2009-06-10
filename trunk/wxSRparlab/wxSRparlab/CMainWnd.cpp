@@ -933,56 +933,22 @@ void MainWnd::OnKdDist(wxCommandEvent& event)
 {
 	#ifdef JMU_KDTREEVTK
 	int idxTgt = _kdDistIdxTgt->GetSelection();
+	int tgtField = 0;
 	wxString strTgt = _kdDistTgt->GetValue();
-	vtkPointSet* target = NULL;
-	if(  strTgt.IsSameAs(wxT("Current"))  )
-	{
-		target = (m_camFrm[idxTgt])->GetCamVtk()->GetTransformedStructGrid();
-	}
-	if(  strTgt.IsSameAs(wxT("Background"))  )
-	{
-		target = (m_camFrm[idxTgt])->GetCamBGVtk()->GetTransformedStructGrid();
-	}
-	if(  strTgt.IsSameAs(wxT("Segmentation"))  )
-	{
-		vtkStructuredGrid* tgt = (m_camFrm[idxTgt])->GetCamVtk()->GetTransformedStructGrid();
-		vtkSmartPointer<vtkPoints> TargetPoints = vtkSmartPointer<vtkPoints>::New();
-		for (vtkIdType i=0; i < tgt->GetNumberOfPoints(); i++)
-		{
-			if( tgt->IsPointVisible(i) )
-			{
-				TargetPoints->InsertNextPoint( tgt->GetPoint(i));
-			}
-		}
-		target = vtkUnstructuredGrid::New();
-		target->SetPoints(TargetPoints);
-	}
+	if( strTgt.IsSameAs(wxT("Current"))      ) {tgtField = 0;};
+	if( strTgt.IsSameAs(wxT("Background"))   ) {tgtField = 1;};
+	if( strTgt.IsSameAs(wxT("Foreground"))   ) {tgtField = 2;};
+	if( strTgt.IsSameAs(wxT("Segmentation")) ) {tgtField = 3;};
+
 	int idxSrc = _kdDistIdxSrc->GetSelection();
 	wxString strSrc = _kdDistSrc->GetValue();
-	vtkPointSet* source = NULL;
-	if(  strSrc.IsSameAs(wxT("Current"))  )
-	{
-		source = (m_camFrm[idxSrc])->GetCamVtk()->GetTransformedStructGrid();
-	}
-	if(  strSrc.IsSameAs(wxT("Background"))  )
-	{
-		source = (m_camFrm[idxSrc])->GetCamBGVtk()->GetTransformedStructGrid();
-	}
-	if(  strSrc.IsSameAs(wxT("Segmentation"))  )
-	{
-		vtkStructuredGrid* src = (m_camFrm[idxSrc])->GetCamVtk()->GetTransformedStructGrid();
-		vtkSmartPointer<vtkPoints> SourcePoints = vtkSmartPointer<vtkPoints>::New();
-		for (vtkIdType i=0; i < src->GetNumberOfPoints(); i++)
-		{
-			if( src->IsPointVisible(i) )
-			{
-				SourcePoints->InsertNextPoint( src->GetPoint(i));
-			}
-		}
-		source = vtkUnstructuredGrid::New();
-		source->SetPoints(SourcePoints);
-	}
-	double eps = _vtkWin->kdTreeEps(source, target);
+	int srcField = 0;
+	if( strSrc.IsSameAs(wxT("Current"))      ) { srcField = 0;};
+	if( strSrc.IsSameAs(wxT("Background"))   ) { srcField = 1;};
+	if( strSrc.IsSameAs(wxT("Foreground"))   ) { srcField = 2;};
+	if( strSrc.IsSameAs(wxT("Segmentation")) ) { srcField = 3;};
+
+	double eps = _vtkWin->kdDist(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField);
 	wxString strDist;
 	strDist.sprintf(wxT("kdDist returned: %g"), eps);
 	SetStatusText(strDist);
