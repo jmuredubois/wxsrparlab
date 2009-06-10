@@ -1113,6 +1113,8 @@ void CamFrame::OnSetTrfMat(wxCommandEvent& WXUNUSED(event))
 	  wxString strPathMat = OpenDialogMat->GetPath();
 	  _camVtk->setTrfMat(strPathMat.char_str());
 	  _camBGVtk->setTrfMat(strPathMat.char_str());
+	  _camFGVtk->setTrfMat(strPathMat.char_str());
+	  //_camSegmGVtk->setTrfMat(strPathMat.char_str());
   } // (OpenDialogMat->ShowModal()==wxID_OK) )
   delete(OpenDialogMat);
 
