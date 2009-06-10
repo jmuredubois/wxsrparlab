@@ -68,7 +68,32 @@ CViewSrVtk::CViewSrVtk(wxFrame* pWnd, int x, int y, int w, int h)
 	#ifdef JMU_ICPVTK
 		_icpTxtActor = vtkTextActor::New();	//!< actor for icp res. display
 		renderer->AddActor(_icpTxtActor);
-		_icpTxtActor->SetDisplayPosition(w-125, h-20);
+		_icpTxtActor->SetDisplayPosition(w-300, h-80);
+
+		// new ICP actor
+		_icpGrid = vtkStructuredGrid::New(); // to be replaced
+		_icpToPoly = vtkStructuredGridGeometryFilter::New();
+		_icpToPoly->SetInput(_icpGrid);
+		_icpMapperZ = vtkPolyDataMapper::New();
+		_icpMapperZ->SetLookupTable(depthLUT);  // sets color
+		_icpMapperZ->SetInputConnection(_icpToPoly->GetOutputPort());
+		_icpMapperAmp = vtkPolyDataMapper::New();
+		_icpMapperAmp->SetLookupTable(grayLUT);  // sets color
+		_icpMapperAmp->SetInputConnection(_icpToPoly->GetOutputPort());
+		_icpMapperSegm = vtkPolyDataMapper::New();
+		_icpMapperSegm->SetLookupTable(segmLUT);  // sets color
+		_icpMapperSegm->SetInputConnection(_icpToPoly->GetOutputPort());
+		_icpActor = vtkActor::New();
+		_icpActor->SetMapper(_icpMapperZ);
+		_icpMapperZ->Register(_icpActor);
+		_icpMapperAmp->Register(_icpActor);
+		_icpMapperSegm->Register(_icpActor);
+		_icpActor->GetProperty()->SetRepresentationToPoints();
+		_icpActor->GetProperty()->SetPointSize(3.0);			//! HARD CODED POINT SIZE
+		_icpActor->GetProperty()->SetDiffuse(0.0);
+		_icpActor->GetProperty()->SetSpecular(0.0);
+		_icpActor->GetProperty()->SetAmbient(1.0);
+		renderer->AddActor(_icpActor);
 	#endif
 	#ifdef JMU_KDTREEVTK
 		_kdTxtActor = vtkTextActor::New() ;	//!< actor for kdDist display
@@ -100,6 +125,13 @@ CViewSrVtk::~CViewSrVtk()
 
 	#ifdef JMU_ICPVTK
 		_icpTxtActor->Delete();
+		// new ICP actor
+		_icpActor->Delete();
+		_icpMapperZ->Delete();
+		_icpMapperAmp->Delete();
+		_icpMapperSegm->Delete();
+		_icpToPoly->Delete();
+		//_icpGrid->Delete();
 	#endif
 	#ifdef JMU_KDTREEVTK
 		_kdTxtActor->Delete();
@@ -284,6 +316,9 @@ int CViewSrVtk::changeDepthRange(float minVal, float maxVal)
 {
 	int res = _vtkSubMax;
 	int i = 0;
+	#ifdef JMU_ICPVTK
+		_icpMapperZ->SetScalarRange((double) minVal, (double) maxVal);
+	#endif
 	//renWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 	return res-i;
 }
@@ -295,6 +330,9 @@ int CViewSrVtk::changeAmpRange(float minAmp, float maxAmp)
 {
 	int res = _vtkSubMax;
 	int i = 0;
+		#ifdef JMU_ICPVTK
+		_icpMapperAmp->SetScalarRange((double) minAmp, (double) maxAmp);
+	#endif
 	//renWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 	return res-i;
 }
@@ -306,6 +344,9 @@ int CViewSrVtk::changeSegmRange(float minSegm, float maxSegm)
 {
 	int res = _vtkSubMax;
 	int i = 0;
+	#ifdef JMU_ICPVTK
+		_icpMapperSegm->SetScalarRange((double) minSegm, (double) maxSegm);
+	#endif
 	//renWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 	return res-i;
 }
@@ -524,7 +565,7 @@ void CViewSrVtk::hideDepthCbar(bool doHide)
 }
 
 #ifdef JMU_ICPVTK
-vtkStructuredGrid* CViewSrVtk::icpWork(vtkPointSet* source, vtkPointSet* target, double mat[12])
+vtkStructuredGrid* CViewSrVtk::icpWork(vtkPointSet* source, vtkPointSet* target, double mat[16])
 {
 	int res = 0;
 
@@ -547,15 +588,25 @@ vtkStructuredGrid* CViewSrVtk::icpWork(vtkPointSet* source, vtkPointSet* target,
 	ICPTransFilter->SetTransform(icp);
 	ICPTransFilter->Update();
 
+	vtkMatrix4x4* mat4 = icp->GetMatrix();
+	int k=0;
+	for(int k1 =0; k<4; k1++ ) 
+	{
+		for(int k2 =0; k2<4; k2++ ) 
+		{
+			mat[k] = mat4->GetElement(k2, k1);
+			k+=1;
+		}
+	}
 	return ICPTransFilter->GetStructuredGridOutput();
 
 	//return res;
 }
 #endif
 #ifdef JMU_ICPVTK
-vtkStructuredGrid* CViewSrVtk::icpFct(std::vector<CamFrame*>* camFrms, int idxSrc, int srcField, int idxTgt, int tgtField, double mat[16])
+void CViewSrVtk::icpFct(std::vector<CamFrame*>* camFrms, int idxSrc, int srcField, int idxTgt, int tgtField, double mat[16])
 {
-	if( camFrms == NULL) { return NULL;};
+	if( camFrms == NULL) { return;};
 	std::vector<CamFrame*>::iterator it; 
 	CamFrame* srcVtk = NULL; 
 	CamFrame* tgtVtk = NULL;
@@ -565,8 +616,8 @@ vtkStructuredGrid* CViewSrVtk::icpFct(std::vector<CamFrame*>* camFrms, int idxSr
 		if(camSub == idxSrc) { srcVtk = (*it); };
 		if(camSub == idxTgt) { tgtVtk = (*it); };
 	}
-	if( srcVtk == NULL){ return NULL;};
-	if( tgtVtk == NULL){ return NULL;};
+	if( srcVtk == NULL){ return; };
+	if( tgtVtk == NULL){ return; };
 	vtkPointSet* target = NULL;
 	switch(tgtField){
 		case 0:
@@ -626,7 +677,14 @@ vtkStructuredGrid* CViewSrVtk::icpFct(std::vector<CamFrame*>* camFrms, int idxSr
 			break;
 	}
 	vtkStructuredGrid* ptsSetICP = icpWork(source, target, mat);
-	return ptsSetICP;
+	_icpToPoly->SetInput(ptsSetICP);
+	_icpToPoly->Modified();
+	char icpText[512];
+	sprintf(icpText, "ICP: target: cam%i field%i (%i pts) / source: cam%i field%i (%i pts) \n [ %g %g %g %g \n %g %g %g %g \n %g %g %g %g \n %g %g %g %g ]",
+		idxTgt, tgtField, (int)target->GetNumberOfPoints(), idxSrc, srcField, (int)source->GetNumberOfPoints(),
+		mat[0], mat[4], mat[8], mat[12],mat[1], mat[5], mat[9], mat[13],mat[2], mat[6], mat[10], mat[14], mat[3], mat[7], mat[11], mat[15]);
+	setIcpTxt(icpText);
+	return ;
 }
 #endif // JMU_ICPVTK
 #ifdef JMU_ICPVTK
