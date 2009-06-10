@@ -160,10 +160,15 @@ private:
 #ifdef JMU_ICPVTK
 	vtkPointSet* _icpPtsSrc;
 	vtkPointSet* _icpPtsTgt;
+	vtkStructuredGrid* _icpStructGrid;
+	vtkTextActor* _icpTxtActor;	//!< actor for icpRes display
+	void setIcpTxt(char* txt);
 #endif
 #ifdef JMU_KDTREEVTK
 	vtkPointSet* _kdPtsSrc;
 	vtkPointSet* _kdPtsTgt;
+	vtkTextActor* _kdTxtActor;	//!< actor for kdDist display
+	void setKdDistTxt(char* txt);
 #endif
 
 };
