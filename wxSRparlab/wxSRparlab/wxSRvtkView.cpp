@@ -507,7 +507,7 @@ void CViewSrVtk::hideDepthCbar(bool doHide)
 }
 
 #ifdef JMU_ICPVTK
-vtkStructuredGrid* CViewSrVtk::icpCam(vtkStructuredGrid* source, vtkStructuredGrid* target)
+vtkStructuredGrid* CViewSrVtk::icpWork(vtkPointSet* source, vtkPointSet* target, double mat[12])
 {
 	int res = 0;
 
@@ -533,6 +533,83 @@ vtkStructuredGrid* CViewSrVtk::icpCam(vtkStructuredGrid* source, vtkStructuredGr
 	return ICPTransFilter->GetStructuredGridOutput();
 
 	//return res;
+}
+#endif
+#ifdef JMU_ICPVTK
+vtkStructuredGrid* CViewSrVtk::icpFct(std::vector<CamFrame*>* camFrms, int idxSrc, int srcField, int idxTgt, int tgtField, double mat[16])
+{
+	if( camFrms == NULL) { return NULL;};
+	std::vector<CamFrame*>::iterator it; 
+	CamFrame* srcVtk = NULL; 
+	CamFrame* tgtVtk = NULL;
+	for ( it=camFrms->begin() ; it != camFrms->end(); it++)
+	{
+		int camSub = (*it)->GetVtkSub();
+		if(camSub == idxSrc) { srcVtk = (*it); };
+		if(camSub == idxTgt) { tgtVtk = (*it); };
+	}
+	if( srcVtk == NULL){ return NULL;};
+	if( tgtVtk == NULL){ return NULL;};
+	vtkPointSet* target = NULL;
+	switch(tgtField){
+		case 0:
+			target = tgtVtk->GetCamVtk()->GetTransformedStructGrid();
+			break;
+		case 1:
+			target = tgtVtk->GetCamBGVtk()->GetTransformedStructGrid();
+			break;
+		case 2:
+			target = tgtVtk->GetCamFGVtk()->GetTransformedStructGrid();
+			break;
+		case 3:
+			{
+			vtkStructuredGrid* tgt = tgtVtk->GetCamVtk()->GetTransformedStructGrid();
+			vtkSmartPointer<vtkPoints> TargetPoints = vtkSmartPointer<vtkPoints>::New();
+			for (vtkIdType i=0; i < tgt->GetNumberOfPoints(); i++)
+			{
+				if( tgt->IsPointVisible(i) )
+				{
+					TargetPoints->InsertNextPoint( tgt->GetPoint(i));
+				}
+			}
+			target = vtkUnstructuredGrid::New();
+			target->SetPoints(TargetPoints);
+			}
+			break;
+		default:
+			break;
+	}
+	vtkPointSet* source = NULL;
+	switch(srcField){
+		case 0:
+			source = srcVtk->GetCamVtk()->GetTransformedStructGrid();
+			break;
+		case 1:
+			source = srcVtk->GetCamBGVtk()->GetTransformedStructGrid();
+			break;
+		case 2:
+			source = srcVtk->GetCamFGVtk()->GetTransformedStructGrid();
+			break;
+		case 3:
+			{
+			vtkStructuredGrid* src = srcVtk->GetCamVtk()->GetTransformedStructGrid();
+			vtkSmartPointer<vtkPoints> SourcePoints = vtkSmartPointer<vtkPoints>::New();
+			for (vtkIdType i=0; i < src->GetNumberOfPoints(); i++)
+			{
+				if( src->IsPointVisible(i) )
+				{
+					SourcePoints->InsertNextPoint( src->GetPoint(i));
+				}
+			}
+			source = vtkUnstructuredGrid::New();
+			source->SetPoints(SourcePoints);
+			}
+			break;
+		default:
+			break;
+	}
+	vtkStructuredGrid* ptsSetICP = icpWork(source, target, mat);
+	return ptsSetICP;
 }
 #endif
 
