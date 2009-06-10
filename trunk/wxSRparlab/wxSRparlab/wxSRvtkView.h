@@ -111,7 +111,8 @@ public:
 	vtkStructuredGrid* icpCam(vtkStructuredGrid* source, vtkStructuredGrid* target);
 #endif
 #ifdef JMU_KDTREEVTK
-	double		kdTreeEps(vtkStructuredGrid* source, vtkStructuredGrid* target);
+	double		kdDist(int idxSrc, int srcField, int idxTgt, int tgtField);
+	double		kdTreeEps(vtkPointSet* source, vtkPointSet* target);
 #endif
 
 private:
