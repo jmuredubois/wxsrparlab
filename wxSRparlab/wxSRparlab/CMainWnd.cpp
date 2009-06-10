@@ -948,9 +948,10 @@ void MainWnd::OnKdDist(wxCommandEvent& event)
 	if( strSrc.IsSameAs(wxT("Foreground"))   ) { srcField = 2;};
 	if( strSrc.IsSameAs(wxT("Segmentation")) ) { srcField = 3;};
 
-	double eps = _vtkWin->kdDist(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField);
+	double res[3]; res[0] = -1; res[1] = -1; res[2] = -1;
+	double eps = _vtkWin->kdDist(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, res);
 	wxString strDist;
-	strDist.sprintf(wxT("kdDist returned: %g"), eps);
+	strDist.sprintf(wxT("kdDist returned: %g - avg=%g - std=%g - eps=%g"), eps, res[1], res[2], res[0]);
 	SetStatusText(strDist);
 	#endif //JMU_KDTREEVTK
 }

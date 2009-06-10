@@ -537,7 +537,7 @@ vtkStructuredGrid* CViewSrVtk::icpCam(vtkStructuredGrid* source, vtkStructuredGr
 #endif
 
 #ifdef JMU_KDTREEVTK
-double CViewSrVtk::kdTreeEps(vtkPointSet* source, vtkPointSet* target)
+double CViewSrVtk::kdTreeEps(vtkPointSet* source, vtkPointSet* target, double res[3])
 {
 	double eps = 0;
 	vtkKdTree* kdtree = vtkKdTree::New();
@@ -572,6 +572,7 @@ double CViewSrVtk::kdTreeEps(vtkPointSet* source, vtkPointSet* target)
 	}
 	double std = sqrt(diffSqSum / ( (double) numPoints));
 	eps = std + avg;
+	res[0] = eps; res[1] = avg; res[2] = std;
 	if(dists != NULL){ free(dists); dists=NULL;};
 	return eps;
 }
@@ -581,13 +582,20 @@ double CViewSrVtk::kdTreeEps(vtkPointSet* source, vtkPointSet* target)
  * - bug: for now only first and last cam are used \n
  * - todo: make dataset choice configurable
  */
-double CViewSrVtk::kdDist(std::vector<CamFrame*>* camFrm, int idxSrc, int srcField, int idxTgt, int tgtField)
+double CViewSrVtk::kdDist(std::vector<CamFrame*>* camFrms, int idxSrc, int srcField, int idxTgt, int tgtField, double res[3])
 {
-	if( camFrm == NULL) { return -1;};
+	if( camFrms == NULL) { return -1;};
 	//if( (int) camFrm.size() < idxSrc+1) { return -1;};
 	//if( (int) camFrm.size() < idxTgt+1) { return -1;};
-	CamFrame* srcVtk = camFrm->at(idxSrc); 
-	CamFrame* tgtVtk = camFrm->at(idxTgt);
+	std::vector<CamFrame*>::iterator it; 
+	CamFrame* srcVtk = NULL; 
+	CamFrame* tgtVtk = NULL;
+	for ( it=camFrms->begin() ; it != camFrms->end(); it++)
+	{
+		int camSub = (*it)->GetVtkSub();
+		if(camSub == idxSrc) { srcVtk = (*it); };
+		if(camSub == idxTgt) { tgtVtk = (*it); };
+	}
 	if( srcVtk == NULL){ return -1;};
 	if( tgtVtk == NULL){ return -1;};
 	vtkPointSet* target = NULL;
@@ -648,7 +656,7 @@ double CViewSrVtk::kdDist(std::vector<CamFrame*>* camFrm, int idxSrc, int srcFie
 		default:
 			break;
 	}
-	double eps = kdTreeEps(source, target);
+	double eps = kdTreeEps(source, target, res);
 	return eps;
 }
 #endif // JMU_USE_VTK
