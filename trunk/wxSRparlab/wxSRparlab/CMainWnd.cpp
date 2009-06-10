@@ -916,9 +916,25 @@ void MainWnd::OnDepthCbar(wxCommandEvent& event)
 void MainWnd::OnICP(wxCommandEvent& event)
 {
 	#ifdef JMU_ICPVTK
-	vtkStructuredGrid* target = (m_camFrm.front())->GetCamVtk()->GetTransformedStructGrid();
-	vtkStructuredGrid* source = (m_camFrm.back() )->GetCamVtk()->GetTransformedStructGrid();
-	vtkStructuredGrid* icpSource = _vtkWin->icpCam(source, target);
+	int idxTgt = _kdDistIdxTgt->GetSelection();
+	int tgtField = 0;
+	wxString strTgt = _kdDistTgt->GetValue();
+	if( strTgt.IsSameAs(wxT("Current"))      ) {tgtField = 0;};
+	if( strTgt.IsSameAs(wxT("Background"))   ) {tgtField = 1;};
+	if( strTgt.IsSameAs(wxT("Foreground"))   ) {tgtField = 2;};
+	if( strTgt.IsSameAs(wxT("Segmentation")) ) {tgtField = 3;};
+
+	int idxSrc = _kdDistIdxSrc->GetSelection();
+	wxString strSrc = _kdDistSrc->GetValue();
+	int srcField = 0;
+	if( strSrc.IsSameAs(wxT("Current"))      ) { srcField = 0;};
+	if( strSrc.IsSameAs(wxT("Background"))   ) { srcField = 1;};
+	if( strSrc.IsSameAs(wxT("Foreground"))   ) { srcField = 2;};
+	if( strSrc.IsSameAs(wxT("Segmentation")) ) { srcField = 3;};
+
+	double mat[16]; for(int k =0; k<16; k++ ) { mat[k] = 0.0;}; mat[0]=1.0; mat[5]=1.0; mat[10]=1.0; mat[15]=1.0;
+	vtkStructuredGrid* icpSource = _vtkWin->icpFct(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, mat);
+	//vtkStructuredGrid* icpSource = _vtkWin->icpCam(source, target);
 	(m_camFrm.back() )->GetCamVtk()->ShowStructGrid(icpSource);
 	_vtkWin->Render();
 	#endif //JMU_ICPVTK
