@@ -1259,9 +1259,13 @@ void CamFrame::RansacBG(wxCommandEvent& WXUNUSED(event))
 	  }
   int res = PLRSC_ransac(m_ransac, PLAVG_GetAvgBuf(m_bgAvg), PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLNN_GetBoolBuf(m_bgNaN), segmBuf, 0);
   RSCPLAN pla = PLRSC_GetPlaBest(m_ransac);
+  double mat[9]; for(int k=0; k<9; k++) { mat[k] = 0; }; // matrix to store trf
+  double resTrf = PLRSC_GetProjZRotMat(m_ransac, mat);
   double* nVec = &(pla.nVec[0]);
   wxString strS;
-  strS.Printf(wxT("Best plane at iter %i (%05i inliers)-  %+06.4G x  %+06.4G y  %+06.4G z  - (%+06.4G)  = 0"), pla.iter, pla.inliers.size(), nVec[0], nVec[1], nVec[2], nVec[3]);
+  strS.Printf(wxT("Best plane at iter %i (%05i inliers)-  %+06.4G x  %+06.4G y  %+06.4G z  - (%+06.4G)  = 0 \n [%g %g %g \n  %g %g %g \n %g %g %g ]" ),
+	              pla.iter, pla.inliers.size(), nVec[0], nVec[1], nVec[2], nVec[3],
+				  mat[0],mat[3],mat[6],mat[1],mat[4],mat[7],mat[2],mat[5],mat[8]);
   m_settingsPane->SetText(strS);
   if(pla.iter < 0){ return;}; // return here to display of bad plane since ...
 							  // ... a number of iter < 0 indicates a RANSAC error

@@ -7,8 +7,8 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="../../../../builds/Debug/bin/wxSRparlabVTKPREMd.app/Contents/MacOS/wxSRparlabVTKPREMd.dylib" prefix_auto="0" extension_auto="0" />
-				<Option object_output="../../../../builds/Debug/obj" />
+				<Option output="../../../../../../../builds/Debug/bin/wxSRparlabVTKPREMd.exe" prefix_auto="0" extension_auto="0" />
+				<Option object_output="../../../../../../../builds/Debug/obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -17,33 +17,29 @@
 					<Add option="-DJMU_TGTFOLLOW" />
 					<Add option="-DDEBUG" />
 					<Add option="-D_DEBUG" />
-					<Add option="`wx-config --cxxflags` -W -Wall -ansi" />
-					<Add directory="../../../../software/ticpp" />
+					<Add option="-DWIN32" />
+					<Add option="-D_WINDOWS" />
+					<Add directory="../../../../../../../Software/ticpp" />
 					<Add directory="../../libSRPLscat" />
 					<Add directory="../../libSRPLavg" />
 					<Add directory="../../libSRPLcoordTrf" />
 					<Add directory="../../libSRPLsegm" />
 					<Add directory="../../libSRPLransac" />
-					<Add directory="../../../../builds/VTK504" />
-					<Add directory="../../../../software/VTK/Graphics" />
-					<Add directory="../../../../software/VTK/Rendering" />
-					<Add directory="../../../../software/VTK/Common" />
-					<Add directory="../../../../software/VTK/Filtering" />
-					<Add directory="../../../../software/VTK/IO" />
-					<Add directory="../../../../software/VTK/Hybrid" />
-					<Add directory="../../../../software/fftw-3.2.1/include" />
-					<Add directory="../../../../software/VTK" />
+					<Add directory="../../../../../../../Software/vtk504bin" />
+					<Add directory="../../../../../../../Software/VTK/vtk-5.0.4/Graphics" />
+					<Add directory="../../../../../../../Software/VTK/vtk-5.0.4/Rendering" />
+					<Add directory="../../../../../../../Software/VTK/vtk-5.0.4/Common" />
+					<Add directory="../../../../../../../Software/VTK/vtk-5.0.4/Filtering" />
+					<Add directory="../../../../../../../Software/VTK/vtk-5.0.4/IO" />
+					<Add directory="../../../../../../../Software/VTK/vtk-5.0.4/Hybrid" />
+					<Add directory="../../../../../../../Software/fftw/fftw-3.1.2-dll" />
 				</Compiler>
 				<Linker>
-					<Add option="-dynamiclib" />
-					<Add option="`wx-config --libs`" />
-					<Add directory="../../../../software/ticpp/lib" />
-					<Add directory="../../../../builds/VTK504" />
-					<Add directory="../../../../builds/Debug/bin" />
-					<Add directory="../../../../usr/local/lib" />
-					<Add directory="../../../../software/fftw-3.2.1/lib" />
-					<Add directory="../../../../software/fftw-3.2.1/lib" />
-					<Add directory="../../../../opt/local/var/macports/software/wxWidgets/2.8.10_0/opt/local/lib" />
+					<Add option="-mwindows" />
+					<Add directory="../../../../../../../Software/ticpp/lib" />
+					<Add directory="../../../../../../../Software/vtk504bin" />
+					<Add directory="../../../../../../../builds/Debug/bin" />
+					<Add directory="../../../../../../../Software/fftw/fftw-3.1.2-dll" />
 					<Add library="vtkGraphics" />
 					<Add library="vtkRendering" />
 					<Add library="vtkCommon" />
@@ -56,12 +52,12 @@
 					<Add library="SRPLcoordTrfd" />
 					<Add library="SRPLsegmd" />
 					<Add library="SRPLransacd" />
-					<Add library="fftw3" />
+					<Add library="libfftw3-3" />
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="../../../../builds/Release/bin/wxSRparlabVTKPREM.app/Contents/MacOS/wxSRparlabVTKPREM.dylib" prefix_auto="0" extension_auto="0" />
-				<Option object_output="../../../../builds/Release/obj" />
+				<Option output="../../../../../../../builds/Release/bin/wxSRparlabVTKPREM.exe" prefix_auto="0" extension_auto="0" />
+				<Option object_output="../../../../../../../builds/Release/obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -69,34 +65,30 @@
 					<Add option="-DJMU_USE_VTK" />
 					<Add option="-DJMU_TGTFOLLOW" />
 					<Add option="-DNDEBUG" />
-					<Add option="`wx-config --cxxflags` -W -Wall -ansi" />
-					<Add directory="../../../../software/ticpp" />
+					<Add option="-DWIN32" />
+					<Add option="-D_WINDOWS" />
+					<Add directory="../../../../../../../Software/ticpp" />
 					<Add directory="../../libSRPLscat" />
 					<Add directory="../../libSRPLavg" />
 					<Add directory="../../libSRPLcoordTrf" />
 					<Add directory="../../libSRPLsegm" />
 					<Add directory="../../libSRPLransac" />
-					<Add directory="../../../../builds/VTK504" />
-					<Add directory="../../../../software/VTK/Graphics" />
-					<Add directory="../../../../software/VTK/Rendering" />
-					<Add directory="../../../../software/VTK/Common" />
-					<Add directory="../../../../software/VTK/Filtering" />
-					<Add directory="../../../../software/VTK/IO" />
-					<Add directory="../../../../software/VTK/Hybrid" />
-					<Add directory="../../../../software/fftw-3.2.1/include" />
-					<Add directory="../../../../software/VTK" />
+					<Add directory="../../../../../../../Software/vtk504bin" />
+					<Add directory="../../../../../../../Software/VTK/vtk-5.0.4/Graphics" />
+					<Add directory="../../../../../../../Software/VTK/vtk-5.0.4/Rendering" />
+					<Add directory="../../../../../../../Software/VTK/vtk-5.0.4/Common" />
+					<Add directory="../../../../../../../Software/VTK/vtk-5.0.4/Filtering" />
+					<Add directory="../../../../../../../Software/VTK/vtk-5.0.4/IO" />
+					<Add directory="../../../../../../../Software/VTK/vtk-5.0.4/Hybrid" />
+					<Add directory="../../../../../../../Software/fftw/fftw-3.1.2-dll" />
 				</Compiler>
 				<Linker>
-					<Add option="-Wl,-x" />
-					<Add option="-dynamiclib" />
-					<Add option="`wx-config --libs`" />
-					<Add directory="../../../../software/ticpp/lib" />
-					<Add directory="../../../../builds/VTK504" />
-					<Add directory="../../../../builds/Release/bin" />
-					<Add directory="../../../../usr/local/lib" />
-					<Add directory="../../../../software/fftw-3.2.1/lib" />
-					<Add directory="../../../../software/fftw-3.2.1/lib" />
-					<Add directory="../../../../opt/local/var/macports/software/wxWidgets/2.8.10_0/opt/local/lib" />
+					<Add option="-s" />
+					<Add option="-mwindows" />
+					<Add directory="../../../../../../../Software/ticpp/lib" />
+					<Add directory="../../../../../../../Software/vtk504bin" />
+					<Add directory="../../../../../../../builds/Release/bin" />
+					<Add directory="../../../../../../../Software/fftw/fftw-3.1.2-dll" />
 					<Add library="vtkGraphics" />
 					<Add library="vtkRendering" />
 					<Add library="vtkCommon" />
@@ -109,7 +101,7 @@
 					<Add library="SRPLcoordTrf" />
 					<Add library="SRPLsegm" />
 					<Add library="SRPLransac" />
-					<Add library="fftw3" />
+					<Add library="libfftw3-3" />
 				</Linker>
 			</Target>
 		</Build>
