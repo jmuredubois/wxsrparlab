@@ -422,7 +422,7 @@ void MainWnd::AddChildren()
 		_sizerCamVisCol->Add(chkBox, wxGBPosition(i,0));
 		_visVtk.push_back(chkBox);	// add visibility checkbox to container
 		wxComboBox* colBox = new wxComboBox(_bgPanel, IDC_colVtk, wxT("Depth (Z)"),
-			wxDefaultPosition, wxDefaultSize, 7, colors, wxCB_READONLY);
+			wxDefaultPosition, wxDefaultSize, 8, colors, wxCB_READONLY);
 		_sizerCamVisCol->Add(colBox, wxGBPosition(i,1));
 		_colVtk.push_back(colBox);
 		// labBGT.sprintf(wxT("BGcam %i"), i); // ... change cam BG nickname ...
@@ -431,7 +431,7 @@ void MainWnd::AddChildren()
 		_sizerCamVisCol->Add(chkBGBox, wxGBPosition(i,2));
 		_visBGVtk.push_back(chkBGBox);	// add visibility checkbox to container
 		wxComboBox* colBGBox = new wxComboBox(_bgPanel, IDC_colVtk, wxT("Depth (Z)"),
-			wxDefaultPosition, wxDefaultSize, 7, colors, wxCB_READONLY);
+			wxDefaultPosition, wxDefaultSize, 8, colors, wxCB_READONLY);
 		_sizerCamVisCol->Add(colBGBox, wxGBPosition(i,3));
 		_colBGVtk.push_back(colBGBox);
 		// labFGT.sprintf(wxT("FGcam %i"), i); // ... change cam FG nickname ...
@@ -440,7 +440,7 @@ void MainWnd::AddChildren()
 		_sizerCamVisCol->Add(chkFGBox, wxGBPosition(i,4));
 		_visFGVtk.push_back(chkFGBox);	// add visibility checkbox to container
 		wxComboBox* colFGBox = new wxComboBox(_bgPanel, IDC_colVtk, wxT("Depth (Z)"),
-			wxDefaultPosition, wxDefaultSize, 7, colors, wxCB_READONLY);
+			wxDefaultPosition, wxDefaultSize, 8, colors, wxCB_READONLY);
 		_sizerCamVisCol->Add(colFGBox, wxGBPosition(i,5));
 		_colFGVtk.push_back(colFGBox);
 		// labSegmT.sprintf(wxT("Segm. %i"), i); // ... change cam Segm nickname ...
@@ -449,7 +449,7 @@ void MainWnd::AddChildren()
 		_sizerCamVisCol->Add(chkSegmBox, wxGBPosition(i,6));
 		_visSegmVtk.push_back(chkSegmBox);	// add visibility checkbox to container
 		wxComboBox* colSegmBox = new wxComboBox(_bgPanel, IDC_colVtk, wxT("Depth (Z)"),
-			wxDefaultPosition, wxDefaultSize, 7, colors, wxCB_READONLY);
+			wxDefaultPosition, wxDefaultSize, 8, colors, wxCB_READONLY);
 		_sizerCamVisCol->Add(colSegmBox, wxGBPosition(i,7));
 		_colSegmVtk.push_back(colSegmBox);*/
 
@@ -831,14 +831,14 @@ void MainWnd::PopCam(int vtkSub)
 		if( (*itCam)->GetVtkSub() == vtkSub)
 		{
 			m_camFrm.erase(itCam);
-			(*itCtrl )->Disable();
-			(*itCtrl2)->Disable();
-			(*itCtrl3)->Disable();
-			(*itCtrl4)->Disable();
-			(*itCtrl5)->Disable();
-			(*itCtrl6)->Disable();
-			//(*itCtrl7)->Disable();
-			//(*itCtrl8)->Disable();
+			(*itCtrl )->Disable(); _colVtk.erase(itCtrl ); 
+			(*itCtrl2)->Disable(); _visVtk.erase(itCtrl2); 
+			(*itCtrl3)->Disable(); _colBGVtk.erase(itCtrl3); 
+			(*itCtrl4)->Disable(); _visBGVtk.erase(itCtrl4); 
+			(*itCtrl5)->Disable(); _colFGVtk.erase(itCtrl5);
+			(*itCtrl6)->Disable(); _visFGVtk.erase(itCtrl6);
+			//(*itCtrl7)->Disable(); _colSegmVtk.erase(itCtrl8);
+			//(*itCtrl8)->Disable(); _visSegmVtk.erase(itCtrl8);
 			_icpIdxSrc->Enable(vtkSub, false);
 			_icpIdxTgt->Enable(vtkSub, false);
 			_kdDistIdxSrc->Enable(vtkSub, false);
