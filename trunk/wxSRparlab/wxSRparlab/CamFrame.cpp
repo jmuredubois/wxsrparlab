@@ -287,7 +287,7 @@ int CamFrame::CreateAndSetNotebook(const wxString& title)
 	m_viewBGRangePane = new CamViewData(m_camNB, wxT("BG pha"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
 	m_viewBGRangePane->InitViewData();
 	m_viewBGRangePane->SetDispMin(45000.0);
-	m_viewBGRangePane->SetDispMax(0.0); 
+	m_viewBGRangePane->SetDispMax(0.0);
 	// %%%%% BACKGROUND AMPLITUDE panel
 	m_viewBGAmpPane = new CamViewData(m_camNB, wxT("BG amp"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
 	m_viewBGAmpPane->InitViewData();
@@ -297,7 +297,7 @@ int CamFrame::CreateAndSetNotebook(const wxString& title)
 	m_viewSegmPane = new CamViewData(m_camNB, wxT("segm"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
 	m_viewSegmPane->InitViewData();
 	m_viewSegmPane->SetDispMin(0);
-	m_viewSegmPane->SetDispMax(255); 
+	m_viewSegmPane->SetDispMax(255);
 
 	/* NBparadigm */
 	m_camNB->AddPage(m_settingsPane, wxT("Settings"), TRUE);//, -1);
@@ -464,8 +464,8 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   delete(OpenDialogAmp);
   if((m_pFile4ReadPha  != NULL) && (m_pFile4ReadAmp  != NULL) && (m_pFile4ReadPha->IsOpened()) && (m_pFile4ReadAmp->IsOpened()))
   {
-	  SRBUF newbuf; newbuf.amp = NULL; newbuf.pha = NULL; 
-	  newbuf.nCols = m_nCols; newbuf.nRows = m_nRows; 
+	  SRBUF newbuf; newbuf.amp = NULL; newbuf.pha = NULL;
+	  newbuf.nCols = m_nCols; newbuf.nRows = m_nRows;
 	  newbuf.bufferSizeInBytes = m_nRows * m_nCols * 2 * sizeof(unsigned short);
 	  PLSC_Open(&m_scat, newbuf);
 	  PLNN_Open(&m_NaN, newbuf);
@@ -515,8 +515,8 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   m_settingsPane->SetText(strR);
   SetStatusText( strR );
 
-  SRBUF newbuf; newbuf.amp = NULL; newbuf.pha = NULL; 
-  newbuf.nCols = m_nCols; newbuf.nRows = m_nRows; 
+  SRBUF newbuf; newbuf.amp = NULL; newbuf.pha = NULL;
+  newbuf.nCols = m_nCols; newbuf.nRows = m_nRows;
   newbuf.bufferSizeInBytes = m_nRows * m_nCols * 2 * sizeof(unsigned short);
   PLSC_Open(&m_scat, newbuf);
   PLNN_Open(&m_NaN, newbuf);
@@ -661,7 +661,7 @@ void CamFrame::OnRecord(wxCommandEvent& WXUNUSED(event))
 	    }
 
 	    strR.sprintf(wxT("Files opened.")); // ... change text ...
-		
+
 	    m_settingsPane->SetText(strR);
 		SetStatusText( strR );
 	} // (OpenDialogPha->ShowModal()==wxID_OK) && (OpenDialogAmp->ShowModal()==wxID_OK)
@@ -670,7 +670,7 @@ void CamFrame::OnRecord(wxCommandEvent& WXUNUSED(event))
   } // 'record' checkbox is checked
   else
   {
-	  // Properly close record by deleting wxFile 
+	  // Properly close record by deleting wxFile
 	  if(m_pFile4WritePha != NULL) { delete(m_pFile4WritePha); m_pFile4WritePha = NULL; };
       if(m_pFile4WriteAmp != NULL) { delete(m_pFile4WriteAmp); m_pFile4WriteAmp = NULL; };
 	  // save record params
@@ -896,12 +896,12 @@ void CamFrame::AcqOneFrm()
 		    srBuf.bufferSizeInBytes = m_nCols*m_nRows*2*sizeof(unsigned short);
 	  // res+=PLNN_FlagNaN(m_NaN, srBuf); // already done on line 760
 	  //res+=PLNN_FlagNaN(m_NaNbg, PLAVG_GetAvgBuf(m_bgAvg)); // already done on line 774
-	  PLSEGM_Segment(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN), 
+	  PLSEGM_Segment(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN),
 				PLAVG_GetAvgBuf(m_bgAvg), PLNN_GetNaNbuf(m_bgNaN), PLAVG_GetAvgVar(m_bgAvg) );
 	  unsigned char* segmBuf = NULL;
 	  if(IsSegmChecked())
 	  {
-		  PLSEGM_SegmentXYZ(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN), 
+		  PLSEGM_SegmentXYZ(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN),
 			  PLAVG_GetAvgBuf(m_bgAvg), PLNN_GetNaNbuf(m_bgNaN), PLAVG_GetAvgVar(m_bgAvg),
 			  PLCTR_GetZ(m_CTrf), PLCTR_GetZ(m_CTrfBG));
 		  segmBuf = (unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).bg;
@@ -958,7 +958,7 @@ void CamFrame::AcqOneFrm()
 	  if((m_pFile4WriteSeg  != NULL) && (m_pFile4WriteSeg->IsOpened()))
 	  {  // write SEGMENTATION data to file
 		  res = (int) m_pFile4WriteSeg->Write(segmBuf, (int)m_nCols*(int)m_nRows*sizeof(unsigned char));
-	  } 
+	  }
 	  m_settingsPane->SetText(strR);
 	  m_viewRangePane->SetTxtInfo(strR);
 	  m_viewAmpPane->SetTxtInfo(strR);
@@ -1243,12 +1243,12 @@ void CamFrame::OnSetSegmParams(wxCommandEvent& WXUNUSED(event))
 void CamFrame::RansacBG(wxCommandEvent& WXUNUSED(event))
 {
   // // here just for debuggin purposes: the logical place is after a 'learn background' action
-	/*PLSEGM_Segment(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN), 
+	/*PLSEGM_Segment(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN),
 				PLAVG_GetAvgBuf(m_bgAvg), PLNN_GetNaNbuf(m_bgNaN), PLAVG_GetAvgVar(m_bgAvg) );*/ // done in AcqOneFrm
 	  unsigned char* segmBuf = NULL;
 	  if(IsSegmChecked())
 	  {
-		  /*PLSEGM_SegmentXYZ(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN), 
+		  /*PLSEGM_SegmentXYZ(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN),
 			  PLAVG_GetAvgBuf(m_bgAvg), PLNN_GetNaNbuf(m_bgNaN), PLAVG_GetAvgVar(m_bgAvg),
 			  PLCTR_GetZ(m_CTrf), PLCTR_GetZ(m_CTrfBG)); */ // done in AcqOneFrm
 		  segmBuf = (unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).bg;
@@ -1261,11 +1261,12 @@ void CamFrame::RansacBG(wxCommandEvent& WXUNUSED(event))
   RSCPLAN pla = PLRSC_GetPlaBest(m_ransac);
   double* nVec = &(pla.nVec[0]);
   wxString strS;
-  strS.Printf(wxT("Best plane at iter %i  -  %+06.4G x  %+06.4G y  %+06.4G z  - (%+06.4G)  = 0"), pla.iter, nVec[0], nVec[1], nVec[2], nVec[3]);
+  strS.Printf(wxT("Best plane at iter %i (%05i inliers)-  %+06.4G x  %+06.4G y  %+06.4G z  - (%+06.4G)  = 0"), pla.iter, pla.inliers.size(), nVec[0], nVec[1], nVec[2], nVec[3]);
   m_settingsPane->SetText(strS);
   if(pla.iter < 0){ return;}; // return here to display of bad plane since ...
 							  // ... a number of iter < 0 indicates a RANSAC error
 
+  // OPTION 1 was to hijack the target follower. Unfortunately, this is not enough
   #ifdef JMU_TGTFOLLOW
 		//if(m_pFile4TgtCoord != NULL)
 		{
@@ -1293,6 +1294,22 @@ void CamFrame::RansacBG(wxCommandEvent& WXUNUSED(event))
 				_camVtk->updateTarget(&(tgt[0]), 15); // to update line and triangles
 		}
   #endif // JMU_TGTFOLLOW
+
+		// DISPLAY OPTION 2: blank the points that don't belong
+		std::vector<int>::iterator it;
+		int pix = 0; int row=0; int col=0;
+		for(it=pla.inliers.begin(); it!=pla.inliers.end(); it++)
+		{ // seems like vtk is col major while my buffers are row-major
+			//pix = *it;
+			row = *it / m_nCols;
+			col = *it % m_nCols;
+			pix = col * m_nRows + row;
+			_camVtk->GetStructGrid()->BlankPoint(pix);
+		}
+		_camVtk->GetStructGrid()->Modified();
+		_camVtk->GetStructGrid()->Update();
+		_vtkWin->Render();
+
   return;
 }
 #endif // JMU_RANSAC
@@ -1306,12 +1323,12 @@ void CamFrame::RansacFG(wxCommandEvent& WXUNUSED(event))
 	srBuf.nCols = m_nCols;
 	srBuf.nRows = m_nRows;
 	srBuf.bufferSizeInBytes = m_nCols*m_nRows*2*sizeof(unsigned short);
-	/*PLSEGM_Segment(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN), 
+	/*PLSEGM_Segment(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN),
 				PLAVG_GetAvgBuf(m_bgAvg), PLNN_GetNaNbuf(m_bgNaN), PLAVG_GetAvgVar(m_bgAvg) );*/ // done in AcqOneFrm
 	  unsigned char* segmBuf = NULL;
 	  if(IsSegmChecked())
 	  {
-		  /*PLSEGM_SegmentXYZ(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN), 
+		  /*PLSEGM_SegmentXYZ(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN),
 			  PLAVG_GetAvgBuf(m_bgAvg), PLNN_GetNaNbuf(m_bgNaN), PLAVG_GetAvgVar(m_bgAvg),
 			  PLCTR_GetZ(m_CTrf), PLCTR_GetZ(m_CTrfBG)); */ // done in AcqOneFrm
 		  segmBuf = (unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).bg;
@@ -1371,7 +1388,7 @@ void CamFrame::OnRecXYZ(wxCommandEvent& WXUNUSED(event))
 	    }
 
 	    strR.sprintf(wxT("XYZ file opened.")); // ... change text ...
-		
+
 	    m_settingsPane->SetText(strR);
 		SetStatusText( strR );
 	} // (OpenDialog->ShowModal()==wxID_OK)
@@ -1414,7 +1431,7 @@ void CamFrame::OnRecSeg(wxCommandEvent& WXUNUSED(event))
 	    }
 
 	    strR.sprintf(wxT("Seg file opened.")); // ... change text ...
-		
+
 	    m_settingsPane->SetText(strR);
 		SetStatusText( strR );
 	} // (OpenDialog->ShowModal()==wxID_OK)
