@@ -69,7 +69,7 @@ public:
 	int getVtkSub();
 	int setTrfMat(char* fn);
 
-	#ifdef JMU_TGTFOLLOW 
+	#ifdef JMU_TGTFOLLOW
 	  int setTgtFile(char* fn);
 	  int updateTarget(float x, float y, float z);
 	  int updateTarget(); //overloaded operator to reset to camera center
@@ -103,6 +103,7 @@ public:
 	vtkFloatArray* GetDdata(){return dData;};
 	vtkFloatArray* GetAdata(){return aData;};
 	vtkFloatArray* GetSdata(){return sData;};
+	vtkStructuredGrid* GetStructGrid();
 	vtkStructuredGrid* GetTransformedStructGrid();
 	//vtkPointSet* GetTransformedPtSet(bool segmented);
 	vtkDataObject* GetTransformedDataObj();
@@ -126,7 +127,7 @@ private:
   vtkFollower				*srLabelActor;		//!< actor for TOF camera label (text)
   int		addSrCam(); //!< adds the sr cam actor to the current view
   int		freeSrCam(); //!< adds the sr cam actor to the current view
-  #ifdef JMU_TGTFOLLOW 
+  #ifdef JMU_TGTFOLLOW
     vtkLineSource		*tgtLine; //! target line
 	vtkPolyDataMapper	*tgtLineMapper; //!
 	vtkActor			*tgtLineActor;
@@ -166,7 +167,7 @@ private:
   int addDataAct();
   int freeDataAct();
 
-  
+
   short		*_x;
   short		*_y;
   unsigned short *_z;

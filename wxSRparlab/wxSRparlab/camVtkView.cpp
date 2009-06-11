@@ -443,7 +443,7 @@ int CamVtkView::updateTOF(int rows, int cols, unsigned short *z, short *y, short
 			sData->SetValue((iv1+iv2), (float) segm[i]) ;		//  :-( unable to avoid loop yet :-(
 			if(blankSegm && (segm[i] < blankThr) )
 			{
-				data->BlankPoint(iv1+iv2); 
+				data->BlankPoint(iv1+iv2);
 			}
 			else
 			{
@@ -882,6 +882,11 @@ void CamVtkView::setDataOpacity(double alpha)
 {
 	if( (alpha<0.0) || (alpha > 1.0)){return;};
 	dataActor->GetProperty()->SetOpacity(alpha);
+}
+
+vtkStructuredGrid* CamVtkView::GetStructGrid()
+{
+	return data;
 }
 
 vtkStructuredGrid* CamVtkView::GetTransformedStructGrid()
