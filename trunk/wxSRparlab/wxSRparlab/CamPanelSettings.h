@@ -66,6 +66,7 @@ public:
 	bool IsSegmChecked(){return m_ckBoxSegBayes->IsChecked();}; //
 	#ifdef JMU_RANSAC
 		int GetRansacNiterMax();
+		double GetRansacDistPla();
 	#endif
 
 
@@ -89,6 +90,8 @@ private:
 	  wxButton* m_buttonRansacFG; // call RANSAC of fg data
 	  wxTextCtrl* m_TxtRansacNiterMax; // RANSAC max number of iterations
 	  int _ransacNiterMax; // RANSAC max number of iterations
+	  wxTextCtrl* m_TxtRansacDistPla; // RANSAC max number of iterations
+	  double _ransacDistPla; // RANSAC max number of iterations
 	  //bool _TxtRansacNiterMaxInit;
 	#endif
 

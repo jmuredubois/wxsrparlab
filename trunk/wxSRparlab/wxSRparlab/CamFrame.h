@@ -124,6 +124,7 @@ public:
 	void RansacBG(wxCommandEvent& WXUNUSED(event));
 	void RansacFG(wxCommandEvent& WXUNUSED(event));
 	void OnSetRansacNiterMax(wxCommandEvent& event);
+	void OnSetRansacDistPla(wxCommandEvent& event);
 #endif
 	void OnRecXYZ(wxCommandEvent& WXUNUSED(event));
 	void OnRecSeg(wxCommandEvent& WXUNUSED(event));
@@ -233,6 +234,7 @@ enum CamFrameEnum
 	IDC_RecordVTK = 30,
 	IDC_BlankSegmVtk = 31,
 	IDT_BlankSegmThr = 32,
+	IDT_RansacDistPla = 33,
 	ID_ThisIsAStop = 255
 };
 
