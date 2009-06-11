@@ -1757,3 +1757,44 @@ void CamFrame::setDataMapperColorK(int idx)
 	}*/
 }
 #endif // JMU_USE_VTK
+int CamFrame::WriteCamTrfMat(char* fn, double mat[9])
+{
+	int res = 0;
+
+	try
+	{
+		// http://www.grinninglizard.com/tinyxmldocs/tutorial0.html
+		ticpp::Document doc( fn );
+		ticpp::Declaration* decl = new ticpp::Declaration("1.0","utf-8","");
+		ticpp::Element* root = new ticpp::Element("TrfMat");
+		doc.LinkEndChild( decl );
+		doc.LinkEndChild( root );
+
+		////doc.LoadFile(); 
+		//char rowStr[64]; char attrStr[64]; double val=0.0;
+		//for(int row = 0; row <4; row++)
+		//{
+		//	sprintf(rowStr, "Row%i", row);
+		//	ticpp::Element* pRow = new ticpp::Element(rowStr);
+		//	for(int col = 0; col <4 ; col++)
+		//	{
+		//		sprintf(attrStr, "val%i", col);
+		//		pRow->GetAttribute(attrStr, &val);
+		//		camTranMat->SetElement(row,col,val);
+		//	}
+		//}
+
+	}
+	catch( ticpp::Exception& ex )
+	{
+		std::cout << ex.what();
+		return -1;
+	}
+	catch(...)
+	{
+		//camTranMat->Identity(); // if a problem occured, set TrfMat to Identity
+		return -1;
+	}
+	
+	return res;
+}
