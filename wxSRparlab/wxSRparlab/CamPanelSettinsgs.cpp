@@ -21,6 +21,9 @@ CamPanelSettings::CamPanelSettings(wxWindow* parent, const wxString& title, cons
 {
 	#ifdef JMU_RANSAC
 		m_TxtRansacNiterMax = NULL;
+		_ransacNiterMax = 2800;
+		m_TxtRansacDistPla  = NULL;
+		_ransacDistPla = 300.0;
 	#endif
 	#ifdef JMU_USE_VTK
 		m_ckBoxBlankSegmVTK = NULL;
@@ -155,11 +158,17 @@ int CamPanelSettings::InitSettings()
 	#ifdef JMU_RANSAC
 		m_buttonRansacBG = new wxButton(this, IDB_RansacBG, wxT("RANSAC bg."));
 		m_buttonRansacFG = new wxButton(this, IDB_RansacFG, wxT("RANSAC fg."));
-		m_TxtRansacNiterMax = new wxTextCtrl( this, IDT_RansacNiterMax, wxString::Format(wxT("%i"),2800) ); 
+		m_TxtRansacNiterMax = new wxTextCtrl( this, IDT_RansacNiterMax, wxString::Format(wxT("%i"),_ransacNiterMax) ); 
+		wxStaticText* rscIterLabel = new wxStaticText( this, wxID_ANY, wxT("Niter:"));
+		m_TxtRansacDistPla  = new wxTextCtrl( this, IDT_RansacDistPla,  wxString::Format(wxT("%g"),_ransacDistPla) );
+		wxStaticText* rscDistLabel = new wxStaticText( this, wxID_ANY, wxT("distThr:"));
 		wxBoxSizer *sizerRansac = new wxBoxSizer(wxHORIZONTAL);
 	    sizerRansac->Add(m_buttonRansacBG, 1, wxEXPAND);
 	    sizerRansac->Add(m_buttonRansacFG, 1, wxEXPAND);
+		sizerRansac->Add(rscIterLabel, 0, wxEXPAND);
 		sizerRansac->Add(m_TxtRansacNiterMax, 1, wxEXPAND);
+		sizerRansac->Add(rscDistLabel, 0, wxEXPAND);
+		sizerRansac->Add(m_TxtRansacDistPla, 1, wxEXPAND);
 	#endif
 
 	/* sizer stuff  ...*/
@@ -185,7 +194,7 @@ int CamPanelSettings::InitSettings()
 	sizerPanel->Add(m_ckBoxFgHidesData, 0, wxEXPAND);
 	sizerPanel->Add(m_ckBoxNoFlagNaN, 0, wxEXPAND);
 	#ifdef JMU_RANSAC
-		sizerPanel->Add(sizerRansac, 1, wxEXPAND);
+		sizerPanel->Add(sizerRansac, 0, wxEXPAND);
 	#endif
 	sizerPanel->Add(m_statText, 1, wxEXPAND);
 
@@ -304,17 +313,37 @@ int CamPanelSettings::GetRansacNiterMax()
 	wxString strVal = m_TxtRansacNiterMax->GetValue();
 	if( strVal.ToLong(&val) ) /* read value as int*/
 	{
-		//SetAmpMax(val);
+		_ransacNiterMax = (int) val;
 	}
 	else
 	{
 		m_TxtRansacNiterMax->DiscardEdits();
 		return -1;
-		//m_TxtRansacIterMax->GetValue().Printf(wxT("%d"), _ampMax);
+		m_TxtRansacNiterMax->GetValue().Printf(wxT("%i"), _ransacNiterMax);
 	}
-	return (int)val;
+	return (int)_ransacNiterMax;
 };
-#endif
+#endif // JMU_RANSAC
+#ifdef JMU_RANSAC
+//! Reads the value in the text control for number of RANSAC iterations
+double CamPanelSettings::GetRansacDistPla()
+{
+	if(!m_TxtRansacDistPla){return -1;};
+	double val = 0;
+	wxString strVal = m_TxtRansacDistPla->GetValue();
+	if( strVal.ToDouble(&val) ) /* read value as int*/
+	{
+		_ransacDistPla = val;
+	}
+	else
+	{
+		m_TxtRansacDistPla->DiscardEdits();
+		return -1;
+		m_TxtRansacDistPla->GetValue().Printf(wxT("%g"), _ransacDistPla);
+	}
+	return _ransacDistPla;
+};
+#endif // JMU_RANSAC
 
 #ifdef JMU_USE_VTK
 //! Reads the value in the text control for number of RANSAC iterations
