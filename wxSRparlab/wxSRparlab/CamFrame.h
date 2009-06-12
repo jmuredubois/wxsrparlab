@@ -124,7 +124,9 @@ public:
 	bool IsSegmChecked(){ return m_settingsPane->IsSegmChecked(); };
 #ifdef JMU_RANSAC
 	void RansacBG(wxCommandEvent& WXUNUSED(event));
+	void RansacBGsucc(wxCommandEvent& WXUNUSED(event));
 	void RansacFG(wxCommandEvent& WXUNUSED(event));
+	void RansacFollow();
 	void OnSetRansacNiterMax(wxCommandEvent& event);
 	void OnSetRansacDistPla(wxCommandEvent& event);
 #endif
@@ -193,6 +195,7 @@ private:
 	SRPLSEGM m_segm;		// scattering compensation object
 #ifdef JMU_RANSAC
 	SRPLRSC m_ransac;		// ransac object
+	unsigned char _rscSucc;			// counter for SUCCESSIVE ransac applications
 #endif
 	long _acqTime;
 	wxStopWatch* m_pAcqSWatch;
@@ -237,6 +240,7 @@ enum CamFrameEnum
 	IDC_BlankSegmVtk = 31,
 	IDT_BlankSegmThr = 32,
 	IDT_RansacDistPla = 33,
+	IDB_RansacBGsucc = 34,
 	ID_ThisIsAStop = 255
 };
 

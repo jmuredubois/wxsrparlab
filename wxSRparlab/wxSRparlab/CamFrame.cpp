@@ -144,6 +144,7 @@ CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos
 	m_segm = NULL;
 #ifdef JMU_RANSAC
 	m_ransac = NULL;
+	_rscSucc = 0;
 #endif
 }
 
@@ -214,6 +215,7 @@ BEGIN_EVENT_TABLE(CamFrame, wxFrame)
 	EVT_BUTTON(IDB_SegmSetParams, CamFrame::OnSetSegmParams)
 	#ifdef JMU_RANSAC
 		EVT_BUTTON(IDB_RansacBG, CamFrame::RansacBG)
+		EVT_BUTTON(IDB_RansacBGsucc, CamFrame::RansacBGsucc)
 		EVT_BUTTON(IDB_RansacFG, CamFrame::RansacFG)
 		EVT_TEXT(IDT_RansacNiterMax, CamFrame::OnSetRansacNiterMax)
 		EVT_TEXT(IDT_RansacDistPla, CamFrame::OnSetRansacDistPla)
@@ -588,6 +590,7 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
   if(m_segm != NULL)  {PLSEGM_Close(m_segm);   m_segm = NULL; };
 #ifdef JMU_RANSAC
   if(m_ransac != NULL) {PLRSC_Close(m_ransac); m_ransac = NULL; };
+  _rscSucc=0;
 #endif
   m_settingsPane->EnableOpenSR();	// enable "Open" button
   m_settingsPane->SetText(wxT("Close successfull"));
@@ -1238,25 +1241,41 @@ void CamFrame::OnSetSegmParams(wxCommandEvent& WXUNUSED(event))
 #ifdef JMU_RANSAC
 void CamFrame::RansacBG(wxCommandEvent& WXUNUSED(event))
 {
-    // 
-	/*PLSEGM_Segment(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN),
-				PLAVG_GetAvgBuf(m_bgAvg), PLNN_GetNaNbuf(m_bgNaN), PLAVG_GetAvgVar(m_bgAvg) );*/ // done in AcqOneFrm
+    /*
 	  unsigned char* segmBuf = NULL;
 	  if(IsSegmChecked())
 	  {
-		  /*PLSEGM_SegmentXYZ(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN),
-			  PLAVG_GetAvgBuf(m_bgAvg), PLNN_GetNaNbuf(m_bgNaN), PLAVG_GetAvgVar(m_bgAvg),
-			  PLCTR_GetZ(m_CTrf), PLCTR_GetZ(m_CTrfBG)); */ // done in AcqOneFrm
 		  segmBuf = (unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).bg;
 	  }
 	  else
 	  {
 		  segmBuf = (unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).fg;
 	  }
-  //RISKY
-	  memset(segmBuf, 0x0, m_nCols*m_nRows*sizeof(unsigned char)); // DEBUG DEBUG DEBUG RISKY
+  //TODO for RANSAC on segmented data only
+      PLRSC_SetSegmMap(m_ransac, PLAVG_GetAvgBuf(m_bgAvg), segmBuf)
+  // but then careful what segmIdx to input !!!
+	 */ 
   // call worker ransac function
-  int res = PLRSC_ransac(m_ransac, PLAVG_GetAvgBuf(m_bgAvg), PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLNN_GetBoolBuf(m_bgNaN), segmBuf, 0);
+  _rscSucc =0;
+  int res = PLRSC_ransac(m_ransac, PLAVG_GetAvgBuf(m_bgAvg), PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLNN_GetBoolBuf(m_bgNaN), _rscSucc);
+  this->RansacFollow();
+  _rscSucc +=1;
+  /*this->RansacBGsucc(WXUNUSED(event));*/
+  return;
+}
+#endif // JMU_RANSAC
+#ifdef JMU_RANSAC
+void CamFrame::RansacBGsucc(wxCommandEvent& WXUNUSED(event))
+{
+  int res = PLRSC_ransac(m_ransac, PLAVG_GetAvgBuf(m_bgAvg), PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLNN_GetBoolBuf(m_bgNaN), _rscSucc);
+  this->RansacFollow();
+  _rscSucc +=1;
+  return;
+}
+#endif // JMU_RANSAC
+#ifdef JMU_RANSAC
+void CamFrame::RansacFollow()
+{
   RSCPLAN pla = PLRSC_GetPlaBest(m_ransac);			// Get best plane
   double distPla = PLRSC_GetDistPla(m_ransac);		// get parameter used as inlier threshold
   int iterMax = PLRSC_GetIterMax(m_ransac);			// get parameter number of iter
@@ -1272,7 +1291,7 @@ void CamFrame::RansacBG(wxCommandEvent& WXUNUSED(event))
 	mat4[14] = 3000 - pla.nVec[3]; // HARDCODED ALIGNMENT DEPTH 3000 mm
   double* nVec = &(pla.nVec[0]);
   wxString strS; wxString strSParam; wxString strSResLine; wxString strSVec; wxString strSMat;
-  strSParam.Printf(wxT(" Ransac: %05i iterations - Inlier dist threshold: %04g mm. \n"), iterMax, distPla); 
+  strSParam.Printf(wxT(" Ransac LOOPED %02i times - %05i outliers: %05i iterations - Inlier dist threshold: %04g mm. \n"), _rscSucc, pla.outliers.size(), iterMax, distPla); 
   strSResLine.Printf(wxT("Best plane at iter: %i  - %05i inliers. \n"), pla.iter, pla.inliers.size());
   strSVec.Printf(wxT("  %+06.4G x  %+06.4G y  %+06.4G z  %+06.4G  = 0 \n"), nVec[0], nVec[1], nVec[2], nVec[3]);
   /*strSMat.Printf(wxT("[%g %g %g \n  %g %g %g \n %g %g %g ] \n" ),
@@ -1284,7 +1303,7 @@ void CamFrame::RansacBG(wxCommandEvent& WXUNUSED(event))
   m_settingsPane->SetText(strS);
   if(pla.iter < 0){ return;}; // return here to display of bad plane since ...
 							  // ... a number of iter < 0 indicates a RANSAC error
-  char fname[512]; sprintf(fname, "rscBGCam_%02u.xml", _vtkSub);
+  char fname[512]; sprintf(fname, "rscBGCam_%02u_pla%02u.xml", _vtkSub, _rscSucc);
   wxDateTime now = wxDateTime::Now(); wxString date1 = now.Format();
   char comments[512]; 
   if( date1.length() + strS.length() < 500)
@@ -1343,29 +1362,8 @@ void CamFrame::RansacBG(wxCommandEvent& WXUNUSED(event))
 #endif // JMU_RANSAC
 #ifdef JMU_RANSAC
 void CamFrame::RansacFG(wxCommandEvent& WXUNUSED(event))
-{
-  // // here just for debuggin purposes: the logical place is after a 'learn background' action
-	SRBUF srBuf;
-	srBuf.pha = (unsigned short*) m_pSrBuf;
-	srBuf.amp = (unsigned short*) (&m_pSrBuf[m_nRows*m_nCols*sizeof(unsigned short)]);
-	srBuf.nCols = m_nCols;
-	srBuf.nRows = m_nRows;
-	srBuf.bufferSizeInBytes = m_nCols*m_nRows*2*sizeof(unsigned short);
-	/*PLSEGM_Segment(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN),
-				PLAVG_GetAvgBuf(m_bgAvg), PLNN_GetNaNbuf(m_bgNaN), PLAVG_GetAvgVar(m_bgAvg) );*/ // done in AcqOneFrm
-	  unsigned char* segmBuf = NULL;
-	  if(IsSegmChecked())
-	  {
-		  /*PLSEGM_SegmentXYZ(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN),
-			  PLAVG_GetAvgBuf(m_bgAvg), PLNN_GetNaNbuf(m_bgNaN), PLAVG_GetAvgVar(m_bgAvg),
-			  PLCTR_GetZ(m_CTrf), PLCTR_GetZ(m_CTrfBG)); */ // done in AcqOneFrm
-		  segmBuf = (unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).bg;
-	  }
-	  else
-	  {
-		  segmBuf = (unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).fg;
-	  }
-  int res = PLRSC_ransac(m_ransac, srBuf, PLCTR_GetZ(m_CTrf), PLCTR_GetY(m_CTrf), PLCTR_GetX(m_CTrf), PLNN_GetBoolBuf(m_NaN), segmBuf, 0);
+{  // NOT IMPLEMENTED YET
+   // int res = PLRSC_ransac(m_ransac, srBuf, PLCTR_GetZ(m_CTrf), PLCTR_GetY(m_CTrf), PLCTR_GetX(m_CTrf), PLNN_GetBoolBuf(m_NaN), 0);
   return;
 }
 #endif // JMU_RANSAC
