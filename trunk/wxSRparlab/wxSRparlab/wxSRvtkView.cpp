@@ -567,8 +567,6 @@ void CViewSrVtk::hideDepthCbar(bool doHide)
 #ifdef JMU_ICPVTK
 vtkStructuredGrid* CViewSrVtk::icpWork(vtkPointSet* source, vtkPointSet* target, double mat[16])
 {
-	int res = 0;
-
 	// ripped off from : http://www.vtk.org/Wiki/Iterative_Closest_Points_(ICP)_Transform
 
 	//setup ICP transform
@@ -599,8 +597,6 @@ vtkStructuredGrid* CViewSrVtk::icpWork(vtkPointSet* source, vtkPointSet* target,
 		}
 	}
 	return ICPTransFilter->GetStructuredGridOutput();
-
-	//return res;
 }
 #endif
 #ifdef JMU_ICPVTK
