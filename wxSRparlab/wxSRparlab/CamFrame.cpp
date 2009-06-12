@@ -1257,19 +1257,31 @@ void CamFrame::RansacBG(wxCommandEvent& WXUNUSED(event))
 	  {
 		  segmBuf = (unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).fg;
 	  }
+  // call worker ransac function
   int res = PLRSC_ransac(m_ransac, PLAVG_GetAvgBuf(m_bgAvg), PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLNN_GetBoolBuf(m_bgNaN), segmBuf, 0);
-  RSCPLAN pla = PLRSC_GetPlaBest(m_ransac);
-  double distPla = PLRSC_GetDistPla(m_ransac);
-  int iterMax = PLRSC_GetIterMax(m_ransac);
+  RSCPLAN pla = PLRSC_GetPlaBest(m_ransac);			// Get best plane
+  double distPla = PLRSC_GetDistPla(m_ransac);		// get parameter used as inlier threshold
+  int iterMax = PLRSC_GetIterMax(m_ransac);			// get parameter number of iter
   double mat[9]; for(int k=0; k<9; k++) { mat[k] = 0; }; // matrix to store trf
-  double resTrf = PLRSC_GetProjZRotMat(m_ransac, mat);
+  double resTrf = PLRSC_GetProjZRotMat(m_ransac, mat);   // get rotation matrix to project best plane to z axis
+  double mat4[16]; for(int k=0; k<16; k++){mat4[k]=0;}; mat4[15]=1; 
+	for(int k=0, c=0, r=0; k<9; k++)
+	{													// convert rotatino matrix into 4 matrix
+		c = k /3; r = k % 3;
+		mat4[r+c*4] = mat[k];
+	}
+	// translation along z, will allow to have all RANSAC planes at same Z, fixed now at 3000
+	mat4[14] = 3000 - pla.nVec[3]; // HARDCODED ALIGNMENT DEPTH 3000 mm
   double* nVec = &(pla.nVec[0]);
   wxString strS; wxString strSParam; wxString strSResLine; wxString strSVec; wxString strSMat;
   strSParam.Printf(wxT(" Ransac: %05i iterations - Inlier dist threshold: %04g mm. \n"), iterMax, distPla); 
   strSResLine.Printf(wxT("Best plane at iter: %i  - %05i inliers. \n"), pla.iter, pla.inliers.size());
   strSVec.Printf(wxT("  %+06.4G x  %+06.4G y  %+06.4G z  %+06.4G  = 0 \n"), nVec[0], nVec[1], nVec[2], nVec[3]);
-  strSMat.Printf(wxT("[%g %g %g \n  %g %g %g \n %g %g %g ] \n" ),
-				  mat[0],mat[3],mat[6],mat[1],mat[4],mat[7],mat[2],mat[5],mat[8]);
+  /*strSMat.Printf(wxT("[%g %g %g \n  %g %g %g \n %g %g %g ] \n" ),
+				  mat[0],mat[3],mat[6],mat[1],mat[4],mat[7],mat[2],mat[5],mat[8]);*/
+  strSMat.Printf(wxT("[%+0.6f %+0.6f %+0.6f %+0.6f \n  %+0.6f %+0.6f %+0.6f %+0.6f \n  %+0.6f %+0.6f %+0.6f %+0.6f \n   %+0.6f %+0.6f %+0.6f %+0.6f ] \n" ),
+		mat4[0], mat4[4], mat4[8], mat4[12],mat4[1], mat4[5], mat4[9], mat4[13],
+		mat4[2], mat4[6], mat4[10], mat4[14], mat4[3], mat4[7], mat4[11], mat4[15]);
   strS = strSParam + strSResLine + strSVec + strSMat;
   m_settingsPane->SetText(strS);
   if(pla.iter < 0){ return;}; // return here to display of bad plane since ...
@@ -1282,7 +1294,7 @@ void CamFrame::RansacBG(wxCommandEvent& WXUNUSED(event))
 	  sprintf(comments, "%s\n%s", date1.char_str(), strS.char_str());
   }
   else{ sprintf(comments, "%s\n%s", date1.char_str(), "Comments too long, did not fit...");}
-  this->WriteCamTrfMat3(fname, mat, comments);
+  this->WriteCamTrfMat4(fname, mat4, comments);
 
   // OPTION 1 was to hijack the target follower. Unfortunately, this is not enough
   #ifdef JMU_TGTFOLLOW
@@ -1778,7 +1790,7 @@ int CamFrame::WriteCamTrfMat3(char* fn, double mat3[9], char* comments)
 	for(int k=0, c=0, r=0; k<9; k++)
 	{
 		c = k /3; r = k % 3;
-		mat4[r*4+c] = mat3[k];
+		mat4[r+c*4] = mat3[k];
 	}
 	return this->WriteCamTrfMat4(fn, mat4, comments);
 }
@@ -1803,7 +1815,7 @@ int CamFrame::WriteCamTrfMat4(char* fn, double mat4[16], char* comments)
 			for(int col = 0; col <4 ; col++)
 			{
 				sprintf(attrStr, "val%i", col);
-				sprintf(valStr, "%0.5f", mat4[row*4+col]);
+				sprintf(valStr, "%+0.6f", mat4[row+col*4]);
 				pRow.SetAttribute(attrStr, valStr);
 			}
 			root.InsertEndChild( pRow );
