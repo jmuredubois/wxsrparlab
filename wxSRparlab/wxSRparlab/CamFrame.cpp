@@ -1261,6 +1261,8 @@ void CamFrame::RansacBG(wxCommandEvent& WXUNUSED(event))
   RSCPLAN pla = PLRSC_GetPlaBest(m_ransac);
   double mat[9]; for(int k=0; k<9; k++) { mat[k] = 0; }; // matrix to store trf
   double resTrf = PLRSC_GetProjZRotMat(m_ransac, mat);
+  char fname[512]; sprintf(fname, "toto.xml");
+  this->WriteCamTrfMat3(fname, mat);
   double* nVec = &(pla.nVec[0]);
   wxString strS;
   strS.Printf(wxT("Best plane at iter %i (%05i inliers)-  %+06.4G x  %+06.4G y  %+06.4G z  - (%+06.4G)  = 0 \n [%g %g %g \n  %g %g %g \n %g %g %g ]" ),
@@ -1757,7 +1759,20 @@ void CamFrame::setDataMapperColorK(int idx)
 	}*/
 }
 #endif // JMU_USE_VTK
-int CamFrame::WriteCamTrfMat(char* fn, double mat[9])
+int CamFrame::WriteCamTrfMat3(char* fn, double mat3[9])
+{
+	int res = 0;
+	double mat4[16]; for(int k=0; k<16; k++){mat4[k]=0;}; mat4[15]=1;
+	//int r=0; int c=0;
+	for(int k=0, c=0, r=0; k<9; k++)
+	{
+		r = k /3; c = k % 3;
+		mat4[r*4+c] = mat3[k];
+	}
+
+	return this->WriteCamTrfMat4(fn, mat4);
+}
+int CamFrame::WriteCamTrfMat4(char* fn, double mat4[16])
 {
 	int res = 0;
 
@@ -1765,24 +1780,24 @@ int CamFrame::WriteCamTrfMat(char* fn, double mat[9])
 	{
 		// http://www.grinninglizard.com/tinyxmldocs/tutorial0.html
 		ticpp::Document doc( fn );
-		ticpp::Declaration* decl = new ticpp::Declaration("1.0","utf-8","");
-		ticpp::Element* root = new ticpp::Element("TrfMat");
-		doc.LinkEndChild( decl );
-		doc.LinkEndChild( root );
-
-		////doc.LoadFile(); 
-		//char rowStr[64]; char attrStr[64]; double val=0.0;
-		//for(int row = 0; row <4; row++)
-		//{
-		//	sprintf(rowStr, "Row%i", row);
-		//	ticpp::Element* pRow = new ticpp::Element(rowStr);
-		//	for(int col = 0; col <4 ; col++)
-		//	{
-		//		sprintf(attrStr, "val%i", col);
-		//		pRow->GetAttribute(attrStr, &val);
-		//		camTranMat->SetElement(row,col,val);
-		//	}
-		//}
+		ticpp::Declaration decl("1.0","utf-8","");
+		ticpp::Element root("TrfMat");
+		doc.InsertEndChild( decl );
+		char rowStr[64]; char attrStr[64]; char valStr[64];
+		for(int row = 0; row <4; row++)
+		{
+			sprintf(rowStr, "Row%i", row);
+			ticpp::Element pRow(rowStr);
+			for(int col = 0; col <4 ; col++)
+			{
+				sprintf(attrStr, "val%i", col);
+				sprintf(valStr, "%0.5f", mat4[row*4+col]);
+				pRow.SetAttribute(attrStr, valStr);
+			}
+			root.InsertEndChild( pRow );
+		}
+		doc.InsertEndChild( root );
+		doc.SaveFile();
 
 	}
 	catch( ticpp::Exception& ex )
