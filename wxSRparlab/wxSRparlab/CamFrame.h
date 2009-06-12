@@ -105,8 +105,8 @@ public:
 	void setDataMapperColorB(int idx);
 	void setDataMapperColorW(int idx);
 	void setDataMapperColorK(int idx);
-	int  WriteCamTrfMat3(char* fn, double mat3[9]);
-	int  WriteCamTrfMat4(char* fn, double mat4[16]);
+	int  WriteCamTrfMat3(char* fn, double mat3[9], char* comments);
+	int  WriteCamTrfMat4(char* fn, double mat4[16], char* comments);
 #endif
 	int GetVtkSub(){return _vtkSub;};
 	int GetNumCols(){return m_nCols;};

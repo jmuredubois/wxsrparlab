@@ -1259,18 +1259,30 @@ void CamFrame::RansacBG(wxCommandEvent& WXUNUSED(event))
 	  }
   int res = PLRSC_ransac(m_ransac, PLAVG_GetAvgBuf(m_bgAvg), PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLNN_GetBoolBuf(m_bgNaN), segmBuf, 0);
   RSCPLAN pla = PLRSC_GetPlaBest(m_ransac);
+  double distPla = PLRSC_GetDistPla(m_ransac);
+  int iterMax = PLRSC_GetIterMax(m_ransac);
   double mat[9]; for(int k=0; k<9; k++) { mat[k] = 0; }; // matrix to store trf
   double resTrf = PLRSC_GetProjZRotMat(m_ransac, mat);
-  char fname[512]; sprintf(fname, "toto.xml");
-  this->WriteCamTrfMat3(fname, mat);
   double* nVec = &(pla.nVec[0]);
-  wxString strS;
-  strS.Printf(wxT("Best plane at iter %i (%05i inliers)-  %+06.4G x  %+06.4G y  %+06.4G z  - (%+06.4G)  = 0 \n [%g %g %g \n  %g %g %g \n %g %g %g ]" ),
-	              pla.iter, pla.inliers.size(), nVec[0], nVec[1], nVec[2], nVec[3],
+  wxString strS; wxString strSParam; wxString strSResLine; wxString strSVec; wxString strSMat;
+  strSParam.Printf(wxT(" Ransac: %05i iterations - Inlier dist threshold: %04g mm. \n"), iterMax, distPla); 
+  strSResLine.Printf(wxT("Best plane at iter: %i  - %05i inliers. \n"), pla.iter, pla.inliers.size());
+  strSVec.Printf(wxT("  %+06.4G x  %+06.4G y  %+06.4G z  %+06.4G  = 0 \n"), nVec[0], nVec[1], nVec[2], nVec[3]);
+  strSMat.Printf(wxT("[%g %g %g \n  %g %g %g \n %g %g %g ] \n" ),
 				  mat[0],mat[3],mat[6],mat[1],mat[4],mat[7],mat[2],mat[5],mat[8]);
+  strS = strSParam + strSResLine + strSVec + strSMat;
   m_settingsPane->SetText(strS);
   if(pla.iter < 0){ return;}; // return here to display of bad plane since ...
 							  // ... a number of iter < 0 indicates a RANSAC error
+  char fname[512]; sprintf(fname, "rscBGCam_%02u.xml", _vtkSub);
+  wxDateTime now = wxDateTime::Now(); wxString date1 = now.Format();
+  char comments[512]; 
+  if( date1.length() + strS.length() < 500)
+  {
+	  sprintf(comments, "%s\n%s", date1.char_str(), strS.char_str());
+  }
+  else{ sprintf(comments, "%s\n%s", date1.char_str(), "Comments too long, did not fit...");}
+  this->WriteCamTrfMat3(fname, mat, comments);
 
   // OPTION 1 was to hijack the target follower. Unfortunately, this is not enough
   #ifdef JMU_TGTFOLLOW
@@ -1759,20 +1771,18 @@ void CamFrame::setDataMapperColorK(int idx)
 	}*/
 }
 #endif // JMU_USE_VTK
-int CamFrame::WriteCamTrfMat3(char* fn, double mat3[9])
+int CamFrame::WriteCamTrfMat3(char* fn, double mat3[9], char* comments)
 {
 	int res = 0;
 	double mat4[16]; for(int k=0; k<16; k++){mat4[k]=0;}; mat4[15]=1;
-	//int r=0; int c=0;
 	for(int k=0, c=0, r=0; k<9; k++)
 	{
-		r = k /3; c = k % 3;
+		c = k /3; r = k % 3;
 		mat4[r*4+c] = mat3[k];
 	}
-
-	return this->WriteCamTrfMat4(fn, mat4);
+	return this->WriteCamTrfMat4(fn, mat4, comments);
 }
-int CamFrame::WriteCamTrfMat4(char* fn, double mat4[16])
+int CamFrame::WriteCamTrfMat4(char* fn, double mat4[16], char* comments)
 {
 	int res = 0;
 
@@ -1781,8 +1791,10 @@ int CamFrame::WriteCamTrfMat4(char* fn, double mat4[16])
 		// http://www.grinninglizard.com/tinyxmldocs/tutorial0.html
 		ticpp::Document doc( fn );
 		ticpp::Declaration decl("1.0","utf-8","");
-		ticpp::Element root("TrfMat");
 		doc.InsertEndChild( decl );
+		ticpp::Comment comment(comments);
+		doc.InsertEndChild(comment);
+		ticpp::Element root("TrfMat");
 		char rowStr[64]; char attrStr[64]; char valStr[64];
 		for(int row = 0; row <4; row++)
 		{
