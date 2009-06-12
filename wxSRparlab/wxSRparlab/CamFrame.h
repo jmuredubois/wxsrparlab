@@ -19,16 +19,16 @@
 #include "srBuf.h"
 #include "libSRPLscat.h"
 #include "libSRPLflagNaN.h"
-#pragma comment( lib, "libSRPLscat" )
+//#pragma comment( lib, "libSRPLscat" )
 #include "libSRPLavg.h"
-#pragma comment( lib, "libSRPLavg" )
+//#pragma comment( lib, "libSRPLavg" )
 #include "libSRPLcoordTrf.h"
-#pragma comment( lib, "libSRPLcoordTrf" )
+//#pragma comment( lib, "libSRPLcoordTrf" )
 #include "libSRPLsegm.h"
-#pragma comment( lib, "libSRPLsegm" )
+//#pragma comment( lib, "libSRPLsegm" )
 #ifdef JMU_RANSAC
 #include "libSRPLransac.h"
-#pragma comment( lib, "libSRPLransac" )
+//#pragma comment( lib, "libSRPLransac" )
 #endif
 
 

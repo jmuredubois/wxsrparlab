@@ -910,10 +910,6 @@ void CamFrame::AcqOneFrm()
 	  {
 		  segmBuf = (unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).fg;
 	  }
-//#ifdef JMU_RANSAC
-//	  // // here just for debuggin purposes: the logical place is after a 'learn background' action
-//	  //PLRSC_ransac(m_ransac, srBuf, PLCTR_GetZ(m_CTrf), PLCTR_GetY(m_CTrf), PLCTR_GetX(m_CTrf), PLNN_GetBoolBuf(m_NaN), segmBuf, 0);
-//#endif
 	  m_viewSegmPane->SetDataArray<unsigned char>( segmBuf, m_nRows*m_nCols);
 	  m_viewBGRangePane->SetDataArray<unsigned short>((unsigned short*) (PLAVG_GetAvgBuf(m_bgAvg)).pha, m_nRows*m_nCols);
 	  m_viewBGAmpPane->SetDataArray<unsigned short>((unsigned short*) (PLAVG_GetAvgBuf(m_bgAvg)).amp, m_nRows*m_nCols);
@@ -1242,7 +1238,7 @@ void CamFrame::OnSetSegmParams(wxCommandEvent& WXUNUSED(event))
 #ifdef JMU_RANSAC
 void CamFrame::RansacBG(wxCommandEvent& WXUNUSED(event))
 {
-  // // here just for debuggin purposes: the logical place is after a 'learn background' action
+    // 
 	/*PLSEGM_Segment(m_segm, srBuf, PLNN_GetNaNbuf(m_NaN),
 				PLAVG_GetAvgBuf(m_bgAvg), PLNN_GetNaNbuf(m_bgNaN), PLAVG_GetAvgVar(m_bgAvg) );*/ // done in AcqOneFrm
 	  unsigned char* segmBuf = NULL;
@@ -1257,6 +1253,8 @@ void CamFrame::RansacBG(wxCommandEvent& WXUNUSED(event))
 	  {
 		  segmBuf = (unsigned char*) (PLSEGM_GetSegmBuf(m_segm)).fg;
 	  }
+  //RISKY
+	  memset(segmBuf, 0x0, m_nCols*m_nRows*sizeof(unsigned char)); // DEBUG DEBUG DEBUG RISKY
   // call worker ransac function
   int res = PLRSC_ransac(m_ransac, PLAVG_GetAvgBuf(m_bgAvg), PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLNN_GetBoolBuf(m_bgNaN), segmBuf, 0);
   RSCPLAN pla = PLRSC_GetPlaBest(m_ransac);			// Get best plane
@@ -1266,7 +1264,7 @@ void CamFrame::RansacBG(wxCommandEvent& WXUNUSED(event))
   double resTrf = PLRSC_GetProjZRotMat(m_ransac, mat);   // get rotation matrix to project best plane to z axis
   double mat4[16]; for(int k=0; k<16; k++){mat4[k]=0;}; mat4[15]=1; 
 	for(int k=0, c=0, r=0; k<9; k++)
-	{													// convert rotatino matrix into 4 matrix
+	{													// convert rotation matrix into 4 matrix
 		c = k /3; r = k % 3;
 		mat4[r+c*4] = mat[k];
 	}
