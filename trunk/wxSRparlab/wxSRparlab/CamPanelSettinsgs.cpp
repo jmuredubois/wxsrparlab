@@ -156,14 +156,18 @@ int CamPanelSettings::InitSettings()
 
 	// RANSAC controls //
 	#ifdef JMU_RANSAC
-		m_buttonRansacBG = new wxButton(this, IDB_RansacBG, wxT("RANSAC bg."));
-		m_buttonRansacFG = new wxButton(this, IDB_RansacFG, wxT("RANSAC fg."));
+		wxStaticText* ransacText = new wxStaticText(this, wxID_ANY, wxT("RANSAC"));
+		m_buttonRansacBG = new wxButton(this, IDB_RansacBG, wxT("BG."));
+		m_buttonRansacBGsucc = new wxButton(this, IDB_RansacBGsucc, wxT("bg N"));
+		m_buttonRansacFG = new wxButton(this, IDB_RansacFG, wxT("FG."));
 		m_TxtRansacNiterMax = new wxTextCtrl( this, IDT_RansacNiterMax, wxString::Format(wxT("%i"),_ransacNiterMax) ); 
 		wxStaticText* rscIterLabel = new wxStaticText( this, wxID_ANY, wxT("Niter:"));
 		m_TxtRansacDistPla  = new wxTextCtrl( this, IDT_RansacDistPla,  wxString::Format(wxT("%g"),_ransacDistPla) );
 		wxStaticText* rscDistLabel = new wxStaticText( this, wxID_ANY, wxT("distThr:"));
 		wxBoxSizer *sizerRansac = new wxBoxSizer(wxHORIZONTAL);
+		sizerRansac->Add(ransacText, 0, wxEXPAND);
 	    sizerRansac->Add(m_buttonRansacBG, 1, wxEXPAND);
+		sizerRansac->Add(m_buttonRansacBGsucc, 1, wxEXPAND);
 	    sizerRansac->Add(m_buttonRansacFG, 1, wxEXPAND);
 		sizerRansac->Add(rscIterLabel, 0, wxEXPAND);
 		sizerRansac->Add(m_TxtRansacNiterMax, 1, wxEXPAND);

@@ -87,6 +87,7 @@ private:
 	wxButton* m_buttonSegmParams; // segmentation parameters button
 	#ifdef JMU_RANSAC
 	  wxButton* m_buttonRansacBG; // call RANSAC on bg data
+	  wxButton* m_buttonRansacBGsucc; // call successive RANSAC on bg data
 	  wxButton* m_buttonRansacFG; // call RANSAC of fg data
 	  wxTextCtrl* m_TxtRansacNiterMax; // RANSAC max number of iterations
 	  int _ransacNiterMax; // RANSAC max number of iterations
