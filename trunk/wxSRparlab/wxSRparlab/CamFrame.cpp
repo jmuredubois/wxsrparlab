@@ -1792,7 +1792,7 @@ int CamFrame::WriteCamTrfMat4(wxString fn, double mat4[16], wxString comments)
 		ticpp::Document doc( fn.mb_str() );
 		ticpp::Declaration decl("1.0","utf-8","");
 		doc.InsertEndChild( decl );
-		ticpp::Comment comment(comments.mb_str());
+		ticpp::Comment comment( comments.mb_str() );
 		doc.InsertEndChild(comment);
 		ticpp::Element root("TrfMat");
 		char rowStr[64]; char attrStr[64]; char valStr[64];
