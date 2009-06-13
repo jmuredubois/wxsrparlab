@@ -923,7 +923,7 @@ void CamFrame::AcqOneFrm()
 		if(m_settingsPane->IsRecVTKChecked())
 		{ // when wanting to save, a filename must be provided
 			wxString curImg;
-			curImg.Printf(wxT("%s%04u.vtk"), _vtkRecPrefix, m_nFrmRead);
+			curImg.Printf(wxT("%04u.vtk"), m_nFrmRead); curImg = _vtkRecPrefix + curImg;
 			char charBuf[512];
 			strcpy( charBuf, (const char*) curImg.char_str() );
 			_camVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrf), PLCTR_GetY(m_CTrf), PLCTR_GetX(m_CTrf), (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2], segmBuf, charBuf);
@@ -1254,7 +1254,7 @@ void CamFrame::RansacBG(wxCommandEvent& WXUNUSED(event))
 	 */ 
   // call worker ransac function
   _rscSucc =0;
-  int res = PLRSC_ransac(m_ransac, PLAVG_GetAvgBuf(m_bgAvg), PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLNN_GetBoolBuf(m_bgNaN), _rscSucc);
+  PLRSC_ransac(m_ransac, PLAVG_GetAvgBuf(m_bgAvg), PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLNN_GetBoolBuf(m_bgNaN), _rscSucc);
   this->RansacFollow();
   _rscSucc +=1;
   /*this->RansacBGsucc(WXUNUSED(event));*/
@@ -1277,7 +1277,7 @@ void CamFrame::RansacFollow()
   double distPla = PLRSC_GetDistPla(m_ransac);		// get parameter used as inlier threshold
   int iterMax = PLRSC_GetIterMax(m_ransac);			// get parameter number of iter
   double mat[9]; for(int k=0; k<9; k++) { mat[k] = 0; }; // matrix to store trf
-  double resTrf = PLRSC_GetProjZRotMat(m_ransac, mat);   // get rotation matrix to project best plane to z axis
+  PLRSC_GetProjZRotMat(m_ransac, mat);   // get rotation matrix to project best plane to z axis
   double mat4[16]; for(int k=0; k<16; k++){mat4[k]=0;}; mat4[15]=1; 
 	for(int k=0, c=0, r=0; k<9; k++)
 	{													// convert rotation matrix into 4 matrix
@@ -1303,7 +1303,7 @@ void CamFrame::RansacFollow()
   wxString fname; fname.Printf(wxT("rscBGCam_%02u_pla%02u.xml"), _vtkSub, _rscSucc);
   wxDateTime now = wxDateTime::Now(); wxString date1 = now.Format();
   wxString comments; 
-  comments.Printf(wxT("%s\n%s"), date1.char_str(), strS.char_str());
+  comments =  date1.char_str() + wxString(wxT("\n")) + strS;
   this->WriteCamTrfMat4(fname, mat4, comments);
 
   // OPTION 1 was to hijack the target follower. Unfortunately, this is not enough
@@ -1471,7 +1471,6 @@ void CamFrame::OnRecSeg(wxCommandEvent& WXUNUSED(event))
 void CamFrame::OnRecVTK(wxCommandEvent& WXUNUSED(event))
 {
 #ifdef JMU_USE_VTK
-  unsigned int res = 0;
   m_settingsPane->SetText(wxT("Record VTK attempt..."));
   wxString strR;
 
@@ -1789,10 +1788,10 @@ int CamFrame::WriteCamTrfMat4(wxString fn, double mat4[16], wxString comments)
 	try
 	{
 		// http://www.grinninglizard.com/tinyxmldocs/tutorial0.html
-		ticpp::Document doc( fn.mb_str() );
+		ticpp::Document doc( std::string(fn.mb_str()) );
 		ticpp::Declaration decl("1.0","utf-8","");
 		doc.InsertEndChild( decl );
-		ticpp::Comment comment( comments.mb_str() );
+		ticpp::Comment comment( std::string(comments.mb_str()) );
 		doc.InsertEndChild(comment);
 		ticpp::Element root("TrfMat");
 		char rowStr[64]; char attrStr[64]; char valStr[64];
