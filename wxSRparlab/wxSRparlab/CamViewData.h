@@ -70,8 +70,6 @@ public:
 		if(numPix*sizeof(T) > m_nDataWidth * m_nDataHeight *sizeof(T)){return -2;};
 		if(m_pDataArray == NULL){return -3;};
 
-		T first = buf[0];
-
 		wxMutexError errMutex= m_mutexDataArray->Lock();
 		if(errMutex == wxMUTEX_NO_ERROR)
 		{

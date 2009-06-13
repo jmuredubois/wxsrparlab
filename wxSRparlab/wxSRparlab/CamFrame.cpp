@@ -1303,7 +1303,7 @@ void CamFrame::RansacFollow()
   wxString fname; fname.Printf(wxT("rscBGCam_%02u_pla%02u.xml"), _vtkSub, _rscSucc);
   wxDateTime now = wxDateTime::Now(); wxString date1 = now.Format();
   wxString comments; 
-  comments =  date1.char_str() + wxString(wxT("\n")) + strS;
+  comments =  date1 + wxString(wxT("\n")) + strS;
   this->WriteCamTrfMat4(fname, mat4, comments);
 
   // OPTION 1 was to hijack the target follower. Unfortunately, this is not enough
