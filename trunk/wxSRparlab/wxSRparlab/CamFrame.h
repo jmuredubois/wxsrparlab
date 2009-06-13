@@ -71,7 +71,7 @@ public:
 	~CamFrame();
 	//! Close() method
     void OnClose(wxCommandEvent& event);
-	int CreateAndSetNotebook(const wxString& title); //!< creates a new Notebook
+	int CreateAndSetNotebook(); //!< creates a new Notebook
 	void OnOpenDev(wxCommandEvent& WXUNUSED(event));
 	void OnCloseDev(wxCommandEvent& WXUNUSED(event));
 	void OnDevSRsettings(wxCommandEvent& WXUNUSED(event));
@@ -105,8 +105,8 @@ public:
 	void setDataMapperColorB(int idx);
 	void setDataMapperColorW(int idx);
 	void setDataMapperColorK(int idx);
-	int  WriteCamTrfMat3(char* fn, double mat3[9], char* comments);
-	int  WriteCamTrfMat4(char* fn, double mat4[16], char* comments);
+	int  WriteCamTrfMat3(wxString fn, double mat3[9] , wxString comments);
+	int  WriteCamTrfMat4(wxString fn, double mat4[16], wxString comments);
 #endif
 	int GetVtkSub(){return _vtkSub;};
 	int GetNumCols(){return m_nCols;};

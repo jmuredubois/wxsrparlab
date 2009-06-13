@@ -408,7 +408,7 @@ void MainWnd::AddChildren()
 		//! ... create and show new camFrame ... \n
 		CamFrame *camFrm = new CamFrame( this, lab, pos, sz );
 		camFrm->Show(TRUE);
-		camFrm->CreateAndSetNotebook(labT);
+		camFrm->CreateAndSetNotebook();
 #ifdef JMU_USE_VTK
 		camFrm->SetVtkWin(_vtkWin, i);
 #endif
@@ -792,12 +792,11 @@ void MainWnd::SetColVtkIdx(std::vector<wxComboBox*> colCmbBox, std::vector<CamFr
 		if(  strCol.IsSameAs(wxT("red")) || strCol.IsSameAs(wxT("green")) || strCol.IsSameAs(wxT("blue"))
 			 || strCol.IsSameAs(wxT("white")) || strCol.IsSameAs(wxT("black")))
 		{
-			if(  strCol.IsSameAs(wxT("red"  ))  ) { (*itCam)->setDataMapperColorR(idx);/*/r=1.0; g=0.0; b=0.0;/**/} ;
-			if(  strCol.IsSameAs(wxT("green"))  ) { (*itCam)->setDataMapperColorG(idx);/*/r=0.0; g=1.0; b=0.0;/**/} ;
-			if(  strCol.IsSameAs(wxT("blue" ))  ) { (*itCam)->setDataMapperColorB(idx);/*/r=0.0; g=0.0; b=1.0;/**/} ;
-			if(  strCol.IsSameAs(wxT("white"))  ) { (*itCam)->setDataMapperColorW(idx);/*/r=1.0; g=1.0; b=1.0;/**/} ;
-			if(  strCol.IsSameAs(wxT("black"))  ) { (*itCam)->setDataMapperColorK(idx);/*/r=0.0; g=0.0; b=0.0;/**/} ;
-			/*/(*itCam)->GetCamVtk()->setDataActColorRGB(r,g,b);/**/
+			if(  strCol.IsSameAs(wxT("red"  ))  ) { (*itCam)->setDataMapperColorR(idx);} ;
+			if(  strCol.IsSameAs(wxT("green"))  ) { (*itCam)->setDataMapperColorG(idx);} ;
+			if(  strCol.IsSameAs(wxT("blue" ))  ) { (*itCam)->setDataMapperColorB(idx);} ;
+			if(  strCol.IsSameAs(wxT("white"))  ) { (*itCam)->setDataMapperColorW(idx);} ;
+			if(  strCol.IsSameAs(wxT("black"))  ) { (*itCam)->setDataMapperColorK(idx);} ;
 		}
 	}
 }

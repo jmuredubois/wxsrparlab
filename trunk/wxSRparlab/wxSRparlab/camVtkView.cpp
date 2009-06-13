@@ -680,16 +680,6 @@ void CamVtkView::setDataMapperColorK()
 	dataActor->SetMapper(dataMapperAmp);
 }
 
-#ifdef JMU_TGTFOLLOW
-int CamVtkView::setTgtFile(char* fn)
-{
-	int res = 0;
-	//#ifdef JMU_TGTFOLLOW
-	//#endif
-	return res;
-}
-#endif
-
 /**
  * Updates the tracking end point
  */

@@ -70,7 +70,6 @@ public:
 	int setTrfMat(char* fn);
 
 	#ifdef JMU_TGTFOLLOW
-	  int setTgtFile(char* fn);
 	  int updateTarget(float x, float y, float z);
 	  int updateTarget(); //overloaded operator to reset to camera center
 	  int updateTarget(float *ptsF, int nCoord);

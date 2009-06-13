@@ -57,7 +57,7 @@ CamViewData::CamViewData(wxWindow* parent, const wxString& title, const wxPoint&
 	m_dDispMin = 25344.0;
 	m_dDispMax = 0.0;
 
-	res += Map2rgb<unsigned short>(val);
+	res += Map2rgb<unsigned short>();
 }
 /**
  * Camera view panel class destructor \n
@@ -106,7 +106,7 @@ int CamViewData::AllocRGBA() //! Allocate RGB and alpha buffer
 	/* Debug: 3ramps /
 	int c = 0; int r = 0; unsigned char R, G, B;
 	R = 0; G = 0; B = 0;
-	/* ENDOF Debug: 3ramps */
+	// ENDOF Debug: 3ramps */
 	for(i = 0 ; i <(m_nDataWidth * m_nDataHeight); i++)
 	{
 		/* Debug: 3ramps /
@@ -122,12 +122,12 @@ int CamViewData::AllocRGBA() //! Allocate RGB and alpha buffer
 		if(r < (m_nDataHeight /3)) {R=c;G=0;B=0;}
 		else{if(r < (m_nDataHeight *2/3)) {R=0;G=c;B=0;}
 		else{R=0;G=0;B=c;} } ;
-		/* ENDOF Debug: 3ramps */
+		// ENDOF Debug: 3ramps */
 		/* Debug: blueScreen /
 		m_pRGB[3*i+0] = (unsigned char) 0x00; 
 		m_pRGB[3*i+1] = (unsigned char) 0x00;
 		m_pRGB[3*i+2] = (unsigned char) 0xFF;  
-		/* ENDOF Debug: blueScreen */ 
+		// ENDOF Debug: blueScreen */ 
 
 		m_pAlpha[i] = (unsigned char) 0xFF; // alpha to 1.0
 	}
@@ -257,9 +257,8 @@ void CamViewData::StopView(wxCommandEvent& WXUNUSED(event))
  */
 void CamViewData::OnSize( wxSizeEvent& even )
 {
-	int nWidth = even.GetSize().GetWidth();
-	int nHeight = even.GetSize().GetHeight();
-
+	//int nWidth = even.GetSize().GetWidth();
+	//int nHeight = even.GetSize().GetHeight();
 	even.Skip();		// allow automatic handling of event
 
 }

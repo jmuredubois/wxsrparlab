@@ -244,7 +244,7 @@ void CamFrame::OnClose(wxCommandEvent& WXUNUSED(event))
  * Camera frame close \n
  * The method: \n
  */
-int CamFrame::CreateAndSetNotebook(const wxString& title)
+int CamFrame::CreateAndSetNotebook()
 {
 	int res  = 0;
 	if(m_camNB != NULL)
@@ -607,7 +607,6 @@ void CamFrame::OnCloseDev(wxCommandEvent& WXUNUSED(event))
 //! Calls SR settings dialog box (windows only)
 void CamFrame::OnDevSRsettings(wxCommandEvent& WXUNUSED(event))
 {
-  int res = 0;
   //_sr=0;//there are no valid device opened
   m_settingsPane->SetText(wxT("Attempt to open SR settings"));
 #ifndef DUMMYSR
@@ -924,7 +923,7 @@ void CamFrame::AcqOneFrm()
 		if(m_settingsPane->IsRecVTKChecked())
 		{ // when wanting to save, a filename must be provided
 			wxString curImg;
-			curImg.sprintf(wxT("%s%04u.vtk"), _vtkRecPrefix, m_nFrmRead);
+			curImg.Printf(wxT("%s%04u.vtk"), _vtkRecPrefix, m_nFrmRead);
 			char charBuf[512];
 			strcpy( charBuf, (const char*) curImg.char_str() );
 			_camVtk->updateTOF(m_nRows, m_nCols, PLCTR_GetZ(m_CTrf), PLCTR_GetY(m_CTrf), PLCTR_GetX(m_CTrf), (unsigned short*) &m_pSrBuf[m_nCols*m_nRows*2], segmBuf, charBuf);
@@ -1038,7 +1037,6 @@ void CamFrame::SetFreq(wxCommandEvent&(event))
 //! Interface fct to set the read mode
 void CamFrame::SetReadMode(wxCommandEvent&(event))
 {
-  int res = 0;
   wxString strR;
   wxString strF = event.GetString();
   if( ( strF.Find(wxT("Continuous")) != wxNOT_FOUND) )
@@ -1143,7 +1141,6 @@ void CamFrame::OnTgtFile(wxCommandEvent& WXUNUSED(event))
   {
 	  wxString strPathTgt = OpenDialogTgt->GetPath();
 	  m_pFile4TgtCoord = new wxFFile(strPathTgt, wxT("rb"));
-	  //_camVtk->setTgtFile(strPathTgt.char_str());
   } // (OpenDialogMat->ShowModal()==wxID_OK) )
   delete(OpenDialogTgt);
 
@@ -1267,7 +1264,7 @@ void CamFrame::RansacBG(wxCommandEvent& WXUNUSED(event))
 #ifdef JMU_RANSAC
 void CamFrame::RansacBGsucc(wxCommandEvent& WXUNUSED(event))
 {
-  int res = PLRSC_ransac(m_ransac, PLAVG_GetAvgBuf(m_bgAvg), PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLNN_GetBoolBuf(m_bgNaN), _rscSucc);
+  PLRSC_ransac(m_ransac, PLAVG_GetAvgBuf(m_bgAvg), PLCTR_GetZ(m_CTrfBG), PLCTR_GetY(m_CTrfBG), PLCTR_GetX(m_CTrfBG), PLNN_GetBoolBuf(m_bgNaN), _rscSucc);
   this->RansacFollow();
   _rscSucc +=1;
   return;
@@ -1303,14 +1300,10 @@ void CamFrame::RansacFollow()
   m_settingsPane->SetText(strS);
   if(pla.iter < 0){ return;}; // return here to display of bad plane since ...
 							  // ... a number of iter < 0 indicates a RANSAC error
-  char fname[512]; sprintf(fname, "rscBGCam_%02u_pla%02u.xml", _vtkSub, _rscSucc);
+  wxString fname; fname.Printf(wxT("rscBGCam_%02u_pla%02u.xml"), _vtkSub, _rscSucc);
   wxDateTime now = wxDateTime::Now(); wxString date1 = now.Format();
-  char comments[512]; 
-  if( date1.length() + strS.length() < 500)
-  {
-	  sprintf(comments, "%s\n%s", date1.char_str(), strS.char_str());
-  }
-  else{ sprintf(comments, "%s\n%s", date1.char_str(), "Comments too long, did not fit...");}
+  wxString comments; 
+  comments.Printf(wxT("%s\n%s"), date1.char_str(), strS.char_str());
   this->WriteCamTrfMat4(fname, mat4, comments);
 
   // OPTION 1 was to hijack the target follower. Unfortunately, this is not enough
@@ -1779,9 +1772,8 @@ void CamFrame::setDataMapperColorK(int idx)
 	}*/
 }
 #endif // JMU_USE_VTK
-int CamFrame::WriteCamTrfMat3(char* fn, double mat3[9], char* comments)
+int CamFrame::WriteCamTrfMat3(wxString fn, double mat3[9], wxString comments)
 {
-	int res = 0;
 	double mat4[16]; for(int k=0; k<16; k++){mat4[k]=0;}; mat4[15]=1;
 	for(int k=0, c=0, r=0; k<9; k++)
 	{
@@ -1790,17 +1782,17 @@ int CamFrame::WriteCamTrfMat3(char* fn, double mat3[9], char* comments)
 	}
 	return this->WriteCamTrfMat4(fn, mat4, comments);
 }
-int CamFrame::WriteCamTrfMat4(char* fn, double mat4[16], char* comments)
+int CamFrame::WriteCamTrfMat4(wxString fn, double mat4[16], wxString comments)
 {
 	int res = 0;
 
 	try
 	{
 		// http://www.grinninglizard.com/tinyxmldocs/tutorial0.html
-		ticpp::Document doc( fn );
+		ticpp::Document doc( fn.mb_str() );
 		ticpp::Declaration decl("1.0","utf-8","");
 		doc.InsertEndChild( decl );
-		ticpp::Comment comment(comments);
+		ticpp::Comment comment(comments.mb_str());
 		doc.InsertEndChild(comment);
 		ticpp::Element root("TrfMat");
 		char rowStr[64]; char attrStr[64]; char valStr[64];

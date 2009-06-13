@@ -78,7 +78,7 @@ public:
 			memcpy( (void*) m_pDataArray, (const void*) buf, numPix*sizeof(T));
 			errMutex = m_mutexDataArray->Unlock();
 		}
-		this->Map2rgb<T>(first);
+		this->Map2rgb<T>();
 		m_DrawPanel->Refresh();
 		if(this->IsShownOnScreen()){ this->Refresh();};
 
@@ -88,7 +88,7 @@ public:
 
 
 	/* Mapping data to RGB buffer*/
-	template<typename T> int Map2rgb(T firstVal)
+	template<typename T> int Map2rgb()
 {
 	int res = 0;
 	if(m_pLUT       == NULL){return -1;};
