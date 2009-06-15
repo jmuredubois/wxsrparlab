@@ -332,7 +332,7 @@ int CamFrame::CreateAndSetNotebook()
 //! Opens SR device
 void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
 {
-  unsigned int res = 0;
+  int res = 0;
   m_mutexSrBuf = new wxMutex(wxMUTEX_DEFAULT);
   //logPrintf("swissrangerTester: SR_Open device");
   m_settingsPane->SetText(wxT("Open attempt"));

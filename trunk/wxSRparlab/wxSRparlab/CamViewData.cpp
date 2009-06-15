@@ -52,8 +52,6 @@ CamViewData::CamViewData(wxWindow* parent, const wxString& title, const wxPoint&
 	res += AllocWxImg();
 	res += AllocWxBitmap();
 
-	unsigned short val = 0;
-
 	m_dDispMin = 25344.0;
 	m_dDispMax = 0.0;
 
