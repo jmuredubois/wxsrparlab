@@ -300,9 +300,9 @@ void MainWnd::Init()
 			wxDefaultPosition, wxDefaultSize, 4, srcTgt, wxCB_READONLY);
 	_icpTgt = new wxComboBox(_bgPanel, IDC_icpTgt, wxT("Current"),
 			wxDefaultPosition, wxDefaultSize, 4, srcTgt, wxCB_READONLY);
-	_icpIdxSrc = new wxRadioBox(_bgPanel, IDC_kdDistIdxSrc, wxT("Cam"),
+	_icpIdxSrc = new wxRadioBox(_bgPanel, IDC_icpIdxSrc, wxT("Cam"),
 			wxDefaultPosition, wxDefaultSize, NUMCAMS, strCams);
-	_icpIdxTgt = new wxRadioBox(_bgPanel, IDC_kdDistIdxTgt, wxT("Cam"),
+	_icpIdxTgt = new wxRadioBox(_bgPanel, IDC_icpIdxTgt, wxT("Cam"),
 			wxDefaultPosition, wxDefaultSize, NUMCAMS, strCams);
 
 	wxBoxSizer *sizerICP = new wxBoxSizer(wxHORIZONTAL); // create sizer ICP params
