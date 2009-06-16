@@ -915,16 +915,16 @@ void MainWnd::OnDepthCbar(wxCommandEvent& event)
 void MainWnd::OnICP(wxCommandEvent& event)
 {
 	#ifdef JMU_ICPVTK
-	int idxTgt = _kdDistIdxTgt->GetSelection();
+	int idxTgt = _icpIdxTgt->GetSelection();
 	int tgtField = 0;
-	wxString strTgt = _kdDistTgt->GetValue();
+	wxString strTgt = _icpTgt->GetValue();
 	if( strTgt.IsSameAs(wxT("Current"))      ) {tgtField = 0;};
 	if( strTgt.IsSameAs(wxT("Background"))   ) {tgtField = 1;};
 	if( strTgt.IsSameAs(wxT("Foreground"))   ) {tgtField = 2;};
 	if( strTgt.IsSameAs(wxT("Segmentation")) ) {tgtField = 3;};
 
-	int idxSrc = _kdDistIdxSrc->GetSelection();
-	wxString strSrc = _kdDistSrc->GetValue();
+	int idxSrc = _icpIdxSrc->GetSelection();
+	wxString strSrc = _icpSrc->GetValue();
 	int srcField = 0;
 	if( strSrc.IsSameAs(wxT("Current"))      ) { srcField = 0;};
 	if( strSrc.IsSameAs(wxT("Background"))   ) { srcField = 1;};
