@@ -591,11 +591,11 @@ vtkStructuredGrid* CViewSrVtk::icpWork(vtkPointSet* source, vtkPointSet* target,
 
 	vtkMatrix4x4* mat4 = icp->GetMatrix();
 	int k=0;
-	for(int k1 =0; k<4; k1++ ) 
+	for(int col =0; col<4; col++ ) 
 	{
-		for(int k2 =0; k2<4; k2++ ) 
+		for(int row =0; row<4; row++ ) 
 		{
-			mat[k] = mat4->GetElement(k2, k1);
+			mat[k] = mat4->GetElement(row, col);
 			k+=1;
 		}
 	}
@@ -675,9 +675,13 @@ void CViewSrVtk::icpFct(std::vector<CamFrame*>* camFrms, int idxSrc, int srcFiel
 		default:
 			break;
 	}
-	vtkStructuredGrid* ptsSetICP = icpWork(source, target, icpIter, icpTrlCM, mat);
-	_icpToPoly->SetInput(ptsSetICP);
-	_icpToPoly->Modified();
+	vtkStructuredGrid* ptsSetICP = NULL;
+	ptsSetICP = icpWork(source, target, icpIter, icpTrlCM, mat);
+	if(ptsSetICP != NULL)
+	{
+		_icpToPoly->SetInput(ptsSetICP);
+		_icpToPoly->Modified();
+	}
 	char icpText[512];
 	sprintf(icpText, "ICP: target: cam%i field%i (%i pts) / source: cam%i field%i (%i pts) \n [ %g %g %g %g \n %g %g %g %g \n %g %g %g %g \n %g %g %g %g ]",
 		idxTgt, tgtField, (int)target->GetNumberOfPoints(), idxSrc, srcField, (int)source->GetNumberOfPoints(),
@@ -705,6 +709,9 @@ void CViewSrVtk::setICPColorDepth()
 {
 	//data->GetPointData()->SetScalars(dData);
 	//dataMapperZ->SetLookupTable(depthLUT);  // sets color
+	vtkDataArray* toto = _icpToPoly->GetOutput(0)->GetPointData()->GetScalars("Depth");
+	_icpToPoly->GetOutput()->GetPointData()->SetActiveScalars("Depth");
+	_icpMapperZ->SetLookupTable(depthLUT);
 	_icpActor->SetMapper(_icpMapperZ);
 
 }
@@ -712,12 +719,16 @@ void CViewSrVtk::setICPColorGray()
 {
 	//data->GetPointData()->SetScalars(aData);
 	//dataMapperAmp->SetLookupTable(grayLUT);  // sets color
+	_icpToPoly->GetOutput(0)->GetPointData()->SetActiveScalars("Amplitude");
+	_icpMapperZ->SetLookupTable(grayLUT);
 	_icpActor->SetMapper(_icpMapperAmp);
 }
 void CViewSrVtk::setICPColorSegm()
 {
 	//data->GetPointData()->SetScalars(sData);  //
 	//dataMapperSegm->SetLookupTable(segmLUT);  // sets color
+	_icpToPoly->GetOutput(0)->GetPointData()->SetActiveScalars("Segmentation");
+	_icpMapperZ->SetLookupTable(segmLUT);
 	_icpActor->SetMapper(_icpMapperSegm);
 }
 #endif // JMU_ICPVTK
