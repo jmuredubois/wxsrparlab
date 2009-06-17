@@ -518,6 +518,7 @@ void MainWnd::SetZVtk()
 		{
 			(*itCam)->changeDepthRangeVtk((float) _zMin, (float) _zMax);
 		}
+		_vtkWin->changeDepthRange((float) _zMin, (float) _zMax);
 		_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 	}
 }
@@ -591,6 +592,7 @@ void MainWnd::SetAmpVtk()
 		{
 			(*itCam)->changeAmpRangeVtk((float) _ampMin, (float) _ampMax);
 		}
+		_vtkWin->changeAmpRange((float) _ampMin, (float) _ampMax);
 		_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 	}
 #endif
@@ -629,6 +631,7 @@ void MainWnd::SetSegmVtk()
 		{
 			(*itCam)->changeSegmRangeVtk((float) _segmMin, (float) _segmMax);
 		}
+		_vtkWin->changeSegmRange((float) _segmMin, (float) _segmMax);
 		_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 	}
 #endif

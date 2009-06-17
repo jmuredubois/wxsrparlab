@@ -72,17 +72,20 @@ CViewSrVtk::CViewSrVtk(wxFrame* pWnd, int x, int y, int w, int h)
 
 		// new ICP actor
 		_icpGrid = vtkStructuredGrid::New(); // to be replaced
-		_icpToPoly = vtkStructuredGridGeometryFilter::New();
-		_icpToPoly->SetInput(_icpGrid);
-		_icpMapperZ = vtkPolyDataMapper::New();
+		//_icpToPoly = vtkStructuredGridGeometryFilter::New();
+		//_icpToPoly->SetInput(_icpGrid);
+		_icpMapperZ = vtkDataSetMapper::New();
 		_icpMapperZ->SetLookupTable(depthLUT);  // sets color
-		_icpMapperZ->SetInputConnection(_icpToPoly->GetOutputPort());
-		_icpMapperAmp = vtkPolyDataMapper::New();
+		_icpMapperZ->SetInput(_icpGrid);
+		//_icpMapperZ->SetInputConnection(_icpToPoly->GetOutputPort());
+		_icpMapperAmp = vtkDataSetMapper::New();
 		_icpMapperAmp->SetLookupTable(grayLUT);  // sets color
-		_icpMapperAmp->SetInputConnection(_icpToPoly->GetOutputPort());
-		_icpMapperSegm = vtkPolyDataMapper::New();
+		_icpMapperAmp->SetInput(_icpGrid);
+		//_icpMapperAmp->SetInputConnection(_icpToPoly->GetOutputPort());
+		_icpMapperSegm = vtkDataSetMapper::New();
 		_icpMapperSegm->SetLookupTable(segmLUT);  // sets color
-		_icpMapperSegm->SetInputConnection(_icpToPoly->GetOutputPort());
+		_icpMapperSegm->SetInput(_icpGrid);
+		//_icpMapperSegm->SetInputConnection(_icpToPoly->GetOutputPort());
 		_icpActor = vtkActor::New();
 		_icpActor->SetMapper(_icpMapperZ);
 		_icpMapperZ->Register(_icpActor);
@@ -130,8 +133,8 @@ CViewSrVtk::~CViewSrVtk()
 		_icpMapperZ->Delete();
 		_icpMapperAmp->Delete();
 		_icpMapperSegm->Delete();
-		_icpToPoly->Delete();
-		//_icpGrid->Delete();
+		//_icpToPoly->Delete();
+		//if(_icpGrid != NULL){_icpGrid->Delete();};
 	#endif
 	#ifdef JMU_KDTREEVTK
 		_kdTxtActor->Delete();
@@ -690,9 +693,17 @@ void CViewSrVtk::icpFct(std::vector<CamFrame*>* camFrms, int idxSrc, int srcFiel
 	if(ptsSetICP != NULL)
 	{
 		toto = ptsSetICP->GetPointData()->SetActiveAttribute("Amplitude",0);
-		_icpToPoly->SetInput(ptsSetICP);
-		toto =_icpToPoly->GetOutput()->GetPointData()->SetActiveAttribute("Amplitude",0); // this is where amplitude fails to be carried on
-		_icpToPoly->Modified();
+		//if(_icpGrid != NULL){_icpGrid->Delete();};
+		_icpGrid = ptsSetICP;
+		_icpGrid->Modified();
+		toto = _icpGrid->GetPointData()->SetActiveAttribute("Amplitude",0);
+		_icpMapperAmp->SetInput(_icpGrid);
+		_icpMapperAmp->Modified();
+		_icpActor->SetMapper(_icpMapperAmp);
+		_icpActor->Modified();
+		//_icpToPoly->SetInput(ptsSetICP);
+		//toto =_icpToPoly->GetOutput()->GetPointData()->SetActiveAttribute("Amplitude",0); // this is where amplitude fails to be carried on
+		//_icpToPoly->Modified();
 	}
 	char icpText[512];
 	sprintf(icpText, "ICP: target: cam%i field%i (%i pts) / source: cam%i field%i (%i pts) \n [ %g %g %g %g \n %g %g %g %g \n %g %g %g %g \n %g %g %g %g ]",
@@ -719,26 +730,20 @@ void CViewSrVtk::hideICPact(bool doHide)
 #ifdef JMU_ICPVTK
 void CViewSrVtk::setICPColorDepth()
 {
-	//data->GetPointData()->SetScalars(dData);
-	//dataMapperZ->SetLookupTable(depthLUT);  // sets color
-	_icpToPoly->GetOutput()->GetPointData()->SetActiveScalars("Depth"); // does not work
+	//_icpToPoly->GetOutput()->GetPointData()->SetActiveScalars("Depth"); // does not work
 	_icpMapperZ->SetLookupTable(depthLUT);
 	_icpActor->SetMapper(_icpMapperZ);
 
 }
 void CViewSrVtk::setICPColorGray()
 {
-	//data->GetPointData()->SetScalars(aData);
-	//dataMapperAmp->SetLookupTable(grayLUT);  // sets color
-	_icpToPoly->GetOutput(0)->GetPointData()->SetActiveScalars("Amplitude");
+	//_icpToPoly->GetOutput(0)->GetPointData()->SetActiveScalars("Amplitude");
 	_icpMapperZ->SetLookupTable(grayLUT);
 	_icpActor->SetMapper(_icpMapperAmp);
 }
 void CViewSrVtk::setICPColorSegm()
 {
-	//data->GetPointData()->SetScalars(sData);  //
-	//dataMapperSegm->SetLookupTable(segmLUT);  // sets color
-	_icpToPoly->GetOutput(0)->GetPointData()->SetActiveScalars("Segmentation");
+	//_icpToPoly->GetOutput(0)->GetPointData()->SetActiveScalars("Segmentation");
 	_icpMapperZ->SetLookupTable(segmLUT);
 	_icpActor->SetMapper(_icpMapperSegm);
 }

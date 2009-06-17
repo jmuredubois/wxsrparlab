@@ -166,10 +166,10 @@ private:
 	vtkPointSet* _icpPtsSrc;
 	vtkPointSet* _icpPtsTgt;
 	vtkStructuredGrid*	_icpGrid; 
-	vtkStructuredGridGeometryFilter* _icpToPoly;
-	vtkPolyDataMapper*		_icpMapperZ;		//!< mapper for icp
-	vtkPolyDataMapper*		_icpMapperAmp;		//!< mapper for icp
-	vtkPolyDataMapper*		_icpMapperSegm;		//!< mapper for icp
+	//vtkStructuredGridGeometryFilter* _icpToPoly;
+	vtkDataSetMapper*		_icpMapperZ;		//!< mapper for icp
+	vtkDataSetMapper*		_icpMapperAmp;		//!< mapper for icp
+	vtkDataSetMapper*		_icpMapperSegm;		//!< mapper for icp
     vtkActor*				_icpActor;			//!< actor for icp
 	vtkTextActor* _icpTxtActor;	//!< actor for icpRes display
 	void setIcpTxt(char* txt);
