@@ -330,7 +330,7 @@ int CViewSrVtk::changeAmpRange(float minAmp, float maxAmp)
 {
 	int res = _vtkSubMax;
 	int i = 0;
-		#ifdef JMU_ICPVTK
+	#ifdef JMU_ICPVTK
 		_icpMapperAmp->SetScalarRange((double) minAmp, (double) maxAmp);
 	#endif
 	//renWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
@@ -565,7 +565,7 @@ void CViewSrVtk::hideDepthCbar(bool doHide)
 }
 
 #ifdef JMU_ICPVTK
-vtkStructuredGrid* CViewSrVtk::icpWork(vtkPointSet* source, vtkPointSet* target, double mat[16])
+vtkStructuredGrid* CViewSrVtk::icpWork(vtkPointSet* source, vtkPointSet* target, int icpIter, int icpTrlCM, double mat[16])
 {
 	// ripped off from : http://www.vtk.org/Wiki/Iterative_Closest_Points_(ICP)_Transform
 
@@ -575,8 +575,11 @@ vtkStructuredGrid* CViewSrVtk::icpWork(vtkPointSet* source, vtkPointSet* target,
 	icp->SetTarget(target);
 	icp->GetLandmarkTransform()->SetModeToRigidBody();
 	//icp->DebugOn();
-	icp->SetMaximumNumberOfIterations(20);
-	icp->StartByMatchingCentroidsOn();
+	icp->SetMaximumNumberOfIterations(icpIter);
+	if(icpTrlCM==1)
+	{
+		icp->StartByMatchingCentroidsOn();
+	}
 	icp->Modified();
 	icp->Update();
 
@@ -600,7 +603,7 @@ vtkStructuredGrid* CViewSrVtk::icpWork(vtkPointSet* source, vtkPointSet* target,
 }
 #endif
 #ifdef JMU_ICPVTK
-void CViewSrVtk::icpFct(std::vector<CamFrame*>* camFrms, int idxSrc, int srcField, int idxTgt, int tgtField, double mat[16])
+void CViewSrVtk::icpFct(std::vector<CamFrame*>* camFrms, int idxSrc, int srcField, int idxTgt, int tgtField, int icpIter, int icpTrlCM, double mat[16])
 {
 	if( camFrms == NULL) { return;};
 	std::vector<CamFrame*>::iterator it; 
@@ -672,7 +675,7 @@ void CViewSrVtk::icpFct(std::vector<CamFrame*>* camFrms, int idxSrc, int srcFiel
 		default:
 			break;
 	}
-	vtkStructuredGrid* ptsSetICP = icpWork(source, target, mat);
+	vtkStructuredGrid* ptsSetICP = icpWork(source, target, icpIter, icpTrlCM, mat);
 	_icpToPoly->SetInput(ptsSetICP);
 	_icpToPoly->Modified();
 	char icpText[512];
@@ -681,6 +684,41 @@ void CViewSrVtk::icpFct(std::vector<CamFrame*>* camFrms, int idxSrc, int srcFiel
 		mat[0], mat[4], mat[8], mat[12],mat[1], mat[5], mat[9], mat[13],mat[2], mat[6], mat[10], mat[14], mat[3], mat[7], mat[11], mat[15]);
 	setIcpTxt(icpText);
 	return ;
+}
+#endif // JMU_ICPVTK
+#ifdef JMU_ICPVTK
+void CViewSrVtk::hideICPact(bool doHide)
+{
+	if(doHide)
+	{
+		_icpActor->VisibilityOff();
+	}
+	else
+	{
+		_icpActor->VisibilityOn();
+	}
+	return;
+}
+#endif // JMU_ICPVTK
+#ifdef JMU_ICPVTK
+void CViewSrVtk::setICPColorDepth()
+{
+	//data->GetPointData()->SetScalars(dData);
+	//dataMapperZ->SetLookupTable(depthLUT);  // sets color
+	_icpActor->SetMapper(_icpMapperZ);
+
+}
+void CViewSrVtk::setICPColorGray()
+{
+	//data->GetPointData()->SetScalars(aData);
+	//dataMapperAmp->SetLookupTable(grayLUT);  // sets color
+	_icpActor->SetMapper(_icpMapperAmp);
+}
+void CViewSrVtk::setICPColorSegm()
+{
+	//data->GetPointData()->SetScalars(sData);  //
+	//dataMapperSegm->SetLookupTable(segmLUT);  // sets color
+	_icpActor->SetMapper(_icpMapperSegm);
 }
 #endif // JMU_ICPVTK
 #ifdef JMU_ICPVTK

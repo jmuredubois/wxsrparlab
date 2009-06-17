@@ -102,8 +102,12 @@ public:
 	void hideAmplCbar(bool doHide);
 	void hideDepthCbar(bool doHide);
 #ifdef JMU_ICPVTK
-	vtkStructuredGrid* icpWork(vtkPointSet* source, vtkPointSet* target, double mat[16]);
-	void icpFct(std::vector<CamFrame*>* camFrms, int idxSrc, int srcField, int idxTgt, int tgtField, double mat[16]);
+	vtkStructuredGrid* icpWork(vtkPointSet* source, vtkPointSet* target, int icpIter, int icpTrlCM, double mat[16]);
+	void icpFct(std::vector<CamFrame*>* camFrms, int idxSrc, int srcField, int idxTgt, int tgtField, int icpIter, int icpTrlCM, double mat[16]);
+	void hideICPact(bool doHide);
+	void setICPColorDepth();
+	void setICPColorGray();
+	void setICPColorSegm();
 #endif
 #ifdef JMU_KDTREEVTK
 	double		kdDist(std::vector<CamFrame*>* camFrms, int idxSrc, int srcField, int idxTgt, int tgtField, double res[3]);
