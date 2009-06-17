@@ -111,8 +111,15 @@ BEGIN_EVENT_TABLE(MainWnd, wxFrame)
 	EVT_CHECKBOX(IDC_AmplCbar, MainWnd::OnAmplCbar)
 	EVT_CHECKBOX(IDC_DepthCbar, MainWnd::OnDepthCbar)
 	EVT_TIMER(IDE_RendTimer, MainWnd::OnRendTimer)
+	#ifdef JMU_ICPVTK
 	EVT_BUTTON(IDB_icpVtk, MainWnd::OnICP)
+	EVT_TEXT(IDT_icpIter, MainWnd::TextICPiter)
+	EVT_CHECKBOX(IDC_visICP, MainWnd::SetVisICP)
+	EVT_COMBOBOX(IDC_colICP, MainWnd::SetColICP)
+	#endif
+	#ifdef JMU_KDTREEVTK
 	EVT_BUTTON(IDB_kdDistVtk, MainWnd::OnKdDist)
+	#endif
 #endif // JMU_USE_VTK
 END_EVENT_TABLE()
 
@@ -174,6 +181,8 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
 	m_pThreadReadDataSync = NULL;
 	#ifdef JMU_ICPVTK
 		_buttICP = NULL;
+		_visICP = NULL; _colICP= NULL; _icpTrlCM= NULL; _txtICPiter=NULL; 
+		_icpIter=20;
 		_icpSrc = NULL; _icpTgt = NULL;
 		_icpIdxSrc = NULL; _icpIdxTgt = NULL;
 	#endif
@@ -296,6 +305,13 @@ void MainWnd::Init()
 	}
 #ifdef JMU_ICPVTK
 	_buttICP = new wxButton(_bgPanel, IDB_icpVtk, wxT("ICP") );
+	_visICP = new wxCheckBox(_bgPanel, IDC_visICP, wxT("Hide"));
+	wxString colICP[] = { wxT("Depth (Z)"), wxT("Amplitude"), wxT("Segmentation")};
+	_colICP=  new wxComboBox(_bgPanel, IDC_colICP, wxT("Amplitude"),
+		   wxDefaultPosition, wxDefaultSize, 3, colICP, wxCB_READONLY);
+	_icpTrlCM= new wxCheckBox(_bgPanel, IDC_icpTrlCM, wxT("Match center of mass"));
+	wxStaticText* icpIterLabel = new wxStaticText(_bgPanel, wxID_ANY, wxT("ICP iter.")); 
+	_txtICPiter=new wxTextCtrl( _bgPanel, IDT_icpIter, wxString::Format(wxT("%i"), _icpIter) );
 	_icpSrc = new wxComboBox(_bgPanel, IDC_icpSrc, wxT("Current"),
 			wxDefaultPosition, wxDefaultSize, 4, srcTgt, wxCB_READONLY);
 	_icpTgt = new wxComboBox(_bgPanel, IDC_icpTgt, wxT("Current"),
@@ -305,13 +321,20 @@ void MainWnd::Init()
 	_icpIdxTgt = new wxRadioBox(_bgPanel, IDC_icpIdxTgt, wxT("Cam"),
 			wxDefaultPosition, wxDefaultSize, NUMCAMS, strCams);
 
+	wxBoxSizer *sizerICPopt = new wxBoxSizer(wxHORIZONTAL); // create sizer ICPoptions
+	    sizerICPopt->Add(icpIterLabel,flagsNoExpand);
+	    sizerICPopt->Add(_txtICPiter,flagsNoExpand);
+		sizerICPopt->Add(_icpTrlCM,flagsNoExpand);
+		sizerICPopt->Add(_visICP,flagsNoExpand);
+		sizerICPopt->Add(_colICP,flagsNoExpand);
 	wxBoxSizer *sizerICP = new wxBoxSizer(wxHORIZONTAL); // create sizer ICP params
-		sizerICP->Add(_buttICP, flagsExpand);
+		sizerICP->Add(_buttICP, flagsNoExpand);
 		sizerICP->Add(_icpIdxSrc , flagsExpand);
 		sizerICP->Add(_icpSrc , flagsExpand);
 		sizerICP->Add(_icpIdxTgt , flagsExpand);
 		sizerICP->Add(_icpTgt , flagsExpand);
 
+	sizerVtk0->Add(sizerICPopt, flagsNoExpand);
 	sizerVtk0->Add(sizerICP, flagsExpand);
 #endif
 #ifdef JMU_KDTREEVTK
@@ -421,7 +444,7 @@ void MainWnd::AddChildren()
 		chkBox->SetValue(true);
 		_sizerCamVisCol->Add(chkBox, wxGBPosition(i,0));
 		_visVtk.push_back(chkBox);	// add visibility checkbox to container
-		wxComboBox* colBox = new wxComboBox(_bgPanel, IDC_colVtk, wxT("Depth (Z)"),
+		wxComboBox* colBox = new wxComboBox(_bgPanel, IDC_colVtk, wxT("Amplitude"),
 			wxDefaultPosition, wxDefaultSize, 8, colors, wxCB_READONLY);
 		_sizerCamVisCol->Add(colBox, wxGBPosition(i,1));
 		_colVtk.push_back(colBox);
@@ -439,7 +462,7 @@ void MainWnd::AddChildren()
 		chkFGBox->SetValue(true);
 		_sizerCamVisCol->Add(chkFGBox, wxGBPosition(i,4));
 		_visFGVtk.push_back(chkFGBox);	// add visibility checkbox to container
-		wxComboBox* colFGBox = new wxComboBox(_bgPanel, IDC_colVtk, wxT("Depth (Z)"),
+		wxComboBox* colFGBox = new wxComboBox(_bgPanel, IDC_colVtk, wxT("Amplitude"),
 			wxDefaultPosition, wxDefaultSize, 8, colors, wxCB_READONLY);
 		_sizerCamVisCol->Add(colFGBox, wxGBPosition(i,5));
 		_colFGVtk.push_back(colFGBox);
@@ -907,7 +930,58 @@ void MainWnd::OnDepthCbar(wxCommandEvent& event)
 	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 }
 #endif // JMU_USE_VTK
-#ifdef JMU_USE_VTK
+#ifdef JMU_ICPVTK
+void MainWnd::SetVisICP(wxCommandEvent& event)
+{
+	_vtkWin->hideICPact(_visICP->IsChecked());
+	_vtkWin->Render();
+}
+#endif // JMU_ICPVTK
+#ifdef JMU_ICPVTK
+void MainWnd::SetColICP(wxCommandEvent& event)
+{
+	/* wxString colICP[] = { wxT("Depth (Z)"), wxT("Amplitude"), wxT("Segmentation") };*/
+		wxString strCol = _colICP->GetValue();
+		if(  strCol.IsSameAs(wxT("Depth (Z)"))  )
+		{
+			_vtkWin->setICPColorDepth();
+			SetZMin(_zMin); // trick to update data Mapper
+		}
+		if(  strCol.IsSameAs(wxT("Amplitude"))  )
+		{
+			_vtkWin->setICPColorGray();
+			SetAmpMin(_ampMin); // trick to update data Mapper
+		}
+		if(  strCol.IsSameAs(wxT("Segmentation"))  )
+		{
+			_vtkWin->setICPColorSegm();
+			SetSegMin(_segmMin); // trick to update data Mapper
+		}
+}
+#endif // JMU_ICPVTK
+#ifdef JMU_ICPVTK
+void MainWnd::TextICPiter(wxCommandEvent& )
+{
+	unsigned long val = 0;
+	if( !_txtICPiter){return ;};
+	wxString strVal = _txtICPiter->GetValue();
+	if( strVal.ToULong(& val) ) /* read value as double*/
+	{
+		_icpIter = (int) val;
+	}
+	else
+	{
+		_txtICPiter->DiscardEdits();
+		_txtICPiter->GetValue().Printf(wxT("%u"), _icpIter);
+	}
+}
+#endif // JMU_ICPVTK
+//#ifdef JMU_ICPVTK
+//void MainWnd::SetICPtrlCM(wxCommandEvent& event)
+//{
+//}
+//#endif // JMU_ICPVTK
+#ifdef JMU_ICPVTK
 /** acting on "ICP" button \n
  * - bug: for now only first and last cam are used \n
  * - todo: make dataset choice configurable
@@ -934,12 +1008,14 @@ void MainWnd::OnICP(wxCommandEvent& event)
 	double mat[16]; for(int k =0; k<16; k++ ) { mat[k] = 0.0;}; mat[0]=1.0; mat[5]=1.0; mat[10]=1.0; mat[15]=1.0;
 	//vtkStructuredGrid* icpSource = _vtkWin->icpFct(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, mat);
 	//(m_camFrm.back() )->GetCamVtk()->ShowStructGrid(icpSource);
-	_vtkWin->icpFct(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, mat);
+	int trlCM = 0;
+	if(_icpTrlCM->IsChecked()) {trlCM =1;};
+	_vtkWin->icpFct(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, _icpIter, trlCM, mat);
 	_vtkWin->Render();
 	#endif //JMU_ICPVTK
 }
 #endif // JMU_USE_VTK
-#ifdef JMU_USE_VTK
+#ifdef JMU_KDTREEVTK
 /** acting on "kdDist" button \n
  * - bug: for now only first and last cam are used \n
  * - todo: make dataset choice configurable

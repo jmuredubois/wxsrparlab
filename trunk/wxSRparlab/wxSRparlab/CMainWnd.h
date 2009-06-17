@@ -66,8 +66,16 @@ public:
 	void OnSegmCbar(wxCommandEvent& event);  //! Display or hide segm colorbar
 	void OnAmplCbar(wxCommandEvent& event);  //! Display or hide ampl colorbar
 	void OnDepthCbar(wxCommandEvent& event); //! Display or hide depth colorbar
+	#ifdef JMU_ICPVTK
 	void OnICP(wxCommandEvent& event); //! try to use VTK's ICP
+	void SetVisICP(wxCommandEvent& event); // 
+	void SetColICP(wxCommandEvent& event); // 
+	void TextICPiter(wxCommandEvent& ); //
+	//void SetICPtrlCM(wxCommandEvent& event); //
+	#endif
+	#ifdef JMU_KDTREEVTK
 	void OnKdDist(wxCommandEvent& event); //!  point set distance based on VTK kd-tree
+	#endif
 #endif // JMU_USE_VTK
 
 
@@ -116,6 +124,11 @@ private:
 	wxCheckBox* _ckDepthCbar; //! Show depth        colorbar checkbox
 #ifdef JMU_ICPVTK
 	wxButton* _buttICP; //! button for ICP
+	wxCheckBox* _visICP; //! Show ICP checkbox
+	wxComboBox* _colICP; //! ICP color combo box
+	wxCheckBox* _icpTrlCM; //! ICP zero center of mass flag
+	wxTextCtrl *_txtICPiter; //!< control txt : ICP iterations
+	int _icpIter;
 	wxComboBox* _icpSrc;
 	wxComboBox* _icpTgt;
 	wxRadioBox* _icpIdxSrc;
@@ -159,5 +172,9 @@ enum MainWndEnum
 	IDC_kdDistSrc,
 	IDC_kdDistTgt,
 	IDC_kdDistIdxSrc,
-	IDC_kdDistIdxTgt
+	IDC_kdDistIdxTgt,
+	IDT_icpIter,
+	IDC_icpTrlCM,
+	IDC_visICP,
+	IDC_colICP
 };
