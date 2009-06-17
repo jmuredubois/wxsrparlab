@@ -318,6 +318,7 @@ int CViewSrVtk::changeDepthRange(float minVal, float maxVal)
 	int i = 0;
 	#ifdef JMU_ICPVTK
 		_icpMapperZ->SetScalarRange((double) minVal, (double) maxVal);
+		_icpMapperZ->Modified();
 	#endif
 	//renWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 	return res-i;
@@ -332,6 +333,7 @@ int CViewSrVtk::changeAmpRange(float minAmp, float maxAmp)
 	int i = 0;
 	#ifdef JMU_ICPVTK
 		_icpMapperAmp->SetScalarRange((double) minAmp, (double) maxAmp);
+		_icpMapperAmp->Modified();
 	#endif
 	//renWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 	return res-i;
@@ -346,6 +348,7 @@ int CViewSrVtk::changeSegmRange(float minSegm, float maxSegm)
 	int i = 0;
 	#ifdef JMU_ICPVTK
 		_icpMapperSegm->SetScalarRange((double) minSegm, (double) maxSegm);
+		_icpMapperSegm->Modified();
 	#endif
 	//renWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 	return res-i;
@@ -583,6 +586,8 @@ vtkStructuredGrid* CViewSrVtk::icpWork(vtkPointSet* source, vtkPointSet* target,
 	icp->Modified();
 	icp->Update();
 
+	int toto = source->GetPointData()->SetActiveAttribute("Amplitude",0);
+
 	//transform the source points by the ICP solution
 	vtkTransformFilter* ICPTransFilter = vtkTransformFilter::New();
 	ICPTransFilter->SetInput(source);
@@ -599,7 +604,10 @@ vtkStructuredGrid* CViewSrVtk::icpWork(vtkPointSet* source, vtkPointSet* target,
 			k+=1;
 		}
 	}
-	return ICPTransFilter->GetStructuredGridOutput();
+	vtkStructuredGrid* output; output = NULL;
+	output = ICPTransFilter->GetStructuredGridOutput();
+	toto = output->GetPointData()->SetActiveAttribute("Amplitude",0);
+	return output;
 }
 #endif
 #ifdef JMU_ICPVTK
@@ -675,11 +683,15 @@ void CViewSrVtk::icpFct(std::vector<CamFrame*>* camFrms, int idxSrc, int srcFiel
 		default:
 			break;
 	}
+	int toto = source->GetPointData()->SetActiveAttribute("Amplitude",0);
+
 	vtkStructuredGrid* ptsSetICP = NULL;
 	ptsSetICP = icpWork(source, target, icpIter, icpTrlCM, mat);
 	if(ptsSetICP != NULL)
 	{
+		toto = ptsSetICP->GetPointData()->SetActiveAttribute("Amplitude",0);
 		_icpToPoly->SetInput(ptsSetICP);
+		toto =_icpToPoly->GetOutput()->GetPointData()->SetActiveAttribute("Amplitude",0); // this is where amplitude fails to be carried on
 		_icpToPoly->Modified();
 	}
 	char icpText[512];
@@ -709,8 +721,7 @@ void CViewSrVtk::setICPColorDepth()
 {
 	//data->GetPointData()->SetScalars(dData);
 	//dataMapperZ->SetLookupTable(depthLUT);  // sets color
-	vtkDataArray* toto = _icpToPoly->GetOutput(0)->GetPointData()->GetScalars("Depth");
-	_icpToPoly->GetOutput()->GetPointData()->SetActiveScalars("Depth");
+	_icpToPoly->GetOutput()->GetPointData()->SetActiveScalars("Depth"); // does not work
 	_icpMapperZ->SetLookupTable(depthLUT);
 	_icpActor->SetMapper(_icpMapperZ);
 
