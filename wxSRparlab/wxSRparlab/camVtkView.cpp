@@ -881,8 +881,8 @@ vtkStructuredGrid* CamVtkView::GetStructGrid()
 
 vtkStructuredGrid* CamVtkView::GetTransformedStructGrid()
 {
-	vtkStructuredGrid* toto = dataWriter->GetInput(0);
-	return toto;
+	vtkStructuredGrid* grid = dataWriter->GetInput(0);
+	return grid;
 }
 
 vtkDataObject* CamVtkView::GetTransformedDataObj()
@@ -892,10 +892,10 @@ vtkDataObject* CamVtkView::GetTransformedDataObj()
 
 //vtkPointSet* CamVtkView::GetTransformedPtSet(bool segmented)
 //{
-//	vtkStructuredGrid* toto = vtkStructuredGrid::SafeDownCast(camTranFilter->GetOutputDataObject(0));
+//	vtkStructuredGrid* grid = vtkStructuredGrid::SafeDownCast(camTranFilter->GetOutputDataObject(0));
 //	if(segmented==true)
 //
-//	return toto;
+//	return grid;
 //}
 
 void CamVtkView::ShowStructGrid(vtkStructuredGrid* grid2show)

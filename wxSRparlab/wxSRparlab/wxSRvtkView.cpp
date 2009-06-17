@@ -589,8 +589,6 @@ vtkStructuredGrid* CViewSrVtk::icpWork(vtkPointSet* source, vtkPointSet* target,
 	icp->Modified();
 	icp->Update();
 
-	int toto = source->GetPointData()->SetActiveAttribute("Amplitude",0);
-
 	//transform the source points by the ICP solution
 	vtkTransformFilter* ICPTransFilter = vtkTransformFilter::New();
 	ICPTransFilter->SetInput(source);
@@ -609,14 +607,14 @@ vtkStructuredGrid* CViewSrVtk::icpWork(vtkPointSet* source, vtkPointSet* target,
 	}
 	vtkStructuredGrid* output; output = NULL;
 	output = ICPTransFilter->GetStructuredGridOutput();
-	toto = output->GetPointData()->SetActiveAttribute("Amplitude",0);
 	return output;
 }
 #endif
 #ifdef JMU_ICPVTK
-void CViewSrVtk::icpFct(std::vector<CamFrame*>* camFrms, int idxSrc, int srcField, int idxTgt, int tgtField, int icpIter, int icpTrlCM, double mat[16])
+wxString CViewSrVtk::icpFct(std::vector<CamFrame*>* camFrms, int idxSrc, int srcField, int idxTgt, int tgtField, int icpIter, int icpTrlCM, double mat[16])
 {
-	if( camFrms == NULL) { return;};
+	wxString strRes; strRes.clear();
+	if( camFrms == NULL) { return strRes;};
 	std::vector<CamFrame*>::iterator it; 
 	CamFrame* srcVtk = NULL; 
 	CamFrame* tgtVtk = NULL;
@@ -626,8 +624,8 @@ void CViewSrVtk::icpFct(std::vector<CamFrame*>* camFrms, int idxSrc, int srcFiel
 		if(camSub == idxSrc) { srcVtk = (*it); };
 		if(camSub == idxTgt) { tgtVtk = (*it); };
 	}
-	if( srcVtk == NULL){ return; };
-	if( tgtVtk == NULL){ return; };
+	if( srcVtk == NULL){ return strRes; };
+	if( tgtVtk == NULL){ return strRes; };
 	vtkPointSet* target = NULL;
 	switch(tgtField){
 		case 0:
@@ -686,31 +684,30 @@ void CViewSrVtk::icpFct(std::vector<CamFrame*>* camFrms, int idxSrc, int srcFiel
 		default:
 			break;
 	}
-	int toto = source->GetPointData()->SetActiveAttribute("Amplitude",0);
 
 	vtkStructuredGrid* ptsSetICP = NULL;
 	ptsSetICP = icpWork(source, target, icpIter, icpTrlCM, mat);
 	if(ptsSetICP != NULL)
 	{
-		toto = ptsSetICP->GetPointData()->SetActiveAttribute("Amplitude",0);
 		//if(_icpGrid != NULL){_icpGrid->Delete();};
 		_icpGrid = ptsSetICP;
-		_icpGrid->Modified();
-		toto = _icpGrid->GetPointData()->SetActiveAttribute("Amplitude",0);
-		_icpMapperAmp->SetInput(_icpGrid);
-		_icpMapperAmp->Modified();
-		_icpActor->SetMapper(_icpMapperAmp);
+		_icpMapperAmp->SetInput(_icpGrid); // ? necessary ->seems so
+		_icpActor->SetMapper(_icpMapperAmp); // ? necessary -> seems so
 		_icpActor->Modified();
 		//_icpToPoly->SetInput(ptsSetICP);
-		//toto =_icpToPoly->GetOutput()->GetPointData()->SetActiveAttribute("Amplitude",0); // this is where amplitude fails to be carried on
 		//_icpToPoly->Modified();
 	}
-	char icpText[512];
-	sprintf(icpText, "ICP: target: cam%i field%i (%i pts) / source: cam%i field%i (%i pts) \n [ %g %g %g %g \n %g %g %g %g \n %g %g %g %g \n %g %g %g %g ]",
+
+	strRes.Printf(wxT("ICP: target: cam%i field%i (%i pts) \n source: cam%i field%i (%i pts) \n [ %g %g %g %g \n %g %g %g %g \n %g %g %g %g \n %g %g %g %g ]"),
 		idxTgt, tgtField, (int)target->GetNumberOfPoints(), idxSrc, srcField, (int)source->GetNumberOfPoints(),
 		mat[0], mat[4], mat[8], mat[12],mat[1], mat[5], mat[9], mat[13],mat[2], mat[6], mat[10], mat[14], mat[3], mat[7], mat[11], mat[15]);
+	char icpText[512];
+	if(strRes.length()<512)
+	{
+		strcpy(icpText, (const char*) strRes.char_str());
+	}
 	setIcpTxt(icpText);
-	return ;
+	return strRes;
 }
 #endif // JMU_ICPVTK
 #ifdef JMU_ICPVTK

@@ -1013,7 +1013,12 @@ void MainWnd::OnICP(wxCommandEvent& event)
 	//(m_camFrm.back() )->GetCamVtk()->ShowStructGrid(icpSource);
 	int trlCM = 0;
 	if(_icpTrlCM->IsChecked()) {trlCM =1;};
-	_vtkWin->icpFct(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, _icpIter, trlCM, mat);
+	wxString strRes = _vtkWin->icpFct(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, _icpIter, trlCM, mat);
+	wxString fname; fname.Printf(wxT("icpRes_tgt%02u_field%02u_src%02u_field%02u.xml"), idxTgt, tgtField,idxSrc, srcField);
+	wxDateTime now = wxDateTime::Now(); wxString date1 = now.Format();
+	wxString comments; 
+	comments =  date1 + wxString(wxT("\n")) + strRes;
+	m_camFrm[0]->WriteCamTrfMat4(fname, mat, comments);
 	_vtkWin->Render();
 	#endif //JMU_ICPVTK
 }
