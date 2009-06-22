@@ -60,6 +60,10 @@ public:
 	void TextChangedSegMax(wxCommandEvent &); //!< react on event changed max seg
 	void SetVisVtk(wxCommandEvent& event); //!< react on event changed visibility
 	void SetColVtk(wxCommandEvent& event); //!< react on event changed color options
+	void SetVisBGVtk(wxCommandEvent& event); //!< react on event changed visibility BG
+	void SetColBGVtk(wxCommandEvent& event); //!< react on event changed color options BG
+	void SetVisFGVtk(wxCommandEvent& event); //!< react on event changed visibility FG
+	void SetColFGVtk(wxCommandEvent& event); //!< react on event changed color options FG
 	void OnParaProj(wxCommandEvent& event); //! Set projection to parallel or perpective
 	void OnRendTimer(wxTimerEvent& event); //! Render timer event action
 	CViewSrVtk* GetVtkWin(){return _vtkWin;} ; //!< pointer to vtk window
@@ -105,10 +109,16 @@ private:
 	CViewSrVtk	*_vtkWin ; //!< pointer to vtk window
 	std::vector<wxCheckBox*> _visVtk;		//!< list of visibility checkboxes
 	std::vector<wxComboBox*> _colVtk;		//!< list of vtk color options
+	std::vector<wxComboBox*> _repVtk;		//!< list of vtk representations options
+	std::vector<wxSlider*>   _alpVtk;		//!< slider for vtk alpha option
 	std::vector<wxCheckBox*> _visBGVtk;		//!< list of BACKGROUND visibility checkboxes
 	std::vector<wxComboBox*> _colBGVtk;		//!< list of BACKGROUND vtk color options
+	std::vector<wxComboBox*> _repBGVtk;		//!< list of vtk representations options
+	std::vector<wxSlider*>   _alpBGVtk;		//!< slider for vtk alpha option
 	std::vector<wxCheckBox*> _visFGVtk;		//!< list of FOREGROUND visibility checkboxes
 	std::vector<wxComboBox*> _colFGVtk;		//!< list of FOREGROUND vtk color options
+	std::vector<wxComboBox*> _repFGVtk;		//!< list of vtk representations options
+	std::vector<wxSlider*>   _alpFGVtk;		//!< slider for vtk alpha option
 	std::vector<wxCheckBox*> _visSegmVtk;		//!< list of SEGMENTED visibility checkboxes
 	std::vector<wxComboBox*> _colSegmVtk;		//!< list of SEGMENTED vtk color options
 	wxGridBagSizer *_sizerCamVisCol;
@@ -176,5 +186,16 @@ enum MainWndEnum
 	IDT_icpIter,
 	IDC_icpTrlCM,
 	IDC_visICP,
-	IDC_colICP
+	IDC_colICP,
+	IDC_repVtk,
+	IDC_alpVtk,
+	IDC_visBGVtk,
+	IDC_colBGVtk,
+	IDC_repBGVtk,
+	IDC_alpBGVtk,
+	IDC_visFGVtk,
+	IDC_colFGVtk,
+    IDC_repFGVtk,
+	IDC_alpFGVtk
+
 };

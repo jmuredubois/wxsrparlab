@@ -106,6 +106,10 @@ BEGIN_EVENT_TABLE(MainWnd, wxFrame)
 	EVT_TEXT(IDT_segMax, MainWnd::TextChangedSegMax)
 	EVT_CHECKBOX(IDC_visVtk, MainWnd::SetVisVtk)
 	EVT_COMBOBOX(IDC_colVtk, MainWnd::SetColVtk)
+	EVT_CHECKBOX(IDC_visBGVtk, MainWnd::SetVisBGVtk)
+	EVT_COMBOBOX(IDC_colBGVtk, MainWnd::SetColBGVtk)
+	EVT_CHECKBOX(IDC_visFGVtk, MainWnd::SetVisFGVtk)
+	EVT_COMBOBOX(IDC_colFGVtk, MainWnd::SetColFGVtk)
 	EVT_CHECKBOX(IDC_ParaProj, MainWnd::OnParaProj)
 	EVT_CHECKBOX(IDC_SegmCbar, MainWnd::OnSegmCbar)
 	EVT_CHECKBOX(IDC_AmplCbar, MainWnd::OnAmplCbar)
@@ -207,10 +211,16 @@ MainWnd::~MainWnd()
 	if(_vtkWin){ delete(_vtkWin); _vtkWin =NULL; };
 	_visVtk.clear();
 	_colVtk.clear();
+	_repVtk.clear();
+	_alpVtk.clear();
 	_visBGVtk.clear();
 	_colBGVtk.clear();
+	_repBGVtk.clear();
+	_alpBGVtk.clear();
 	_visFGVtk.clear();
 	_colFGVtk.clear();
+	_repFGVtk.clear();
+	_alpFGVtk.clear();
 	//_visSegmVtk.clear();
 	//_colSegmVtk.clear();
 #endif // JMU_USE_VTK
@@ -449,20 +459,20 @@ void MainWnd::AddChildren()
 		_sizerCamVisCol->Add(colBox, wxGBPosition(i,1));
 		_colVtk.push_back(colBox);
 		// labBGT.sprintf(wxT("BGcam %i"), i); // ... change cam BG nickname ...
-		wxCheckBox *chkBGBox = new wxCheckBox(_bgPanel, IDC_visVtk, labBGT);	
+		wxCheckBox *chkBGBox = new wxCheckBox(_bgPanel, IDC_visBGVtk, labBGT);	
 		chkBGBox->SetValue(true);
 		_sizerCamVisCol->Add(chkBGBox, wxGBPosition(i,2));
 		_visBGVtk.push_back(chkBGBox);	// add visibility checkbox to container
-		wxComboBox* colBGBox = new wxComboBox(_bgPanel, IDC_colVtk, wxT("Depth (Z)"),
+		wxComboBox* colBGBox = new wxComboBox(_bgPanel, IDC_colBGVtk, wxT("Depth (Z)"),
 			wxDefaultPosition, wxDefaultSize, 8, colors, wxCB_READONLY);
 		_sizerCamVisCol->Add(colBGBox, wxGBPosition(i,3));
 		_colBGVtk.push_back(colBGBox);
 		// labFGT.sprintf(wxT("FGcam %i"), i); // ... change cam FG nickname ...
-		wxCheckBox *chkFGBox = new wxCheckBox(_bgPanel, IDC_visVtk, labFGT);	
+		wxCheckBox *chkFGBox = new wxCheckBox(_bgPanel, IDC_visFGVtk, labFGT);	
 		chkFGBox->SetValue(true);
 		_sizerCamVisCol->Add(chkFGBox, wxGBPosition(i,4));
 		_visFGVtk.push_back(chkFGBox);	// add visibility checkbox to container
-		wxComboBox* colFGBox = new wxComboBox(_bgPanel, IDC_colVtk, wxT("Amplitude"),
+		wxComboBox* colFGBox = new wxComboBox(_bgPanel, IDC_colFGVtk, wxT("Amplitude"),
 			wxDefaultPosition, wxDefaultSize, 8, colors, wxCB_READONLY);
 		_sizerCamVisCol->Add(colFGBox, wxGBPosition(i,5));
 		_colFGVtk.push_back(colFGBox);
@@ -751,9 +761,22 @@ void MainWnd::AcqAll(wxCommandEvent& event)
 void MainWnd::SetVisVtk(wxCommandEvent& event)
 {
 	SetVisVtkIdx(_visVtk, m_camFrm,0);
+	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+/* acting on visVTK checkbox*/
+void MainWnd::SetVisBGVtk(wxCommandEvent& event)
+{
 	SetVisVtkIdx(_visBGVtk, m_camFrm,1);
+	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+/* acting on visVTK checkbox*/
+void MainWnd::SetVisFGVtk(wxCommandEvent& event)
+{
 	SetVisVtkIdx(_visFGVtk, m_camFrm,2);
-	//SetVisVtkIdx(_visSegmVtk, m_camFrm,3);
 	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 }
 #endif // JMU_USE_VTK
@@ -778,9 +801,22 @@ void MainWnd::SetVisVtkIdx(std::vector<wxCheckBox*> visChkBox, std::vector<CamFr
 void MainWnd::SetColVtk(wxCommandEvent& event)
 {
 	SetColVtkIdx(_colVtk, m_camFrm,0);
+	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+/* acting on colVTK radio box*/
+void MainWnd::SetColBGVtk(wxCommandEvent& event)
+{
 	SetColVtkIdx(_colBGVtk, m_camFrm,1);
+	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+/* acting on colVTK radio box*/
+void MainWnd::SetColFGVtk(wxCommandEvent& event)
+{
 	SetColVtkIdx(_colFGVtk, m_camFrm,2);
-	//SetColVtkIdx(_colSegmVtk, m_camFrm,3);
 	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
 }
 #endif // JMU_USE_VTK
