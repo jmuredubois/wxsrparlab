@@ -107,12 +107,15 @@ BEGIN_EVENT_TABLE(MainWnd, wxFrame)
 	EVT_CHECKBOX(IDC_visVtk, MainWnd::SetVisVtk)
 	EVT_COMBOBOX(IDC_colVtk, MainWnd::SetColVtk)
 	EVT_COMBOBOX(IDC_repVtk, MainWnd::SetRepVtk)
+	EVT_COMMAND_SCROLL_THUMBRELEASE(IDC_alpVtk, MainWnd::SetAlpVtk)
 	EVT_CHECKBOX(IDC_visBGVtk, MainWnd::SetVisBGVtk)
 	EVT_COMBOBOX(IDC_colBGVtk, MainWnd::SetColBGVtk)
 	EVT_COMBOBOX(IDC_repBGVtk, MainWnd::SetRepBGVtk)
+	EVT_COMMAND_SCROLL_THUMBRELEASE(IDC_alpBGVtk, MainWnd::SetAlpBGVtk)
 	EVT_CHECKBOX(IDC_visFGVtk, MainWnd::SetVisFGVtk)
 	EVT_COMBOBOX(IDC_colFGVtk, MainWnd::SetColFGVtk)
 	EVT_COMBOBOX(IDC_repFGVtk, MainWnd::SetRepFGVtk)
+	EVT_COMMAND_SCROLL_THUMBRELEASE(IDC_alpFGVtk, MainWnd::SetAlpFGVtk)
 	EVT_CHECKBOX(IDC_ParaProj, MainWnd::OnParaProj)
 	EVT_CHECKBOX(IDC_SegmCbar, MainWnd::OnSegmCbar)
 	EVT_CHECKBOX(IDC_AmplCbar, MainWnd::OnAmplCbar)
@@ -320,7 +323,7 @@ void MainWnd::Init()
 	_buttICP = new wxButton(_bgPanel, IDB_icpVtk, wxT("ICP") );
 	_visICP = new wxCheckBox(_bgPanel, IDC_visICP, wxT("Hide"));
 	wxString colICP[] = { wxT("Depth (Z)"), wxT("Ampl."), wxT("Segm.")};
-	_colICP=  new wxComboBox(_bgPanel, IDC_colICP, wxT("Amplitude"),
+	_colICP=  new wxComboBox(_bgPanel, IDC_colICP, wxT("Ampl."),
 		   wxDefaultPosition, wxDefaultSize, 3, colICP, wxCB_READONLY);
 	_icpTrlCM= new wxCheckBox(_bgPanel, IDC_icpTrlCM, wxT("Match center of mass"));
 	wxStaticText* icpIterLabel = new wxStaticText(_bgPanel, wxID_ANY, wxT("ICP iter.")); 
@@ -459,7 +462,7 @@ void MainWnd::AddChildren()
 		chkBox->SetValue(true);
 		_sizerCamVisCol->Add(chkBox, wxGBPosition(i,0));
 		_visVtk.push_back(chkBox);	// add visibility checkbox to container
-		wxComboBox* colBox = new wxComboBox(_bgPanel, IDC_colVtk, wxT("Amplitude"),
+		wxComboBox* colBox = new wxComboBox(_bgPanel, IDC_colVtk, wxT("Ampl."),
 			wxDefaultPosition, wxDefaultSize, 8, colors, wxCB_READONLY);
 		_sizerCamVisCol->Add(colBox, wxGBPosition(i,1));
 		_colVtk.push_back(colBox);
@@ -468,7 +471,7 @@ void MainWnd::AddChildren()
 		_sizerCamVisCol->Add(repBox, wxGBPosition(i,2));
 		_repVtk.push_back(repBox);
 		wxSlider* alpSli = new wxSlider(_bgPanel, IDC_alpVtk, 10, 0, 10, 
-			wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL);// | wxSL_AUTOTICKS | wxSL_LABELS );
+			wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_AUTOTICKS );//| wxSL_LABELS );
 		_sizerCamVisCol->Add(alpSli, wxGBPosition(i,3));
 		_alpVtk.push_back(alpSli);
 		// labBGT.sprintf(wxT("BGcam %i"), i); // ... change cam BG nickname ...
@@ -485,7 +488,7 @@ void MainWnd::AddChildren()
 		_sizerCamVisCol->Add(repBGBox, wxGBPosition(i,6));
 		_repBGVtk.push_back(repBGBox);
 		wxSlider* alpBGSli = new wxSlider(_bgPanel, IDC_alpBGVtk, 3, 0, 10, 
-			wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL);// | wxSL_AUTOTICKS | wxSL_LABELS );
+			wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_AUTOTICKS );//| wxSL_LABELS );
 		_sizerCamVisCol->Add(alpBGSli, wxGBPosition(i,7));
 		_alpBGVtk.push_back(alpBGSli);
 		// labFGT.sprintf(wxT("FGcam %i"), i); // ... change cam FG nickname ...
@@ -493,7 +496,7 @@ void MainWnd::AddChildren()
 		chkFGBox->SetValue(true);
 		_sizerCamVisCol->Add(chkFGBox, wxGBPosition(i,8));
 		_visFGVtk.push_back(chkFGBox);	// add visibility checkbox to container
-		wxComboBox* colFGBox = new wxComboBox(_bgPanel, IDC_colFGVtk, wxT("Amplitude"),
+		wxComboBox* colFGBox = new wxComboBox(_bgPanel, IDC_colFGVtk, wxT("Ampl."),
 			wxDefaultPosition, wxDefaultSize, 8, colors, wxCB_READONLY);
 		_sizerCamVisCol->Add(colFGBox, wxGBPosition(i,9));
 		_colFGVtk.push_back(colFGBox);
@@ -502,7 +505,7 @@ void MainWnd::AddChildren()
 		_sizerCamVisCol->Add(repFGBox, wxGBPosition(i,10));
 		_repFGVtk.push_back(repFGBox);
 		wxSlider* alpFGSli = new wxSlider(_bgPanel, IDC_alpFGVtk, 2, 0, 10, 
-			wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL);// | wxSL_AUTOTICKS | wxSL_LABELS );
+			wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_AUTOTICKS);// | wxSL_LABELS );
 		_sizerCamVisCol->Add(alpFGSli, wxGBPosition(i,11));
 		_alpFGVtk.push_back(alpFGSli);
 		// labSegmT.sprintf(wxT("Segm. %i"), i); // ... change cam Segm nickname ...
@@ -869,7 +872,7 @@ void MainWnd::SetColVtkIdx(std::vector<wxComboBox*> colCmbBox, std::vector<CamFr
 			(*itCam)->setDataMapperColorDepth(idx);
 			SetZMin(_zMin); // trick to update data Mapper
 		}
-		if(  strCol.IsSameAs(wxT("Amp."))  )
+		if(  strCol.IsSameAs(wxT("Ampl."))  )
 		{
 			(*itCam)->setDataMapperColorGray(idx);
 			SetAmpMin(_ampMin); // trick to update data Mapper
@@ -937,6 +940,50 @@ void MainWnd::SetRepVtkIdx(std::vector<wxComboBox*> repCmbBox, std::vector<CamFr
 		{
 			(*itCam)->setDataMapperRepSurf(idx);
 		}
+	}
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+/* acting on colVTK radio box*/
+void MainWnd::SetAlpVtk(wxScrollEvent& event)
+{
+	SetAlpVtkIdx(_alpVtk, m_camFrm,0);
+	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+/* acting on colVTK radio box*/
+void MainWnd::SetAlpBGVtk(wxScrollEvent& event)
+{
+	SetAlpVtkIdx(_alpBGVtk, m_camFrm,1);
+	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+/* acting on colVTK radio box*/
+void MainWnd::SetAlpFGVtk(wxScrollEvent& event)
+{
+	SetAlpVtkIdx(_alpFGVtk, m_camFrm,2);
+	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+/* acting on colVTK radio box*/
+void MainWnd::SetAlpVtkIdx(std::vector<wxSlider*> alpSli, std::vector<CamFrame*> camFrm, int idx)
+{
+	int i = 0;
+	std::vector<wxSlider*>::iterator itAlp;  // get iterator on the controls
+	std::vector<CamFrame*>::iterator itCam;  // get iterator on the camera frames
+	for ( itAlp  =alpSli.begin(), itCam  =camFrm.begin();
+		  itAlp !=alpSli.end()  , itCam !=camFrm.end(); 
+		  itAlp++, itCam++, i++ )
+	{
+		if(!_vtkWin){return;};
+		/*wxSlider* alpSli = new wxSlider(_bgPanel, IDC_alpVtk, 10, 0, 10, 
+			wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL);// | wxSL_AUTOTICKS | wxSL_LABELS );*/
+		int alp = (*itAlp)->GetValue();
+		double alpha = (double) alp / 10; // values mapped in .1 increments from 0.0 to 1.0
+		(*itCam)->setDataMapperOpacity(idx, alpha);
 	}
 }
 #endif // JMU_USE_VTK

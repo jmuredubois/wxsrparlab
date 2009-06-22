@@ -61,15 +61,15 @@ public:
 	void SetVisVtk(wxCommandEvent& event); //!< react on event changed visibility
 	void SetColVtk(wxCommandEvent& event); //!< react on event changed color options
 	void SetRepVtk(wxCommandEvent& event); //!< react on event changed visibility
-	void SetAlpVtk(wxCommandEvent& event); //!< react on event changed color options
+	void SetAlpVtk(wxScrollEvent& event); //!< react on event changed color options
 	void SetVisBGVtk(wxCommandEvent& event); //!< react on event changed visibility BG
 	void SetColBGVtk(wxCommandEvent& event); //!< react on event changed color options BG
 	void SetRepBGVtk(wxCommandEvent& event); //!< react on event changed visibility
-	void SetAlpBGVtk(wxCommandEvent& event); //!< react on event changed color options
+	void SetAlpBGVtk(wxScrollEvent& event); //!< react on event changed color options
 	void SetVisFGVtk(wxCommandEvent& event); //!< react on event changed visibility FG
 	void SetColFGVtk(wxCommandEvent& event); //!< react on event changed color options FG
 	void SetRepFGVtk(wxCommandEvent& event); //!< react on event changed visibility
-	void SetAlpFGVtk(wxCommandEvent& event); //!< react on event changed color options
+	void SetAlpFGVtk(wxScrollEvent& event); //!< react on event changed color options
 	void OnParaProj(wxCommandEvent& event); //! Set projection to parallel or perpective
 	void OnRendTimer(wxTimerEvent& event); //! Render timer event action
 	CViewSrVtk* GetVtkWin(){return _vtkWin;} ; //!< pointer to vtk window
