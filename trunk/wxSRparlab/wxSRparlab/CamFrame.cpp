@@ -1771,6 +1771,81 @@ void CamFrame::setDataMapperColorK(int idx)
 	}*/
 }
 #endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+void CamFrame::setDataMapperRepPts(int idx)
+{
+	if(idx==0)
+	{
+		if(_camVtk == NULL){return;};
+		_camVtk->setDataRepPoints();
+	}
+	if(idx==1)
+	{
+		if(_camBGVtk == NULL){return;};
+		_camBGVtk->setDataRepPoints();
+	}
+	if(idx==2)
+	{
+		if(_camFGVtk == NULL){return;};
+		_camFGVtk->setDataRepPoints();
+	}
+	/*if(idx==3)
+	{
+		if(_camSegmVtk == NULL){return;};
+		_camSegmVtk->setDataRepPoints();
+	}*/
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+void CamFrame::setDataMapperRepSurf(int idx)
+{
+	if(idx==0)
+	{
+		if(_camVtk == NULL){return;};
+		_camVtk->setDataRepSurface();
+	}
+	if(idx==1)
+	{
+		if(_camBGVtk == NULL){return;};
+		_camBGVtk->setDataRepSurface();
+	}
+	if(idx==2)
+	{
+		if(_camFGVtk == NULL){return;};
+		_camFGVtk->setDataRepSurface();
+	}
+	/*if(idx==3)
+	{
+		if(_camSegmVtk == NULL){return;};
+		_camSegmVtk->setDataRepSurface();
+	}*/
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+void CamFrame::setDataMapperOpacity(int idx, double alpha)
+{
+	if(idx==0)
+	{
+		if(_camVtk == NULL){return;};
+		_camVtk->setDataOpacity(alpha);
+	}
+	if(idx==1)
+	{
+		if(_camBGVtk == NULL){return;};
+		_camBGVtk->setDataOpacity(alpha);
+	}
+	if(idx==2)
+	{
+		if(_camFGVtk == NULL){return;};
+		_camFGVtk->setDataOpacity(alpha);
+	}
+	/*if(idx==3)
+	{
+		if(_camSegmVtk == NULL){return;};
+		_camSegmVtk->setDataOpacity(alpha);
+	}*/
+}
+#endif // JMU_USE_VTK
 int CamFrame::WriteCamTrfMat3(wxString fn, double mat3[9], wxString comments)
 {
 	double mat4[16]; for(int k=0; k<16; k++){mat4[k]=0;}; mat4[15]=1;

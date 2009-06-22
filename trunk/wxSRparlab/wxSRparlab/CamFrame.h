@@ -105,6 +105,9 @@ public:
 	void setDataMapperColorB(int idx);
 	void setDataMapperColorW(int idx);
 	void setDataMapperColorK(int idx);
+	void setDataMapperRepPts(int idx);
+	void setDataMapperRepSurf(int idx);
+	void setDataMapperOpacity(int idx, double alpha);
 	int  WriteCamTrfMat3(wxString fn, double mat3[9] , wxString comments);
 	int  WriteCamTrfMat4(wxString fn, double mat4[16], wxString comments);
 #endif

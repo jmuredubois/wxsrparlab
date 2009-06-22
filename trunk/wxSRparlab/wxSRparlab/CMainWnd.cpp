@@ -106,10 +106,13 @@ BEGIN_EVENT_TABLE(MainWnd, wxFrame)
 	EVT_TEXT(IDT_segMax, MainWnd::TextChangedSegMax)
 	EVT_CHECKBOX(IDC_visVtk, MainWnd::SetVisVtk)
 	EVT_COMBOBOX(IDC_colVtk, MainWnd::SetColVtk)
+	EVT_COMBOBOX(IDC_repVtk, MainWnd::SetRepVtk)
 	EVT_CHECKBOX(IDC_visBGVtk, MainWnd::SetVisBGVtk)
 	EVT_COMBOBOX(IDC_colBGVtk, MainWnd::SetColBGVtk)
+	EVT_COMBOBOX(IDC_repBGVtk, MainWnd::SetRepBGVtk)
 	EVT_CHECKBOX(IDC_visFGVtk, MainWnd::SetVisFGVtk)
 	EVT_COMBOBOX(IDC_colFGVtk, MainWnd::SetColFGVtk)
+	EVT_COMBOBOX(IDC_repFGVtk, MainWnd::SetRepFGVtk)
 	EVT_CHECKBOX(IDC_ParaProj, MainWnd::OnParaProj)
 	EVT_CHECKBOX(IDC_SegmCbar, MainWnd::OnSegmCbar)
 	EVT_CHECKBOX(IDC_AmplCbar, MainWnd::OnAmplCbar)
@@ -316,7 +319,7 @@ void MainWnd::Init()
 #ifdef JMU_ICPVTK
 	_buttICP = new wxButton(_bgPanel, IDB_icpVtk, wxT("ICP") );
 	_visICP = new wxCheckBox(_bgPanel, IDC_visICP, wxT("Hide"));
-	wxString colICP[] = { wxT("Depth (Z)"), wxT("Amplitude"), wxT("Segmentation")};
+	wxString colICP[] = { wxT("Depth (Z)"), wxT("Ampl."), wxT("Segm.")};
 	_colICP=  new wxComboBox(_bgPanel, IDC_colICP, wxT("Amplitude"),
 		   wxDefaultPosition, wxDefaultSize, 3, colICP, wxCB_READONLY);
 	_icpTrlCM= new wxCheckBox(_bgPanel, IDC_icpTrlCM, wxT("Match center of mass"));
@@ -427,8 +430,10 @@ void MainWnd::AddChildren()
 #ifdef JMU_USE_VTK
 	_vtkWin = new CViewSrVtk(NULL, 440,50,1024,768);
 
-	wxString colors[] = { wxT("Depth (Z)"), wxT("Amplitude"), wxT("Segmentation"), wxT("red"),
+	wxString colors[] = { wxT("Depth (Z)"), wxT("Ampl."), wxT("Segm."), wxT("red"),
         wxT("green"), wxT("blue"), wxT("white"), wxT("black") };
+
+	wxString reprVtk[] = { wxT("Pts."), wxT("Surf") };
 #endif
 
 	//! - for the max number of cameras ...
@@ -458,24 +463,48 @@ void MainWnd::AddChildren()
 			wxDefaultPosition, wxDefaultSize, 8, colors, wxCB_READONLY);
 		_sizerCamVisCol->Add(colBox, wxGBPosition(i,1));
 		_colVtk.push_back(colBox);
+		wxComboBox* repBox = new wxComboBox(_bgPanel, IDC_repVtk, wxT("Pts."),
+			wxDefaultPosition, wxDefaultSize, 2, reprVtk, wxCB_READONLY);
+		_sizerCamVisCol->Add(repBox, wxGBPosition(i,2));
+		_repVtk.push_back(repBox);
+		wxSlider* alpSli = new wxSlider(_bgPanel, IDC_alpVtk, 10, 0, 10, 
+			wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL);// | wxSL_AUTOTICKS | wxSL_LABELS );
+		_sizerCamVisCol->Add(alpSli, wxGBPosition(i,3));
+		_alpVtk.push_back(alpSli);
 		// labBGT.sprintf(wxT("BGcam %i"), i); // ... change cam BG nickname ...
 		wxCheckBox *chkBGBox = new wxCheckBox(_bgPanel, IDC_visBGVtk, labBGT);	
 		chkBGBox->SetValue(true);
-		_sizerCamVisCol->Add(chkBGBox, wxGBPosition(i,2));
+		_sizerCamVisCol->Add(chkBGBox, wxGBPosition(i,4));
 		_visBGVtk.push_back(chkBGBox);	// add visibility checkbox to container
 		wxComboBox* colBGBox = new wxComboBox(_bgPanel, IDC_colBGVtk, wxT("Depth (Z)"),
 			wxDefaultPosition, wxDefaultSize, 8, colors, wxCB_READONLY);
-		_sizerCamVisCol->Add(colBGBox, wxGBPosition(i,3));
+		_sizerCamVisCol->Add(colBGBox, wxGBPosition(i,5));
 		_colBGVtk.push_back(colBGBox);
+		wxComboBox* repBGBox = new wxComboBox(_bgPanel, IDC_repBGVtk, wxT("Surf"),
+			wxDefaultPosition, wxDefaultSize, 2, reprVtk, wxCB_READONLY);
+		_sizerCamVisCol->Add(repBGBox, wxGBPosition(i,6));
+		_repBGVtk.push_back(repBGBox);
+		wxSlider* alpBGSli = new wxSlider(_bgPanel, IDC_alpBGVtk, 3, 0, 10, 
+			wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL);// | wxSL_AUTOTICKS | wxSL_LABELS );
+		_sizerCamVisCol->Add(alpBGSli, wxGBPosition(i,7));
+		_alpBGVtk.push_back(alpBGSli);
 		// labFGT.sprintf(wxT("FGcam %i"), i); // ... change cam FG nickname ...
 		wxCheckBox *chkFGBox = new wxCheckBox(_bgPanel, IDC_visFGVtk, labFGT);	
 		chkFGBox->SetValue(true);
-		_sizerCamVisCol->Add(chkFGBox, wxGBPosition(i,4));
+		_sizerCamVisCol->Add(chkFGBox, wxGBPosition(i,8));
 		_visFGVtk.push_back(chkFGBox);	// add visibility checkbox to container
 		wxComboBox* colFGBox = new wxComboBox(_bgPanel, IDC_colFGVtk, wxT("Amplitude"),
 			wxDefaultPosition, wxDefaultSize, 8, colors, wxCB_READONLY);
-		_sizerCamVisCol->Add(colFGBox, wxGBPosition(i,5));
+		_sizerCamVisCol->Add(colFGBox, wxGBPosition(i,9));
 		_colFGVtk.push_back(colFGBox);
+		wxComboBox* repFGBox = new wxComboBox(_bgPanel, IDC_repFGVtk, wxT("Surf"),
+			wxDefaultPosition, wxDefaultSize, 2, reprVtk, wxCB_READONLY);
+		_sizerCamVisCol->Add(repFGBox, wxGBPosition(i,10));
+		_repFGVtk.push_back(repFGBox);
+		wxSlider* alpFGSli = new wxSlider(_bgPanel, IDC_alpFGVtk, 2, 0, 10, 
+			wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL);// | wxSL_AUTOTICKS | wxSL_LABELS );
+		_sizerCamVisCol->Add(alpFGSli, wxGBPosition(i,11));
+		_alpFGVtk.push_back(alpFGSli);
 		// labSegmT.sprintf(wxT("Segm. %i"), i); // ... change cam Segm nickname ...
 		/*wxCheckBox *chkSegmBox = new wxCheckBox(_bgPanel, IDC_visVtk, labSegmT);	
 		chkSegmBox->SetValue(true);
@@ -832,21 +861,20 @@ void MainWnd::SetColVtkIdx(std::vector<wxComboBox*> colCmbBox, std::vector<CamFr
 		  itCtrl++, itCam++, i++ )
 	{
 		if(!_vtkWin){return;};
-		/* wxString colors[] = { wxT("Depth (Z)"), wxT("Amplitude"), wxT("Segmentation"), wxT("red"),
+		/* wxString colors[] = { wxT("Depth (Z)"), wxT("Ampl."), wxT("Segm."), wxT("red"),
         wxT("green"), wxT("blue"), wxT("white"), wxT("black") };*/
 		wxString strCol = (*itCtrl)->GetValue();
-		double r, g, b; r=0.0; g=0.0; b=0.0;
 		if(  strCol.IsSameAs(wxT("Depth (Z)"))  )
 		{
 			(*itCam)->setDataMapperColorDepth(idx);
 			SetZMin(_zMin); // trick to update data Mapper
 		}
-		if(  strCol.IsSameAs(wxT("Amplitude"))  )
+		if(  strCol.IsSameAs(wxT("Amp."))  )
 		{
 			(*itCam)->setDataMapperColorGray(idx);
 			SetAmpMin(_ampMin); // trick to update data Mapper
 		}
-		if(  strCol.IsSameAs(wxT("Segmentation"))  )
+		if(  strCol.IsSameAs(wxT("Segm."))  )
 		{
 			(*itCam)->setDataMapperColorSegm(idx);
 			SetSegMin(_segmMin); // trick to update data Mapper
@@ -863,41 +891,105 @@ void MainWnd::SetColVtkIdx(std::vector<wxComboBox*> colCmbBox, std::vector<CamFr
 	}
 }
 #endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+/* acting on colVTK radio box*/
+void MainWnd::SetRepVtk(wxCommandEvent& event)
+{
+	SetRepVtkIdx(_repVtk, m_camFrm,0);
+	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+/* acting on colVTK radio box*/
+void MainWnd::SetRepBGVtk(wxCommandEvent& event)
+{
+	SetRepVtkIdx(_repBGVtk, m_camFrm,1);
+	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+/* acting on colVTK radio box*/
+void MainWnd::SetRepFGVtk(wxCommandEvent& event)
+{
+	SetRepVtkIdx(_repFGVtk, m_camFrm,2);
+	_vtkWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
+}
+#endif // JMU_USE_VTK
+#ifdef JMU_USE_VTK
+/* acting on colVTK radio box*/
+void MainWnd::SetRepVtkIdx(std::vector<wxComboBox*> repCmbBox, std::vector<CamFrame*> camFrm, int idx)
+{
+	int i = 0;
+	std::vector<wxComboBox*>::iterator itRep;  // get iterator on the controls
+	std::vector<CamFrame*>::iterator itCam;  // get iterator on the camera frames
+	for ( itRep  =repCmbBox.begin(), itCam  =camFrm.begin();
+		  itRep !=repCmbBox.end()  , itCam !=camFrm.end(); 
+		  itRep++, itCam++, i++ )
+	{
+		if(!_vtkWin){return;};
+		/* wxString reprVtk[] = { wxT("Pts."), wxT("Surf") };*/
+		wxString strRep = (*itRep)->GetValue();
+		if(  strRep.IsSameAs(wxT("Pts."))  )
+		{
+			(*itCam)->setDataMapperRepPts(idx);
+		}
+		if(  strRep.IsSameAs(wxT("Surf"))  )
+		{
+			(*itCam)->setDataMapperRepSurf(idx);
+		}
+	}
+}
+#endif // JMU_USE_VTK
 /* remove CamFrame object from list if window is closed */
 void MainWnd::PopCam(int vtkSub)
 {
 #ifdef JMU_USE_VTK
 	int i = 0;
-	std::vector<wxComboBox*>::iterator itCtrl;  // get iterator on the controls
-	std::vector<wxCheckBox*>::iterator itCtrl2;  // get iterator on the controls
-	std::vector<wxComboBox*>::iterator itCtrl3;  // get iterator on the controls
-	std::vector<wxCheckBox*>::iterator itCtrl4;  // get iterator on the controls
-	std::vector<wxComboBox*>::iterator itCtrl5;  // get iterator on the controls
-	std::vector<wxCheckBox*>::iterator itCtrl6;  // get iterator on the controls
+	std::vector<wxComboBox*>::iterator itCol;    // get iterator on the controls
+	std::vector<wxCheckBox*>::iterator itVis;    // get iterator on the controls
+	std::vector<wxComboBox*>::iterator itRep;    // get iterator on the controls
+	std::vector<wxSlider*>::iterator   itAlp;    // get iterator on the controls
+	std::vector<wxComboBox*>::iterator itBGcol;  // get iterator on the controls
+	std::vector<wxCheckBox*>::iterator itBGvis;  // get iterator on the controls
+	std::vector<wxComboBox*>::iterator itBGrep;  // get iterator on the controls
+	std::vector<wxSlider*>::iterator   itBGalp;  // get iterator on the controls
+	std::vector<wxComboBox*>::iterator itFGcol;  // get iterator on the controls
+	std::vector<wxCheckBox*>::iterator itFGvis;  // get iterator on the controls
+	std::vector<wxComboBox*>::iterator itFGrep;  // get iterator on the controls
+	std::vector<wxSlider*>::iterator   itFGalp;  // get iterator on the controls
 	//std::vector<wxComboBox*>::iterator itCtrl7;  // get iterator on the controls
 	//std::vector<wxCheckBox*>::iterator itCtrl8;  // get iterator on the controls
 	std::vector<CamFrame*>::iterator itCam;  // get iterator on the camera frames
-	for ( itCtrl  =_colVtk.begin()  , itCtrl2  =_visVtk.begin()  , 
-		  itCtrl3 =_colBGVtk.begin(), itCtrl4  =_visBGVtk.begin(), 
-		  itCtrl5 =_colFGVtk.begin(), itCtrl6  =_visFGVtk.begin(), 
+	for ( itCol   =_colVtk.begin()  , itVis   =_visVtk.begin()  , itRep   =_repVtk.begin()  , itAlp   =_alpVtk.begin()  ,
+		  itBGcol =_colBGVtk.begin(), itBGvis =_visBGVtk.begin(), itBGrep =_repBGVtk.begin(), itBGalp =_alpBGVtk.begin(),
+		  itFGcol =_colFGVtk.begin(), itFGvis =_visFGVtk.begin(), itFGrep =_repFGVtk.begin(), itFGalp =_alpFGVtk.begin(), 
 		  //itCtrl7 =_colSegmVtk.begin(), itCtrl8  =_visSegmVtk.begin(), 
 		  itCam  =m_camFrm.begin();
-		  itCtrl  !=_colVtk.end()   , itCtrl2 !=_visVtk.end()  ,
-	      itCtrl3 !=_colBGVtk.end() , itCtrl4 !=_visBGVtk.end(),
-		  itCtrl5 !=_colFGVtk.end() , itCtrl6 !=_visFGVtk.end(),
+		  itCol   !=_colVtk.end()   , itVis   !=_visVtk.end()  , itRep   !=_repVtk.end()  , itAlp   !=_alpVtk.end(),
+	      itBGcol !=_colBGVtk.end() , itBGvis !=_visBGVtk.end(), itBGrep !=_repBGVtk.end(), itBGalp !=_alpBGVtk.end(),
+		  itFGcol !=_colFGVtk.end() , itFGvis !=_visFGVtk.end(), itFGrep !=_repFGVtk.end(), itFGalp !=_alpFGVtk.end(),
 		  //itCtrl7 !=_colSegmVtk.end() , itCtrl8 !=_visSegmVtk.end(),
 		  itCam !=m_camFrm.end(); 
-		  itCtrl++, itCtrl2++, itCtrl3++, itCtrl4++,itCtrl5++, itCtrl6++,/*itCtrl7++, itCtrl8++,*/ itCam++, i++ )
+		  itCol++  , itVis++  , itRep++  , itAlp++  ,
+		  itBGcol++, itBGvis++, itBGrep++, itBGalp++,
+		  itFGcol++, itFGvis++, itFGrep++, itFGalp++,
+		  /*itCtrl7++, itCtrl8++,*/ itCam++, i++ )
 	{
 		if( (*itCam)->GetVtkSub() == vtkSub)
 		{
 			m_camFrm.erase(itCam);
-			(*itCtrl )->Disable(); _colVtk.erase(itCtrl ); 
-			(*itCtrl2)->Disable(); _visVtk.erase(itCtrl2); 
-			(*itCtrl3)->Disable(); _colBGVtk.erase(itCtrl3); 
-			(*itCtrl4)->Disable(); _visBGVtk.erase(itCtrl4); 
-			(*itCtrl5)->Disable(); _colFGVtk.erase(itCtrl5);
-			(*itCtrl6)->Disable(); _visFGVtk.erase(itCtrl6);
+			(*itCol  )->Disable(); _colVtk.erase(itCol); 
+			(*itVis  )->Disable(); _visVtk.erase(itVis); 
+			(*itRep  )->Disable(); _repVtk.erase(itRep); 
+			(*itAlp  )->Disable(); _alpVtk.erase(itAlp); 
+			(*itBGcol)->Disable(); _colBGVtk.erase(itBGcol); 
+			(*itBGvis)->Disable(); _visBGVtk.erase(itBGvis);
+			(*itBGrep)->Disable(); _repBGVtk.erase(itBGrep); 
+			(*itBGalp)->Disable(); _alpBGVtk.erase(itBGalp);
+			(*itFGcol)->Disable(); _colFGVtk.erase(itFGcol);
+			(*itFGvis)->Disable(); _visFGVtk.erase(itFGvis);
+			(*itFGrep)->Disable(); _repFGVtk.erase(itFGrep); 
+			(*itFGalp)->Disable(); _alpFGVtk.erase(itFGalp);
 			//(*itCtrl7)->Disable(); _colSegmVtk.erase(itCtrl8);
 			//(*itCtrl8)->Disable(); _visSegmVtk.erase(itCtrl8);
 			_icpIdxSrc->Enable(vtkSub, false);
@@ -979,19 +1071,19 @@ void MainWnd::SetVisICP(wxCommandEvent& event)
 #ifdef JMU_ICPVTK
 void MainWnd::SetColICP(wxCommandEvent& event)
 {
-	/* wxString colICP[] = { wxT("Depth (Z)"), wxT("Amplitude"), wxT("Segmentation") };*/
+	/* wxString colICP[] = { wxT("Depth (Z)"), wxT("Ampl."), wxT("Segm.") };*/
 		wxString strCol = _colICP->GetValue();
 		if(  strCol.IsSameAs(wxT("Depth (Z)"))  )
 		{
 			_vtkWin->setICPColorDepth();
 			SetZMin(_zMin); // trick to update data Mapper
 		}
-		if(  strCol.IsSameAs(wxT("Amplitude"))  )
+		if(  strCol.IsSameAs(wxT("Amp."))  )
 		{
 			_vtkWin->setICPColorGray();
 			SetAmpMin(_ampMin); // trick to update data Mapper
 		}
-		if(  strCol.IsSameAs(wxT("Segmentation"))  )
+		if(  strCol.IsSameAs(wxT("Segm."))  )
 		{
 			_vtkWin->setICPColorSegm();
 			SetSegMin(_segmMin); // trick to update data Mapper
