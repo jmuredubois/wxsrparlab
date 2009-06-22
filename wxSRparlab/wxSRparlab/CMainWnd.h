@@ -60,10 +60,16 @@ public:
 	void TextChangedSegMax(wxCommandEvent &); //!< react on event changed max seg
 	void SetVisVtk(wxCommandEvent& event); //!< react on event changed visibility
 	void SetColVtk(wxCommandEvent& event); //!< react on event changed color options
+	void SetRepVtk(wxCommandEvent& event); //!< react on event changed visibility
+	void SetAlpVtk(wxCommandEvent& event); //!< react on event changed color options
 	void SetVisBGVtk(wxCommandEvent& event); //!< react on event changed visibility BG
 	void SetColBGVtk(wxCommandEvent& event); //!< react on event changed color options BG
+	void SetRepBGVtk(wxCommandEvent& event); //!< react on event changed visibility
+	void SetAlpBGVtk(wxCommandEvent& event); //!< react on event changed color options
 	void SetVisFGVtk(wxCommandEvent& event); //!< react on event changed visibility FG
 	void SetColFGVtk(wxCommandEvent& event); //!< react on event changed color options FG
+	void SetRepFGVtk(wxCommandEvent& event); //!< react on event changed visibility
+	void SetAlpFGVtk(wxCommandEvent& event); //!< react on event changed color options
 	void OnParaProj(wxCommandEvent& event); //! Set projection to parallel or perpective
 	void OnRendTimer(wxTimerEvent& event); //! Render timer event action
 	CViewSrVtk* GetVtkWin(){return _vtkWin;} ; //!< pointer to vtk window
@@ -124,6 +130,8 @@ private:
 	wxGridBagSizer *_sizerCamVisCol;
 	void SetVisVtkIdx(std::vector<wxCheckBox*> visChkBox, std::vector<CamFrame*> camFrm, int idx); //!< react on event changed visibility
 	void SetColVtkIdx(std::vector<wxComboBox*> colCmbBox, std::vector<CamFrame*> camFrm, int idx);  //!< react on event changed colormap
+	void SetRepVtkIdx(std::vector<wxComboBox*> repCmbBox, std::vector<CamFrame*> camFrm, int idx);  //!< react on event changed colormap
+	void SetAlpVtkIdx(std::vector<wxSlider*>   alpSliBox, std::vector<CamFrame*> camFrm, int idx);  //!< react on event changed colormap
 	wxCheckBox* _ckParaProj; //! Parallel projection button
 	wxTimer	_renderTimer; //! timer for rendering events
 	int _rendTgt; //! target rendering time in ms
