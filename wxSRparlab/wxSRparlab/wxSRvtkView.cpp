@@ -691,10 +691,12 @@ wxString CViewSrVtk::icpFct(std::vector<CamFrame*>* camFrms, int idxSrc, int src
 	{
 		//if(_icpGrid != NULL){_icpGrid->Delete();};
 		_icpGrid = ptsSetICP;
-		_icpMapperAmp->SetInput(_icpGrid); 
 		_icpMapperZ->SetInput(_icpGrid); 
-		_icpMapperSegm->SetInput(_icpGrid); 
+		_icpMapperAmp->SetInput(_icpGrid); 
+		_icpMapperSegm->SetInput(_icpGrid);
+		_icpMapperZ->Modified();
 		_icpMapperAmp->Modified();
+		_icpMapperSegm->Modified();
 		_icpActor->SetMapper(_icpMapperAmp); // ? necessary -> seems so
 		_icpActor->Modified();
 		//_icpToPoly->SetInput(ptsSetICP);
@@ -730,20 +732,19 @@ void CViewSrVtk::hideICPact(bool doHide)
 #ifdef JMU_ICPVTK
 void CViewSrVtk::setICPColorDepth()
 {
-	_icpMapperZ->GetInput()->GetPointData()->SetActiveScalars("Depth");// does not work
+	//_icpMapperZ->GetInput()->GetPointData()->SetActiveScalars("Depth");// does not work
 	//_icpMapperZ->SetLookupTable(depthLUT);
 	_icpActor->SetMapper(_icpMapperZ);
-
 }
 void CViewSrVtk::setICPColorGray()
 {
-	_icpMapperAmp->GetInput()->GetPointData()->SetActiveScalars("Amplitude"); // does not work
+	//_icpMapperAmp->GetInput()->GetPointData()->SetActiveScalars("Amplitude"); // does not work
 	//_icpMapperAmp->SetLookupTable(grayLUT);
 	_icpActor->SetMapper(_icpMapperAmp);
 }
 void CViewSrVtk::setICPColorSegm()
 {
-	_icpMapperSegm->GetInput()->GetPointData()->SetActiveScalars("Segmentation"); // does not work
+	//_icpMapperSegm->GetInput()->GetPointData()->SetActiveScalars("Segmentation"); // does not work
 	//_icpMapperSegm->SetLookupTable(segmLUT);
 	_icpActor->SetMapper(_icpMapperSegm);
 }
