@@ -78,8 +78,10 @@ public:
 	void OnDepthCbar(wxCommandEvent& event); //! Display or hide depth colorbar
 	#ifdef JMU_ICPVTK
 	void OnICP(wxCommandEvent& event); //! try to use VTK's ICP
-	void SetVisICP(wxCommandEvent& event); // 
-	void SetColICP(wxCommandEvent& event); // 
+	void SetVisICP(wxCommandEvent& event); //!< react on event changed visibility
+	void SetColICP(wxCommandEvent& event); //!< react on event changed color options 
+	void SetRepICP(wxCommandEvent& event); //!< react on event changed visibility
+	void SetAlpICP(wxScrollEvent& event);  //!< react on event changed color options
 	void TextICPiter(wxCommandEvent& ); //
 	//void SetICPtrlCM(wxCommandEvent& event); //
 	#endif
@@ -144,6 +146,8 @@ private:
 	wxButton* _buttICP; //! button for ICP
 	wxCheckBox* _visICP; //! Show ICP checkbox
 	wxComboBox* _colICP; //! ICP color combo box
+	wxComboBox* _repICP; //! ICP repr. combo box
+	wxSlider*   _alpICP; //! ICP alpha slider
 	wxCheckBox* _icpTrlCM; //! ICP zero center of mass flag
 	wxTextCtrl *_txtICPiter; //!< control txt : ICP iterations
 	int _icpIter;
@@ -195,6 +199,8 @@ enum MainWndEnum
 	IDC_icpTrlCM,
 	IDC_visICP,
 	IDC_colICP,
+	IDC_repICP,
+	IDC_alpICP,
 	IDC_repVtk,
 	IDC_alpVtk,
 	IDC_visBGVtk,
