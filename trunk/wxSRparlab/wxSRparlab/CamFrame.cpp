@@ -1285,7 +1285,7 @@ void CamFrame::RansacFollow()
 		mat4[r+c*4] = mat[k];
 	}
 	// translation along z, will allow to have all RANSAC planes at same Z, fixed now at 3000
-	mat4[14] = 3000 - pla.nVec[3]; // HARDCODED ALIGNMENT DEPTH 3000 mm
+	mat4[14] = 0000 - pla.nVec[3]; // HARDCODED ALIGNMENT DEPTH 3000 mm
   double* nVec = &(pla.nVec[0]);
   wxString strS; wxString strSParam; wxString strSResLine; wxString strSVec; wxString strSMat;
   strSParam.Printf(wxT(" Ransac LOOPED %02i times - %05i outliers: %05i iterations - Inlier dist threshold: %04g mm. \n"), _rscSucc, pla.outliers.size(), iterMax, distPla); 
