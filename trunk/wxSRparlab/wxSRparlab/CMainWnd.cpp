@@ -126,6 +126,8 @@ BEGIN_EVENT_TABLE(MainWnd, wxFrame)
 	EVT_TEXT(IDT_icpIter, MainWnd::TextICPiter)
 	EVT_CHECKBOX(IDC_visICP, MainWnd::SetVisICP)
 	EVT_COMBOBOX(IDC_colICP, MainWnd::SetColICP)
+	EVT_COMBOBOX(IDC_repICP, MainWnd::SetRepICP)
+	EVT_COMMAND_SCROLL_THUMBRELEASE(IDC_alpICP, MainWnd::SetAlpICP)
 	#endif
 	#ifdef JMU_KDTREEVTK
 	EVT_BUTTON(IDB_kdDistVtk, MainWnd::OnKdDist)
@@ -192,6 +194,7 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
 	#ifdef JMU_ICPVTK
 		_buttICP = NULL;
 		_visICP = NULL; _colICP= NULL; _icpTrlCM= NULL; _txtICPiter=NULL; 
+		_repICP=NULL; _alpICP=NULL;
 		_icpIter=20;
 		_icpSrc = NULL; _icpTgt = NULL;
 		_icpIdxSrc = NULL; _icpIdxTgt = NULL;
@@ -320,11 +323,17 @@ void MainWnd::Init()
 		//labT.sprintf(wxT("Cam %i"), i); // ... change cam nickname ...
 	}
 #ifdef JMU_ICPVTK
+	wxSize sizeSli = wxSize(75,30);
 	_buttICP = new wxButton(_bgPanel, IDB_icpVtk, wxT("ICP") );
 	_visICP = new wxCheckBox(_bgPanel, IDC_visICP, wxT("Hide"));
 	wxString colICP[] = { wxT("Depth (Z)"), wxT("Ampl."), wxT("Segm.")};
+	wxString reprVtk[] = { wxT("Pts."), wxT("Surf")};
 	_colICP=  new wxComboBox(_bgPanel, IDC_colICP, wxT("Ampl."),
 		   wxDefaultPosition, wxDefaultSize, 3, colICP, wxCB_READONLY);
+	_repICP = new wxComboBox(_bgPanel, IDC_repICP, wxT("Pts."),
+			wxDefaultPosition, wxDefaultSize, 2, reprVtk, wxCB_READONLY);
+	_alpICP = new wxSlider(_bgPanel, IDC_alpICP, 10, 0, 10, 
+			wxDefaultPosition, sizeSli, wxSL_HORIZONTAL | wxSL_AUTOTICKS );//| wxSL_LABELS );
 	_icpTrlCM= new wxCheckBox(_bgPanel, IDC_icpTrlCM, wxT("Match center of mass"));
 	wxStaticText* icpIterLabel = new wxStaticText(_bgPanel, wxID_ANY, wxT("ICP iter.")); 
 	_txtICPiter=new wxTextCtrl( _bgPanel, IDT_icpIter, wxString::Format(wxT("%i"), _icpIter) );
@@ -338,16 +347,18 @@ void MainWnd::Init()
 			wxDefaultPosition, wxDefaultSize, NUMCAMS, strCams);
 
 	wxBoxSizer *sizerICPopt = new wxBoxSizer(wxHORIZONTAL); // create sizer ICPoptions
-	    sizerICPopt->Add(icpIterLabel,flagsNoExpand);
-	    sizerICPopt->Add(_txtICPiter,flagsNoExpand);
-		sizerICPopt->Add(_icpTrlCM,flagsNoExpand);
-		sizerICPopt->Add(_visICP,flagsNoExpand);
-		sizerICPopt->Add(_colICP,flagsNoExpand);
+	    sizerICPopt->Add(icpIterLabel);
+	    sizerICPopt->Add(_txtICPiter);
+		sizerICPopt->Add(_icpTrlCM);
+		sizerICPopt->Add(_visICP);
+		sizerICPopt->Add(_colICP);
+		sizerICPopt->Add(_repICP);
+		sizerICPopt->Add(_alpICP);
 	wxBoxSizer *sizerICP = new wxBoxSizer(wxHORIZONTAL); // create sizer ICP params
-		sizerICP->Add(_buttICP, flagsNoExpand);
-		sizerICP->Add(_icpIdxSrc , flagsExpand);
+		sizerICP->Add(_buttICP, flagsExpand);
+		sizerICP->Add(_icpIdxSrc);
 		sizerICP->Add(_icpSrc , flagsExpand);
-		sizerICP->Add(_icpIdxTgt , flagsExpand);
+		sizerICP->Add(_icpIdxTgt );
 		sizerICP->Add(_icpTgt , flagsExpand);
 
 	sizerVtk0->Add(sizerICPopt, flagsNoExpand);
@@ -366,9 +377,9 @@ void MainWnd::Init()
 
 	wxBoxSizer *sizerKdDist = new wxBoxSizer(wxHORIZONTAL); // create sizer KdDist params
 		sizerKdDist->Add(_buttKdDistVtk, flagsExpand);
-		sizerKdDist->Add(_kdDistIdxSrc , flagsExpand);
+		sizerKdDist->Add(_kdDistIdxSrc );
 		sizerKdDist->Add(_kdDistSrc    , flagsExpand);
-		sizerKdDist->Add(_kdDistIdxTgt , flagsExpand);
+		sizerKdDist->Add(_kdDistIdxTgt );
 		sizerKdDist->Add(_kdDistTgt    , flagsExpand);
 
 	sizerVtk0->Add(sizerKdDist, flagsExpand);
@@ -457,6 +468,7 @@ void MainWnd::AddChildren()
 		pos += incr; //... increment position.
 
 #ifdef JMU_USE_VTK
+		wxSize sizeSli = wxSize(75,30);
 		//llabT.sprintf(wxT("Cam %i"), i); // ... change cam nickname ...
 		wxCheckBox *chkBox = new wxCheckBox(_bgPanel, IDC_visVtk, labT);	
 		chkBox->SetValue(true);
@@ -471,7 +483,7 @@ void MainWnd::AddChildren()
 		_sizerCamVisCol->Add(repBox, wxGBPosition(i,2));
 		_repVtk.push_back(repBox);
 		wxSlider* alpSli = new wxSlider(_bgPanel, IDC_alpVtk, 10, 0, 10, 
-			wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_AUTOTICKS );//| wxSL_LABELS );
+			wxDefaultPosition, sizeSli, wxSL_HORIZONTAL | wxSL_AUTOTICKS );//| wxSL_LABELS );
 		_sizerCamVisCol->Add(alpSli, wxGBPosition(i,3));
 		_alpVtk.push_back(alpSli);
 		// labBGT.sprintf(wxT("BGcam %i"), i); // ... change cam BG nickname ...
@@ -488,7 +500,7 @@ void MainWnd::AddChildren()
 		_sizerCamVisCol->Add(repBGBox, wxGBPosition(i,6));
 		_repBGVtk.push_back(repBGBox);
 		wxSlider* alpBGSli = new wxSlider(_bgPanel, IDC_alpBGVtk, 3, 0, 10, 
-			wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_AUTOTICKS );//| wxSL_LABELS );
+			wxDefaultPosition, sizeSli, wxSL_HORIZONTAL | wxSL_AUTOTICKS );//| wxSL_LABELS );
 		_sizerCamVisCol->Add(alpBGSli, wxGBPosition(i,7));
 		_alpBGVtk.push_back(alpBGSli);
 		// labFGT.sprintf(wxT("FGcam %i"), i); // ... change cam FG nickname ...
@@ -505,7 +517,7 @@ void MainWnd::AddChildren()
 		_sizerCamVisCol->Add(repFGBox, wxGBPosition(i,10));
 		_repFGVtk.push_back(repFGBox);
 		wxSlider* alpFGSli = new wxSlider(_bgPanel, IDC_alpFGVtk, 2, 0, 10, 
-			wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_AUTOTICKS);// | wxSL_LABELS );
+			wxDefaultPosition, sizeSli, wxSL_HORIZONTAL | wxSL_AUTOTICKS);// | wxSL_LABELS );
 		_sizerCamVisCol->Add(alpFGSli, wxGBPosition(i,11));
 		_alpFGVtk.push_back(alpFGSli);
 		// labSegmT.sprintf(wxT("Segm. %i"), i); // ... change cam Segm nickname ...
@@ -1135,8 +1147,37 @@ void MainWnd::SetColICP(wxCommandEvent& event)
 			_vtkWin->setICPColorSegm();
 			SetSegMin(_segmMin); // trick to update data Mapper
 		}
+	_vtkWin->Render();
 }
 #endif // JMU_ICPVTK
+#ifdef JMU_ICPVTK
+void MainWnd::SetRepICP(wxCommandEvent& event)
+{
+	/* wxString reprVtk[] = { wxT("Pts."), wxT("Surf") };*/
+		wxString strRep = _repICP->GetValue();
+		if(  strRep.IsSameAs(wxT("Pts."))  )
+		{
+			_vtkWin->setICPActRepPts();
+		}
+		if(  strRep.IsSameAs(wxT("Surf"))  )
+		{
+			_vtkWin->setICPActRepSurf();
+		}
+	_vtkWin->Render();
+}
+#endif // JMU_ICPVTK
+#ifdef JMU_USE_VTK
+/* acting on colVTK radio box*/
+void MainWnd::SetAlpICP(wxScrollEvent& event)
+{
+	/*wxSlider* alpSli = new wxSlider(_bgPanel, IDC_alpVtk, 10, 0, 10, 
+			wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL);// | wxSL_AUTOTICKS | wxSL_LABELS );*/
+	int alp = _alpICP->GetValue();
+	double alpha = (double) alp / 10; // values mapped in .1 increments from 0.0 to 1.0
+	_vtkWin->setICPActOpacity(alpha);
+	_vtkWin->Render();
+}
+#endif // JMU_USE_VTK
 #ifdef JMU_ICPVTK
 void MainWnd::TextICPiter(wxCommandEvent& )
 {
@@ -1154,11 +1195,6 @@ void MainWnd::TextICPiter(wxCommandEvent& )
 	}
 }
 #endif // JMU_ICPVTK
-//#ifdef JMU_ICPVTK
-//void MainWnd::SetICPtrlCM(wxCommandEvent& event)
-//{
-//}
-//#endif // JMU_ICPVTK
 #ifdef JMU_ICPVTK
 /** acting on "ICP" button \n
  * - bug: for now only first and last cam are used \n

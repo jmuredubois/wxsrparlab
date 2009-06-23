@@ -87,7 +87,7 @@ CViewSrVtk::CViewSrVtk(wxFrame* pWnd, int x, int y, int w, int h)
 		_icpMapperSegm->SetInput(_icpGrid);
 		//_icpMapperSegm->SetInputConnection(_icpToPoly->GetOutputPort());
 		_icpActor = vtkActor::New();
-		_icpActor->SetMapper(_icpMapperZ);
+		_icpActor->SetMapper(_icpMapperAmp);
 		_icpMapperZ->Register(_icpActor);
 		_icpMapperAmp->Register(_icpActor);
 		_icpMapperSegm->Register(_icpActor);
@@ -691,7 +691,10 @@ wxString CViewSrVtk::icpFct(std::vector<CamFrame*>* camFrms, int idxSrc, int src
 	{
 		//if(_icpGrid != NULL){_icpGrid->Delete();};
 		_icpGrid = ptsSetICP;
-		_icpMapperAmp->SetInput(_icpGrid); // ? necessary ->seems so
+		_icpMapperAmp->SetInput(_icpGrid); 
+		_icpMapperZ->SetInput(_icpGrid); 
+		_icpMapperSegm->SetInput(_icpGrid); 
+		_icpMapperAmp->Modified();
 		_icpActor->SetMapper(_icpMapperAmp); // ? necessary -> seems so
 		_icpActor->Modified();
 		//_icpToPoly->SetInput(ptsSetICP);
@@ -727,22 +730,39 @@ void CViewSrVtk::hideICPact(bool doHide)
 #ifdef JMU_ICPVTK
 void CViewSrVtk::setICPColorDepth()
 {
-	//_icpToPoly->GetOutput()->GetPointData()->SetActiveScalars("Depth"); // does not work
-	_icpMapperZ->SetLookupTable(depthLUT);
+	_icpMapperZ->GetInput()->GetPointData()->SetActiveScalars("Depth");// does not work
+	//_icpMapperZ->SetLookupTable(depthLUT);
 	_icpActor->SetMapper(_icpMapperZ);
 
 }
 void CViewSrVtk::setICPColorGray()
 {
-	//_icpToPoly->GetOutput(0)->GetPointData()->SetActiveScalars("Amplitude");
-	_icpMapperZ->SetLookupTable(grayLUT);
+	_icpMapperAmp->GetInput()->GetPointData()->SetActiveScalars("Amplitude"); // does not work
+	//_icpMapperAmp->SetLookupTable(grayLUT);
 	_icpActor->SetMapper(_icpMapperAmp);
 }
 void CViewSrVtk::setICPColorSegm()
 {
-	//_icpToPoly->GetOutput(0)->GetPointData()->SetActiveScalars("Segmentation");
-	_icpMapperZ->SetLookupTable(segmLUT);
+	_icpMapperSegm->GetInput()->GetPointData()->SetActiveScalars("Segmentation"); // does not work
+	//_icpMapperSegm->SetLookupTable(segmLUT);
 	_icpActor->SetMapper(_icpMapperSegm);
+}
+#endif // JMU_ICPVTK
+#ifdef JMU_ICPVTK
+void CViewSrVtk::setICPActOpacity(double alpha)
+{
+	if( (alpha >= 0.0) && (alpha <= 1.0))
+	{
+		_icpActor->GetProperty()->SetOpacity(alpha);
+	}
+}
+void CViewSrVtk::setICPActRepPts()
+{
+	_icpActor->GetProperty()->SetRepresentationToPoints();
+}
+void CViewSrVtk::setICPActRepSurf()
+{
+	_icpActor->GetProperty()->SetRepresentationToSurface();
 }
 #endif // JMU_ICPVTK
 #ifdef JMU_ICPVTK

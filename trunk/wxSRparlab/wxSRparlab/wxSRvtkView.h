@@ -108,6 +108,9 @@ public:
 	void setICPColorDepth();
 	void setICPColorGray();
 	void setICPColorSegm();
+	void setICPActOpacity(double alpha);
+	void setICPActRepPts();
+	void setICPActRepSurf();
 #endif
 #ifdef JMU_KDTREEVTK
 	double		kdDist(std::vector<CamFrame*>* camFrms, int idxSrc, int srcField, int idxTgt, int tgtField, double res[3]);
