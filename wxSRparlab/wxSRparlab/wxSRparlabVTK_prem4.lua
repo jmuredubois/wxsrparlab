@@ -38,6 +38,7 @@ project "wxSRparlabVTKPREM"
 	includedirs				{string.format('%s%s',os.getenv("JMU_SVNSANDBOX_TRUNK"), "/libSRPLcoordTrf")}
 	includedirs				{string.format('%s%s',os.getenv("JMU_SVNSANDBOX_TRUNK"), "/libSRPLsegm")}
 	includedirs				{string.format('%s%s',os.getenv("JMU_SVNSANDBOX_TRUNK"), "/libSRPLransac")}
+    includedirs				{string.format('%s%s',os.getenv("JMU_SVNSANDBOX_TRUNK"), "/libSRPLalign")}
 	
 	
 	includedirs				{
@@ -70,6 +71,7 @@ project "wxSRparlabVTKPREM"
 	configuration "vs*"
 		-- Windows and Visual C++ 2005/2008
 		defines					{ "_CRT_SECURE_NO_DEPRECATE" }
+        implibprefix 				"lib"
 
 	-- Release/Debug
 	-- Set the default targetName if none is specified.
@@ -85,7 +87,7 @@ project "wxSRparlabVTKPREM"
 		defines					{ "NDEBUG" }
 		flags					{ "OptimizeSpeed" }
 		links					{ "ticpp" }	-- link TICPP
-		links					{"SRPLscat", "SRPLavg", "SRPLcoordTrf", "SRPLsegm", "SRPLransac"}
+		links					{"SRPLscat", "SRPLavg", "SRPLcoordTrf", "SRPLsegm", "SRPLransac", "SRPLalignd"}
 		libdirs					{(string.format('%s%s',os.getenv("JMU_BUILDS"), "/Release/bin"))}
 	configuration "Debug"
 		targetname 				( outName.."d" )
@@ -95,7 +97,7 @@ project "wxSRparlabVTKPREM"
 		defines					{ "DEBUG", "_DEBUG" }
 		flags					{ "Symbols" }
 		links					{ "ticppd" }	-- link TICPP
-		links					{"SRPLscatd", "SRPLavgd", "SRPLcoordTrfd", "SRPLsegmd", "SRPLransacd"}
+		links					{"SRPLscatd", "SRPLavgd", "SRPLcoordTrfd", "SRPLsegmd", "SRPLransacd","SRPLalign"}
 		libdirs					{(string.format('%s%s',os.getenv("JMU_BUILDS"), "/Debug/bin"))}
 
 	-- -- Operating Systems specific
