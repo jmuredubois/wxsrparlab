@@ -71,7 +71,7 @@ void jmuDrawPanel::OnRightDclick(wxMouseEvent& event)
 	}
 	else
 	{
-		_parent->GetParentCamFrame()->AddAlignPt(cSR, rSR);
+		_parent->GetParentCamFrame()->AddAlignPt(rSR, cSR);
 	}
 }
 #endif

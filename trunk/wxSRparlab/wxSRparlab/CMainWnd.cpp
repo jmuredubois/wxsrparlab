@@ -133,6 +133,9 @@ BEGIN_EVENT_TABLE(MainWnd, wxFrame)
 	EVT_BUTTON(IDB_kdDistVtk, MainWnd::OnKdDist)
 	#endif
 #endif // JMU_USE_VTK
+#ifdef JMU_ALIGNGUI
+	EVT_BUTTON(IDB_aliPla, MainWnd::OnAlignPlans)
+#endif
 END_EVENT_TABLE()
 
 IMPLEMENT_APP(SrApp)
@@ -205,6 +208,11 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
 		_kdDistIdxSrc = NULL; _kdDistIdxTgt = NULL;
 	#endif
 #endif // JMU_USE_VTK
+#ifdef JMU_ALIGNGUI
+		_buttAliPla = NULL;
+		_AliPlaSrc = NULL   ; _AliPlaTgt = NULL;
+		_AliPlaIdxSrc = NULL; _AliPlaIdxTgt = NULL;
+#endif
 
 	wxString date1 = now.Format();
 	wxString strW = date1 + strM + strU + strP;
@@ -309,9 +317,6 @@ void MainWnd::Init()
 		sizerZAmpScales->Add( sizerAmpScale, flagsExpand);
 		sizerZAmpScales->Add( sizerSegScale, flagsExpand);
 		
-	#ifdef JMU_KDTREEVTK
-	
-	#endif
 	_ckParaProj = new wxCheckBox(_bgPanel, IDC_ParaProj, wxT("Parallel projection"));
 	wxBoxSizer *sizerVtk0 = new wxBoxSizer(wxVERTICAL); // create sizer for frame
 		sizerVtk0->Add(_ckParaProj, flagsExpand);
@@ -384,6 +389,27 @@ void MainWnd::Init()
 
 	sizerVtk0->Add(sizerKdDist, flagsExpand);
 #endif
+#ifdef JMU_ALIGNGUI
+	wxString srcAliPla[] = { wxT("1st plane +p"), wxT("2nd plane +p"), wxT("3rd plane +p"), wxT("3 planes Heb")};
+	_buttAliPla = new wxButton(_bgPanel, IDB_aliPla, wxT("AliPla") );
+	_AliPlaSrc = new wxComboBox(_bgPanel, IDC_aliPlaSrc, wxT("1st plane +p"),
+			wxDefaultPosition, wxDefaultSize, 4, srcAliPla, wxCB_READONLY);
+	_AliPlaTgt = new wxComboBox(_bgPanel, IDC_aliPlaTgt, wxT("1st plane +p"),
+			wxDefaultPosition, wxDefaultSize, 4, srcAliPla, wxCB_READONLY);
+	_AliPlaIdxSrc = new wxRadioBox(_bgPanel, IDC_aliPlaIdxSrc, wxT("Cam"),
+			wxDefaultPosition, wxDefaultSize, NUMCAMS, strCams);
+	_AliPlaIdxTgt = new wxRadioBox(_bgPanel, IDC_aliPlaIdxTgt, wxT("Cam"),
+			wxDefaultPosition, wxDefaultSize, NUMCAMS, strCams);
+
+	wxBoxSizer *sizerAliPla = new wxBoxSizer(wxHORIZONTAL); // create sizer AliPla params
+		sizerAliPla->Add(_buttAliPla, flagsExpand);
+		sizerAliPla->Add(_AliPlaIdxSrc );
+		sizerAliPla->Add(_AliPlaSrc    , flagsExpand);
+		sizerAliPla->Add(_AliPlaIdxTgt );
+		sizerAliPla->Add(_AliPlaTgt    , flagsExpand);
+
+	sizerVtk0->Add(sizerAliPla, flagsExpand);
+#endif // JMU_ALIGNGUI
 	_ckSegmCbar  = new wxCheckBox(_bgPanel, IDC_SegmCbar, wxT("Hide Segm. scale"));
 	_ckAmplCbar  = new wxCheckBox(_bgPanel, IDC_AmplCbar, wxT("Hide Ampl. scale"));
 	_ckDepthCbar = new wxCheckBox(_bgPanel, IDC_DepthCbar, wxT("Hide Depth. scale"));
@@ -409,8 +435,8 @@ void MainWnd::Init()
 		sizerPanel->Add(sizerAcqScales, wxGBPosition(6,0), wxGBSpan(2,4));
 #ifdef JMU_USE_VTK
 		//sizerPanel->Add(_ckParaProj, wxGBPosition(10,0), wxGBSpan(1,4));
-		sizerPanel->Add(sizerVtk0, wxGBPosition(8,0), wxGBSpan(1,4));
-		sizerPanel->Add(sizerCk, wxGBPosition(9,0), wxGBSpan(1,4));
+		sizerPanel->Add(sizerVtk0, wxGBPosition(8,0), wxGBSpan(3,4));
+		sizerPanel->Add(sizerCk, wxGBPosition(11,0), wxGBSpan(1,4));
 #endif // JMU_USE_VTK
 
 	wxBoxSizer *sizerFrame = new wxBoxSizer(wxVERTICAL); // create sizer for frame
@@ -1051,10 +1077,18 @@ void MainWnd::PopCam(int vtkSub)
 			(*itFGalp)->Disable(); _alpFGVtk.erase(itFGalp);
 			//(*itCtrl7)->Disable(); _colSegmVtk.erase(itCtrl8);
 			//(*itCtrl8)->Disable(); _visSegmVtk.erase(itCtrl8);
+		#ifdef JMU_ICPVTK
 			_icpIdxSrc->Enable(vtkSub, false);
 			_icpIdxTgt->Enable(vtkSub, false);
+		#endif
+		#ifdef JMU_KDTREEVTK
 			_kdDistIdxSrc->Enable(vtkSub, false);
 			_kdDistIdxTgt->Enable(vtkSub, false);
+		#endif
+		#ifdef JMU_ALIGNGUI
+			_AliPlaIdxSrc->Enable(vtkSub, false);
+			_AliPlaIdxTgt->Enable(vtkSub, false);
+		#endif
 			break;
 		}
 	}
@@ -1241,7 +1275,6 @@ void MainWnd::OnICP(wxCommandEvent& event)
  */
 void MainWnd::OnKdDist(wxCommandEvent& event)
 {
-	#ifdef JMU_KDTREEVTK
 	int idxTgt = _kdDistIdxTgt->GetSelection();
 	int tgtField = 0;
 	wxString strTgt = _kdDistTgt->GetValue();
@@ -1261,9 +1294,59 @@ void MainWnd::OnKdDist(wxCommandEvent& event)
 	double res[3]; res[0] = -1; res[1] = -1; res[2] = -1;
 	double eps = _vtkWin->kdDist(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, res);
 	wxString strDist;
-	strDist.sprintf(wxT("kdDist returned: %g - avg=%g - std=%g - eps=%g"), eps, res[1], res[2], res[0]);
+	strDist.Printf(wxT("kdDist returned: %g - avg=%g - std=%g - eps=%g"), eps, res[1], res[2], res[0]);
 	SetStatusText(strDist);
-	#endif //JMU_KDTREEVTK
 }
-#endif // JMU_USE_VTK
+#endif //JMU_KDTREEVTK
 
+#ifdef JMU_ALIGNGUI
+/** acting on "kdDist" button \n
+ * - bug: for now only first and last cam are used \n
+ * - todo: make dataset choice configurable
+ */
+void MainWnd::OnAlignPlans(wxCommandEvent& event)
+{
+	int idxTgt = _AliPlaIdxTgt->GetSelection();
+	int tgtField = 0;
+	wxString strTgt = _AliPlaTgt->GetValue();
+	if( strTgt.IsSameAs(wxT("1st plane +p")) ) {tgtField = 0;};
+	if( strTgt.IsSameAs(wxT("2nd plane +p")) ) {tgtField = 1;};
+	if( strTgt.IsSameAs(wxT("3rd plane +p")) ) {tgtField = 2;};
+	if( strTgt.IsSameAs(wxT("3 planes Heb")) ) {tgtField = 3;};
+
+	int idxSrc = _AliPlaIdxSrc->GetSelection();
+	wxString strSrc = _AliPlaSrc->GetValue();
+	int srcField = 0;
+	if( strSrc.IsSameAs(wxT("1st plane +p")) ) { srcField = 0;};
+	if( strSrc.IsSameAs(wxT("2nd plane +p")) ) { srcField = 1;};
+	if( strSrc.IsSameAs(wxT("3rd plane +p")) ) { srcField = 2;};
+	if( strSrc.IsSameAs(wxT("3 planes Heb")) ) { srcField = 3;};
+
+	wxString strAli;
+	strAli.Printf(wxT("AligPlans asked for params: TgtCam %i, field %i  -  SrcCam %i, field %i"),
+		                 idxTgt, tgtField, idxSrc, srcField);
+	SetStatusText(strAli);
+
+	std::vector<CamFrame*>::iterator it; 
+	CamFrame* srcAli = NULL; 
+	CamFrame* tgtAli = NULL;
+	for ( it=m_camFrm.begin() ; it != m_camFrm.end(); it++)
+	{
+		int camSub = (*it)->GetVtkSub();
+		if(camSub == idxSrc) { srcAli = (*it); };
+		if(camSub == idxTgt) { tgtAli = (*it); };
+	}
+	if( srcAli == NULL){ return ; };
+	if( tgtAli == NULL){ return ; };
+
+	int nptsTgt = tgtAli->GetAlignPtCnt();
+	int nptsSrc = srcAli->GetAlignPtCnt();
+
+	strAli.Printf(wxT("Alignment points defined: TgtCam %i: %02i pts  -  SrcCam %i: %02i pts"),
+		                 idxTgt, nptsTgt, idxSrc, nptsSrc);
+	SetStatusText(strAli);
+
+	/*double res[3]; res[0] = -1; res[1] = -1; res[2] = -1;
+	double eps = _vtkWin->kdDist(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, res);*/
+}
+#endif //JMU_ALIGNGUI

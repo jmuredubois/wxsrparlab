@@ -136,6 +136,9 @@ public:
 #endif
 #ifdef JMU_ALIGNGUI
 	void AddAlignPt(int row, int col);
+	int  GetAlignPtCnt(){return _aliPCnt;};
+	void GetAlignPoint(int idx, int &row, int &col, short &x, short &y, unsigned short &z);
+	RSCPLAN GetRansacPlane(int idx);
 #endif
 	void OnRecXYZ(wxCommandEvent& WXUNUSED(event));
 	void OnRecSeg(wxCommandEvent& WXUNUSED(event));
@@ -203,12 +206,12 @@ private:
 #ifdef JMU_RANSAC
 	SRPLRSC m_ransac;		// ransac object
 	unsigned char _rscSucc;			// counter for SUCCESSIVE ransac applications
-	RSCPLAN plaList[3];
 #endif
 #ifdef JMU_ALIGNGUI
-	int _aliPtsR[6];
-	int _aliPtsC[6];
+	int _aliPtsR[6]; int _aliPtsC[6];
+	short _aliPtsX[6]; short _aliPtsY[6]; unsigned short _aliPtsZ[6];
 	int _aliPCnt;
+	RSCPLAN plaAli[3];
 #endif
 	long _acqTime;
 	wxStopWatch* m_pAcqSWatch;

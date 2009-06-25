@@ -89,6 +89,9 @@ public:
 	void OnKdDist(wxCommandEvent& event); //!  point set distance based on VTK kd-tree
 	#endif
 #endif // JMU_USE_VTK
+#ifdef JMU_ALIGNGUI
+	void OnAlignPlans(wxCommandEvent& event); //!  aligment based on RANSAC plans
+#endif
 
 
     DECLARE_EVENT_TABLE()
@@ -164,6 +167,13 @@ private:
 	wxRadioBox* _kdDistIdxTgt;
 #endif
 #endif // JMU_USE_VTK
+#ifdef JMU_ALIGNGUI
+	wxButton* _buttAliPla; //! button for point set distance based on VTK kd-tree
+	wxComboBox* _AliPlaSrc;
+	wxComboBox* _AliPlaTgt;
+	wxRadioBox* _AliPlaIdxSrc;
+	wxRadioBox* _AliPlaIdxTgt;
+#endif // JMU_ALIGNGUI
 };
 
 //! enum used by main wnd
@@ -210,6 +220,11 @@ enum MainWndEnum
 	IDC_visFGVtk,
 	IDC_colFGVtk,
     IDC_repFGVtk,
-	IDC_alpFGVtk
+	IDC_alpFGVtk,
+	IDB_aliPla,
+	IDC_aliPlaSrc,
+	IDC_aliPlaTgt,
+	IDC_aliPlaIdxSrc,
+	IDC_aliPlaIdxTgt
 
 };
