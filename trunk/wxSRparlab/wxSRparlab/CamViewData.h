@@ -39,11 +39,12 @@ protected:
  * This class: \n
  * - displays GUI elements allowing to modify camera settings \n
  */
+class CamFrame;
 class CamViewData: public wxPanel //!< Camera view panel
 {
 public:
 	//! constructor
-    CamViewData( wxWindow* parent, const wxString& title, const wxPoint& pos, const wxSize& size);
+    CamViewData( wxWindow* parent, CamFrame* pCamFrame, const wxString& title, const wxPoint& pos, const wxSize& size);
 	//! destructor
 	~CamViewData();
 
@@ -51,8 +52,10 @@ public:
 	int InitViewData();
 	wxMutex* m_mutexDataArray;
 	wxMutex* m_mutexBitmap;
+	CamFrame* GetParentCamFrame(){ return _pCamFrame;};
 
 private:
+	CamFrame* _pCamFrame;
 	int AllocLUT(); /* initialize LUT */
 	int AllocRGBA(); /* initialize RGB and Alpha buffer */
 	int AllocDataArray(); /* initialize data buffer */
