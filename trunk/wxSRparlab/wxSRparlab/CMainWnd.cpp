@@ -1373,6 +1373,9 @@ void MainWnd::OnAlignPlans(wxCommandEvent& event)
 		  tgtAli->GetAlignPoint(k, r0[k], c0[k], x0[k], y0[k], z0[k]);
 		  srcAli->GetAlignPoint(k, r1[k], c1[k], x1[k], y1[k], z1[k]);
 	  }
+	  free(r0); free(c0); free(r1); free(c1);
+	  free(x0); free(y0); free(x1); free(y1); 
+	  free(z0); free(z1);
 	}
 
 
