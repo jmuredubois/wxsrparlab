@@ -147,7 +147,11 @@ CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos
 	_rscSucc = 0;
 #endif
 #ifdef JMU_ALIGNGUI
-	for(int k=0; k<6; k++){ _aliPtsR[k] = 0; _aliPtsC[k] = 0;};
+	for(int k=0; k<6; k++)
+	{ 
+		_aliPtsR[k] = 0; _aliPtsC[k] = 0;
+		_aliPtsX[k] = 0; _aliPtsY[k] = 0; _aliPtsZ[k] = 0;
+	}
 	_aliPCnt = 0;
 #endif
 }
@@ -1287,6 +1291,10 @@ void CamFrame::RansacFollow()
 	}
 	// translation along z, will allow to have all RANSAC planes at same Z, fixed now at 3000
 	mat4[14] = 0000 - pla.nVec[3]; // HARDCODED ALIGNMENT DEPTH 3000 mm
+  if((_rscSucc>=0) && (_rscSucc<3) )
+  {
+	  plaAli[_rscSucc]=pla;
+  }
   double* nVec = &(pla.nVec[0]);
   wxString strS; wxString strSParam; wxString strSResLine; wxString strSVec; wxString strSMat;
   strSParam.Printf(wxT(" Ransac LOOPED %02i times - %05i outliers: %05i iterations - Inlier dist threshold: %04g mm. \n"), _rscSucc, pla.outliers.size(), iterMax, distPla); 
@@ -1904,15 +1912,52 @@ int CamFrame::WriteCamTrfMat4(wxString fn, double mat4[16], wxString comments)
 #ifdef JMU_ALIGNGUI
 void CamFrame::AddAlignPt(int row, int col)
 {
-	if( (row > m_nRows) || (col > m_nCols)){ return;};
+	if( (row > m_nRows) || (col > m_nCols)){ 
+		return;
+	}
 	if( (_aliPCnt<0) || (_aliPCnt>=6) ){ _aliPCnt=0;}; // only 6 points desired, loop if more
 	_aliPtsR[_aliPCnt] = row;
 	_aliPtsC[_aliPCnt] = col;
-	_aliPCnt++;  // increment counter of valid points
+
+	unsigned short *zBGbuf = NULL; short *yBGbuf = NULL; short *xBGbuf = NULL;
+	zBGbuf = PLCTR_GetZ(m_CTrfBG);
+	yBGbuf = PLCTR_GetY(m_CTrfBG);
+	xBGbuf = PLCTR_GetX(m_CTrfBG);
+	short x, y; unsigned short z; x=0; y=0; z=0;
+	if((zBGbuf!=NULL) && (yBGbuf!=NULL) && (xBGbuf!=NULL) )
+	{
+	  int linPix = row*m_nCols+col; //col*(m_nRows)+row; //<- col major seems bad :-/
+	  z = zBGbuf[linPix];
+	  y = yBGbuf[linPix];
+	  x = xBGbuf[linPix];
+	}
+	_aliPtsZ[_aliPCnt] = z;
+	_aliPtsY[_aliPCnt] = y;
+	_aliPtsX[_aliPCnt] = x;
+
 	wxString resStr;
-	resStr.Printf(wxT("Alignment point %02i added: ( %03i, %03i)"), _aliPCnt-1, row, col);
+	resStr.Printf(wxT("Alignment point %02i added: ( %03i, %03i) -> (%+04i, %+04i, %+04i)"),
+		          _aliPCnt, row, col, x, y, z);
 	//m_settingsPane->SetText(resStr);
+	_aliPCnt++;  // increment counter of valid points
 	this->SetStatusText(resStr);
 }
 #endif
-
+#ifdef JMU_ALIGNGUI
+void CamFrame::GetAlignPoint(int idx, int &row, int &col, short &x, short &y, unsigned short &z)
+{
+	if( (idx<0) || (idx >= 6) || (idx>_aliPCnt) ){ return;};
+	row = _aliPtsR[idx];
+	col = _aliPtsC[idx];
+	z = _aliPtsZ[idx];
+	y = _aliPtsY[idx];
+	x = _aliPtsX[idx];
+}
+#endif
+#ifdef JMU_ALIGNGUI
+RSCPLAN CamFrame::GetRansacPlane(int idx)
+{
+	if( (idx <0) || (idx >= 3) ){ idx = 0;}; // DANGEROUS IF THE PLANES ARE NOT SET BEFROEHAND :-/
+	return plaAli[idx];
+}
+#endif
