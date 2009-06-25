@@ -212,6 +212,8 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
 		_buttAliPla = NULL;
 		_AliPlaSrc = NULL   ; _AliPlaTgt = NULL;
 		_AliPlaIdxSrc = NULL; _AliPlaIdxTgt = NULL;
+		m_Align = NULL;
+		PLALI_Open(&m_Align);
 #endif
 
 	wxString date1 = now.Format();
@@ -224,6 +226,9 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
 MainWnd::~MainWnd()
 {
 	if(m_pThreadReadDataSync != NULL){ m_pThreadReadDataSync->Delete(); }
+#ifdef JMU_ALIGNGUI
+		PLALI_Close(m_Align);
+#endif
 #ifdef JMU_USE_VTK
 	if(_vtkWin){ delete(_vtkWin); _vtkWin =NULL; };
 	_visVtk.clear();
@@ -1345,6 +1350,31 @@ void MainWnd::OnAlignPlans(wxCommandEvent& event)
 	strAli.Printf(wxT("Alignment points defined: TgtCam %i: %02i pts  -  SrcCam %i: %02i pts"),
 		                 idxTgt, nptsTgt, idxSrc, nptsSrc);
 	SetStatusText(strAli);
+
+	if((nptsTgt==nptsSrc) && (nptsTgt>2))
+	{
+	  int npts = nptsTgt;
+	  int *r0, *c0, *r1, *c1;
+	  r0 = (int*) malloc(npts*sizeof(int)); memset(r0, 0x0, npts*sizeof(int));
+	  c0 = (int*) malloc(npts*sizeof(int)); memset(c0, 0x0, npts*sizeof(int));
+	  r1 = (int*) malloc(npts*sizeof(int)); memset(r1, 0x0, npts*sizeof(int));
+	  c1 = (int*) malloc(npts*sizeof(int)); memset(c1, 0x0, npts*sizeof(int));
+	  short *x0, *y0, *x1, *y1;
+	  x0 = (short*) malloc(npts*sizeof(short)); memset(x0, 0x0, npts*sizeof(short));
+	  y0 = (short*) malloc(npts*sizeof(short)); memset(y0, 0x0, npts*sizeof(short));
+	  x1 = (short*) malloc(npts*sizeof(short)); memset(x1, 0x0, npts*sizeof(short));
+	  y1 = (short*) malloc(npts*sizeof(short)); memset(y1, 0x0, npts*sizeof(short));
+	  unsigned short *z0, *z1;
+	  z0 = (unsigned short*) malloc(npts*sizeof(unsigned short)); memset(z0, 0x0, npts*sizeof(unsigned short));
+	  z1 = (unsigned short*) malloc(npts*sizeof(unsigned short)); memset(z1, 0x0, npts*sizeof(unsigned short));
+
+	  for(int k=0; k<npts; k++)
+	  {
+		  tgtAli->GetAlignPoint(k, r0[k], c0[k], x0[k], y0[k], z0[k]);
+		  srcAli->GetAlignPoint(k, r1[k], c1[k], x1[k], y1[k], z1[k]);
+	  }
+	}
+
 
 	/*double res[3]; res[0] = -1; res[1] = -1; res[2] = -1;
 	double eps = _vtkWin->kdDist(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, res);*/

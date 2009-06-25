@@ -9,6 +9,7 @@
 #pragma once
 #include "wxSRparlab.h" //!< top-level header file
 #include "wxSrApp.h"	//!< this class header file
+#include "libSRPLalign.h"
 
 #define JMU_ICPVTK // testing ICP from VTK
 #define JMU_KDTREEVTK // testing KDTREE from VTK
@@ -173,6 +174,7 @@ private:
 	wxComboBox* _AliPlaTgt;
 	wxRadioBox* _AliPlaIdxSrc;
 	wxRadioBox* _AliPlaIdxTgt;
+	SRPLALI m_Align;
 #endif // JMU_ALIGNGUI
 };
 
