@@ -63,6 +63,8 @@ public:
 	/* Opening and closing */
 	void CloseView(wxCommandEvent& WXUNUSED(event)); //!< Closes the display
 	void StopView(wxCommandEvent& WXUNUSED(event));  //!< Disables the display
+	int GetNcols(){return m_nCols;};
+	int GetNrows(){return m_nRows;};
 
 	/* Changing interface buttons text */
 

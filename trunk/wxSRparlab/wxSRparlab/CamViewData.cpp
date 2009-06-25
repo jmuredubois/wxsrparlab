@@ -39,8 +39,36 @@ jmuDrawPanel::~jmuDrawPanel()
 void jmuDrawPanel::OnRightDclick(wxMouseEvent& event)
 {
 	wxPoint pos = event.GetPosition();
-	wxString text; text.Printf(wxT("Right double click detected at pos: (%04i - %04i)"),pos.x, pos.y);
+	/*m_DrawPanel->GetSize(&wP, &hP);
+		if( (wP<1) || (hP<1)) { errMutex = m_mutexBitmap->Unlock(); return res;};
+		double scFact = ((double) wP / (double) m_nCols);
+		if (((double) hP / (double) m_nRows) < scFact) {
+				scFact = ((double) hP / (double) m_nRows);};
+		int wD = (int) floor(m_nCols * scFact);
+		int hD = (int) floor(m_nRows * scFact);
+
+	
+		delete(m_pBitmap);
+		m_pBitmap = new wxBitmap( m_pWxImg->Scale(wD, hD) );*/
+	int nCols = _parent->GetNcols(); int nRows = _parent->GetNrows();
+	int cP, rP;
+	this->GetSize( &cP, &rP);
+	double scFact = ((double) cP / (double) nCols);
+	if (((double) rP / (double) nRows) < scFact) { scFact = ((double) rP / (double) nRows);};
+	int cD = (int) floor(nCols * scFact);
+	int rD = (int) floor(nRows * scFact);
+	int xSR =(int) floor( (double)pos.x * (double)nCols / (double)cD);
+	int ySR =(int) floor( (double)pos.y * (double)nRows / (double)rD);
+	wxString text; 
+	text.Printf(wxT("Right double click -  pos: (%04i - %04i) - SRpos: (%04i - %04i)"),
+		pos.x, pos.y, xSR, ySR);
 	_parent->SetTxtInfo(text);
+	if((xSR>=nCols) || (ySR>=nRows))
+	{
+		text.Printf(wxT("OUTSIDE SR SENSOR -  pos: (%04i - %04i) - SRpos: (%04i - %04i)"),
+		pos.x, pos.y, xSR, ySR);
+		_parent->SetTxtInfo(text);
+	}
 }
 #endif
 
