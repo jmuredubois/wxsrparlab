@@ -64,8 +64,8 @@ CamViewData::CamViewData(wxWindow* parent, const wxString& title, const wxPoint&
 
 	res += AllocLUT(); //Allocs the LUT
 	
-	m_nDataWidth = 176;
-	m_nDataHeight = 144;
+	m_nCols = 176;
+	m_nRows = 144;
 	
 	res += AllocRGBA();
 	res += AllocDataArray();
@@ -113,33 +113,33 @@ int CamViewData::AllocLUT() //! Allocate LUT
  */
 int CamViewData::AllocRGBA() //! Allocate RGB and alpha buffer
 {
-	if( (m_nComp < 0) || (m_nDataWidth < 0) || (m_nDataHeight <0 ) ){return -2;} ; // fail if size not assigned
-	m_pRGB = (unsigned char*) malloc(m_nComp* m_nDataWidth * m_nDataHeight *sizeof(unsigned char));
+	if( (m_nComp < 0) || (m_nCols < 0) || (m_nRows <0 ) ){return -2;} ; // fail if size not assigned
+	m_pRGB = (unsigned char*) malloc(m_nComp* m_nCols * m_nRows *sizeof(unsigned char));
 	if(m_pRGB == NULL) { return -1; }; // return if malloc fails
-	memset((void*) m_pRGB, 0x77, m_nComp* m_nDataWidth * m_nDataHeight *sizeof(unsigned char));
-	m_pAlpha = (unsigned char*) malloc( m_nDataWidth * m_nDataHeight *sizeof(unsigned char));
+	memset((void*) m_pRGB, 0x77, m_nComp* m_nCols * m_nRows *sizeof(unsigned char));
+	m_pAlpha = (unsigned char*) malloc( m_nCols * m_nRows *sizeof(unsigned char));
 	if(m_pAlpha == NULL) { return -1; }; // return if malloc fails
-	memset((void*) m_pAlpha, 0x77, m_nDataWidth * m_nDataHeight *sizeof(unsigned char));
+	memset((void*) m_pAlpha, 0x77, m_nCols * m_nRows *sizeof(unsigned char));
 
 	int i = 0;
 	/* Debug: 3ramps /
 	int c = 0; int r = 0; unsigned char R, G, B;
 	R = 0; G = 0; B = 0;
 	// ENDOF Debug: 3ramps */
-	for(i = 0 ; i <(m_nDataWidth * m_nDataHeight); i++)
+	for(i = 0 ; i <(m_nCols * m_nRows); i++)
 	{
 		/* Debug: 3ramps /
 		m_pRGB[m_nComp*i+0] = R;
 		m_pRGB[m_nComp*i+1] = G;
 		m_pRGB[m_nComp*i+2] = B;
 		c +=1;
-		if (c >= m_nDataWidth)
+		if (c >= m_nCols)
 		{
 			c = 0;
 			r +=1;
 		}
-		if(r < (m_nDataHeight /3)) {R=c;G=0;B=0;}
-		else{if(r < (m_nDataHeight *2/3)) {R=0;G=c;B=0;}
+		if(r < (m_nRows /3)) {R=c;G=0;B=0;}
+		else{if(r < (m_nRows *2/3)) {R=0;G=c;B=0;}
 		else{R=0;G=0;B=c;} } ;
 		// ENDOF Debug: 3ramps */
 		/* Debug: blueScreen /
@@ -158,10 +158,10 @@ int CamViewData::AllocRGBA() //! Allocate RGB and alpha buffer
  */
 int CamViewData::AllocDataArray() //! Allocate dataArray buffer
 {
-	if( (m_nDataWidth < 0) || (m_nDataHeight <0 ) ){return -2;} ; // fail if size not assigned
-	m_pDataArray = (void*) malloc( m_nDataWidth * m_nDataHeight *sizeof(double));
+	if( (m_nCols < 0) || (m_nRows <0 ) ){return -2;} ; // fail if size not assigned
+	m_pDataArray = (void*) malloc( m_nCols * m_nRows *sizeof(double));
 	if(m_pDataArray == NULL) { return -1; }; // return if malloc fails
-	memset((void*) m_pDataArray, 0x77, m_nDataWidth * m_nDataHeight *sizeof(double));
+	memset((void*) m_pDataArray, 0x77, m_nCols * m_nRows *sizeof(double));
 
 	m_mutexDataArray = new wxMutex(wxMUTEX_DEFAULT);
 	m_mutexBitmap = new wxMutex(wxMUTEX_DEFAULT);
@@ -171,7 +171,7 @@ int CamViewData::AllocDataArray() //! Allocate dataArray buffer
 
 	/* Debug: Gray ramps */
 	c= 0;
-	for(i = 0 ; i <(m_nDataWidth * m_nDataHeight); i++)
+	for(i = 0 ; i <(m_nCols * m_nRows); i++)
 	{
 		data[i] = c;
 		c +=1;
@@ -188,10 +188,10 @@ int CamViewData::AllocDataArray() //! Allocate dataArray buffer
 int CamViewData::AllocWxImg() //! Allocate wxImg buffer
 {
 	int res = 0;
-	if( (m_nDataWidth < 0) || (m_nDataHeight <0 ) ){return -2;} ; // fail if size not assigned
+	if( (m_nCols < 0) || (m_nRows <0 ) ){return -2;} ; // fail if size not assigned
 	if(m_pRGB == NULL) { return -1; }; // return the RGB buffer is null
 	// convert data from raw image to wxImg 
-	m_pWxImg = new wxImage( m_nDataWidth, m_nDataHeight, m_pRGB, TRUE );
+	m_pWxImg = new wxImage( m_nCols, m_nRows, m_pRGB, TRUE );
 
 	if(m_pAlpha == NULL) { return -3; }; // return the RGB buffer is null
 	// convert data from raw image to wxImg 
@@ -205,9 +205,9 @@ int CamViewData::AllocWxImg() //! Allocate wxImg buffer
 int CamViewData::AllocWxBitmap() //! Allocate wxBitmap buffer
 {
 	int res = 0;
-	if( (m_nDataWidth < 0) || (m_nDataHeight <0 ) ){return -2;} ; // fail if size not assigned
+	if( (m_nCols < 0) || (m_nRows <0 ) ){return -2;} ; // fail if size not assigned
 	if(m_pWxImg == NULL) { return -1; }; // return the RGB buffer is null
-	m_pBitmap = new wxBitmap( m_pWxImg->Scale(m_nDataWidth , m_nDataHeight) );
+	m_pBitmap = new wxBitmap( m_pWxImg->Scale(m_nCols , m_nRows) );
 	return res;
 }
 /**
@@ -394,7 +394,7 @@ int CamViewData::SetBitmap()
 {
 	int res = 0;
 	if(m_DrawPanel == NULL) { return -1;};
-	if( (m_nDataWidth < 1) || (m_nDataWidth < 1)) { return -2;};
+	if( (m_nCols < 1) || (m_nRows < 1)) { return -2;};
 	if(m_pWxImg == NULL) { return -3;};
 	int wP= 0; int hP = 0;
 	wxMutexError errMutex= m_mutexBitmap->Lock();
@@ -402,11 +402,11 @@ int CamViewData::SetBitmap()
 	{
 		m_DrawPanel->GetSize(&wP, &hP);
 		if( (wP<1) || (hP<1)) { errMutex = m_mutexBitmap->Unlock(); return res;};
-		double scFact = ((double) wP / (double) m_nDataWidth);
-		if (((double) hP / (double) m_nDataHeight) < scFact) {
-				scFact = ((double) hP / (double) m_nDataHeight);};
-		int wD = (int) floor(m_nDataWidth * scFact);
-		int hD = (int) floor(m_nDataHeight * scFact);
+		double scFact = ((double) wP / (double) m_nCols);
+		if (((double) hP / (double) m_nRows) < scFact) {
+				scFact = ((double) hP / (double) m_nRows);};
+		int wD = (int) floor(m_nCols * scFact);
+		int hD = (int) floor(m_nRows * scFact);
 
 	
 		delete(m_pBitmap);

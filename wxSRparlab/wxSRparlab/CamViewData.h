@@ -86,7 +86,7 @@ public:
 	{
 		int res= 0;
 		if(buf == NULL){return -1;};
-		if(numPix*sizeof(T) > m_nDataWidth * m_nDataHeight *sizeof(T)){return -2;};
+		if(numPix*sizeof(T) > m_nCols * m_nRows *sizeof(T)){return -2;};
 		if(m_pDataArray == NULL){return -3;};
 
 		wxMutexError errMutex= m_mutexDataArray->Lock();
@@ -120,7 +120,7 @@ public:
 
 		int val = 0;
 		unsigned char *curPix, *curCol;
-		for(int i = 0 ; i <(m_nDataWidth * m_nDataHeight); i++)
+		for(int i = 0 ; i <(m_nCols * m_nRows); i++)
 		{
 			val = (int)floor(( ((double)data[i]) - m_dDispMin ) * invDyn );
 			if(val <0){ val = 0;}
@@ -173,8 +173,8 @@ private:
 	unsigned char *m_pLUT;		// color LUT
 	int m_nLUTlen;				// color LUT length
 	int m_nComp;				// number of components (RGB)
-	int m_nDataWidth;	// data width
-	int m_nDataHeight;	// data type
+	int m_nCols;	// data width
+	int m_nRows;	// data type
 	int m_nDispWidth;	// data width
 	int m_nDispHeight;	// data type
 	int m_nDataBytes;	// data bytes per sample
