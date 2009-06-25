@@ -203,6 +203,7 @@ private:
 #ifdef JMU_RANSAC
 	SRPLRSC m_ransac;		// ransac object
 	unsigned char _rscSucc;			// counter for SUCCESSIVE ransac applications
+	RSCPLAN plaList[3];
 #endif
 #ifdef JMU_ALIGNGUI
 	int _aliPtsR[6];
