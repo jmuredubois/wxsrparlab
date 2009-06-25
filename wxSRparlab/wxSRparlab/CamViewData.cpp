@@ -29,8 +29,9 @@ BEGIN_EVENT_TABLE(CamViewData, wxPanel)
 END_EVENT_TABLE()
 
 #ifdef JMU_ALIGNGUI
-jmuDrawPanel::jmuDrawPanel( wxWindow* parent) : wxPanel(parent, IDP_DrawPanel)
+jmuDrawPanel::jmuDrawPanel( CamViewData* parent) : wxPanel(parent, IDP_DrawPanel)
 {
+	_parent = parent;
 }
 jmuDrawPanel::~jmuDrawPanel()
 {
@@ -38,6 +39,8 @@ jmuDrawPanel::~jmuDrawPanel()
 void jmuDrawPanel::OnRightDclick(wxMouseEvent& event)
 {
 	wxPoint pos = event.GetPosition();
+	wxString text; text.Printf(wxT("Right double click detected at pos: (%04i - %04i)"),pos.x, pos.y);
+	_parent->SetTxtInfo(text);
 }
 #endif
 

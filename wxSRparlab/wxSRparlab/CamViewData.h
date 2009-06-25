@@ -17,14 +17,17 @@
 #define NCOMP 3		// number of components (RGB)
 
 #ifdef JMU_ALIGNGUI
+class CamViewData;
 class jmuDrawPanel: public wxPanel
 {
 public:
 	//! constructor
-    jmuDrawPanel( wxWindow* parent);
+    jmuDrawPanel( CamViewData* parent);
 	//! destructor
 	~jmuDrawPanel();
 	void OnRightDclick(wxMouseEvent& event);
+private:
+	CamViewData* _parent;
 // protected data
 protected:
 	DECLARE_EVENT_TABLE()
