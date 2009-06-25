@@ -1280,13 +1280,10 @@ void CamFrame::RansacFollow()
   RSCPLAN pla = PLRSC_GetPlaBest(m_ransac);			// Get best plane
   double distPla = PLRSC_GetDistPla(m_ransac);		// get parameter used as inlier threshold
   int iterMax = PLRSC_GetIterMax(m_ransac);			// get parameter number of iter
-  double mat[9]; for(int k=0; k<9; k++) { mat[k] = 0; }; // matrix to store trf
-  PLRSC_GetProjZRotMat(m_ransac, mat);   // get rotation matrix to project best plane to z axis
   double mat4[16]; for(int k=0; k<16; k++){mat4[k]=0;}; mat4[15]=1; 
-	for(int k=0, c=0, r=0; k<9; k++)
-	{													// convert rotation matrix into 4 matrix
-		c = k /3; r = k % 3;
-		mat4[r+c*4] = mat[k];
+	for(int k=0; k<16; k++)
+	{
+		mat4[k]= pla.matZ[k] ; 
 	}
 	// translation along z, will allow to have all RANSAC planes at same Z, fixed now at 3000
 	mat4[14] = 0000 - pla.nVec[3]; // HARDCODED ALIGNMENT DEPTH 3000 mm
@@ -1914,7 +1911,8 @@ void CamFrame::AddAlignPt(int row, int col)
 	_aliPCnt++;  // increment counter of valid points
 	wxString resStr;
 	resStr.Printf(wxT("Alignment point %02i added: ( %03i, %03i)"), _aliPCnt-1, row, col);
-	m_settingsPane->SetText(resStr);
+	//m_settingsPane->SetText(resStr);
+	this->SetStatusText(resStr);
 }
 #endif
 
