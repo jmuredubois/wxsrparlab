@@ -11,9 +11,25 @@
 #include "wxSrApp.h"	//!< application header file
 #include "CMainWnd.h"	//!< main window header file
 #include "CamFrame.h"	//!< cam  window header file
+#define JMU_ALIGNGUI // testing alignment GUI
 
 #define LUTLEN 256	// color LUT length
 #define NCOMP 3		// number of components (RGB)
+
+#ifdef JMU_ALIGNGUI
+class jmuDrawPanel: public wxPanel
+{
+public:
+	//! constructor
+    jmuDrawPanel( wxWindow* parent);
+	//! destructor
+	~jmuDrawPanel();
+	void OnRightDclick(wxMouseEvent& event);
+// protected data
+protected:
+	DECLARE_EVENT_TABLE()
+};
+#endif
 
 /**
  * Camera settings panel class \n
@@ -130,7 +146,11 @@ private:
 	wxTextCtrl* m_textMin;
 	wxTextCtrl* m_textMax;
 	bool m_bTextInit;
+#ifdef JMU_ALIGNGUI
+	jmuDrawPanel* m_DrawPanel;
+#else
 	wxPanel* m_DrawPanel;
+#endif
 	wxStaticText* m_textInfo;
 
 	// Private data
