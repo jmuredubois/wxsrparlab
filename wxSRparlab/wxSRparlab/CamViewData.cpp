@@ -12,6 +12,12 @@
 #include "CamFrame.h"	//!< camera frame header file
 #include "CamViewData.h" //!< camera settings panel header file
 
+#ifdef JMU_ALIGNGUI
+// implement message map
+BEGIN_EVENT_TABLE(jmuDrawPanel, wxPanel)
+	EVT_RIGHT_DCLICK(jmuDrawPanel::OnRightDclick)
+END_EVENT_TABLE()
+#endif
 
 // implement message map
 BEGIN_EVENT_TABLE(CamViewData, wxPanel)
@@ -22,6 +28,18 @@ BEGIN_EVENT_TABLE(CamViewData, wxPanel)
 	EVT_TEXT( IDT_DispMax , CamViewData::TextChangedDispMax)
 END_EVENT_TABLE()
 
+#ifdef JMU_ALIGNGUI
+jmuDrawPanel::jmuDrawPanel( wxWindow* parent) : wxPanel(parent, IDP_DrawPanel)
+{
+}
+jmuDrawPanel::~jmuDrawPanel()
+{
+}
+void jmuDrawPanel::OnRightDclick(wxMouseEvent& event)
+{
+	wxPoint pos = event.GetPosition();
+}
+#endif
 
 /**
  * Camera data panel class constructor \n
@@ -204,8 +222,12 @@ int CamViewData::InitViewData()
 	
 	m_textMin = new wxTextCtrl( this, IDT_DispMin, wxT("25344.0"));
 	m_textMax = new wxTextCtrl( this, IDT_DispMax, wxT("0.0"));
-	m_bTextInit = true; m_textMin->SetModified(true); m_textMax->SetModified(true);
+	m_bTextInit = true; m_textMin->SetModified(true); m_textMax->SetModified(true);	
+#ifdef JMU_ALIGNGUI
+	m_DrawPanel = new jmuDrawPanel(this);
+#else
 	m_DrawPanel = new wxPanel(this, IDP_DrawPanel);//, wxPoint(-1, -1), wxSize(176, 144));
+#endif
 	m_DrawPanel->SetMinSize(wxSize(176, 144));
 	    wxBoxSizer *sizerDraw = new wxBoxSizer(wxHORIZONTAL);
 		sizerDraw->Add(m_DrawPanel, 1, wxEXPAND);
