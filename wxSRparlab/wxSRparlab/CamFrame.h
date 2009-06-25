@@ -9,6 +9,7 @@
 #pragma once
 #include "wxSRparlab.h" //!< top-level header file
 #define JMU_RANSAC // testing experimental C++ RANSAC
+#define JMU_ALIGNGUI // testing alignment GUI
 #include "wxSrApp.h"	//!< application header file
 #include "CMainWnd.h"	//!< main window header file
 #include "CamPanelSettings.h" //!< camera settings panel header file
@@ -133,6 +134,9 @@ public:
 	void OnSetRansacNiterMax(wxCommandEvent& event);
 	void OnSetRansacDistPla(wxCommandEvent& event);
 #endif
+#ifdef JMU_ALIGNGUI
+	void AddAlignPt(int row, int col);
+#endif
 	void OnRecXYZ(wxCommandEvent& WXUNUSED(event));
 	void OnRecSeg(wxCommandEvent& WXUNUSED(event));
 	void OnRecVTK(wxCommandEvent& WXUNUSED(event));
@@ -199,6 +203,11 @@ private:
 #ifdef JMU_RANSAC
 	SRPLRSC m_ransac;		// ransac object
 	unsigned char _rscSucc;			// counter for SUCCESSIVE ransac applications
+#endif
+#ifdef JMU_ALIGNGUI
+	int _aliPtsR[6];
+	int _aliPtsC[6];
+	int _aliPCnt;
 #endif
 	long _acqTime;
 	wxStopWatch* m_pAcqSWatch;

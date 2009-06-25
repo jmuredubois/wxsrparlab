@@ -146,6 +146,10 @@ CamFrame::CamFrame(MainWnd* parentFrm, const wxString& title, const wxPoint& pos
 	m_ransac = NULL;
 	_rscSucc = 0;
 #endif
+#ifdef JMU_ALIGNGUI
+	for(int k=0; k<6; k++){ _aliPtsR[k] = 0; _aliPtsC[k] = 0;};
+	_aliPCnt = 0;
+#endif
 }
 
 /**
@@ -254,49 +258,49 @@ int CamFrame::CreateAndSetNotebook()
 	m_camNB = new wxAuiNotebook(this, -1, wxPoint(-1,-1), wxSize(-1,-1), wxAUI_NB_TOP | wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS );
 
 	// %%%%%%% Settings window
-	m_settingsPane = new CamPanelSettings(m_camNB,wxT("Settings"), wxPoint(-1,-1), wxSize(-1,-1)); /* NBparadigm */
+	m_settingsPane = new CamPanelSettings(m_camNB, this, wxT("Settings"), wxPoint(-1,-1), wxSize(-1,-1)); /* NBparadigm */
 	m_settingsPane->InitSettings();
 
 	// %%%%%% RANGE panel
-	m_viewRangePane = new CamViewData(m_camNB,wxT("Range"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
+	m_viewRangePane = new CamViewData(m_camNB, this, wxT("Range"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
 	m_viewRangePane->InitViewData();
 
 	// %%%%%% AMPLITUDE panel
-	m_viewAmpPane = new CamViewData(m_camNB,wxT("Amplitude"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
+	m_viewAmpPane = new CamViewData(m_camNB, this, wxT("Amplitude"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
 	m_viewAmpPane->InitViewData();
 	m_viewAmpPane->SetDispMin(0.0);
 	m_viewAmpPane->SetDispMax(1000.0);
 
 	// %%%%%% Z panel
-	m_viewZPane = new CamViewData(m_camNB,wxT("Z [mm]"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
+	m_viewZPane = new CamViewData(m_camNB, this, wxT("Z [mm]"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
 	m_viewZPane->InitViewData();
 	m_viewZPane->SetDispMin(3500.0);
 	m_viewZPane->SetDispMax(000.0);
 #ifdef DISPXYBUFFERS
 	// %%%%%% Y panel
-	m_viewYPane = new CamViewData(m_camNB,wxT("Y [mm]"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
+	m_viewYPane = new CamViewData(m_camNB, this, wxT("Y [mm]"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
 	m_viewYPane->InitViewData();
 	m_viewYPane->SetDispMin(-1500.0);
 	m_viewYPane->SetDispMax(1500.0);
 	// %%%%%% x panel
-	m_viewXPane = new CamViewData(m_camNB,wxT("X [mm]"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
+	m_viewXPane = new CamViewData(m_camNB, this, wxT("X [mm]"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
 	m_viewXPane->InitViewData();
 	m_viewXPane->SetDispMin(-1500.0);
 	m_viewXPane->SetDispMax(1500.0);
 #endif
 
 	// %%%%% BACKGROUND RANGE panel
-	m_viewBGRangePane = new CamViewData(m_camNB, wxT("BG pha"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
+	m_viewBGRangePane = new CamViewData(m_camNB, this, wxT("BG pha"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
 	m_viewBGRangePane->InitViewData();
 	m_viewBGRangePane->SetDispMin(45000.0);
 	m_viewBGRangePane->SetDispMax(0.0);
 	// %%%%% BACKGROUND AMPLITUDE panel
-	m_viewBGAmpPane = new CamViewData(m_camNB, wxT("BG amp"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
+	m_viewBGAmpPane = new CamViewData(m_camNB, this, wxT("BG amp"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
 	m_viewBGAmpPane->InitViewData();
 	m_viewBGAmpPane->SetDispMin(0.0);
 	m_viewBGAmpPane->SetDispMax(1000.0);
 	// %%%%% SEGMENTED panel
-	m_viewSegmPane = new CamViewData(m_camNB, wxT("segm"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
+	m_viewSegmPane = new CamViewData(m_camNB, this, wxT("segm"), wxPoint(-1,-1), wxSize(-1,-1));  /* NBparadigm */
 	m_viewSegmPane->InitViewData();
 	m_viewSegmPane->SetDispMin(0);
 	m_viewSegmPane->SetDispMax(255);
@@ -1899,3 +1903,18 @@ int CamFrame::WriteCamTrfMat4(wxString fn, double mat4[16], wxString comments)
 	
 	return res;
 }
+
+#ifdef JMU_ALIGNGUI
+void CamFrame::AddAlignPt(int row, int col)
+{
+	if( (row > m_nRows) || (col > m_nCols)){ return;};
+	if( (_aliPCnt<0) || (_aliPCnt>=6) ){ _aliPCnt=0;}; // only 6 points desired, loop if more
+	_aliPtsR[_aliPCnt] = row;
+	_aliPtsC[_aliPCnt] = col;
+	_aliPCnt++;  // increment counter of valid points
+	wxString resStr;
+	resStr.Printf(wxT("Alignment point %02i added: ( %03i, %03i)"), _aliPCnt-1, row, col);
+	m_settingsPane->SetText(resStr);
+}
+#endif
+

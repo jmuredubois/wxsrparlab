@@ -16,9 +16,10 @@
  * Camera settings panel class constructor \n
  * Each instance must have a parent wnd (usually a notebook) \n
  */
-CamPanelSettings::CamPanelSettings(wxWindow* parent, const wxString& title, const wxPoint& pos, const wxSize& size)
+CamPanelSettings::CamPanelSettings(wxWindow* parent, CamFrame* pCamFrame, const wxString& title, const wxPoint& pos, const wxSize& size)
 : wxPanel(parent, wxID_ANY, pos, size, wxBORDER_NONE, title)
 {
+	_pCamFrame = pCamFrame;
 	#ifdef JMU_RANSAC
 		m_TxtRansacNiterMax = NULL;
 		_ransacNiterMax = 3000;

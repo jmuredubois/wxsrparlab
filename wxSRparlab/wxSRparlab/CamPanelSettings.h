@@ -19,11 +19,12 @@
  * This class: \n
  * - displays GUI elements allowing to modify camera settings \n
  */
+class CamFrame;
 class CamPanelSettings: public wxPanel //!< Camera settings panel
 {
 public:
 	//! constructor
-    CamPanelSettings( wxWindow* parent, const wxString& title, const wxPoint& pos, const wxSize& size);
+    CamPanelSettings( wxWindow* parent, CamFrame* pCamFrame, const wxString& title, const wxPoint& pos, const wxSize& size);
 	//! init settings
 	int InitSettings();
 	void SetText(wxString text); //!< Sets the text in SR setting panel
@@ -71,7 +72,7 @@ public:
 
 
 private:
-
+	CamFrame* _pCamFrame;
 	/* Buttons */
 	wxButton* m_buttonOpenDev; //!< Open camera
 	wxButton* m_buttonCloseDev; //!< Close camera

@@ -57,17 +57,21 @@ void jmuDrawPanel::OnRightDclick(wxMouseEvent& event)
 	if (((double) rP / (double) nRows) < scFact) { scFact = ((double) rP / (double) nRows);};
 	int cD = (int) floor(nCols * scFact);
 	int rD = (int) floor(nRows * scFact);
-	int xSR =(int) floor( (double)pos.x * (double)nCols / (double)cD);
-	int ySR =(int) floor( (double)pos.y * (double)nRows / (double)rD);
+	int cSR =(int) floor( (double)pos.x * (double)nCols / (double)cD);
+	int rSR =(int) floor( (double)pos.y * (double)nRows / (double)rD);
 	wxString text; 
 	text.Printf(wxT("Right double click -  pos: (%04i - %04i) - SRpos: (%04i - %04i)"),
-		pos.x, pos.y, xSR, ySR);
+		pos.x, pos.y, cSR, rSR);
 	_parent->SetTxtInfo(text);
-	if((xSR>=nCols) || (ySR>=nRows))
+	if((cSR>=nCols) || (rSR>=nRows))
 	{
 		text.Printf(wxT("OUTSIDE SR SENSOR -  pos: (%04i - %04i) - SRpos: (%04i - %04i)"),
-		pos.x, pos.y, xSR, ySR);
+		pos.x, pos.y, cSR, rSR);
 		_parent->SetTxtInfo(text);
+	}
+	else
+	{
+		_parent->GetParentCamFrame()->AddAlignPt(cSR, rSR);
 	}
 }
 #endif
@@ -76,12 +80,13 @@ void jmuDrawPanel::OnRightDclick(wxMouseEvent& event)
  * Camera data panel class constructor \n
  * Each instance must have a parent wnd (usually a notebook) \n
  */
-CamViewData::CamViewData(wxWindow* parent, const wxString& title, const wxPoint& pos, const wxSize& size)
+CamViewData::CamViewData(wxWindow* parent, CamFrame* pCamFrame, const wxString& title, const wxPoint& pos, const wxSize& size)
 : wxPanel(parent, wxID_ANY, pos, size, wxBORDER_NONE, title)
 {
 	int res = 0;
 	m_bNewImage = false;
 	m_bTextInit = false;
+	_pCamFrame = pCamFrame;
 
 	m_nComp = NCOMP;
 	m_nLUTlen = LUTLEN;
