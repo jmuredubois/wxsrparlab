@@ -1407,6 +1407,11 @@ void MainWnd::OnAlignPlans(wxCommandEvent& event)
 	comments.Printf(wxT("testting masterplane alignment method"));
 	tgtAli->WriteCamTrfMat4(savName, mat, comments);
 
+	strAli.Printf(wxT("Wrote file: TgtCam %i: %02i pts  -  SrcCam %i: %02i pts"),
+		                 idxTgt, nptsTgt, idxSrc, nptsSrc);
+	SetStatusText(strAli);
+
+
 	/*double res[3]; res[0] = -1; res[1] = -1; res[2] = -1;
 	double eps = _vtkWin->kdDist(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, res);*/
 }
