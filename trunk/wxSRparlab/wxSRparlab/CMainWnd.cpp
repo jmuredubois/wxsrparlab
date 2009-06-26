@@ -1351,33 +1351,61 @@ void MainWnd::OnAlignPlans(wxCommandEvent& event)
 		                 idxTgt, nptsTgt, idxSrc, nptsSrc);
 	SetStatusText(strAli);
 
-	if((nptsTgt==nptsSrc) && (nptsTgt>2))
+	if(nptsTgt!=nptsSrc)
 	{
-	  int npts = nptsTgt;
-	  int *r0, *c0, *r1, *c1;
-	  r0 = (int*) malloc(npts*sizeof(int)); memset(r0, 0x0, npts*sizeof(int));
-	  c0 = (int*) malloc(npts*sizeof(int)); memset(c0, 0x0, npts*sizeof(int));
-	  r1 = (int*) malloc(npts*sizeof(int)); memset(r1, 0x0, npts*sizeof(int));
-	  c1 = (int*) malloc(npts*sizeof(int)); memset(c1, 0x0, npts*sizeof(int));
-	  short *x0, *y0, *x1, *y1;
-	  x0 = (short*) malloc(npts*sizeof(short)); memset(x0, 0x0, npts*sizeof(short));
-	  y0 = (short*) malloc(npts*sizeof(short)); memset(y0, 0x0, npts*sizeof(short));
-	  x1 = (short*) malloc(npts*sizeof(short)); memset(x1, 0x0, npts*sizeof(short));
-	  y1 = (short*) malloc(npts*sizeof(short)); memset(y1, 0x0, npts*sizeof(short));
-	  unsigned short *z0, *z1;
-	  z0 = (unsigned short*) malloc(npts*sizeof(unsigned short)); memset(z0, 0x0, npts*sizeof(unsigned short));
-	  z1 = (unsigned short*) malloc(npts*sizeof(unsigned short)); memset(z1, 0x0, npts*sizeof(unsigned short));
-
-	  for(int k=0; k<npts; k++)
-	  {
-		  tgtAli->GetAlignPoint(k, r0[k], c0[k], x0[k], y0[k], z0[k]);
-		  srcAli->GetAlignPoint(k, r1[k], c1[k], x1[k], y1[k], z1[k]);
-	  }
-	  free(r0); free(c0); free(r1); free(c1);
-	  free(x0); free(y0); free(x1); free(y1); 
-	  free(z0); free(z1);
+		strAli.Printf(wxT("Align. points COUNT MISMATCH: TgtCam %i: %02i pts  -  SrcCam %i: %02i pts"),
+		                 idxTgt, nptsTgt, idxSrc, nptsSrc);
+		SetStatusText(strAli);
+		return;  // return to avoid errors
+	}
+	if(nptsTgt<3)
+	{
+		strAli.Printf(wxT("Align. points MISSING (should be at least 3): TgtCam %i: %02i pts  -  SrcCam %i: %02i pts"),
+		                 idxTgt, nptsTgt, idxSrc, nptsSrc);
+		SetStatusText(strAli);
+		return; // return to avoid errors
+	}
+	if((tgtField>2) || (srcField>2))
+	{
+		strAli.Printf(wxT("Align. with 3 planes not supported yet: TgtCam %i: %02i pts  -  SrcCam %i: %02i pts"),
+		                 idxTgt, nptsTgt, idxSrc, nptsSrc);
+		SetStatusText(strAli);
+		return;  // return to avoid errors
 	}
 
+	int npts = nptsTgt;
+	int r, c; short x,y; unsigned short z;
+	double *xyz0, *xyz1;
+	xyz0 = (double*) malloc(npts*3*sizeof(double)); memset(xyz0, 0x0, npts*3*sizeof(double));
+	xyz1 = (double*) malloc(npts*3*sizeof(double)); memset(xyz1, 0x0, npts*3*sizeof(double));
+	for(int k=0; k<npts; k++)
+	{
+		tgtAli->GetAlignPoint(k, r, c, x, y, z);
+		xyz0[k*3+0] = (double) x;
+		xyz0[k*3+1] = (double) y;
+		xyz0[k*3+2] = (double) z;
+		srcAli->GetAlignPoint(k, r, c, x, y, z);
+		xyz1[k*3+0] = (double) x;
+		xyz1[k*3+1] = (double) y;
+		xyz1[k*3+2] = (double) z;
+	}
+	RSCPLAN plaRsc0 = tgtAli->GetRansacPlane(tgtField);
+	RSCPLAN plaRsc1 = srcAli->GetRansacPlane(srcField);
+	JMUPLAN3D plansAli[2];
+	for(int k=0; k<4; k++)
+	{
+		plansAli[0].n[k] = plaRsc0.nVec[k];
+		plansAli[1].n[k] = plaRsc1.nVec[k];
+	}
+	double mat[16]; for(int k=0; k<16; k++) { mat[k]=0; };
+
+	int res = PLALI_align1plan2dNpoints(m_Align, mat, &(plansAli[0]), &(plansAli[1]), npts, xyz0, xyz1);
+	free(xyz0); free(xyz1); // DO NOT forget to free
+
+	wxString savName; savName.Printf(wxT("MasterPlane.xml"));
+	wxString comments;
+	comments.Printf(wxT("testting masterplane alignment method"));
+	tgtAli->WriteCamTrfMat4(savName, mat, comments);
 
 	/*double res[3]; res[0] = -1; res[1] = -1; res[2] = -1;
 	double eps = _vtkWin->kdDist(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, res);*/
