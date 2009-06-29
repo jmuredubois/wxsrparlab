@@ -24,7 +24,7 @@ CamPanelSettings::CamPanelSettings(wxWindow* parent, CamFrame* pCamFrame, const 
 		m_TxtRansacNiterMax = NULL;
 		_ransacNiterMax = 3000;
 		m_TxtRansacDistPla  = NULL;
-		_ransacDistPla = 200.0;
+		_ransacDistPla = 25.0;
 	#endif
 	#ifdef JMU_USE_VTK
 		m_ckBoxBlankSegmVTK = NULL;

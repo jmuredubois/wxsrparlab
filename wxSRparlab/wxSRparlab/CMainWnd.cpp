@@ -184,7 +184,7 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
 	_txtAmpMax = NULL;
 	_txtAmpInit = false;
 	_ampMin = 0.000;
-	_ampMax = 2000.0;
+	_ampMax = 5000.0;
 	_txtSegMin = NULL;
 	_txtSegMax = NULL;
 	_txtSegInit = false;
@@ -286,34 +286,40 @@ void MainWnd::Init()
 	_buttAcqAll = new wxButton(_bgPanel, IDB_AcqAll, wxT("Acq. all") );
 #ifdef JMU_USE_VTK
 	// depth min and max text controls
-    _txtZMin = new wxTextCtrl( _bgPanel, IDT_zMin, wxT("0.0"));
-	_txtZMax = new wxTextCtrl( _bgPanel, IDT_zMax, wxT("3500.0"));
+    _txtZMin = new wxTextCtrl( _bgPanel, IDT_zMin, wxString::Format(wxT("%d"),_zMin));
+	_txtZMax = new wxTextCtrl( _bgPanel, IDT_zMax, wxString::Format(wxT("%d"),_zMax));
 	_txtMinMaxInit = true; _txtZMin->SetModified(true); _txtZMax->SetModified(true);
+	wxStaticText* txtZlabel = new wxStaticText(_bgPanel, wxID_ANY, wxT("   Z  [mm]  "));
 
 	wxBoxSizer *sizerZscale = new wxBoxSizer(wxHORIZONTAL);
 		//sizerZscale->Add(_buttAcqAll, flagsExpand);
 	    sizerZscale->Add(_txtZMin, flagsExpand);
-		sizerZscale->AddStretchSpacer();
+		//sizerZscale->AddStretchSpacer();
+		sizerZscale->Add(txtZlabel);
 	    sizerZscale->Add(_txtZMax, flagsExpand);
 
 	// amplitude min and max controls
 	_txtAmpMin = new wxTextCtrl( _bgPanel, IDT_ampMin, wxString::Format(wxT("%d"), _ampMin) ); 
 	_txtAmpMax = new wxTextCtrl( _bgPanel, IDT_ampMax, wxString::Format(wxT("%d"), _ampMax) );
 	_txtAmpInit = true; _txtAmpMin->SetModified(true); _txtAmpMax->SetModified(true);
+	wxStaticText* txtAmpLabel = new wxStaticText(_bgPanel, wxID_ANY, wxT(" Amp. [a.u.]"));
 	
 	wxBoxSizer *sizerAmpScale = new wxBoxSizer(wxHORIZONTAL);
 	    sizerAmpScale->Add(_txtAmpMin, flagsExpand);
-		sizerAmpScale->AddStretchSpacer();
+		//sizerAmpScale->AddStretchSpacer();
+		sizerAmpScale->Add(txtAmpLabel);
 	    sizerAmpScale->Add(_txtAmpMax, flagsExpand);
 
 	// segmentation min and max controls
-	_txtSegMin = new wxTextCtrl( _bgPanel, IDT_segMin, wxString::Format(wxT("%d"), _ampMin) ); 
-	_txtSegMax = new wxTextCtrl( _bgPanel, IDT_segMax, wxString::Format(wxT("%d"), _ampMax) );
+	_txtSegMin = new wxTextCtrl( _bgPanel, IDT_segMin, wxString::Format(wxT("%d"), _segmMin) ); 
+	_txtSegMax = new wxTextCtrl( _bgPanel, IDT_segMax, wxString::Format(wxT("%d"), _segmMax) );
 	_txtSegInit = true; _txtSegMin->SetModified(true); _txtSegMax->SetModified(true);
+	wxStaticText* txtSegmLabel = new wxStaticText(_bgPanel, wxID_ANY, wxT("Segm. [a.u.]"));
 	
 	wxBoxSizer *sizerSegScale = new wxBoxSizer(wxHORIZONTAL);
 	    sizerSegScale->Add(_txtSegMin, flagsExpand);
-		sizerSegScale->AddStretchSpacer();
+		//sizerSegScale->AddStretchSpacer();
+		sizerSegScale->Add(txtSegmLabel);
 	    sizerSegScale->Add(_txtSegMax, flagsExpand);
 
 	// group scale textboxes
