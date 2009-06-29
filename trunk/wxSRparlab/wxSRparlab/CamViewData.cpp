@@ -108,6 +108,13 @@ CamViewData::CamViewData(wxWindow* parent, CamFrame* pCamFrame, const wxString& 
 
 	m_dDispMin = 25344.0;
 	m_dDispMax = 0.0;
+	if(title.IsSameAs(wxT("Amplitude"),false)) { m_dDispMin = 0.0; m_dDispMax  =5000.0; }
+	if(title.IsSameAs(wxT("Z [mm]"),false)) { m_dDispMin = 3500.0; m_dDispMax  =0.0; }
+	if(title.IsSameAs(wxT("Y [mm]"),false)) { m_dDispMin = 0.0; m_dDispMax  =2000.0; }
+	if(title.IsSameAs(wxT("X [mm]"),false)) { m_dDispMin = 0.0; m_dDispMax  =2000.0; }
+	if(title.IsSameAs(wxT("BG pha"),false)) { m_dDispMin = 25344.0; m_dDispMax  =0; }
+	if(title.IsSameAs(wxT("BG amp"),false)) { m_dDispMin = 0.0; m_dDispMax  =5000.0; }
+	if(title.IsSameAs(wxT("segm"),false)) { m_dDispMin = 0.0; m_dDispMax  =255.0; }
 
 	res += Map2rgb<unsigned short>();
 }
@@ -256,8 +263,8 @@ int CamViewData::InitViewData()
         wxDefaultPosition, wxDefaultSize, 4, types, 4, wxRA_SPECIFY_COLS);
 
 	
-	m_textMin = new wxTextCtrl( this, IDT_DispMin, wxT("25344.0"));
-	m_textMax = new wxTextCtrl( this, IDT_DispMax, wxT("0.0"));
+	m_textMin = new wxTextCtrl( this, IDT_DispMin, wxString::Format(wxT("%d"),m_dDispMin));
+	m_textMax = new wxTextCtrl( this, IDT_DispMax, wxString::Format(wxT("%d"),m_dDispMax));
 	m_bTextInit = true; m_textMin->SetModified(true); m_textMax->SetModified(true);	
 #ifdef JMU_ALIGNGUI
 	m_DrawPanel = new jmuDrawPanel(this);
