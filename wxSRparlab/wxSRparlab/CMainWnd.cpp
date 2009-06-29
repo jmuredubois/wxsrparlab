@@ -1350,6 +1350,42 @@ void MainWnd::OnAlignPlans(wxCommandEvent& event)
 	if( srcAli == NULL){ return ; };
 	if( tgtAli == NULL){ return ; };
 
+	if((tgtField==3) || (srcField==3))
+	{
+		strAli.Printf(wxT("Attempting to align with 3 planes: TgtCam %i:  -  SrcCam %i: "),
+		                 idxTgt, idxSrc);
+		SetStatusText(strAli);
+		RSCPLAN plaRsc0 = tgtAli->GetRansacPlane(0);
+		RSCPLAN plaRsc1 = tgtAli->GetRansacPlane(1);
+		RSCPLAN plaRsc2 = tgtAli->GetRansacPlane(2);
+		RSCPLAN plaRsc3 = srcAli->GetRansacPlane(0);
+		RSCPLAN plaRsc4 = srcAli->GetRansacPlane(1);
+		RSCPLAN plaRsc5 = srcAli->GetRansacPlane(2);
+		JMUPLAN3D plansAli[6];
+		for(int k=0; k<4; k++)
+		{
+			plansAli[0].n[k] = plaRsc0.nVec[k];
+			plansAli[1].n[k] = plaRsc1.nVec[k];
+			plansAli[2].n[k] = plaRsc2.nVec[k];
+			plansAli[3].n[k] = plaRsc3.nVec[k];
+			plansAli[4].n[k] = plaRsc4.nVec[k];
+			plansAli[5].n[k] = plaRsc5.nVec[k];
+		}
+		double mat[16]; for(int k=0; k<16; k++) { mat[k]=0; };
+		int res = PLALI_alignNplans(m_Align, mat, 3, &(plansAli[0]), &(plansAli[3]) );
+
+		wxString savName; savName.Printf(wxT("Heb3Plans_Tgt%02i_Src%02i.xml"),
+		                 idxTgt, idxSrc);
+		wxString comments;
+		comments.Printf(wxT("Hebert 3 planes alignment method"));
+		tgtAli->WriteCamTrfMat4(savName, mat, comments);
+		strAli.Printf(wxT("Wrote Heb3planes file: TgtCam %02i -  SrcCam %02i"),
+		                 idxTgt, idxSrc);
+		SetStatusText(strAli);
+		
+		return;  // return to avoid errors
+	}
+
 	int nptsTgt = tgtAli->GetAlignPtCnt();
 	int nptsSrc = srcAli->GetAlignPtCnt();
 
@@ -1370,13 +1406,6 @@ void MainWnd::OnAlignPlans(wxCommandEvent& event)
 		                 idxTgt, nptsTgt, idxSrc, nptsSrc);
 		SetStatusText(strAli);
 		return; // return to avoid errors
-	}
-	if((tgtField>2) || (srcField>2))
-	{
-		strAli.Printf(wxT("Align. with 3 planes not supported yet: TgtCam %i: %02i pts  -  SrcCam %i: %02i pts"),
-		                 idxTgt, nptsTgt, idxSrc, nptsSrc);
-		SetStatusText(strAli);
-		return;  // return to avoid errors
 	}
 
 	int npts = nptsTgt;
@@ -1408,12 +1437,13 @@ void MainWnd::OnAlignPlans(wxCommandEvent& event)
 	int res = PLALI_align1plan2dNpoints(m_Align, mat, &(plansAli[0]), &(plansAli[1]), npts, xyz0, xyz1);
 	free(xyz0); free(xyz1); // DO NOT forget to free
 
-	wxString savName; savName.Printf(wxT("MasterPlane.xml"));
+	wxString savName; savName.Printf(wxT("MasterPlane_Tgt%02i_pla%i_Src%02i_pla%i.xml"),
+		                 idxTgt, tgtField, idxSrc, srcField);
 	wxString comments;
-	comments.Printf(wxT("testting masterplane alignment method"));
+	comments.Printf(wxT("Masterplane alignment method"));
 	tgtAli->WriteCamTrfMat4(savName, mat, comments);
 
-	strAli.Printf(wxT("Wrote file: TgtCam %i: %02i pts  -  SrcCam %i: %02i pts"),
+	strAli.Printf(wxT("Wrote masterplane file: TgtCam %i: %02i pts  -  SrcCam %i: %02i pts"),
 		                 idxTgt, nptsTgt, idxSrc, nptsSrc);
 	SetStatusText(strAli);
 

@@ -45,6 +45,10 @@ CamVtkView::CamVtkView(int vtkSub, vtkRenderWindow* ParRenWin, vtkLookupTable* L
 		// add a target actor
 		addTgtAct();
 	#endif
+	#ifdef JMU_RANSAC
+	    // add a RANSAC plane actor
+		addRscAct();
+	#endif
 
 #ifndef VTKNOTRANSFORM
 	char strTrfFile[512];
@@ -81,6 +85,10 @@ CamVtkView::~CamVtkView()
 	#ifdef JMU_TGTFOLLOW
 	  // free tgt actor
 	  res+= freeTgtAct();
+	#endif
+	#ifdef JMU_RANSAC
+	  // free tgt actor
+	  res+= freeRscAct();
 	#endif
 	// free data actor
 	res+= freeDataAct();
@@ -140,6 +148,13 @@ int CamVtkView::setTrfMat(char* fn)
 		{
 			tgtLine->SetPoint1(camTranMat->GetElement(0,3),camTranMat->GetElement(1,3),camTranMat->GetElement(2,3));
 			tgtLine->SetPoint2(camTranMat->GetElement(0,3),camTranMat->GetElement(1,3),camTranMat->GetElement(2,3));
+		}
+	#endif
+	#ifdef JMU_RANSAC
+		if( rscLine != NULL)
+		{
+			rscLine->SetPoint1(camTranMat->GetElement(0,3),camTranMat->GetElement(1,3),camTranMat->GetElement(2,3));
+			rscLine->SetPoint2(camTranMat->GetElement(0,3),camTranMat->GetElement(1,3),camTranMat->GetElement(2,3));
 		}
 	#endif
 	return res;
@@ -838,6 +853,180 @@ int CamVtkView::freeTgtAct()
 	return res-1;
 }
 #endif
+
+/**
+ * Updates the tracking end point
+ */
+#ifdef JMU_RANSAC
+int CamVtkView::updateRscPla(float x, float y, float z)
+{
+	int res = 0;
+	if((rscLineActor != NULL) && (rscTriActor != NULL) )
+	{
+		rscLineActor->VisibilityOn();
+		rscTriActor->VisibilityOn();
+	}
+	if((rscLine != NULL))
+	{
+		rscLine->SetPoint2((double) x,(double) y,(double) z);
+		rscLine->Modified();
+		rscTriPoints->SetPoint(0, 0.0, 0.0,0.0);
+        rscTriPoints->SetPoint(1,-1.0, 1.0,0.0);
+        rscTriPoints->SetPoint(2, 1.0, 1.0,0.0);
+        rscTriPoints->SetPoint(3, 1.0,-1.0,0.0);
+        rscTriPoints->SetPoint(4,-2.0,-1.0,0.0);
+        rscTriPoints->Modified();
+		//renWin->Render(); //JMU20081110 rendering should be handeld by top-most window to avoid too many renderings
+	}
+	return res;
+}
+int CamVtkView::updateRscPla()
+{
+	int res = 0;
+	if((rscLineActor != NULL) && (rscTriActor != NULL) )
+	{
+		rscLineActor->VisibilityOff();
+		rscTriActor->VisibilityOff();
+	}
+	//if((rscLine != NULL) && (camTranMat != NULL) )
+	//{
+	//	rscLine->SetPoint2(camTranMat->GetElement(0,3),camTranMat->GetElement(1,3),camTranMat->GetElement(2,3));
+	//	rscLine->Modified();
+
+	//	rscTriPoints->InsertPoint(0, 0.0, 0.0,0.0);
+	//	rscTriPoints->InsertPoint(1,-1.0, 1.0,0.0);
+	//	rscTriPoints->InsertPoint(2, 1.0, 1.0,0.0);
+	//	rscTriPoints->InsertPoint(3, 1.0,-1.0,0.0);
+	//	rscTriPoints->InsertPoint(4,-2.0,-1.0,0.0);
+	//	rscTriPoints->Modified();
+	//}
+	return res;
+}
+#endif // JMU_RANSAC
+#ifdef JMU_RANSAC
+int CamVtkView::updateRscPla(float *ptsF, int nCoord)
+{
+	int res = 0;
+	if ( (nCoord != 3) && (nCoord !=15)) {return -1;} ; // return if wrong number of coord is passed
+	if((rscLineActor != NULL) && (rscTriActor != NULL) )
+	{
+		rscLineActor->VisibilityOn();
+		rscTriActor->VisibilityOn();
+	}
+	if((rscLine != NULL) && (ptsF != NULL))
+	{
+		rscLine->SetPoint2((double) ptsF[0],(double) ptsF[1],(double) ptsF[2]);
+		rscLine->Modified();
+		if(nCoord==15)
+		{
+			rscTriPoints->SetPoint(0, (double) ptsF[ 0],(double) ptsF[ 1],(double) ptsF[ 2]);
+			rscTriPoints->SetPoint(1, (double) ptsF[ 3],(double) ptsF[ 4],(double) ptsF[ 5]);
+			rscTriPoints->SetPoint(2, (double) ptsF[ 6],(double) ptsF[ 7],(double) ptsF[ 8]);
+			rscTriPoints->SetPoint(3, (double) ptsF[ 9],(double) ptsF[10],(double) ptsF[11]);
+			rscTriPoints->SetPoint(4, (double) ptsF[12],(double) ptsF[13],(double) ptsF[14]);
+			rscTriPoints->Modified();
+		}
+	}
+	return res;
+}
+#endif // JMU_RANSAC
+#ifdef JMU_RANSAC
+int CamVtkView::addRscAct()
+{
+	int res = 0;
+	rscLine = vtkLineSource::New();
+	rscLine->SetPoint1(camTranMat->GetElement(0,3),camTranMat->GetElement(1,3),camTranMat->GetElement(2,3));
+	rscLine->SetPoint2(camTranMat->GetElement(0,3),camTranMat->GetElement(1,3),camTranMat->GetElement(2,3));
+	rscLineMapper = vtkPolyDataMapper::New();
+	rscLineMapper->SetInputConnection(rscLine->GetOutputPort());
+	rscLineActor = vtkActor::New();
+	rscLineActor->SetMapper(rscLineMapper);
+	rscLineActor->GetProperty()->SetColor(0.0,0.0,1.0);	//!< HARDCODED SR CAMERA COLOR
+	rscLineActor->GetProperty()->SetLineWidth(5.0f);
+	if(_vtkSub==0){ rscLineActor->GetProperty()->SetColor(0.0,0.0,1.0); }; // BLUE for 0-th cam
+	if(_vtkSub==1){ rscLineActor->GetProperty()->SetColor(1.0,0.0,0.0); }; // RED  for 1-st add cam
+	if(_vtkSub==2){ rscLineActor->GetProperty()->SetColor(0.0,1.0,0.0); }; // GREENfor 2-nd add cam
+	if(_vtkSub==3){ rscLineActor->GetProperty()->SetColor(0.7,0.0,0.7); }; // PURPLfor 3-rd add cam
+	renderer->AddActor(rscLineActor);
+
+	rscTriPoints = vtkPoints::New();
+	rscTriPoints->SetNumberOfPoints(5);
+	rscTriPoints->InsertPoint(0, 0.0, 0.0,0.0);
+	rscTriPoints->InsertPoint(1,-1.0, 1.0,0.0);
+	rscTriPoints->InsertPoint(2, 1.0, 1.0,0.0);
+	rscTriPoints->InsertPoint(3, 1.0,-1.0,0.0);
+	rscTriPoints->InsertPoint(4,-2.0,-1.0,0.0);
+	rscTriTCoords = vtkFloatArray::New();
+	rscTriTCoords->SetNumberOfComponents(3);
+	rscTriTCoords->SetNumberOfTuples(5);
+	rscTriTCoords->InsertTuple3(0, 1, 1, 1);
+	rscTriTCoords->InsertTuple3(1, 2, 2, 2);
+	rscTriTCoords->InsertTuple3(2, 3, 3, 3);
+	rscTriTCoords->InsertTuple3(3, 4, 4, 4);
+	rscTriTCoords->InsertTuple3(4, 5, 5, 5);
+	rscTri = new vtkTriangle*[4];
+	if( (rscTri == NULL)){ return -2;};
+	for(int k=0; k<4; k++)
+	{
+		rscTri[k] = vtkTriangle::New();
+		rscTri[k]->GetPointIds()->SetNumberOfIds(3);
+		rscTri[k]->GetPointIds()->SetId(0,0);
+	}
+		rscTri[0]->GetPointIds()->SetId(1, 1);
+		rscTri[0]->GetPointIds()->SetId(2, 2);
+		rscTri[1]->GetPointIds()->SetId(1, 2);
+		rscTri[1]->GetPointIds()->SetId(2, 3);
+		rscTri[2]->GetPointIds()->SetId(1, 3);
+		rscTri[2]->GetPointIds()->SetId(2, 4);
+		rscTri[3]->GetPointIds()->SetId(1, 4);
+		rscTri[3]->GetPointIds()->SetId(2, 1);
+
+	rscTriGrid = vtkUnstructuredGrid::New();
+	rscTriGrid->Allocate(4,4);
+	for(int k=0; k<4; k++)
+	{
+		rscTriGrid->InsertNextCell(rscTri[k]->GetCellType(), rscTri[k]->GetPointIds());
+	}
+	rscTriGrid->SetPoints(rscTriPoints);
+	rscTriGrid->GetPointData()->SetTCoords(rscTriTCoords);
+	rscTriMapper = vtkDataSetMapper::New();
+	rscTriMapper->SetInput(rscTriGrid);
+	rscTriActor = vtkActor::New();
+	rscTriActor->SetMapper(rscTriMapper);
+	rscTriActor->GetProperty()->SetOpacity(0.5); //transparency
+	if(_vtkSub==0){ rscTriActor->GetProperty()->SetColor(0.0,0.0,1.0); }; // BLUE for 0-th cam
+	if(_vtkSub==1){ rscTriActor->GetProperty()->SetColor(1.0,0.0,0.0); }; // RED  for 1-st add cam
+	if(_vtkSub==2){ rscTriActor->GetProperty()->SetColor(0.0,1.0,0.0); }; // GREENfor 2-nd add cam
+	if(_vtkSub==3){ rscTriActor->GetProperty()->SetColor(0.7,0.0,0.7); }; // PURPLfor 3-rd add cam
+	renderer->AddActor(rscTriActor);
+
+	return res;
+}
+#endif
+#ifdef JMU_RANSAC
+int CamVtkView::freeRscAct()
+{
+	int res = rscLineActor->GetReferenceCount();
+	rscLine->Delete();
+	rscLineMapper->Delete();
+	rscLineActor->Delete();
+
+
+	rscTriPoints->Delete();
+	rscTriTCoords->Delete();
+	if(rscTri != NULL)
+	{
+		for(int k=0; k<4; k++)
+		{
+			rscTri[k]->Delete();
+		}
+		delete(rscTri); rscTri=NULL;
+	}
+	rscTriMapper->Delete();
+	rscTriActor->Delete();
+	return res-1;
+}
+#endif // JMU_RANSAC
 
 
 /**

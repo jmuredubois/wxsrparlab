@@ -889,6 +889,9 @@ void CamFrame::AcqOneFrm()
 			}
 		}
 	  #endif // JMU_TGTFOLLOW
+	  #ifdef JMU_RANSAC
+		_camVtk->updateRscPla(); // erase ransac plane, so that it doesn't clutter display
+	  #endif
 
 	  strR.sprintf(wxT("frm:%05u - pixFileRead %i - %ix%i  - %i"), m_nFrmRead, res, m_nRows, m_nCols, m_nSrBufSz);
 	  m_viewRangePane->SetDataArray<unsigned short>((unsigned short*) &m_pSrBuf[0], m_nRows*m_nCols);
@@ -1315,9 +1318,7 @@ void CamFrame::RansacFollow()
   comments =  date1 + wxString(wxT("\n")) + strS;
   this->WriteCamTrfMat4(fname, mat4, comments);
 
-  // OPTION 1 was to hijack the target follower. Unfortunately, this is not enough
-  #ifdef JMU_TGTFOLLOW
-		//if(m_pFile4TgtCoord != NULL)
+  // OPTION 1 was to hijack the target follower. Unfortunately, this was not enough
 		{
 			double* nVec = &(pla.nVec[0]);
 			//float frmCntFl;
@@ -1336,13 +1337,9 @@ void CamFrame::RansacFollow()
 			{
 				tgt[p] = -(nVec[0]*tgt[p-2] + nVec[1]*tgt[p-1] + nVec[3] ) / nVec[2];
 			}
-
-			//res  =(int) m_pFile4TgtCoord->Read(&frmCntFl, sizeof(float));
-			//res  =(int) m_pFile4TgtCoord->Read(&tgt, 15*sizeof(float));
-				//_camVtk->updateTarget(&(tgt[0]), 3); // to update only line
-				_camVtk->updateTarget(&(tgt[0]), 15); // to update line and triangles
+				//_camVtk->updateRscPla(&(tgt[0]), 3); // to update only line
+				_camVtk->updateRscPla(&(tgt[0]), 15); // to update line and triangles
 		}
-  #endif // JMU_TGTFOLLOW
 
 		// DISPLAY OPTION 2: blank the points that don't belong
 		std::vector<int>::iterator it;
