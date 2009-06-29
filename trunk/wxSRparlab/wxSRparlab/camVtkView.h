@@ -74,6 +74,11 @@ public:
 	  int updateTarget(); //overloaded operator to reset to camera center
 	  int updateTarget(float *ptsF, int nCoord);
 	#endif
+    #ifdef JMU_RANSAC
+	  int updateRscPla(float x, float y, float z);
+	  int updateRscPla(); //overloaded operator to reset to camera center
+	  int updateRscPla(float *ptsF, int nCoord);
+	#endif
 	int updateTOF(int rows, int cols, unsigned short *z, short *y, short *x, unsigned short* amp);
 	int updateTOF(int rows, int cols, unsigned short *z, short *y, short *x, unsigned short* amp, unsigned char* segm);
 	int updateTOF(int rows, int cols, unsigned short *z, short *y, short *x, unsigned short* amp, unsigned char* segm, char* fname);
@@ -138,6 +143,19 @@ private:
 	vtkActor			*tgtTriActor;
 	int addTgtAct();
 	int freeTgtAct();
+  #endif
+  #ifdef JMU_RANSAC
+    vtkLineSource		*rscLine; //! target line
+	vtkPolyDataMapper	*rscLineMapper; //!
+	vtkActor			*rscLineActor;
+	vtkPoints			*rscTriPoints;
+	vtkFloatArray		*rscTriTCoords;
+	vtkTriangle			**rscTri;
+	vtkUnstructuredGrid	*rscTriGrid;
+	vtkDataSetMapper	*rscTriMapper;
+	vtkActor			*rscTriActor;
+	int addRscAct();
+	int freeRscAct();
   #endif
 
   vtkLookupTable	*depthLUT;	//!< LUT for depth data display
