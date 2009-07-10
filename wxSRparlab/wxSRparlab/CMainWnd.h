@@ -88,6 +88,7 @@ public:
 	#endif
 	#ifdef JMU_KDTREEVTK
 	void OnKdDist(wxCommandEvent& event); //!  point set distance based on VTK kd-tree
+	void TextKdDistThr(wxCommandEvent& ); //
 	#endif
 #endif // JMU_USE_VTK
 #ifdef JMU_ALIGNGUI
@@ -166,6 +167,8 @@ private:
 	wxComboBox* _kdDistTgt;
 	wxRadioBox* _kdDistIdxSrc;
 	wxRadioBox* _kdDistIdxTgt;
+	wxTextCtrl* _kdDistThr; //!< control txt : dist thr
+	double _kdThr;
 #endif
 #endif // JMU_USE_VTK
 #ifdef JMU_ALIGNGUI
@@ -207,6 +210,7 @@ enum MainWndEnum
 	IDC_kdDistTgt,
 	IDC_kdDistIdxSrc,
 	IDC_kdDistIdxTgt,
+	IDT_kdDistThr,
 	IDT_icpIter,
 	IDC_icpTrlCM,
 	IDC_visICP,
