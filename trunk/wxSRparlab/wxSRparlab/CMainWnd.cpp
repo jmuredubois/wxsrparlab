@@ -131,6 +131,7 @@ BEGIN_EVENT_TABLE(MainWnd, wxFrame)
 	#endif
 	#ifdef JMU_KDTREEVTK
 	EVT_BUTTON(IDB_kdDistVtk, MainWnd::OnKdDist)
+	EVT_TEXT(IDT_kdDistThr, MainWnd::TextKdDistThr)
 	#endif
 #endif // JMU_USE_VTK
 #ifdef JMU_ALIGNGUI
@@ -206,6 +207,7 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
 		_buttKdDistVtk = NULL;
 		_kdDistSrc = NULL; _kdDistTgt = NULL;
 		_kdDistIdxSrc = NULL; _kdDistIdxTgt = NULL;
+		_kdDistThr=NULL; _kdThr=0.0;
 	#endif
 #endif // JMU_USE_VTK
 #ifdef JMU_ALIGNGUI
@@ -390,6 +392,12 @@ void MainWnd::Init()
 			wxDefaultPosition, wxDefaultSize, NUMCAMS, strCams);
 	_kdDistIdxTgt = new wxRadioBox(_bgPanel, IDC_kdDistIdxTgt, wxT("Cam"),
 			wxDefaultPosition, wxDefaultSize, NUMCAMS, strCams);
+	wxStaticText* kdThrLabel = new wxStaticText(_bgPanel, wxID_ANY, wxT("Inlier dist. threshold"));
+	_kdDistThr=new wxTextCtrl( _bgPanel, IDT_kdDistThr, wxString::Format(wxT("%d"), _kdThr) );
+    
+	wxBoxSizer *sizerKDopt = new wxBoxSizer(wxHORIZONTAL); // create sizer ICPoptions
+	    sizerKDopt->Add(kdThrLabel);
+	    sizerKDopt->Add(_kdDistThr);
 
 	wxBoxSizer *sizerKdDist = new wxBoxSizer(wxHORIZONTAL); // create sizer KdDist params
 		sizerKdDist->Add(_buttKdDistVtk, flagsExpand);
@@ -398,6 +406,7 @@ void MainWnd::Init()
 		sizerKdDist->Add(_kdDistIdxTgt );
 		sizerKdDist->Add(_kdDistTgt    , flagsExpand);
 
+	sizerVtk0->Add(sizerKDopt, flagsNoExpand);
 	sizerVtk0->Add(sizerKdDist, flagsExpand);
 #endif
 #ifdef JMU_ALIGNGUI
@@ -1303,12 +1312,31 @@ void MainWnd::OnKdDist(wxCommandEvent& event)
 	if( strSrc.IsSameAs(wxT("Segmentation")) ) { srcField = 3;};
 
 	double res[3]; res[0] = -1; res[1] = -1; res[2] = -1;
-	double eps = _vtkWin->kdDist(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, res);
+	double thr = _kdThr;
+	int inliers[2]; inliers[0]=0; inliers[1]=0;
+	double eps = _vtkWin->kdDist(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, res, thr, inliers);
 	wxString strDist;
-	strDist.Printf(wxT("kdDist returned: %g - avg=%g - std=%g - eps=%g"), eps, res[1], res[2], res[0]);
+	strDist.Printf(wxT("kdDist with thr:%g returned: tgt:%05u - src:%05u - avg=%g - std=%g - eps=%g"), thr, inliers[0], inliers[1], res[1], res[2], res[0]);
 	SetStatusText(strDist);
 }
 #endif //JMU_KDTREEVTK
+#ifdef JMU_KDTREEVTK
+void MainWnd::TextKdDistThr(wxCommandEvent& )
+{
+	double val = 0;
+	if( !_kdDistThr){return ;};
+	wxString strVal = _kdDistThr->GetValue();
+	if( strVal.ToDouble(& val) ) /* read value as double*/
+	{
+		_kdThr = val;
+	}
+	else
+	{
+		_kdDistThr->DiscardEdits();
+		_kdDistThr->GetValue().Printf(wxT("%d"), _kdThr);
+	}
+}
+#endif // JMU_KDTREEVTK
 
 #ifdef JMU_ALIGNGUI
 /** acting on "kdDist" button \n
