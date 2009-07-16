@@ -794,7 +794,7 @@ double CViewSrVtk::kdTreeEps(vtkPointSet* source, vtkPointSet* target, double re
 	memset( dists, 0x0, numPoints *sizeof(double));
 
 	// loop on all target points
-	for(vtkIdType pt=0; pt < numPoints; pt++)
+	for(vtkIdType pt=0; pt < source->GetNumberOfPoints(); pt++)
 	{
 		ptXYZ = srcPoints->GetPoint(pt);
 		kdtree->FindClosestPoint(ptXYZ, dist2);
