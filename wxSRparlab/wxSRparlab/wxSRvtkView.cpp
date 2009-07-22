@@ -845,6 +845,81 @@ double CViewSrVtk::kdTreeEps(vtkPointSet* source, vtkPointSet* target, double re
 }
 #endif
 #ifdef JMU_KDTREEVTK
+double CViewSrVtk::kdTreeEps(vtkStructuredGrid* source, vtkStructuredGrid* src2Blank, vtkStructuredGrid* target, double res[3], double thr, int inliers[2])
+{
+	double eps = 0;
+	vtkKdTree* kdtree = vtkKdTree::New();
+	if(source==NULL){return -1;};
+	if(target==NULL){return -1;};
+	vtkPoints* srcPoints = source->GetPoints();
+	vtkPoints* tgtPoints = target->GetPoints();
+	kdtree->BuildLocatorFromPoints(tgtPoints);
+	vtkIdType numPoints = source->GetNumberOfPoints();
+	double* ptXYZ = NULL;	// pointer for current point coordinates
+	double dist2=0;			// container for squared distance
+	double distSum = 0;		// sum  of UNSQUARED distances
+	double* dists = NULL;	// list of UNSQUARED distances
+	dists = (double*) malloc( numPoints *sizeof(double));
+	if(dists == NULL){ return -1;};
+	memset( dists, 0x0, numPoints *sizeof(double));
+
+	// loop on all target points
+	for(vtkIdType pt=0; pt < source->GetNumberOfPoints(); pt++)
+	{
+		ptXYZ = srcPoints->GetPoint(pt);
+		kdtree->FindClosestPoint(ptXYZ, dist2);
+		dist2 = sqrt(dist2);
+		dists[pt] = dist2;
+		if(thr==0.0)
+		{
+			distSum += dist2;
+			dists[pt] = dist2;
+			src2Blank->UnBlankPoint(pt);
+		}
+		else
+		{
+			if(dist2 <thr)
+			{
+				distSum += dist2;
+				dists[pt] = dist2;
+				src2Blank->UnBlankPoint(pt);
+			}
+			else // outlier if distance is above threshold
+			{
+				distSum+= 0;
+				numPoints -=1;
+				src2Blank->BlankPoint(pt);
+			}
+		}
+	}
+	src2Blank->Modified();
+	//renWin->Render();
+	double avg = distSum / ( (double) numPoints);
+	double diffSqSum = 0;
+	for(vtkIdType pt=0; pt < source->GetNumberOfPoints(); pt++)
+	{
+		if(thr==0.0)
+		{
+			diffSqSum += ( (dists[pt]-avg) * (dists[pt]-avg) );
+		}
+		else
+		{
+			if(dists[pt] <thr)
+			{
+				diffSqSum += ( (dists[pt]-avg) * (dists[pt]-avg) );
+			}
+		}
+	}
+	double std = sqrt(diffSqSum / ( (double) numPoints));
+	eps = std + avg;
+	res[0] = eps; res[1] = avg; res[2] = std;
+	inliers[0] = (int) target->GetNumberOfPoints();
+	inliers[1] = (int) numPoints;
+	if(dists != NULL){ free(dists); dists=NULL;};
+	return eps;
+}
+#endif
+#ifdef JMU_KDTREEVTK
 /** acting on "kdDist" button \n
  * - bug: for now only first and last cam are used \n
  * - todo: make dataset choice configurable
@@ -923,7 +998,16 @@ double CViewSrVtk::kdDist(std::vector<CamFrame*>* camFrms, int idxSrc, int srcFi
 		default:
 			break;
 	}
-	double eps = kdTreeEps(source, target, res, thr, inliers);
+	double eps = -1;
+	if( srcField ==3 )
+	{
+		eps = kdTreeEps(source, target, res, thr, inliers); // with vtkPointSet if st least one point is blanked
+	}
+	else
+	{
+		eps = kdTreeEps(srcVtk->GetCamVtk()->GetTransformedStructGrid(), srcVtk->GetCamVtk()->GetStructGrid(), tgtVtk->GetCamVtk()->GetTransformedStructGrid(), res, thr, inliers); // this function should blank unmathced points)
+		renWin->Render();
+	}
 	char kdText[512];
 	sprintf(kdText, "kdDist with thr%g: target: cam%i field%i (%i pts) / source: cam%i field%i (%i pts) -> avg=%g - std=%g - eps=%g",
 		thr, idxTgt, tgtField, inliers[0], idxSrc, srcField, inliers[1],
