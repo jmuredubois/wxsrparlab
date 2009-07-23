@@ -845,7 +845,7 @@ double CViewSrVtk::kdTreeEps(vtkPointSet* source, vtkPointSet* target, double re
 }
 #endif
 #ifdef JMU_KDTREEVTK
-double CViewSrVtk::kdTreeEps(vtkStructuredGrid* source, vtkStructuredGrid* src2Blank, vtkStructuredGrid* target, double res[3], double thr, int inliers[2])
+double CViewSrVtk::kdTreeEps(vtkPointSet* source, vtkStructuredGrid* src2Blank, vtkStructuredGrid* srcTRF2Blank, vtkPointSet* target, double res[3], double thr, int inliers[2])
 {
 	double eps = 0;
 	vtkKdTree* kdtree = vtkKdTree::New();
@@ -863,18 +863,38 @@ double CViewSrVtk::kdTreeEps(vtkStructuredGrid* source, vtkStructuredGrid* src2B
 	if(dists == NULL){ return -1;};
 	memset( dists, 0x0, numPoints *sizeof(double));
 
+	vtkKdTree* kdBlank = vtkKdTree::New();
+	vtkIdType ptBlank = 0; double distBlank = 0;
+	if( (src2Blank!=NULL) && (srcTRF2Blank!=NULL)) // if there is a source STRUCTURED GRID to blank
+	{
+		kdBlank->BuildLocatorFromPoints(srcTRF2Blank->GetPoints()); //creat a new kdTree to search on that Grid
+	}
+
+
 	// loop on all target points
 	for(vtkIdType pt=0; pt < source->GetNumberOfPoints(); pt++)
 	{
+		//if(  ! (source->IsPointVisible(pt)) ) // when a point isn't visible
+		//{
+		//	numPoints -=1; // decrease the points count
+		//	continue; // and skip NN search
+		//}
 		ptXYZ = srcPoints->GetPoint(pt);
 		kdtree->FindClosestPoint(ptXYZ, dist2);
+		if( (src2Blank!=NULL) && (srcTRF2Blank!=NULL)) // if there is a source STRUCTURED GRID to blank
+		{
+			ptBlank = kdBlank->FindClosestPoint(ptXYZ, distBlank);
+		}
 		dist2 = sqrt(dist2);
 		dists[pt] = dist2;
 		if(thr==0.0)
 		{
 			distSum += dist2;
 			dists[pt] = dist2;
-			src2Blank->UnBlankPoint(pt);
+			if( (src2Blank!=NULL) && (srcTRF2Blank!=NULL)) // if there is a source STRUCTURED GRID to blank
+			{
+				src2Blank->UnBlankPoint(ptBlank);
+			}
 		}
 		else
 		{
@@ -882,13 +902,19 @@ double CViewSrVtk::kdTreeEps(vtkStructuredGrid* source, vtkStructuredGrid* src2B
 			{
 				distSum += dist2;
 				dists[pt] = dist2;
-				src2Blank->UnBlankPoint(pt);
+				if( (src2Blank!=NULL) && (srcTRF2Blank!=NULL)) // if there is a source STRUCTURED GRID to blank
+				{
+					src2Blank->UnBlankPoint(ptBlank);
+				}
 			}
 			else // outlier if distance is above threshold
 			{
 				distSum+= 0;
 				numPoints -=1;
-				src2Blank->BlankPoint(pt);
+				if( (src2Blank!=NULL) && (srcTRF2Blank!=NULL)) // if there is a source STRUCTURED GRID to blank
+				{
+					src2Blank->BlankPoint(ptBlank);
+				}
 			}
 		}
 	}
@@ -898,6 +924,10 @@ double CViewSrVtk::kdTreeEps(vtkStructuredGrid* source, vtkStructuredGrid* src2B
 	double diffSqSum = 0;
 	for(vtkIdType pt=0; pt < source->GetNumberOfPoints(); pt++)
 	{
+		//if(  ! (source->IsPointVisible(pt)) ) // when a point isn't visible
+		//{
+		//	continue; // and skip NN search
+		//}
 		if(thr==0.0)
 		{
 			diffSqSum += ( (dists[pt]-avg) * (dists[pt]-avg) );
@@ -970,18 +1000,29 @@ double CViewSrVtk::kdDist(std::vector<CamFrame*>* camFrms, int idxSrc, int srcFi
 			break;
 	}
 	vtkPointSet* source = NULL;
+	vtkStructuredGrid* src2Blank = NULL;
+	vtkStructuredGrid* srcTRF2Blank = NULL;
+	double eps = -1;
 	switch(srcField){
 		case 0:
 			source = srcVtk->GetCamVtk()->GetTransformedStructGrid();
+			srcTRF2Blank = srcVtk->GetCamVtk()->GetTransformedStructGrid();
+			src2Blank = srcVtk->GetCamVtk()->GetStructGrid();
 			break;
 		case 1:
 			source = srcVtk->GetCamBGVtk()->GetTransformedStructGrid();
+			srcTRF2Blank = srcVtk->GetCamBGVtk()->GetTransformedStructGrid();
+			src2Blank = srcVtk->GetCamBGVtk()->GetStructGrid();
 			break;
 		case 2:
 			source = srcVtk->GetCamFGVtk()->GetTransformedStructGrid();
+			srcTRF2Blank = srcVtk->GetCamFGVtk()->GetTransformedStructGrid();
+			src2Blank = srcVtk->GetCamFGVtk()->GetStructGrid();
 			break;
 		case 3:
 			{
+			srcTRF2Blank = srcVtk->GetCamVtk()->GetTransformedStructGrid();
+			src2Blank = srcVtk->GetCamVtk()->GetStructGrid();
 			vtkStructuredGrid* src = srcVtk->GetCamVtk()->GetTransformedStructGrid();
 			vtkSmartPointer<vtkPoints> SourcePoints = vtkSmartPointer<vtkPoints>::New();
 			for (vtkIdType i=0; i < src->GetNumberOfPoints(); i++)
@@ -998,16 +1039,8 @@ double CViewSrVtk::kdDist(std::vector<CamFrame*>* camFrms, int idxSrc, int srcFi
 		default:
 			break;
 	}
-	double eps = -1;
-	if( srcField ==3 )
-	{
-		eps = kdTreeEps(source, target, res, thr, inliers); // with vtkPointSet if st least one point is blanked
-	}
-	else
-	{
-		eps = kdTreeEps(srcVtk->GetCamVtk()->GetTransformedStructGrid(), srcVtk->GetCamVtk()->GetStructGrid(), tgtVtk->GetCamVtk()->GetTransformedStructGrid(), res, thr, inliers); // this function should blank unmathced points)
-		renWin->Render();
-	}
+	eps = kdTreeEps(source, src2Blank, srcTRF2Blank, target, res, thr, inliers); // this function should blank unmathced points)
+	renWin->Render();
 	char kdText[512];
 	sprintf(kdText, "kdDist with thr%g: target: cam%i field%i (%i pts) / source: cam%i field%i (%i pts) -> avg=%g - std=%g - eps=%g",
 		thr, idxTgt, tgtField, inliers[0], idxSrc, srcField, inliers[1],
