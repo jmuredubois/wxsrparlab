@@ -113,7 +113,7 @@ public:
 	void setICPActRepSurf();
 #endif
 #ifdef JMU_KDTREEVTK
-	double		kdDist(std::vector<CamFrame*>* camFrms, int idxSrc, int srcField, int idxTgt, int tgtField, double res[3], double thr, int inliers[2]);
+	double		kdDist(std::vector<CamFrame*>* camFrms, int idxSrc, int srcField, int idxTgt, int tgtField, double res[3], double thr, int inliers[2], bool blankBadPts);
 	double		kdTreeEps(vtkPointSet* source, vtkPointSet* target, double res[3], double thr, int inliers[2]);
 	double		kdTreeEps(vtkPointSet* source, vtkStructuredGrid* src2Blank, vtkStructuredGrid* srcTRF2Blank, vtkPointSet* target, double res[3], double thr, int inliers[2]);
 #endif

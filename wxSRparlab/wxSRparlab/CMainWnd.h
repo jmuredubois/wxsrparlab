@@ -169,6 +169,7 @@ private:
 	wxRadioBox* _kdDistIdxTgt;
 	wxTextCtrl* _kdDistThr; //!< control txt : dist thr
 	double _kdThr;
+	wxCheckBox* _kdDistBlank; //! blank points far away with kdDist
 #endif
 #endif // JMU_USE_VTK
 #ifdef JMU_ALIGNGUI
@@ -211,6 +212,7 @@ enum MainWndEnum
 	IDC_kdDistIdxSrc,
 	IDC_kdDistIdxTgt,
 	IDT_kdDistThr,
+	IDC_kdDistBlank,
 	IDT_icpIter,
 	IDC_icpTrlCM,
 	IDC_visICP,

@@ -918,7 +918,10 @@ double CViewSrVtk::kdTreeEps(vtkPointSet* source, vtkStructuredGrid* src2Blank, 
 			}
 		}
 	}
-	src2Blank->Modified();
+	if( (src2Blank!=NULL) && (srcTRF2Blank!=NULL)) // if there is a source STRUCTURED GRID to blank
+	{
+		src2Blank->Modified();
+	}
 	//renWin->Render();
 	double avg = distSum / ( (double) numPoints);
 	double diffSqSum = 0;
@@ -954,7 +957,7 @@ double CViewSrVtk::kdTreeEps(vtkPointSet* source, vtkStructuredGrid* src2Blank, 
  * - bug: for now only first and last cam are used \n
  * - todo: make dataset choice configurable
  */
-double CViewSrVtk::kdDist(std::vector<CamFrame*>* camFrms, int idxSrc, int srcField, int idxTgt, int tgtField, double res[3], double thr, int inliers[2])
+double CViewSrVtk::kdDist(std::vector<CamFrame*>* camFrms, int idxSrc, int srcField, int idxTgt, int tgtField, double res[3], double thr, int inliers[2], bool blankBadPoints)
 {
 	if( camFrms == NULL) { return -1;};
 	//if( (int) camFrm.size() < idxSrc+1) { return -1;};
@@ -1038,6 +1041,11 @@ double CViewSrVtk::kdDist(std::vector<CamFrame*>* camFrms, int idxSrc, int srcFi
 			break;
 		default:
 			break;
+	}
+	if(!blankBadPoints) // if we do not want to blank the points, avoid passing the struct grids
+	{
+		src2Blank = NULL;
+		srcTRF2Blank = NULL;
 	}
 	eps = kdTreeEps(source, src2Blank, srcTRF2Blank, target, res, thr, inliers); // this function should blank unmathced points)
 	renWin->Render();

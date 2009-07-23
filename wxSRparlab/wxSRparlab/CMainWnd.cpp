@@ -208,6 +208,7 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
 		_kdDistSrc = NULL; _kdDistTgt = NULL;
 		_kdDistIdxSrc = NULL; _kdDistIdxTgt = NULL;
 		_kdDistThr=NULL; _kdThr=0.0;
+		_kdDistBlank = NULL;
 	#endif
 #endif // JMU_USE_VTK
 #ifdef JMU_ALIGNGUI
@@ -394,10 +395,12 @@ void MainWnd::Init()
 			wxDefaultPosition, wxDefaultSize, NUMCAMS, strCams);
 	wxStaticText* kdThrLabel = new wxStaticText(_bgPanel, wxID_ANY, wxT("Inlier dist. threshold"));
 	_kdDistThr=new wxTextCtrl( _bgPanel, IDT_kdDistThr, wxString::Format(wxT("%d"), _kdThr) );
+	_kdDistBlank = new wxCheckBox(_bgPanel, IDC_kdDistBlank, wxT("Hide points above threshold"));
     
 	wxBoxSizer *sizerKDopt = new wxBoxSizer(wxHORIZONTAL); // create sizer ICPoptions
 	    sizerKDopt->Add(kdThrLabel);
 	    sizerKDopt->Add(_kdDistThr);
+		sizerKDopt->Add(_kdDistBlank);
 
 	wxBoxSizer *sizerKdDist = new wxBoxSizer(wxHORIZONTAL); // create sizer KdDist params
 		sizerKdDist->Add(_buttKdDistVtk, flagsExpand);
@@ -1314,7 +1317,7 @@ void MainWnd::OnKdDist(wxCommandEvent& event)
 	double res[3]; res[0] = -1; res[1] = -1; res[2] = -1;
 	double thr = _kdThr;
 	int inliers[2]; inliers[0]=0; inliers[1]=0;
-	double eps = _vtkWin->kdDist(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, res, thr, inliers);
+	double eps = _vtkWin->kdDist(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, res, thr, inliers, _kdDistBlank->IsChecked());
 	wxString strDist;
 	strDist.Printf(wxT("kdDist with thr:%g returned: tgt:%05u - src:%05u - avg=%g - std=%g - eps=%g"), thr, inliers[0], inliers[1], res[1], res[2], res[0]);
 	SetStatusText(strDist);
