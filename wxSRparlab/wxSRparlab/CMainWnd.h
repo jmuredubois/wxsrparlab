@@ -89,6 +89,8 @@ public:
 	#ifdef JMU_KDTREEVTK
 	void OnKdDist(wxCommandEvent& event); //!  point set distance based on VTK kd-tree
 	void TextKdDistThr(wxCommandEvent& ); //
+	void OnKdDistSave(wxCommandEvent& WXUNUSED(event));
+	void KdDistPNG(); //!  point set distance based on VTK kd-tree
 	#endif
 #endif // JMU_USE_VTK
 #ifdef JMU_ALIGNGUI
@@ -170,6 +172,8 @@ private:
 	wxTextCtrl* _kdDistThr; //!< control txt : dist thr
 	double _kdThr;
 	wxCheckBox* _kdDistBlank; //! blank points far away with kdDist
+	wxCheckBox* _kdDistSave; //! save ALL kdDist results
+	wxString _kdSavePrefix; //!< vtk recording string prefix
 #endif
 #endif // JMU_USE_VTK
 #ifdef JMU_ALIGNGUI
@@ -213,6 +217,7 @@ enum MainWndEnum
 	IDC_kdDistIdxTgt,
 	IDT_kdDistThr,
 	IDC_kdDistBlank,
+	IDC_kdDistSave,
 	IDT_icpIter,
 	IDC_icpTrlCM,
 	IDC_visICP,

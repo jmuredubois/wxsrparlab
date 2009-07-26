@@ -89,6 +89,7 @@
 #define JMU_RANSAC // testing experimental C++ RANSAC
 #define JMU_ICPVTK // testing ICP from VTK
 #define JMU_KDTREEVTK // testing KDTREE from VTK
+#define JMU_KDSAVE // saving kdTree distances.
 #define JMU_ALIGNGUI // testing alignment GUI
 
 #include "srBuf.h"
