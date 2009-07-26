@@ -1054,6 +1054,21 @@ double CViewSrVtk::kdDist(std::vector<CamFrame*>* camFrms, int idxSrc, int srcFi
 		thr, idxTgt, tgtField, inliers[0], idxSrc, srcField, inliers[1],
 		res[1], res[2], res[0]);
 	setKdDistTxt(kdText);
+	char fname[256];
+	sprintf(fname, "%stgt%02ufield%02ufrm%05u_src%02ufield%02ufrm%05u.png","test", idxTgt, tgtField, tgtVtk->GetCurFrame(), idxSrc, srcField, srcVtk->GetCurFrame() );
+    savePNGimg(fname);
+	return eps;
+}
+#endif // JMU_KDTREEVTK
+#ifdef JMU_KDTREEVTK
+/** acting on "kdDist" button \n
+ * - bug: for now only first and last cam are used \n
+ * - todo: make dataset choice configurable
+ */
+double CViewSrVtk::kdDist(std::vector<CamFrame*>* camFrms, int idxSrc, int srcField, int idxTgt, int tgtField, double res[3], double thr, int inliers[2], bool blankBadPoints, char* fname)
+{
+	double eps = kdDist(camFrms, idxSrc, srcField, idxTgt, tgtField, res, thr, inliers, blankBadPoints);
+	savePNGimg(fname);
 	return eps;
 }
 #endif // JMU_KDTREEVTK
@@ -1064,3 +1079,13 @@ void CViewSrVtk::setKdDistTxt(char* txt)
 	_kdTxtActor->SetInput(txt);
 }
 #endif // JMU_KDTREEVTK
+
+void CViewSrVtk::savePNGimg(char* txt)
+{
+    vtkWindowToImageFilter* w2i = vtkWindowToImageFilter::New();
+    w2i->SetInput(renWin);
+    vtkPNGWriter* png = vtkPNGWriter::New();
+    png->SetInput(w2i->GetOutput());
+    png->SetFileName(txt);
+    png->Write();
+}

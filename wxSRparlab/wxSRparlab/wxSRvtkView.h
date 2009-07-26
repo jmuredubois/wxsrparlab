@@ -51,6 +51,8 @@
 #include "vtkPointSet.h"			// for ICP or kdDist, when segmenting dataset
 #include "vtkUnstructuredGrid.h"	// for ICP or kdDist, when segmenting dataset
 #include "vtkSmartPointer.h"		// for ICP or kdDist, when segmenting dataset
+#include "vtkWindowToImageFilter.h"
+#include "vtkPNGWriter.h"
 #ifdef JMU_ICPVTK
 #include "vtkCellArray.h"
 #include "vtkSmartPointer.h"
@@ -101,6 +103,7 @@ public:
 	void hideSegmCbar(bool doHide);
 	void hideAmplCbar(bool doHide);
 	void hideDepthCbar(bool doHide);
+	void savePNGimg(char* fname);
 #ifdef JMU_ICPVTK
 	vtkStructuredGrid* icpWork(vtkPointSet* source, vtkPointSet* target, int icpIter, int icpTrlCM, double mat[16]);
 	wxString icpFct(std::vector<CamFrame*>* camFrms, int idxSrc, int srcField, int idxTgt, int tgtField, int icpIter, int icpTrlCM, double mat[16]);
@@ -114,6 +117,7 @@ public:
 #endif
 #ifdef JMU_KDTREEVTK
 	double		kdDist(std::vector<CamFrame*>* camFrms, int idxSrc, int srcField, int idxTgt, int tgtField, double res[3], double thr, int inliers[2], bool blankBadPts);
+	double		kdDist(std::vector<CamFrame*>* camFrms, int idxSrc, int srcField, int idxTgt, int tgtField, double res[3], double thr, int inliers[2], bool blankBadPts, char* fname);
 	double		kdTreeEps(vtkPointSet* source, vtkPointSet* target, double res[3], double thr, int inliers[2]);
 	double		kdTreeEps(vtkPointSet* source, vtkStructuredGrid* src2Blank, vtkStructuredGrid* srcTRF2Blank, vtkPointSet* target, double res[3], double thr, int inliers[2]);
 #endif

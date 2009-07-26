@@ -1294,7 +1294,7 @@ void CamFrame::RansacFollow()
 	}
 	// translation along z, will allow to have all RANSAC planes at same Z, fixed now at 3000
 	mat4[14] = 0000 - pla.nVec[3]; // HARDCODED ALIGNMENT DEPTH 3000 mm
-  if((_rscSucc>=0) && (_rscSucc<3) )
+  if((_rscSucc>0) && (_rscSucc<3) )
   {
 	  plaAli[_rscSucc]=pla;
   }

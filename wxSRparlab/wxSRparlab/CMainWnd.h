@@ -233,6 +233,7 @@ enum MainWndEnum
 	IDC_aliPlaSrc,
 	IDC_aliPlaTgt,
 	IDC_aliPlaIdxSrc,
-	IDC_aliPlaIdxTgt
+	IDC_aliPlaIdxTgt,
+	IDC_savePNGimg
 
 };
