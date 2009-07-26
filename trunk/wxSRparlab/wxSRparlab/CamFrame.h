@@ -110,6 +110,7 @@ public:
 	int GetVtkSub(){return _vtkSub;};
 	int GetNumCols(){return m_nCols;};
 	int GetNumRows(){return m_nRows;};
+	int GetCurFrame(){return m_nFrmRead;};
 	SRCAM GetSRcam(){return m_sr;};
 	void OnSetScatParams(wxCommandEvent& WXUNUSED(event));
 	bool IsScatChecked(){ return m_settingsPane->IsScatChecked(); };
