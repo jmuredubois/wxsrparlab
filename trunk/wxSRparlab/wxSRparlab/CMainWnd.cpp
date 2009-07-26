@@ -80,6 +80,11 @@ void *ThreadReadDataSync::Entry()
 		m_Wnd->Refresh();
 		m_Wnd->SetStatusText(strFps);
         wxThread::Sleep(acqTime);
+	  //#ifdef JMU_KDTREEVTK
+	  //#ifdef JMU_KDSAVE
+	  //   this->KdDistPNG();
+	  //#endif
+	  //#endif
 		#ifdef LARGE_PSF
 			if(m_cFrm->IsScatChecked())
 			{
@@ -132,6 +137,7 @@ BEGIN_EVENT_TABLE(MainWnd, wxFrame)
 	#ifdef JMU_KDTREEVTK
 	EVT_BUTTON(IDB_kdDistVtk, MainWnd::OnKdDist)
 	EVT_TEXT(IDT_kdDistThr, MainWnd::TextKdDistThr)
+	EVT_CHECKBOX(IDC_kdDistSave, MainWnd::OnKdDistSave)
 	#endif
 #endif // JMU_USE_VTK
 #ifdef JMU_ALIGNGUI
@@ -209,6 +215,8 @@ MainWnd::MainWnd(const wxString& title, const wxPoint& pos, const wxSize& size)
 		_kdDistIdxSrc = NULL; _kdDistIdxTgt = NULL;
 		_kdDistThr=NULL; _kdThr=0.0;
 		_kdDistBlank = NULL;
+		_kdDistSave = NULL;
+		_kdSavePrefix.Empty();
 	#endif
 #endif // JMU_USE_VTK
 #ifdef JMU_ALIGNGUI
@@ -396,11 +404,13 @@ void MainWnd::Init()
 	wxStaticText* kdThrLabel = new wxStaticText(_bgPanel, wxID_ANY, wxT("Inlier dist. threshold"));
 	_kdDistThr=new wxTextCtrl( _bgPanel, IDT_kdDistThr, wxString::Format(wxT("%d"), _kdThr) );
 	_kdDistBlank = new wxCheckBox(_bgPanel, IDC_kdDistBlank, wxT("Hide points above threshold"));
+	_kdDistSave = new wxCheckBox(_bgPanel, IDC_kdDistSave, wxT("Save ALL kdDist results"));
     
 	wxBoxSizer *sizerKDopt = new wxBoxSizer(wxHORIZONTAL); // create sizer ICPoptions
 	    sizerKDopt->Add(kdThrLabel);
 	    sizerKDopt->Add(_kdDistThr);
 		sizerKDopt->Add(_kdDistBlank);
+		sizerKDopt->Add(_kdDistSave);
 
 	wxBoxSizer *sizerKdDist = new wxBoxSizer(wxHORIZONTAL); // create sizer KdDist params
 		sizerKdDist->Add(_buttKdDistVtk, flagsExpand);
@@ -845,6 +855,11 @@ void MainWnd::AcqAll(wxCommandEvent& event)
 			wxCommandEvent event( wxEVT_JMUACQONEFRM, IDC_AcqOne );
 			(*it)->ProcessEvent(event);
 		}
+	  #ifdef JMU_KDTREEVTK
+	  #ifdef JMU_KDSAVE
+	     this->KdDistPNG();
+	  #endif
+	  #endif
 	}
 
 }
@@ -1293,8 +1308,6 @@ void MainWnd::OnICP(wxCommandEvent& event)
 #endif // JMU_USE_VTK
 #ifdef JMU_KDTREEVTK
 /** acting on "kdDist" button \n
- * - bug: for now only first and last cam are used \n
- * - todo: make dataset choice configurable
  */
 void MainWnd::OnKdDist(wxCommandEvent& event)
 {
@@ -1324,6 +1337,118 @@ void MainWnd::OnKdDist(wxCommandEvent& event)
 }
 #endif //JMU_KDTREEVTK
 #ifdef JMU_KDTREEVTK
+/** acting to save kdDist results \n
+ */
+void MainWnd::KdDistPNG()
+{
+  if( _kdDistSave->IsChecked() )
+  {
+	int idxTgt = _kdDistIdxTgt->GetSelection();
+	int tgtField = 0;
+	wxString strTgt = _kdDistTgt->GetValue();
+	if( strTgt.IsSameAs(wxT("Current"))      ) {tgtField = 0;};
+	if( strTgt.IsSameAs(wxT("Background"))   ) {tgtField = 1;};
+	if( strTgt.IsSameAs(wxT("Foreground"))   ) {tgtField = 2;};
+	if( strTgt.IsSameAs(wxT("Segmentation")) ) {tgtField = 3;};
+
+	int idxSrc = _kdDistIdxSrc->GetSelection();
+	wxString strSrc = _kdDistSrc->GetValue();
+	int srcField = 0;
+	if( strSrc.IsSameAs(wxT("Current"))      ) { srcField = 0;};
+	if( strSrc.IsSameAs(wxT("Background"))   ) { srcField = 1;};
+	if( strSrc.IsSameAs(wxT("Foreground"))   ) { srcField = 2;};
+	if( strSrc.IsSameAs(wxT("Segmentation")) ) { srcField = 3;};
+
+	double res[3]; res[0] = -1; res[1] = -1; res[2] = -1;
+	double thr = _kdThr;
+	int inliers[2]; inliers[0]=0; inliers[1]=0;
+	double eps = 0;
+
+	std::vector<CamFrame*>* camFrms = this->GetCamFrms();
+	if( camFrms == NULL) { return ;};
+	std::vector<CamFrame*>::iterator it; 
+	CamFrame* srcVtk = NULL; 
+	CamFrame* tgtVtk = NULL;
+	for ( it=camFrms->begin() ; it != camFrms->end(); it++)
+	{
+		int camSub = (*it)->GetVtkSub();
+		if(camSub == idxSrc) { srcVtk = (*it); };
+		if(camSub == idxTgt) { tgtVtk = (*it); };
+	}
+	if( srcVtk == NULL){ return ;};
+	if( tgtVtk == NULL){ return ;};
+	wxString curPng;
+
+	  // // FIRST: NO THR
+	 // // // ALL SETS
+	srcVtk->hideDataActVtk(0, srcField);
+	tgtVtk->hideDataActVtk(0, tgtField);
+	eps = _vtkWin->kdDist(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, res, 0, inliers, true);
+	curPng.Printf(wxT("_tgt%02ufield%02ufrm%05u_src%02ufield%02ufrm%05u_noThr_ALL.png"), idxTgt, tgtField, tgtVtk->GetCurFrame(), idxSrc, srcField, srcVtk->GetCurFrame() ); 
+	curPng = _kdSavePrefix + curPng;
+	_vtkWin->savePNGimg(curPng);
+	 // // // TGT SET ONLY
+	srcVtk->hideDataActVtk(1, srcField);
+	curPng.Printf(wxT("_tgt%02ufield%02ufrm%05u_src%02ufield%02ufrm%05u_noThr_TGT.png"), idxTgt, tgtField, tgtVtk->GetCurFrame(), idxSrc, srcField, srcVtk->GetCurFrame() ); 
+	curPng = _kdSavePrefix + curPng;
+	_vtkWin->savePNGimg(curPng);
+	srcVtk->hideDataActVtk(0, srcField);
+     // // // SRC SET ONLY
+	tgtVtk->hideDataActVtk(1, tgtField);
+	curPng.Printf(wxT("_tgt%02ufield%02ufrm%05u_src%02ufield%02ufrm%05u_noThr_SRC.png"), idxTgt, tgtField, tgtVtk->GetCurFrame(), idxSrc, srcField, srcVtk->GetCurFrame() ); 
+	curPng = _kdSavePrefix + curPng;
+	_vtkWin->savePNGimg(curPng);
+	tgtVtk->hideDataActVtk(0, tgtField);
+	 // // SECOND:  NO BLANKING
+	 // // // ALL SETS
+	srcVtk->hideDataActVtk(0, srcField);
+	tgtVtk->hideDataActVtk(0, tgtField);
+	eps = _vtkWin->kdDist(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, res, thr, inliers, false);
+	curPng.Printf(wxT("_tgt%02ufield%02ufrm%05u_src%02ufield%02ufrm%05u_noBlank_ALL.png"), idxTgt, tgtField, tgtVtk->GetCurFrame(), idxSrc, srcField, srcVtk->GetCurFrame() ); 
+	curPng = _kdSavePrefix + curPng;
+	_vtkWin->savePNGimg(curPng);
+	 // // // TGT SET ONLY
+	srcVtk->hideDataActVtk(1, srcField);
+	curPng.Printf(wxT("_tgt%02ufield%02ufrm%05u_src%02ufield%02ufrm%05u_noBlank_TGT.png"), idxTgt, tgtField, tgtVtk->GetCurFrame(), idxSrc, srcField, srcVtk->GetCurFrame() ); 
+	curPng = _kdSavePrefix + curPng;
+	_vtkWin->savePNGimg(curPng);
+	srcVtk->hideDataActVtk(0, srcField);
+     // // // SRC SET ONLY
+	tgtVtk->hideDataActVtk(1, tgtField);
+	curPng.Printf(wxT("_tgt%02ufield%02ufrm%05u_src%02ufield%02ufrm%05u_noBlank_SRC.png"), idxTgt, tgtField, tgtVtk->GetCurFrame(), idxSrc, srcField, srcVtk->GetCurFrame() ); 
+	curPng = _kdSavePrefix + curPng;
+	_vtkWin->savePNGimg(curPng);
+	tgtVtk->hideDataActVtk(0, tgtField);
+	 // // THIRD:  BLANKING
+	 // // // ALL SETS
+	srcVtk->hideDataActVtk(0, srcField);
+	tgtVtk->hideDataActVtk(0, tgtField);
+	eps = _vtkWin->kdDist(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, res, thr, inliers, true);
+	curPng.Printf(wxT("_tgt%02ufield%02ufrm%05u_src%02ufield%02ufrm%05u_Blank_ALL.png"), idxTgt, tgtField, tgtVtk->GetCurFrame(), idxSrc, srcField, srcVtk->GetCurFrame() ); 
+	curPng = _kdSavePrefix + curPng;
+	_vtkWin->savePNGimg(curPng);
+	 // // // TGT SET ONLY
+	srcVtk->hideDataActVtk(1, srcField);
+	curPng.Printf(wxT("_tgt%02ufield%02ufrm%05u_src%02ufield%02ufrm%05u_Blank_TGT.png"), idxTgt, tgtField, tgtVtk->GetCurFrame(), idxSrc, srcField, srcVtk->GetCurFrame() ); 
+	curPng = _kdSavePrefix + curPng;
+	_vtkWin->savePNGimg(curPng);
+	srcVtk->hideDataActVtk(0, srcField);
+     // // // SRC SET ONLY
+	tgtVtk->hideDataActVtk(1, tgtField);
+	curPng.Printf(wxT("_tgt%02ufield%02ufrm%05u_src%02ufield%02ufrm%05u_Blank_SRC.png"), idxTgt, tgtField, tgtVtk->GetCurFrame(), idxSrc, srcField, srcVtk->GetCurFrame() ); 
+	curPng = _kdSavePrefix + curPng;
+	_vtkWin->savePNGimg(curPng);
+	tgtVtk->hideDataActVtk(0, tgtField);
+
+	//eps = _vtkWin->kdDist(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, res, thr, inliers, _kdDistBlank->IsChecked());
+	
+	wxString strDist;
+	strDist.Printf(wxT("kdDist with thr:%g returned: tgt:%05u - src:%05u - avg=%g - std=%g - eps=%g"), thr, inliers[0], inliers[1], res[1], res[2], res[0]);
+	SetStatusText(strDist);
+  }
+}
+#endif //JMU_KDTREEVTK
+#ifdef JMU_KDTREEVTK
 void MainWnd::TextKdDistThr(wxCommandEvent& )
 {
 	double val = 0;
@@ -1338,6 +1463,36 @@ void MainWnd::TextKdDistThr(wxCommandEvent& )
 		_kdDistThr->DiscardEdits();
 		_kdDistThr->GetValue().Printf(wxT("%d"), _kdThr);
 	}
+}
+#endif // JMU_KDTREEVTK
+#ifdef JMU_KDTREEVTK
+//! Open record interface for VTK data
+void MainWnd::OnKdDistSave(wxCommandEvent& WXUNUSED(event))
+{
+
+ // m_settingsPane->SetText(wxT("Record VTK attempt..."));
+ // wxString strR;
+
+  if( _kdDistSave->IsChecked() )
+  {
+    wxTextEntryDialog* txtDlg = new wxTextEntryDialog(this, wxT("Choose a prefix for PNG files"), wxT("Please enter prefix"), wxT("toto"));
+	if( (txtDlg->ShowModal()==wxID_OK) )
+	{
+		// save str to some string
+		_kdSavePrefix = txtDlg->GetValue();
+		//m_settingsPane->SetText(_vtkRecPrefix);
+	}
+	else
+	{
+		// set empty string to avoid saving
+		//m_settingsPane->SetText(wxT("Not recording VTK ..."));
+	}
+  }
+  else
+  {
+	//m_settingsPane->SetText(wxT("Stopped recording VTK."));
+  } // 'record' checkbox is not checked
+
 }
 #endif // JMU_KDTREEVTK
 
