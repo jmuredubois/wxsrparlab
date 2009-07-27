@@ -1380,19 +1380,19 @@ void MainWnd::KdDistPNG()
 	wxString curPng;
 
 	  // // FIRST: NO THR
-	 // // // ALL SETS
-	srcVtk->hideDataActVtk(0, srcField);
-	tgtVtk->hideDataActVtk(0, tgtField);
 	eps = _vtkWin->kdDist(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, res, 0, inliers, true);
-	curPng.Printf(wxT("_tgt%02ufield%02ufrm%05u_src%02ufield%02ufrm%05u_noThr_ALL.png"), idxTgt, tgtField, tgtVtk->GetCurFrame(), idxSrc, srcField, srcVtk->GetCurFrame() ); 
-	curPng = _kdSavePrefix + curPng;
-	_vtkWin->savePNGimg(curPng);
-	 // // // TGT SET ONLY
-	srcVtk->hideDataActVtk(1, srcField);
-	curPng.Printf(wxT("_tgt%02ufield%02ufrm%05u_src%02ufield%02ufrm%05u_noThr_TGT.png"), idxTgt, tgtField, tgtVtk->GetCurFrame(), idxSrc, srcField, srcVtk->GetCurFrame() ); 
-	curPng = _kdSavePrefix + curPng;
-	_vtkWin->savePNGimg(curPng);
-	srcVtk->hideDataActVtk(0, srcField);
+	// // // // ALL SETS
+	//srcVtk->hideDataActVtk(0, srcField);
+	//tgtVtk->hideDataActVtk(0, tgtField);
+	//curPng.Printf(wxT("_tgt%02ufield%02ufrm%05u_src%02ufield%02ufrm%05u_noThr_ALL.png"), idxTgt, tgtField, tgtVtk->GetCurFrame(), idxSrc, srcField, srcVtk->GetCurFrame() ); 
+	//curPng = _kdSavePrefix + curPng;
+	//_vtkWin->savePNGimg(curPng);
+	// // // // TGT SET ONLY
+	//srcVtk->hideDataActVtk(1, srcField);
+	//curPng.Printf(wxT("_tgt%02ufield%02ufrm%05u_src%02ufield%02ufrm%05u_noThr_TGT.png"), idxTgt, tgtField, tgtVtk->GetCurFrame(), idxSrc, srcField, srcVtk->GetCurFrame() ); 
+	//curPng = _kdSavePrefix + curPng;
+	//_vtkWin->savePNGimg(curPng);
+	//srcVtk->hideDataActVtk(0, srcField);
      // // // SRC SET ONLY
 	tgtVtk->hideDataActVtk(1, tgtField);
 	curPng.Printf(wxT("_tgt%02ufield%02ufrm%05u_src%02ufield%02ufrm%05u_noThr_SRC.png"), idxTgt, tgtField, tgtVtk->GetCurFrame(), idxSrc, srcField, srcVtk->GetCurFrame() ); 
@@ -1400,10 +1400,10 @@ void MainWnd::KdDistPNG()
 	_vtkWin->savePNGimg(curPng);
 	tgtVtk->hideDataActVtk(0, tgtField);
 	 // // SECOND:  NO BLANKING
+	eps = _vtkWin->kdDist(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, res, thr, inliers, false);
 	 // // // ALL SETS
 	srcVtk->hideDataActVtk(0, srcField);
 	tgtVtk->hideDataActVtk(0, tgtField);
-	eps = _vtkWin->kdDist(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, res, thr, inliers, false);
 	curPng.Printf(wxT("_tgt%02ufield%02ufrm%05u_src%02ufield%02ufrm%05u_noBlank_ALL.png"), idxTgt, tgtField, tgtVtk->GetCurFrame(), idxSrc, srcField, srcVtk->GetCurFrame() ); 
 	curPng = _kdSavePrefix + curPng;
 	_vtkWin->savePNGimg(curPng);
@@ -1413,26 +1413,26 @@ void MainWnd::KdDistPNG()
 	curPng = _kdSavePrefix + curPng;
 	_vtkWin->savePNGimg(curPng);
 	srcVtk->hideDataActVtk(0, srcField);
-     // // // SRC SET ONLY
-	tgtVtk->hideDataActVtk(1, tgtField);
-	curPng.Printf(wxT("_tgt%02ufield%02ufrm%05u_src%02ufield%02ufrm%05u_noBlank_SRC.png"), idxTgt, tgtField, tgtVtk->GetCurFrame(), idxSrc, srcField, srcVtk->GetCurFrame() ); 
-	curPng = _kdSavePrefix + curPng;
-	_vtkWin->savePNGimg(curPng);
-	tgtVtk->hideDataActVtk(0, tgtField);
+ //    // // // SRC SET ONLY
+	//tgtVtk->hideDataActVtk(1, tgtField);
+	//curPng.Printf(wxT("_tgt%02ufield%02ufrm%05u_src%02ufield%02ufrm%05u_noBlank_SRC.png"), idxTgt, tgtField, tgtVtk->GetCurFrame(), idxSrc, srcField, srcVtk->GetCurFrame() ); 
+	//curPng = _kdSavePrefix + curPng;
+	//_vtkWin->savePNGimg(curPng);
+	//tgtVtk->hideDataActVtk(0, tgtField);
 	 // // THIRD:  BLANKING
+	eps = _vtkWin->kdDist(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, res, thr, inliers, true);
 	 // // // ALL SETS
 	srcVtk->hideDataActVtk(0, srcField);
 	tgtVtk->hideDataActVtk(0, tgtField);
-	eps = _vtkWin->kdDist(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, res, thr, inliers, true);
 	curPng.Printf(wxT("_tgt%02ufield%02ufrm%05u_src%02ufield%02ufrm%05u_Blank_ALL.png"), idxTgt, tgtField, tgtVtk->GetCurFrame(), idxSrc, srcField, srcVtk->GetCurFrame() ); 
 	curPng = _kdSavePrefix + curPng;
 	_vtkWin->savePNGimg(curPng);
-	 // // // TGT SET ONLY
-	srcVtk->hideDataActVtk(1, srcField);
-	curPng.Printf(wxT("_tgt%02ufield%02ufrm%05u_src%02ufield%02ufrm%05u_Blank_TGT.png"), idxTgt, tgtField, tgtVtk->GetCurFrame(), idxSrc, srcField, srcVtk->GetCurFrame() ); 
-	curPng = _kdSavePrefix + curPng;
-	_vtkWin->savePNGimg(curPng);
-	srcVtk->hideDataActVtk(0, srcField);
+	// // // // TGT SET ONLY
+	//srcVtk->hideDataActVtk(1, srcField);
+	//curPng.Printf(wxT("_tgt%02ufield%02ufrm%05u_src%02ufield%02ufrm%05u_Blank_TGT.png"), idxTgt, tgtField, tgtVtk->GetCurFrame(), idxSrc, srcField, srcVtk->GetCurFrame() ); 
+	//curPng = _kdSavePrefix + curPng;
+	//_vtkWin->savePNGimg(curPng);
+	//srcVtk->hideDataActVtk(0, srcField);
      // // // SRC SET ONLY
 	tgtVtk->hideDataActVtk(1, tgtField);
 	curPng.Printf(wxT("_tgt%02ufield%02ufrm%05u_src%02ufield%02ufrm%05u_Blank_SRC.png"), idxTgt, tgtField, tgtVtk->GetCurFrame(), idxSrc, srcField, srcVtk->GetCurFrame() ); 
@@ -1440,7 +1440,6 @@ void MainWnd::KdDistPNG()
 	_vtkWin->savePNGimg(curPng);
 	tgtVtk->hideDataActVtk(0, tgtField);
 
-	//eps = _vtkWin->kdDist(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, res, thr, inliers, _kdDistBlank->IsChecked());
 	
 	wxString strDist;
 	strDist.Printf(wxT("kdDist with thr:%g returned: tgt:%05u - src:%05u - avg=%g - std=%g - eps=%g"), thr, inliers[0], inliers[1], res[1], res[2], res[0]);
