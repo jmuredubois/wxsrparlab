@@ -1327,12 +1327,12 @@ void MainWnd::OnKdDist(wxCommandEvent& event)
 	if( strSrc.IsSameAs(wxT("Foreground"))   ) { srcField = 2;};
 	if( strSrc.IsSameAs(wxT("Segmentation")) ) { srcField = 3;};
 
-	double res[3]; res[0] = -1; res[1] = -1; res[2] = -1;
+	double res[4]; res[0] = -1; res[1] = -1; res[2] = -1; res[3] = -1;
 	double thr = _kdThr;
 	int inliers[2]; inliers[0]=0; inliers[1]=0;
 	double eps = _vtkWin->kdDist(this->GetCamFrms(), idxSrc, srcField, idxTgt, tgtField, res, thr, inliers, _kdDistBlank->IsChecked());
 	wxString strDist;
-	strDist.Printf(wxT("kdDist with thr:%g returned: tgt:%05u - src:%05u - avg=%g - std=%g - eps=%g"), thr, inliers[0], inliers[1], res[1], res[2], res[0]);
+	strDist.Printf(wxT("kdDist with thr:%g returned: tgt:%05u - src:%05u - avg=%g - std=%g - eps=%g   - RMS=%g"), thr, inliers[0], inliers[1], res[1], res[2], res[0], res[3]);
 	SetStatusText(strDist);
 }
 #endif //JMU_KDTREEVTK
@@ -1359,7 +1359,7 @@ void MainWnd::KdDistPNG()
 	if( strSrc.IsSameAs(wxT("Foreground"))   ) { srcField = 2;};
 	if( strSrc.IsSameAs(wxT("Segmentation")) ) { srcField = 3;};
 
-	double res[3]; res[0] = -1; res[1] = -1; res[2] = -1;
+	double res[4]; res[0] = -1; res[1] = -1; res[2] = -1; res[3] = -1;
 	double thr = _kdThr;
 	int inliers[2]; inliers[0]=0; inliers[1]=0;
 	double eps = 0;
