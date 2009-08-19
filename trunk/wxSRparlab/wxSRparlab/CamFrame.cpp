@@ -618,6 +618,7 @@ void CamFrame::OnDevSRsettings(wxCommandEvent& WXUNUSED(event))
   //_sr=0;//there are no valid device opened
   m_settingsPane->SetText(wxT("Attempt to open SR settings"));
 #ifndef DUMMYSR
+  int res = 0;
   if(m_sr != NULL)
   {
 		res+=SR_OpenSettingsDlg(m_sr, (HWND) (this->GetHandle()) ); //20080228 apparently  SR_OpenSettingsDlgModal is deprecated in driver 1.0.9
