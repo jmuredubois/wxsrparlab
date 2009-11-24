@@ -27,7 +27,7 @@ project "wxSRparlabVTKPREM"
 -- OPTIONS ---------------------------------------------------------------------
 
 	-- -- Dynamic Runtime
-	if not _OPTIONS["dynamic-runtime"] then
+	if _OPTIONS["dynamic-runtime"] then
 		flags					{ "StaticRuntime" }
 	end
 	
@@ -48,7 +48,8 @@ project "wxSRparlabVTKPREM"
 	string.format('%s%s',os.getenv("JMU_VTKSRCBASE"), "/Common"),
 	string.format('%s%s',os.getenv("JMU_VTKSRCBASE"), "/Filtering"),
 	string.format('%s%s',os.getenv("JMU_VTKSRCBASE"), "/IO"),
-	string.format('%s%s',os.getenv("JMU_VTKSRCBASE"), "/Hybrid")
+	string.format('%s%s',os.getenv("JMU_VTKSRCBASE"), "/Hybrid"),
+    string.format('%s%s',os.getenv("JMU_VTKBINBASE"), "/Utilities")
   							}
   	links					{"vtkGraphics", "vtkRendering", "vtkCommon", "vtkFiltering", "vtkIO", "vtkHybrid"}
   	libdirs				{string.format('%s',os.getenv("JMU_VTKBINBASE"))}
@@ -87,8 +88,10 @@ project "wxSRparlabVTKPREM"
 		defines					{ "NDEBUG" }
 		flags					{ "OptimizeSpeed" }
 		links					{ "ticpp" }	-- link TICPP
-		links					{"SRPLscat", "SRPLavg", "SRPLcoordTrf", "SRPLsegm", "SRPLransac", "SRPLalignd"}
+		--links					{"SRPLscat", "SRPLavg", "SRPLcoordTrf", "SRPLsegm", "SRPLransac", "SRPLalign"}
 		libdirs					{(string.format('%s%s',os.getenv("JMU_BUILDS"), "/Release/bin"))}
+        libdirs					{(string.format('%s%s',os.getenv("JMU_BUILDS"), "/Release/lib"))}
+
 	configuration "Debug"
 		targetname 				( outName.."d" )
 		targetdir				(string.format('%s%s',os.getenv("JMU_BUILDS"), "/Debug/bin"))
@@ -97,20 +100,42 @@ project "wxSRparlabVTKPREM"
 		defines					{ "DEBUG", "_DEBUG" }
 		flags					{ "Symbols" }
 		links					{ "ticppd" }	-- link TICPP
-		links					{"SRPLscatd", "SRPLavgd", "SRPLcoordTrfd", "SRPLsegmd", "SRPLransacd","SRPLalign"}
+		--links					{"SRPLscatd", "SRPLavgd", "SRPLcoordTrfd", "SRPLsegmd", "SRPLransacd","SRPLalignd"}
 		libdirs					{(string.format('%s%s',os.getenv("JMU_BUILDS"), "/Debug/bin"))}
+        libdirs					{(string.format('%s%s',os.getenv("JMU_BUILDS"), "/Debug/lib"))}
 
 	-- -- Operating Systems specific
 	if configuration "windows" then
+        flags                   { "WinMain" } 
 		defines					{ "WIN32", "_WINDOWS" }
 		includedirs				{string.format('%s',os.getenv("JMU_FFTW3"))} --FFTW3 includes
 		libdirs				{string.format('%s',os.getenv("JMU_FFTW3"))} --FFTW3 binaries
 		links					{ "libfftw3-3" } -- FFTW3 lib name
-		--includedirs      		{string.format('%s',os.getenv("JMU_MESA_LIBUSBSR"))} -- setup of libUSBSR
-		--libdirs      		{string.format('%s',os.getenv("JMU_MESA_LIBUSBSR"))} -- setup of libUSBSR
+		includedirs      		{string.format('%s',os.getenv("JMU_MESA_LIBUSBSR"))} -- setup of libUSBSR
+		libdirs      		{string.format('%s',os.getenv("JMU_MESA_LIBUSBSR"))} -- setup of libUSBSR
+        includedirs				{(string.format('%s%s',os.getenv("WXWIN"), "/include"))} --wxWidgets include
+        libdirs				{(string.format('%s%s',os.getenv("WXWIN"), "/lib/vc_lib"))} --wxWidgets include
+        links       {"winmm", "comctl32", "rpcrt4", "wsock32", "odbc32" } --wxWidgets links
+        if configuration "vs*" then
+            includedirs				{(string.format('%s%s',os.getenv("WXWIN"), "/include/msvc"))} --wxWidgets include
+            configuration "Debug"
+                includedirs				{(string.format('%s%s',os.getenv("WXWIN"), "/lib/vc_lib/mswd"))} --wxWidgets include
+                libdirs				{(string.format('%s%s',os.getenv("JMU_VTKBINBASE"), "/bin/debug"))} -- VTK libs
+                links					{"libSRPLscatd", "libSRPLavgd", "libSRPLcoordTrfd", "libSRPLsegmd", "libSRPLransacd","libSRPLalignd"}
+                links       {"wxbase28d", "wxbase28d_net", "wxbase28d_xml", "wxexpatd", "wxjpegd", "wxmsw28d_adv",  "wxmsw28d_aui",  "wxmsw28d_core", "wxmsw28d_html", "wxmsw28d_media", "wxmsw28d_qa",  "wxmsw28d_richtext", "wxmsw28d_xrc", "wxpngd", "wxregexd", "wxtiffd", "wxzlibd" }
+            configuration "Release"
+                includedirs				{(string.format('%s%s',os.getenv("WXWIN"), "/lib/vc_lib/msw"))} --wxWidgets include
+                libdirs				{(string.format('%s%s',os.getenv("JMU_VTKBINBASE"), "/bin/release"))} -- VTK libs
+                links					{"libSRPLscat", "libSRPLavg", "libSRPLcoordTrf", "libSRPLsegm", "libSRPLransac", "libSRPLalign"}
+                links       {"wxbase28", "wxbase28_net", "wxbase28_xml", "wxexpat", "wxjpeg", "wxmsw28_adv",  "wxmsw28_aui",  "wxmsw28_core", "wxmsw28_html", "wxmsw28_media", "wxmsw28_qa",  "wxmsw28_richtext", "wxmsw28_xrc", "wxpng", "wxregex", "wxtiff", "wxzlib" }
+        end
 	else
 		excludes				{ "**.rc" }		-- Ignore resource files in Linux.
 		buildoptions			{ "-fPIC" }
+        configuration "Debug"
+            links					{"SRPLscatd", "SRPLavgd", "SRPLcoordTrfd", "SRPLsegmd", "SRPLransacd","SRPLalignd"}
+        configuration "Release"
+            links					{"SRPLscat", "SRPLavg", "SRPLcoordTrf", "SRPLsegm", "SRPLransac", "SRPLalign"}
 	end
 
 	configuration{"macosx", "codeblocks"}
