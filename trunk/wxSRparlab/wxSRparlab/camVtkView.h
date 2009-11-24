@@ -1,8 +1,26 @@
-/**
- * Class camVtkView :
- * a helper class for VTK visualization
- * @author : James Mure-Dubois
- * @Version :0.1.0.0 2008.07.22
+/*
+ * camVtkView.h :
+ * header fora helper class for VTK visualization
+ *
+ *    Copyright 2009 James Mure-Dubois, Heinz Hügli and Institute of Microtechnology of EPFL.
+ *      http://parlab.epfl.ch/
+ *
+ *    This program is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    This program is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * $Rev$:
+ * $Author$:
+ * $Date$:
  */
 
 # pragma once
