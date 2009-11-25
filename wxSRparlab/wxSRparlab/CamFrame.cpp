@@ -372,8 +372,12 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   if(m_sr == NULL)
   {
 	  res = -1;
+	  #ifndef DUMMYSR
 		res = SR_OpenDlg(& m_sr, 2, (HWND) (this->GetHandle())); // opens first found camera
 		//Returns the serial number (if existing) of the camera
+	  #else
+		res = SR_OpenDlg(& m_sr, 2); // dummy Open camera
+	  #endif
   }
   strR.sprintf(wxT("cam open %u"), res); // ... change title text ...
   if(m_sr != NULL)
