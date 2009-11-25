@@ -575,7 +575,7 @@ void MainWnd::AddChildren()
 			wxDefaultPosition, wxDefaultSize, 2, reprVtk, wxCB_READONLY);
 		_sizerCamVisCol->Add(repBGBox, wxGBPosition(i,6));
 		_repBGVtk.push_back(repBGBox);
-		wxSlider* alpBGSli = new wxSlider(_bgPanel, IDC_alpBGVtk, 3, 0, 10, 
+		wxSlider* alpBGSli = new wxSlider(_bgPanel, IDC_alpBGVtk, 10, 0, 10, //!< VTK 542 is SLOW for transparent data
 			wxDefaultPosition, sizeSli, wxSL_HORIZONTAL | wxSL_AUTOTICKS );//| wxSL_LABELS );
 		_sizerCamVisCol->Add(alpBGSli, wxGBPosition(i,7));
 		_alpBGVtk.push_back(alpBGSli);
@@ -592,7 +592,7 @@ void MainWnd::AddChildren()
 			wxDefaultPosition, wxDefaultSize, 2, reprVtk, wxCB_READONLY);
 		_sizerCamVisCol->Add(repFGBox, wxGBPosition(i,10));
 		_repFGVtk.push_back(repFGBox);
-		wxSlider* alpFGSli = new wxSlider(_bgPanel, IDC_alpFGVtk, 2, 0, 10, 
+		wxSlider* alpFGSli = new wxSlider(_bgPanel, IDC_alpFGVtk, 10, 0, 10, //!< VTK 542 is SLOW for transparent data
 			wxDefaultPosition, sizeSli, wxSL_HORIZONTAL | wxSL_AUTOTICKS);// | wxSL_LABELS );
 		_sizerCamVisCol->Add(alpFGSli, wxGBPosition(i,11));
 		_alpFGVtk.push_back(alpFGSli);
