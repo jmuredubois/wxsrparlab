@@ -372,7 +372,7 @@ void CamFrame::OnOpenDev(wxCommandEvent& WXUNUSED(event))
   if(m_sr == NULL)
   {
 	  res = -1;
-		res = SR_OpenUSB(& m_sr, 0); // opens first found camera
+		res = SR_OpenDlg(& m_sr, 2, (HWND) (this->GetHandle())); // opens first found camera
 		//Returns the serial number (if existing) of the camera
   }
   strR.sprintf(wxT("cam open %u"), res); // ... change title text ...

@@ -32,8 +32,8 @@
 	#define _CRT_SECURE_NO_DEPRECATE
 	// Windows Header Files:
 	#include <windows.h>
-	#include "libusbSR.h"
-	#pragma comment( lib, "libusbSR" )
+	#include "libMesaSR.h"
+	#pragma comment( lib, "libMesaSR" )
 #else
     #include "srDummy.h"
 #endif
