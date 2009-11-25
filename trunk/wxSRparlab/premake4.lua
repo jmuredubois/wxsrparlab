@@ -43,13 +43,13 @@ newoption
 
 newoption
 {
-	trigger = "use-vtk",
-	description = "Enable building against VTK(tm) for rendering"
+	trigger = "no-vtk",
+	description = "Disable building against VTK(tm) for rendering (deprecated)"
 }
 
-if _OPTIONS["use-vtk"] then
-	dofile( "wxSRparlab/wxSRparlabVTK_prem4.lua" )
-else
+if _OPTIONS["no-vtk"] then
 	dofile( "wxSRparlab/wxSRparlab_prem4.lua" )
+else
+	dofile( "wxSRparlab/wxSRparlabVTK_prem4.lua" )
 end
 
